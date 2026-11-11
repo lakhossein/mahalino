@@ -33,12 +33,15 @@ jobs:
         shell: bash
         run: |
           node audit-tools/prepare-v030-audit.cjs "$GITHUB_WORKSPACE" "$RUNNER_TEMP/v030-qa"
+          cp audit-tools/v030-browser-regressions.cjs "$RUNNER_TEMP/v030-qa/v030-browser-regressions.cjs"
 
       - name: Run browser QA and collect results
         id: qa
         shell: bash
         run: |
           mkdir -p "$RUNNER_TEMP/v030-qa/results"
+          mkdir -p screenshots
+          export QA_RESULTS_DIR="$RUNNER_TEMP/v030-qa/results"
           python3 -m http.server 8730 --directory V0.30 > "$RUNNER_TEMP/v030-qa/results/http-server.log" 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
@@ -47,7 +50,7 @@ jobs:
             sleep 1
           done
           failures=0
-          for test in smoke-v030.js e2e-functional.js e2e-conversational.js; do
+          for test in smoke-v030.js e2e-functional.js e2e-conversational.js v030-browser-regressions.cjs; do
             echo "===== $test ====="
             if node "$RUNNER_TEMP/v030-qa/$test" > "$RUNNER_TEMP/v030-qa/results/$test.log" 2>&1; then
               echo "PASS: $test"
@@ -58,6 +61,7 @@ jobs:
             fi
             tail -n 65 "$RUNNER_TEMP/v030-qa/results/$test.log"
           done
+          if test -d screenshots; then cp -n screenshots/*.png "$RUNNER_TEMP/v030-qa/results/" 2>/dev/null || true; fi
           echo "failed_suites=$failures" >> "$GITHUB_OUTPUT"
           exit "$failures"
 
