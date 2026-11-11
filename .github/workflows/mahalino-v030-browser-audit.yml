@@ -1,0 +1,70 @@
+name: Mahalino V0.30 browser audit (read-only)
+
+on:
+  push:
+    branches:
+      - audit/v030-browser-qa
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-audit:
+    name: Chromium smoke + functional + conversational
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout (no product modification)
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install Playwright for isolated QA runtime
+        shell: bash
+        run: |
+          npm install --prefix "$RUNNER_TEMP/v030-qa" --no-save playwright
+          "$RUNNER_TEMP/v030-qa/node_modules/.bin/playwright" install --with-deps chromium
+
+      - name: Prepare portable copies of existing QA tests
+        shell: bash
+        run: |
+          node audit-tools/prepare-v030-audit.cjs "$GITHUB_WORKSPACE" "$RUNNER_TEMP/v030-qa"
+
+      - name: Run browser QA and collect results
+        id: qa
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/v030-qa/results"
+          python3 -m http.server 8730 --directory V0.30 > "$RUNNER_TEMP/v030-qa/results/http-server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl -fsS 'http://127.0.0.1:8730/Mahalino%2BV0.30.html' -o /dev/null; then break; fi
+            sleep 1
+          done
+          failures=0
+          for test in smoke-v030.js e2e-functional.js e2e-conversational.js; do
+            echo "===== $test ====="
+            if node "$RUNNER_TEMP/v030-qa/$test" > "$RUNNER_TEMP/v030-qa/results/$test.log" 2>&1; then
+              echo "PASS: $test"
+            else
+              code=$?
+              echo "FAIL: $test (exit $code)"
+              failures=$((failures + 1))
+            fi
+            tail -n 65 "$RUNNER_TEMP/v030-qa/results/$test.log"
+          done
+          echo "failed_suites=$failures" >> "$GITHUB_OUTPUT"
+          exit "$failures"
+
+      - name: Upload logs even when tests fail
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mahalino-v030-browser-audit-logs
+          path: ${{ runner.temp }}/v030-qa/results/
+          retention-days: 30
