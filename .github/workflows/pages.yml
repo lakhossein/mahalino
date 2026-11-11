@@ -1,0 +1,50 @@
+name: Publish Mahalino version gallery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'V0.*/**'
+      - 'previews/**'
+      - 'scripts/build_previews.py'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: mahalino-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout archive
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build version gallery and ZIP downloads
+        run: python3 scripts/build_previews.py --check
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload published site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: build/pages
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

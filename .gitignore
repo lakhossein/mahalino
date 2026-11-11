@@ -1,0 +1,17 @@
+/build/
+/dist/
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.playwright/
+playwright-report/
+test-results/
+desktop.ini
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.env
+.env.*
+!.env.example

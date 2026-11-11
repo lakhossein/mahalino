@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="آرشیو نسخه‌های تعاملی محلینو پلاس">
+  <title>Mahalino+ | آرشیو نسخه‌ها</title>
+  <style>
+    :root { font-family: Tahoma, "Segoe UI", sans-serif; color: #193340; background: #f4f7f8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+    .shell { width: min(1120px, calc(100% - 36px)); margin: auto; }
+    header { background: #fff; border-bottom: 1px solid #e2e9ed; }
+    .nav { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand { direction: ltr; font-size: 21px; font-weight: 800; letter-spacing: -.7px; }
+    .brand-mark { display: inline-block; margin-left: 6px; color: #0c8a78; }
+    .repo { font-size: 13px; font-weight: 600; color: #397368; }
+    .hero { padding: 54px 0 34px; }
+    .eyebrow { color: #0c8a78; font-size: 13px; font-weight: 800; }
+    h1 { font-size: clamp(27px, 4vw, 42px); margin: 14px 0; letter-spacing: -.8px; }
+    .intro { max-width: 760px; color: #60717d; line-height: 2; margin: 0; }
+    .summary { display: inline-block; margin-top: 22px; padding: 9px 13px; border: 1px solid #daebe7; border-radius: 9px; background: #ecf7f3; color: #167463; font-size: 13px; }
+    .heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+    .heading h2 { font-size: 19px; margin: 0; }
+    .hint { color: #7b8c96; font-size: 12px; }
+    .versions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding-bottom: 70px; }
+    .version-card { display: flex; flex-direction: column; padding: 23px; background: #fff; border: 1px solid #e3eaed; border-radius: 16px; box-shadow: 0 5px 22px #27435207; }
+    .card-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .card-head h2 { font-size: 20px; margin: 0; }
+    .latest { font-size: 11px; font-weight: 700; color: #087762; background: #e4f5ee; border-radius: 40px; padding: 7px 10px; }
+    .version-card p { color: #7b8c96; font-size: 13px; line-height: 1.9; margin: 16px 0 25px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+    .actions a { display: inline-block; padding: 11px 14px; border-radius: 9px; font-size: 12px; font-weight: 800; text-align: center; }
+    .view { background: #117e6c; color: #fff; flex: 1; }
+    .view:hover { background: #086a59; }
+    .download { background: #f3f7f8; color: #385464; border: 1px solid #e0eaed; }
+    .download:hover { background: #e9f2f3; }
+    footer { color: #81939c; font-size: 12px; padding: 20px 0 40px; border-top: 1px solid #dfe8ed; }
+    a:focus-visible { outline: 3px solid #2b9b8a; outline-offset: 3px; }
+    @media (max-width: 900px) { .versions { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 600px) { .versions { grid-template-columns: 1fr; } .hero { padding-top: 38px; } .nav { min-height: 66px; } .hint { display: none; } }
+  </style>
+</head>
+<body>
+  <header><div class="shell nav">
+    <a class="brand" href="./">Mahalino<span class="brand-mark">+</span></a>
+    <a class="repo" href="https://github.com/lakhossein/mahalino" rel="noopener noreferrer">مخزن GitHub</a>
+  </div></header>
+  <main class="shell">
+    <section class="hero">
+      <span class="eyebrow">آرشیو تعاملی طراحی و توسعه</span>
+      <h1>نسخه‌های محلینو پلاس</h1>
+      <p class="intro">برای مشاهدهٔ هر نسخه در مرورگر روی «مشاهده نسخه» بزنید. اگر می‌خواهید فایل را برای کسی بفرستید یا نسخه را نگه دارید، «دانلود ZIP» را انتخاب کنید.</p>
+      <span class="summary">{{VERSION_COUNT}} نسخهٔ آرشیوشده · لینک اختصاصی هر نسخه</span>
+    </section>
+    <section aria-label="فهرست نسخه‌ها">
+      <div class="heading"><h2>همهٔ نسخه‌ها</h2><span class="hint">از جدیدترین به قدیمی‌ترین</span></div>
+      <div class="versions">
+        {{VERSION_CARDS}}
+      </div>
+    </section>
+  </main>
+  <footer><div class="shell">این پیش‌نمایش‌ها آرشیوی هستند؛ عملکرد همهٔ سناریوها در تمام نسخه‌ها تضمین نشده است.</div></footer>
+</body>
+</html>
