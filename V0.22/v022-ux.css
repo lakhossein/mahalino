@@ -1,0 +1,87 @@
+/* ═══ V0.22 UX delta (E22) — حالت تاریک، تاریخچهٔ گفت‌وگو، بازخورد کامپوزر ═══
+   بعد از بلاک Agent C و درست پیش از نشانگر «V0.19» تزریق می‌شود؛ CSS برنامه بعد از این
+   قرار دارد، پس در تساوی خاصیت برنده است — به همین دلیل overrideهای تاریک با پیشوند
+   [data-theme="dark"] (خاصیت بالاتر) داده می‌شوند. فقط از متغیرهای موجود استفاده می‌شود؛
+   نقشهٔ Leaflet عمداً روشن می‌ماند (فیلتر تایل اعمال نمی‌شود). */
+
+/* ─── W1: متغیرهای برنامه که بلاک تاریک Agent C پوشش نداده ─── */
+[data-theme="dark"]{
+  --bg:#141a16;
+  --ink2:#c8d0c6;
+  --ok:#91aa91;
+  --osoft:#263329;
+  --asoft:#352d23;
+  --sh:0 1px 2px rgba(0,0,0,.18);
+}
+
+/* ─── W1: رنگ‌های ثابتِ روشن در CSS برنامه که در تاریک می‌شکستند ─── */
+[data-theme="dark"] ::selection{background:#29352c;color:#edf0e9}
+[data-theme="dark"] *{scrollbar-color:#3a463b transparent}
+[data-theme="dark"] ::-webkit-scrollbar-thumb{background:#3a463b}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover{background:#465348}
+[data-theme="dark"] .toast{background:#f3f2ec;color:#171d19;box-shadow:0 10px 24px -10px rgba(0,0,0,.6)}
+[data-theme="dark"] .b-ok{color:#b4c8b3}
+[data-theme="dark"] .btn-primary{color:#202920}
+[data-theme="dark"] .btn-primary:hover{color:#202920}
+[data-theme="dark"] .btn:hover{border-color:#465348}
+[data-theme="dark"] .btn:active{background:#28322a}
+[data-theme="dark"] .btn-danger{border-color:#5a403c}
+[data-theme="dark"] .inp:hover{border-color:#465348}
+[data-theme="dark"] .sus{border-color:#8a6d3f;background:#2a2620}
+[data-theme="dark"] .tli .dot{border-color:#465348}
+[data-theme="dark"] .tli.done .dot{color:#263329}
+[data-theme="dark"] .chart .carea{fill:rgba(168,183,166,.12)}
+[data-theme="dark"] .chart .cp{fill:#171d19}
+[data-theme="dark"] .skip{color:#171d19}
+[data-theme="dark"] #errbar{color:#382927}
+[data-theme="dark"] .cwr-send{color:#202920}
+[data-theme="dark"] .cwr-send:hover{color:#202920;background:#aab9a8}
+
+/* ─── W1: رنگ‌های ثابتِ ثانویه (ردزبان‌ها، سگمنت‌ها، نگه‌دارندهٔ تصویر، هاور کارت‌ها) ─── */
+[data-theme="dark"] .gauge,[data-theme="dark"] .pbar,[data-theme="dark"] .cstep .bar,[data-theme="dark"] .fbar .tr,[data-theme="dark"] .distrow .dbar,[data-theme="dark"] .seg,[data-theme="dark"] .st .stn,[data-theme="dark"] .rail button .n,[data-theme="dark"] .doc-preview{background:var(--surface-2)}
+[data-theme="dark"] .seg button.on{background:#28322a;color:#dce5dc}
+[data-theme="dark"] .st.done .stn{background:var(--osoft);color:var(--ok)}
+[data-theme="dark"] .al-ok,[data-theme="dark"] .rprog span.done,[data-theme="dark"] .lyr.green{border-color:#3d5244}
+[data-theme="dark"] .al-ok,[data-theme="dark"] .rprog span.done,[data-theme="dark"] .lyr.green h4{color:#b4c8b3}
+[data-theme="dark"] .ph,[data-theme="dark"] .lart,[data-theme="dark"] .ccard .cthumb,[data-theme="dark"] .ba{background:#28322a}
+[data-theme="dark"] .mcard:hover,[data-theme="dark"] .flowcard:hover{background:var(--surface-2)}
+[data-theme="dark"] .lcard:hover,[data-theme="dark"] .mcard:hover,[data-theme="dark"] .flowcard:hover,[data-theme="dark"] .hero .btn:not(.btn-primary):hover,[data-theme="dark"] .kpad button:hover{border-color:#465348}
+[data-theme="dark"] .kpad button:active{background:#28322a}
+[data-theme="dark"] input[type=range]::-webkit-slider-runnable-track,[data-theme="dark"] input[type=range]::-moz-range-track{background:#303b32}
+/* اسناد قرارداد (.doc/.receipt) عمداً ظاهر کاغذی دارند و مثل نسخهٔ چاپی می‌مانند؛ Leaflet هم روشن می‌ماند */
+/* نمودار دونات (rcDonut) سکت‌های hex ثابت دارد؛ همهٔ آن‌ها میان‌تُن هستند و روی تاریک خوانا می‌مانند — دست نمی‌خورد */
+
+/* ─── W1/W2: اجزای جدید سایدبار (دکمهٔ تم، بخش گفت‌وگوهای پیشین) ─── */
+.e22-shead{display:flex;justify-content:flex-start;padding:2px 2px 8px;border-bottom:1px solid var(--line-soft);margin-bottom:6px}
+.e22-theme{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);cursor:pointer;transition:border-color .15s,color .15s}
+.e22-theme:hover{border-color:var(--bline);color:var(--brand)}
+.e22-sfilter{margin:2px 10px 8px}
+.e22-sfilter-in{width:100%;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-family:inherit;font-size:11.5px;transition:border-color .15s,box-shadow .15s}
+.e22-sfilter-in::placeholder{color:var(--faint)}
+.e22-sfilter-in:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(13,148,136,.14)}
+[data-theme="dark"] .e22-sfilter-in:focus{box-shadow:0 0 0 3px rgba(168,183,166,.18)}
+.e22-sess .e22-sess-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.e22-sess .e22-sess-t{font-size:12.3px;line-height:1.7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.e22-sess .e22-sess-time{font-size:10px;color:var(--faint);font-weight:400}
+.e22-sess-gsub{font-size:10px;font-weight:700;color:var(--muted);margin:8px 10px 3px}
+.e22-sess-acts{display:flex;gap:2px;flex:none}
+.e22-sact{display:grid;place-items:center;width:24px;height:24px;border:0;background:transparent;border-radius:6px;color:var(--faint);cursor:pointer;font-size:12px;line-height:1;padding:0}
+.e22-sact:hover{background:var(--surface-2);color:var(--ink)}
+.e22-sact-del:hover{color:var(--danger)}
+
+/* ─── W1: دکمه‌های بخشی «حالت نمایش» در تنظیمات ─── */
+.e22-seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.e22-segbtn{min-height:32px;padding:5px 18px;border:0;background:var(--surface);color:var(--ink2);font-family:inherit;font-size:12.5px;cursor:pointer;transition:background .15s,color .15s}
+.e22-segbtn+.e22-segbtn{border-inline-start:1px solid var(--line)}
+.e22-segbtn:hover{background:var(--surface-2);color:var(--ink)}
+.e22-segbtn[aria-pressed="true"]{background:var(--soft);color:var(--brand-ink);font-weight:700}
+
+/* ─── W3: حالت مشغول کامپوزر (کلاس sendbusy از E22.busy) ─── */
+.cwr.sendbusy::after{content:'در حال پردازش…';color:var(--faint);font-size:10px;line-height:1.6;padding:0 2px}
+.cwr.sendbusy .cwr-in{opacity:.75}
+.cwr.sendbusy .cwr-send{cursor:not-allowed}
+/* W5: حلقهٔ فوکوس .cwr-send/.cwr-att از قبل در CSS Agent C موجود است (focus-visible) — چیزی اضافه نمی‌شود */
+
+/* Dark sweep round 2 (orchestrator visual check): sticky topbar + src badges kept white in the Agent C dark block. */
+[data-theme="dark"] .topbar{background:rgba(23,29,25,.96);border-bottom-color:#2a342c}
+[data-theme="dark"] .srcbadge{background:rgba(35,44,37,.94);border-color:#3a463c;color:#dce5dc}

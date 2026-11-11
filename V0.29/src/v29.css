@@ -1,0 +1,167 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   V0.29 — E29 additions (library / projects / notifications / share / sidebar /
+   adaptive chat / pay-confirm / layout fix). Uses existing tokens only.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1) Chat layout fix: fixed viewport shell, internal scrolling only ── */
+html:has(> body.widemain){overflow:hidden;scroll-behavior:auto}
+body.widemain{overflow:hidden;height:100dvh}
+body.widemain main{padding:0 16px}
+body.widemain .app{gap:0;align-items:stretch;height:calc(100dvh - 52px)}
+body.widemain #appwrap>div{min-width:0;min-height:0;height:100%;overflow:hidden}
+body.widemain .side{top:60px;max-height:calc(100dvh - 68px);align-self:start}
+body.widemain .ch-main{height:calc(100dvh - 52px)}
+.ch-b{overscroll-behavior:contain}
+@media (max-width:980px){
+  body.widemain{overflow:hidden;height:100dvh}
+  body.widemain main{padding:0}
+  body.widemain .app{height:calc(100dvh - 52px)}
+}
+
+/* ── 2) Sidebar (V0.29 IA) ── */
+.side{display:flex;flex-direction:column;padding:8px}
+.e29-sbody{flex:1;display:flex;flex-direction:column;min-height:0;overflow-y:auto}
+.e29-prim{display:flex;flex-direction:column;gap:6px;padding:4px 2px 8px}
+.e29-newbtn,.e29-searchbtn{display:flex;align-items:center;gap:9px;width:100%;min-height:42px;padding:9px 12px;border-radius:10px;font:inherit;font-size:13.5px;text-align:start;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;transition:background .15s,border-color .15s}
+.e29-newbtn:hover{background:var(--soft);border-color:var(--bline)}
+.e29-searchbtn:hover{background:var(--bg);border-color:var(--bline)}
+.e29-newbtn .si,.e29-searchbtn .si{width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;flex:none;color:var(--brand)}
+.e29-searchbtn{border-style:dashed;color:var(--ink2)}
+.e29-sec{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 4px}
+.e29-sec b{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.02em}
+.e29-seca{border:0;background:none;font:inherit;font-size:11.5px;color:var(--brand);cursor:pointer;padding:2px 6px;border-radius:6px;display:inline-flex;align-items:center;gap:3px}
+.e29-seca:hover{background:var(--soft)}
+.e29-util{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border:0;background:none;border-radius:9px;font:inherit;font-size:13px;color:var(--ink2);cursor:pointer;text-align:start;transition:background .15s,color .15s}
+.e29-util:hover{background:var(--surface-2);color:var(--ink)}
+.e29-util .si{width:20px;display:grid;place-items:center;flex:none;color:var(--muted)}
+.e29-util.on{background:var(--soft);color:var(--brand-ink);font-weight:700}
+.e29-util.on .si{color:var(--brand)}
+.e29-bdg{margin-inline-start:auto;min-width:19px;height:19px;padding:0 6px;border-radius:99px;background:var(--brand);color:#fff;font-size:10.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+.e29-bdg:empty{display:none}
+.e29-proj{margin:1px 0}
+.e29-projhead{display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border:0;background:none;border-radius:8px;font:inherit;font-size:13px;color:var(--ink2);cursor:pointer;text-align:start}
+.e29-projhead:hover{background:var(--surface-2);color:var(--ink)}
+.e29-projhead .pdot{width:9px;height:9px;border-radius:99px;flex:none}
+.e29-projhead .chev{width:7px;height:7px;border-inline-end:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);opacity:.5;transition:transform .2s;flex:none;margin-inline-start:auto}
+.e29-proj.open>.e29-projhead{background:var(--surface-2);color:var(--ink);font-weight:700}
+.e29-proj.open>.e29-projhead .chev{transform:rotate(135deg)}
+.e29-projchat{display:flex;align-items:center;gap:7px;width:100%;padding:5px 10px 5px 10px;border:0;background:none;border-radius:8px;font:inherit;font-size:12.5px;color:var(--ink2);cursor:pointer;text-align:start;margin-inline-start:14px;width:calc(100% - 14px)}
+.e29-projchat:hover{background:var(--surface-2);color:var(--ink)}
+.e29-projchat.on{color:var(--brand-ink);font-weight:700}
+.e29-pempty{font-size:11.5px;color:var(--faint);padding:4px 12px 6px}
+.e29-pin-h{font-size:10.5px;font-weight:700;color:var(--faint);padding:8px 10px 2px}
+/* collapsed icon rail */
+body.sidefold .side{display:flex;flex-direction:column;width:64px;padding:8px 6px;align-items:center}
+body.sidefold #appwrap{grid-template-columns:64px minmax(0,1fr)}
+body.sidefold .e29-sbody::-webkit-scrollbar{width:0}
+body.sidefold .lbl,body.sidefold .e29-sec b,body.sidefold .e29-bdg,body.sidefold .e29-projchat,body.sidefold small,body.sidefold .e29-pempty,body.sidefold .e29-projhead .chev,body.sidefold .e29-searchbtn input{display:none}
+body.sidefold .e29-newbtn,body.sidefold .e29-searchbtn,body.sidefold .e29-util,body.sidefold .e29-projhead,body.sidefold .e29-fold{width:44px;justify-content:center;padding:10px 0;border-radius:10px}
+body.sidefold .e29-sec{justify-content:center;padding:8px 0 2px}
+body.sidefold .e29-srow{width:44px;justify-content:center;padding:8px 0}
+body.sidefold [data-tip]{position:relative}
+body.sidefold [data-tip]:hover::after{content:attr(data-tip);position:absolute;inset-inline-start:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--dark);color:#fff;font-size:11.5px;padding:4px 9px;border-radius:7px;white-space:nowrap;z-index:60;pointer-events:none;box-shadow:var(--sh)}
+body.sidefold .e29-searchbtn{padding:9px 0}
+/* sidebar footer */
+.e29-sbot{border-top:1px solid var(--line);padding:8px 4px 4px;display:flex;flex-direction:column;gap:2px}
+.e29-srow{display:flex;align-items:center;gap:9px;width:100%;padding:8px 8px;border:0;background:none;color:var(--ink);font:inherit;font-size:12.8px;border-radius:9px;cursor:pointer;text-align:start}
+.e29-srow:hover{background:var(--surface-2)}
+.e29-srow .si{width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;flex:none;opacity:.85}
+
+/* ── 3) Slide-over panel (Library / Notifications / Reminders / Project) ── */
+.e29-pback{position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:70;opacity:0;transition:opacity .18s}
+.e29-pback.on{opacity:1}
+.e29-panel{position:fixed;top:0;bottom:0;inset-inline-start:0;width:min(480px,100vw);background:var(--surface);border-inline-end:1px solid var(--line);z-index:71;display:flex;flex-direction:column;transform:translateX(-105%);transition:transform .22s ease;box-shadow:var(--sh-lg)}
+[dir="ltr"] .e29-panel{transform:translateX(-105%)}
+.e29-panel.on{transform:none}
+.e29-phead{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+.e29-phead b{font-size:15px;flex:1}
+.e29-pclose{border:1px solid var(--line);background:var(--surface);color:var(--ink2);border-radius:8px;padding:6px;line-height:0;cursor:pointer}
+.e29-pclose:hover{border-color:var(--bline);color:var(--ink)}
+.e29-ptabs{display:flex;gap:4px;padding:10px 12px 0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line-soft)}
+.e29-ptabs::-webkit-scrollbar{display:none}
+.e29-ptab{border:1px solid transparent;background:none;font:inherit;font-size:12.5px;color:var(--ink2);padding:7px 13px;border-radius:9px 9px 0 0;cursor:pointer;white-space:nowrap;position:relative}
+.e29-ptab:hover{color:var(--ink);background:var(--surface-2)}
+.e29-ptab.on{color:var(--brand-ink);font-weight:700;border-color:var(--line);border-bottom-color:var(--surface);background:var(--surface)}
+.e29-ptab.on::after{content:'';position:absolute;inset-inline:10px;bottom:-1px;height:2px;background:var(--brand);border-radius:2px}
+.e29-pbody{flex:1;overflow-y:auto;padding:14px 16px 24px;min-height:0;overscroll-behavior:contain}
+.e29-pfoot{border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:8px;align-items:center}
+.e29-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.e29-fchip{font:inherit;font-size:11.5px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);border-radius:999px;padding:4px 12px;cursor:pointer}
+.e29-fchip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+
+/* ── 4) Library cards ── */
+.e29-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.e29-card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 14px;cursor:pointer;transition:border-color .15s,box-shadow .15s;position:relative;min-height:150px;gap:7px}
+.e29-card:hover{border-color:var(--brand);box-shadow:0 4px 16px rgba(15,118,110,.1)}
+.e29-card .etype{align-self:flex-start;font-size:10.5px;font-weight:700;background:var(--soft);color:var(--brand-ink);border-radius:999px;padding:3px 10px}
+.e29-card .etype.t-contract{background:var(--asoft);color:var(--accent-strong)}
+.e29-card .etype.t-analysis{background:var(--info-soft);color:var(--info)}
+.e29-card .etype.t-ai{background:var(--osoft);color:var(--ok)}
+.e29-card .etype.t-wf{background:var(--surface-2);color:var(--ink2)}
+.e29-card b.ttl{font-size:13px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.e29-card .summ{font-size:11.5px;color:var(--ink2);line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+.e29-card .meta{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:10.5px;color:var(--muted)}
+.e29-card .meta .cost{color:var(--accent-strong);font-weight:700}
+.e29-card .cardacts{display:flex;gap:4px;justify-content:flex-end}
+.e29-cact{border:0;background:none;color:var(--muted);border-radius:7px;padding:4px;line-height:0;cursor:pointer}
+.e29-cact:hover{background:var(--surface-2);color:var(--brand)}
+.e29-empty{padding:44px 16px;text-align:center;color:var(--muted)}
+.e29-empty .big{font-size:34px;margin-bottom:8px;opacity:.5}
+.e29-empty b{display:block;font-size:13.5px;color:var(--ink2);margin-bottom:4px}
+/* contract detail */
+.e29-detail{font-size:13px;line-height:1.9}
+.e29-detail .kv{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px dashed var(--line-soft)}
+.e29-detail .kv span{color:var(--muted);flex:none}
+.e29-detail .kv b{text-align:start;word-break:break-word}
+.e29-detail h4{font-size:13.5px;margin:16px 0 6px;color:var(--brand-ink)}
+.e29-detail .sect{background:var(--surface-2);border:1px solid var(--line-soft);border-radius:12px;padding:4px 14px;margin-bottom:12px}
+.e29-vers{border-inline-start:2px solid var(--bline);margin:8px 0 8px 0;padding-inline-start:14px}
+.e29-vers .vi{position:relative;padding:6px 0;font-size:12px;color:var(--ink2)}
+.e29-vers .vi::before{content:'';position:absolute;inset-inline-start:-19px;top:12px;width:9px;height:9px;border-radius:99px;background:var(--brand);border:2px solid var(--surface)}
+/* in-progress workflow card */
+.e29-wfbar{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:6px}
+.e29-wfbar i{display:block;height:100%;background:var(--brand);border-radius:99px}
+
+/* ── 5) Notifications ── */
+.e29-notif{display:flex;gap:10px;padding:11px 10px;border-radius:11px;border:1px solid transparent;cursor:pointer;position:relative;margin-bottom:6px}
+.e29-notif:hover{background:var(--surface-2);border-color:var(--line-soft)}
+.e29-notif.unread{background:var(--soft);border-color:var(--bline)}
+.e29-notif .nic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--surface-2);color:var(--brand)}
+.e29-notif.unread .nic{background:var(--brand);color:#fff}
+.e29-notif .nb{flex:1;min-width:0}
+.e29-notif .nt{font-size:12.8px;font-weight:700;color:var(--ink)}
+.e29-notif.unread .nt{color:var(--brand-ink)}
+.e29-notif .nm{font-size:11.8px;color:var(--ink2);line-height:1.7}
+.e29-notif .nts{font-size:10.5px;color:var(--faint);margin-top:2px}
+.e29-notif .nacts{display:flex;flex-direction:column;gap:2px;opacity:0;transition:opacity .12s}
+.e29-notif:hover .nacts{opacity:1}
+.e29-notif .ndot{width:8px;height:8px;border-radius:99px;background:var(--brand);position:absolute;top:12px;inset-inline-end:8px}
+
+/* ── 6) Share dialog ── */
+.e29-shareprev{background:var(--surface-2);border:1px solid var(--line-soft);border-radius:12px;padding:12px 14px;max-height:230px;overflow-y:auto;font-size:12.3px;line-height:1.9;color:var(--ink2);margin:10px 0}
+.e29-shareprev .svp-u{background:var(--soft);border-radius:10px;padding:5px 10px;margin:4px 0;display:inline-block}
+.e29-shareprev .svp-b{background:var(--surface);border:1px solid var(--line-soft);border-radius:10px;padding:5px 10px;margin:4px 0}
+.e29-sens{display:flex;gap:8px;align-items:flex-start;background:var(--asoft);border:1px solid #ecd9b0;border-radius:10px;padding:9px 12px;font-size:11.8px;color:var(--accent-strong);margin:8px 0}
+.e29-linkbox{display:flex;gap:6px;margin-top:10px}
+.e29-linkbox input{flex:1;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;font-size:12px;direction:ltr;text-align:left;background:var(--surface-2);color:var(--ink)}
+
+/* ── 7) Pay-confirm card in chat ── */
+.e29-paycard{background:var(--surface);border:1px solid var(--bline);border-radius:14px;padding:14px 16px;max-width:520px;box-shadow:var(--sh)}
+.e29-paycard .pt{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.e29-paycard .pr{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-bottom:1px dashed var(--line-soft);color:var(--ink2)}
+.e29-paycard .pr b{color:var(--ink)}
+.e29-paycard .warn{font-size:11.5px;color:var(--accent-strong);margin-top:8px}
+
+/* ── 8) Adaptive chat: typing hint + confirm-previous chips ── */
+.e29-chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.e29-typehint{font-size:11px;color:var(--faint);padding:2px 14px 6px}
+
+/* ── 9) Profile mini-card ── */
+.e29-profcard{background:var(--surface-2);border:1px solid var(--line-soft);border-radius:12px;padding:10px 14px;font-size:11.8px;color:var(--ink2);max-width:520px}
+.e29-profcard b{color:var(--brand-ink)}
+.e29-profcard .prow{display:flex;justify-content:space-between;gap:10px;padding:3px 0}
+.e29-profcard .pact{color:var(--brand);cursor:pointer;font-weight:700}
+@media (max-width:600px){
+  .e29-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .e29-panel{width:100vw}
+}
