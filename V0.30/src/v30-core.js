@@ -10,7 +10,12 @@
    ═══════════════ */
 window.E30={VER:'0.30'};
 E30.uid=function(p){return (p||'E30')+'-'+Date.now().toString(36)+'-'+Math.floor(Math.random()*1e5).toString(36)};
-E30.chatRef=function(){return (window.E29&&E29.chatRef)?E29.chatRef():{chatId:null,chatTitle:'گفت‌وگوی جاری'}};
+E30.chatRef=function(){
+  var legacy=(window.E29&&E29.chatRef)?E29.chatRef():{chatId:null,chatTitle:'گفت‌وگوی جاری'};
+  if(legacy.chatId)return legacy;
+  if(!S.ctx30ActiveKey)S.ctx30ActiveKey='live:'+E30.uid('CTX');
+  return {chatId:S.ctx30ActiveKey.replace(/^chat:/,''),chatTitle:legacy.chatTitle||'گفت‌وگوی جاری'};
+};
 
 /* ── centralized Bana pricing (single source — spec §17.1) ──
    Every service reads cost/label/desc from here for: display, confirmation card,
@@ -19,10 +24,12 @@ E30.PRICING={
   hood_detail :{cost:40, label:'تحلیل جامع محله',        desc:'گزارش جامع بازار، دسترسی‌ها و تناسب یک محله', cx:'high',  refund:'failed_only'},
   hood_compare:{cost:40, label:'مقایسهٔ جامع دو محله',    desc:'مقایسهٔ کنارهم دو محله در همهٔ شاخص‌ها',        cx:'high',  refund:'failed_only'},
   valuation   :{cost:40, label:'تخمین ارزش ملک',         desc:'برآورد ارزش با دادهٔ نمونهٔ سامانه',            cx:'high',  refund:'failed_only'},
-  invest_probe:{cost:40, label:'تحلیل سرمایه‌گذاری ملک',   desc:'بازده، سناریوها و ریسک بر پایهٔ دادهٔ نمونه',     cx:'high',  refund:'failed_only'},
+  /* No real personalized investment engine or document reader is connected to
+     this static demo. Never charge Bana for a prewritten/sample-only result. */
+  invest_probe:{cost:0, label:'خلاصهٔ نمایشی سرمایه‌گذاری', desc:'تحلیل نمونهٔ رایگان؛ بدون دادهٔ شخصی‌سازی‌شدهٔ قابل اتکا', cx:'high', refund:'failed_only'},
   legal       :{cost:100,label:'گزارش حقوقی ملک',         desc:'بررسی وضعیت سند و مسیر انتقال',               cx:'high',  refund:'failed_only'},
   contract_draft:{cost:60,label:'تنظیم و ثبت قرارداد',     desc:'پیش‌نویس و ثبت قرارداد داخلی',                 cx:'high',  refund:'failed_only'},
-  term_ai     :{cost:80, label:'تحلیل هوشمند اسناد فسخ',  desc:'استخراج الزامات تسویه از اسناد فسخ',           cx:'high',  refund:'failed_only'},
+  term_ai     :{cost:0, label:'چک‌لیست نمونهٔ فسخ', desc:'راهنمای عمومی رایگان؛ بدون خواندن یا تحلیل فایل سند', cx:'high', refund:'failed_only'},
   detail      :{cost:10, label:'اطلاعات کامل آگهی',        desc:'نمایش جزئیات کامل یک آگهی',                   cx:'low',   refund:'failed_only'},
   visit       :{cost:20, label:'ثبت درخواست بازدید',       desc:'ارسال درخواست بازدید به مالک',                cx:'low',   refund:'failed_only'},
   bid         :{cost:20, label:'ثبت پیشنهاد پروژه',        desc:'ارسال پیشنهاد در پروژه‌ها',                    cx:'low',   refund:'failed_only'},
@@ -42,6 +49,8 @@ E30.pay=(function(){
   function sess(){if(!S.paySession)S.paySession=null;return S.paySession}
   function set(st){var s=sess();if(s){s.state=st;s.ts=Date.now();save()}}
   function clear(){S.paySession=null;save()}
+  function validService(key){return Object.prototype.hasOwnProperty.call(E30.PRICING,key)&&
+    Number.isFinite(E30.PRICING[key].cost)&&E30.PRICING[key].cost>0}
 
   /* invalidate every rendered confirm card that is not the live session */
   function invalidateOthers(payId){
@@ -85,10 +94,21 @@ E30.pay=(function(){
   /* ── entry: service selected → priced → presented (§11.2 states 1–4) ── */
   function begin(spec){
     /* spec={key,title,desc,ctx,onConfirm,note,source} */
+    spec=spec||{};
     var key=spec.key,cost=E30.price(key);
+    if(!validService(key)){
+      toast('تعرفهٔ معتبر برای این خدمت تعریف نشده است — پرداخت آغاز نشد');
+      return false;
+    }
+    /* A paid service must have a real execution path. Displaying a confirmation
+       with no executable service is misleading, even if the balance is ample. */
+    if(typeof spec.onConfirm!=='function'){
+      toast('اجرای این خدمت فعلاً آماده نیست؛ هیچ بنایی کسر نمی‌شود');
+      return false;
+    }
     var prev=sess();
     /* supersede any live session honestly (old card gets invalidated) */
-    if(prev&&prev.payId){if(prev.state==='processing'||prev.state==='paid'){toast('یک پرداخت دیگر در حال انجام است — لطفاً صبر کنید');return false}invalidateIfNeeded(prev)}
+    if(prev&&prev.payId){if(prev.state==='processing'||prev.state==='paid'||prev.state==='executing'){toast('یک پرداخت دیگر در حال انجام است — لطفاً صبر کنید');return false}invalidateIfNeeded(prev)}
     var s={payId:E30.uid('PAY'),key:key,cost:cost,title:spec.title||E30.label(key),desc:spec.desc||'',ctx:spec.ctx||'',state:'selected',ts:Date.now(),source:spec.source||'',executed:false,paidFlag:false};
     s._cb=spec.onConfirm; /* kept in memory only — not serializable; reload path handled by recover() */
     S.paySession=s;
@@ -124,21 +144,29 @@ E30.pay=(function(){
   /* ── explicit confirm → validating → processing → paid → executing → completed ── */
   function go(payId){
     var s=sess();
-    if(!s||s.payId!==payId){toast('این کارت تأیید دیگر معتبر نیست — سرویس را دوباره انتخاب کنید');return}
+    if(!s||s.payId!==payId){toast('این کارت تأیید دیگر معتبر نیست — سرویس را دوباره انتخاب کنید');return false}
     if(s.state!=='presented'){
-      if(s.state==='processing'||s.state==='paid'||s.state==='executing'){toast('این پرداخت در حال انجام است');return}
-      if(s.state==='completed'){toast('این پرداخت قبلاً انجام شده است');return}
-      toast('این کارت تأیید معتبر نیست');return;
+      if(s.state==='processing'||s.state==='paid'||s.state==='executing'){toast('این پرداخت در حال انجام است');return false}
+      if(s.state==='completed'){toast('این پرداخت قبلاً انجام شده است');return false}
+      toast('این کارت تأیید معتبر نیست');return false;
     }
     set('validating');
-    if((S.tokens||0)<s.cost){set('insufficient');toast('موجودی در فاصلهٔ تأیید تغییر کرد — لطفاً دوباره تلاش کنید');begin({key:s.key,title:s.title,desc:s.desc,ctx:s.ctx,onConfirm:s._cb});return}
+    /* A reload serializes the session but cannot serialize its callback. Check
+       BEFORE any mutation; the previously presented card is now obsolete. */
+    if(typeof s._cb!=='function'||!validService(s.key)||s.cost!==E30.price(s.key)){
+      set('failed');
+      toast('خدمت اجرایی معتبر نیست — پرداخت انجام نشد');
+      return false;
+    }
+    if((S.tokens||0)<s.cost){set('insufficient');toast('موجودی در فاصلهٔ تأیید تغییر کرد — لطفاً دوباره تلاش کنید');begin({key:s.key,title:s.title,desc:s.desc,ctx:s.ctx,onConfirm:s._cb});return false}
     set('processing');
     var btns=document.querySelectorAll('[data-paygo="'+payId+'"]');
     Array.prototype.forEach.call(btns,function(b){b.disabled=true;b.textContent='در حال پردازش…'});
-    /* deduct exactly once — idempotency marker guards any re-entry */
-    if(s.paidFlag){toast('پرداخت تکراری مسدود شد');return}
-    s.paidFlag=true;save();
+    /* Mutate idempotency flag, transaction record and balance as ONE persisted
+       state. A page reload must never see a paid flag without its debit. */
+    if(s.paidFlag){set('failed');toast('پرداخت تکراری مسدود شد');return false}
     var txn=E30.uid('TXN');
+    s.txnId=txn;s.paidFlag=true;
     S.tokens-=s.cost;
     S.log.unshift({t:Date.now(),d:(s.title)+(s.ctx?' — '+s.ctx:''),c:-s.cost,cat:'bana',id:txn,svc:s.key,payId:s.payId});
     save();renderTok();
@@ -147,19 +175,27 @@ E30.pay=(function(){
     set('paid');
     usrC('پرداخت '+fa(s.cost,0)+' بنا برای «'+s.title+'»');
     set('executing');
-    var ok=true,err=null;
-    try{
-      if(typeof s._cb!=='function'){/* callback lost on reload — treat as permanent failure */}
-      else s._cb(txn);
-    }catch(e){ok=false;err=e;console.error('E30 pay exec',e)}
-    if(ok){set('completed');s.executed=true;S.paySession=s;save()}
-    else{
-      /* payment succeeded but service permanently failed → refund (§11.6) */
-      refund(txn,s.key,s.cost,'خطا در اجرای سرویس');
-      set('refunded');
-      botC('پرداخت انجام شد اما اجرای سرویس با خطا مواجه شد — <b>'+fa(s.cost,0)+' بنا بازگشت داده شد</b>. می‌توانید دوباره تلاش کنید.',null);
+    function finish(ok,err){
+      /* The only definitive post-payment states are completed with an actual
+         successful callback, or refunded with a matching credit-journal entry. */
+      if(ok){s.executed=true;set('completed');S.paySession=s;save()}
+      else{
+        if(err)console.error('E30 pay exec',err);
+        refund(txn,s.key,s.cost,'خطا در اجرای سرویس',s.payId);
+        s.refunded=true;
+        set('refunded');
+        botC('پرداخت انجام شد اما اجرای سرویس با خطا مواجه شد — <b>'+fa(s.cost,0)+' بنا بازگشت داده شد</b>. می‌توانید دوباره تلاش کنید.',null);
+      }
+      return !!ok;
     }
-    return ok;
+    try{
+      var result=s._cb(txn);
+      if(result&&typeof result.then==='function'){
+        return Promise.resolve(result).then(function(v){return finish(v!==false,null)},
+          function(err){return finish(false,err)});
+      }
+      return finish(result!==false,null);
+    }catch(e){return finish(false,e)}
   }
 
   /* ── decline (explicit cancel or backdrop/ESC close while presented) ── */
@@ -174,9 +210,11 @@ E30.pay=(function(){
   }
 
   /* refund path (failure after payment) */
-  function refund(txn,key,cost,reason){
+  function refund(txn,key,cost,reason,payId){
+    if(payId&&(S.log||[]).some(function(x){return x.payId===payId&&x.refund}))return false;
     S.tokens+=cost;
-    S.log.unshift({t:Date.now(),d:'بازگشت بنا — '+(reason||''),c:cost,cat:'bana',id:txn,svc:key,refund:true});
+    S.log.unshift({t:Date.now(),d:'بازگشت بنا — '+(reason||''),c:cost,cat:'bana',id:txn,svc:key,payId:payId||null,refund:true});
+    var current=sess();if(current&&payId===current.payId)current.refunded=true;
     save();renderTok();
     try{E29.bus.emit('token.refund',{txn:txn,cost:cost,reason:reason})}catch(e){}
     toast('+'+fa(cost,0)+' بنا بازگشت داده شد');
@@ -188,9 +226,13 @@ E30.pay=(function(){
     var s=sess();
     if(!s)return;
     if(s.state==='processing'||s.state==='paid'||s.state==='executing'){
-      if(s.paidFlag&&!s.executed){
+      if(s.paidFlag&&!s.executed&&!s.refunded&&
+         (S.log||[]).some(function(x){return x.payId===s.payId&&x.c===-s.cost&&
+           (!s.txnId||x.id===s.txnId)})&&
+         !(S.log||[]).some(function(x){return x.refund&&x.payId===s.payId})){
         var txn=E30.uid('TXN-R');
-        refund(txn,s.key,s.cost,'بازیابی پس از وقفه');
+        refund(txn,s.key,s.cost,'بازیابی پس از وقفه',s.payId);
+        s.refunded=true;save();
         try{E29.notifsAPI.push({cat:'financial',etype:'pay.recovered',title:'پرداخت ناتمام بازگشت داده شد',msg:fa(s.cost,0)+' بنا بابت «'+s.title+'» بازگشت داده شد — سرویس اجرا نشده بود.',action:{kind:'wallet'},dedupKey:'rec-'+s.payId})}catch(e){}
       }
     }

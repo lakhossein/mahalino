@@ -1,0 +1,17 @@
+{
+  "name": "mahalino-v030-release-qa",
+  "private": true,
+  "version": "0.30.0",
+  "description": "Reproducible Chromium acceptance gate for Mahalino V0.30",
+  "scripts": {
+    "test:smoke": "node smoke-v030.js",
+    "test:functional": "node e2e-functional.js",
+    "test:conversational": "node e2e-conversational.js",
+    "test:regression": "node v030-browser-regressions.cjs",
+    "test:acceptance": "node e2e-acceptance-v030.cjs",
+    "test:scenarios": "node e2e-scenarios-v030.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.65.0"
+  }
+}

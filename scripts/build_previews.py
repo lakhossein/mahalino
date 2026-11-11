@@ -40,6 +40,7 @@ def entry_file(folder: Path) -> Path:
 
 def exclude(directory: str, names: list[str]) -> set[str]:
     ignored = set()
+    is_v030_root = Path(directory).name == "V0.30"
     for name in names:
         path = Path(directory) / name
         lower = name.lower()
@@ -49,8 +50,8 @@ def exclude(directory: str, names: list[str]) -> set[str]:
             ignored.add(name)
         elif path.is_file() and (
             lower in EXCLUDED_FILES
-            or lower.endswith((".md", ".ps1", ".cmd", ".log"))
-            or lower.startswith("build_v0")
+            or (lower.endswith((".md", ".ps1", ".cmd", ".log")) and not (is_v030_root and lower == "readme.md"))
+            or (lower.startswith("build_v0") and not (is_v030_root and lower == "build_v030.js"))
         ):
             ignored.add(name)
     return ignored

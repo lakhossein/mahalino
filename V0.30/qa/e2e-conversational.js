@@ -1,12 +1,12 @@
 /* e2e-conversational.js — V0.30 conversational suite (§19.2 + §19.3)
    Scripted users with realistic imperfection, driven through the real engine in Chromium. */
-const { chromium } = require('C:/Users/Sedreh/zqa/node_modules/playwright');
-const URL='http://127.0.0.1:8730/Mahalino%2BV0.30.html';
+const { chromium } = require('playwright');
+const URL=process.env.QA_BASE_URL||'http://127.0.0.1:8730/Mahalino%2BV0.30.html';
 let pass=0,fail=0;const fails=[];
 function ok(name,cond,extra){if(cond){pass++;console.log('  ✓ '+name)}else{fail++;fails.push(name);console.log('  ✗ '+name+(extra?' — '+JSON.stringify(extra).slice(0,240):''))}}
 
 (async()=>{
-  const b=await chromium.launch({executablePath:'C:/Users/Sedreh/AppData/Local/ms-playwright/chromium-1254/chrome-win64/chrome.exe',headless:true});
+  const b=await chromium.launch({headless:true,executablePath:process.env.QA_CHROMIUM_EXECUTABLE||undefined,args:process.env.QA_NO_SANDBOX==='1'?['--no-sandbox']:[]});
 
   async function fresh(){
     const ctx=await b.newContext({viewport:{width:1366,height:860}});
@@ -20,7 +20,22 @@ function ok(name,cond,extra){if(cond){pass++;console.log('  ✓ '+name)}else{fai
     async function send(t){await page.fill('#chatIn',t);await page.click('#chatSend');await page.waitForTimeout(650)}
     return {ctx,page,send,errs,
       state:()=>page.evaluate(()=>({act:E30.discAPI.active(),fields:JSON.parse(JSON.stringify(S.ctx30.fields||{})),ce:CE.f,
+        confirmation:S.ctx30Collectors&&S.ctx30Collectors[S.ctx30ActiveKey]&&S.ctx30Collectors[S.ctx30ActiveKey].confirming&&S.ctx30Collectors[S.ctx30ActiveKey].confirming.type,
         bubbles:[...document.querySelectorAll('#chatB .msg.bot .bub')].map(b=>b.textContent)}))};
+  }
+
+  async function settleCollector(u,maxTurns=35){
+    const transcript=[];
+    for(let i=0;i<maxTurns;i++){
+      const st=await u.state();
+      if(!st.act)return {done:true,turns:i,transcript};
+      const phase=st.confirmation||'question';
+      if(phase==='contradiction')return {done:false,turns:i,transcript,blocker:'unresolved contradiction'};
+      const answer=phase==='financial'||phase==='final'?'درسته':'مهم نیست';
+      transcript.push({phase,answer});
+      await u.send(answer);
+    }
+    return {done:false,turns:maxTurns,transcript,blocker:'bounded completion limit exceeded'};
   }
 
   console.log('— U1: everything-at-once buyer —');
@@ -32,9 +47,9 @@ function ok(name,cond,extra){if(cond){pass++;console.log('  ✓ '+name)}else{fai
     ok('U1.1 all facts extracted in one pass (budget+scope+rooms+hoods+purpose)',Object.keys(st.fields).length>=6,st.fields);
     const qCount=(st.bubbles.filter(b=>/؟/.test(b)).length);
     ok('U1.2 ≤2 questions asked (nothing re-asked)',qCount<=2,{qCount});
-    await u.send('درسته');
+    const finish=await settleCollector(u);
     st=await u.state();
-    ok('U1.3 confirms into buy flow',st.ce==='buy'||st.act===false,st.ce);
+    ok('U1.3 confirms through adaptive profile into buy flow',finish.done&&st.ce==='buy',{ce:st.ce,finish});
     await u.ctx.close();
   }
 
@@ -48,11 +63,11 @@ function ok(name,cond,extra){if(cond){pass++;console.log('  ✓ '+name)}else{fai
     ok('U2.2 first question is financial (top impact)',/ودیعه|بودجه/.test(firstQ),firstQ.slice(-60));
     await u.send('ودیعه ۵۰۰ میلیون تومان، اجاره ماهی ۱۵ میلیون تومان');
     await u.send('برای خودم تنهایی');
-    for(let i=0;i<8;i++){const a=await u.page.evaluate(()=>E30.discAPI.active());if(!a)break;await u.send('مهم نیست')}
-    await u.send('درسته');
+    const finish=await settleCollector(u);
     await u.page.waitForTimeout(500);
     st=await u.state();
-    ok('U2.3 completes with skips honored',st.act===false,st.fields);
+    ok('U2.3 explicitly confirms financials then completes with optional skips',finish.done&&st.act===false&&
+      finish.transcript.some(x=>x.phase==='financial')&&finish.transcript.some(x=>x.phase==='final'),{finish,fields:st.fields});
     ok('U2.4 financial values preserved exactly (rial-normalized)',st.fields.budget_rent&&st.fields.budget_rent.v.v[0]===150000000&&st.fields.budget_dep.v.v[0]===5000000000,st.fields.budget_rent);
     await u.ctx.close();
   }
@@ -63,8 +78,9 @@ function ok(name,cond,extra){if(cond){pass++;console.log('  ✓ '+name)}else{fai
     await u.send('می‌خوام خونه اجاره کنم، نوساز برایم کاملاً الزامی است');
     await u.send('راجع به عمر بنا: تا ۲۰ سال هم اوکیه'); // contradiction with الزامی نوساز
     let st=await u.state();
-    const contradiction=st.bubbles.some(b=>/نکته|قبلاً.*گفته بودید|الزامی است\?|الزامی است؟/.test(b));
-    ok('U3.1 contradiction between نوساز and age surfaced',contradiction,st.bubbles.slice(-3).map(b=>b.slice(0,80)));
+    const contradiction=st.bubbles.some(b=>/تناقض|تعارض|نکته|قبلاً.*گفته بودید|الزامی است\?|الزامی است؟/.test(b));
+    ok('U3.1 contradiction is surfaced and collector waits for resolution',contradiction&&st.act===true&&st.confirmation==='contradiction',
+      {state:st.confirmation,messages:st.bubbles.slice(-3).map(b=>b.slice(0,80))});
     await u.ctx.close();
   }
 
@@ -77,11 +93,11 @@ function ok(name,cond,extra){if(cond){pass++;console.log('  ✓ '+name)}else{fai
     const defaulted=D0&&D0.B&&(D0.B.rentB===500000000||D0.B.rentB>0);
     ok('U4.1 no silent financial default while budget unknown',defaulted!==true,{B:D0&&D0.B});
     await u.send('نمی‌دونم، بعداً می‌گم');
-    for(let i=0;i<8;i++){const a=await u.page.evaluate(()=>E30.discAPI.active());if(!a)break;await u.send('مهم نیست')}
-    await u.send('درسته');
+    const finish=await settleCollector(u);
     await u.page.waitForTimeout(500);
     st=await u.state();
-    ok('U4.2 collector completes despite unknown budget (graceful)',st.act===false,st.fields);
+    ok('U4.2 collector completes despite unknown budget (graceful)',finish.done&&st.act===false,
+      {finish,fields:st.fields});
     await u.ctx.close();
   }
 
@@ -173,14 +189,18 @@ function ok(name,cond,extra){if(cond){pass++;console.log('  ✓ '+name)}else{fai
     await u.send('تازه ازدواج کردم و دنبال یه خونه نوساز می‌گردم که به محل کارم نزدیک باشه. نمی‌دونم بهتره ودیعه بیشتری بدم یا اجاره بیشتری قبول کنم.');
     await u.send('کارم جردنه');
     await u.send('ودیعه ۲ میلیارد تومان، اجاره ۱۸ میلیون تومان');
+    // The financial read-back is independent from the final profile approval.
+    const moneyGate=await u.state();
+    if(moneyGate.confirmation==='financial')await u.send('درسته');
     await u.send('همان ۲ خواب');
-    for(let i=0;i<8;i++){const a=await u.page.evaluate(()=>E30.discAPI.active());if(!a)break;await u.send('مهم نیست')}
-    await u.send('درسته');
+    const finish=await settleCollector(u);
     await u.page.waitForTimeout(600);
     const st=await u.state();
-    ok('C.1 free-form opening reaches hand-off with confirmed set',st.ce==='rent',st.ce);
+    ok('C.1 free-form opening reaches hand-off with confirmed set',finish.done&&st.ce==='rent',
+      {ce:st.ce,finish,moneyGate:moneyGate.confirmation});
     const D=await u.page.evaluate(()=>{const D=wd('rent').data;return {rentB:D.B&&D.B.rentB,depB:D.B&&D.B.depB,age:D.P&&D.P.maxAge,hard:D.P&&D.P._ageHard}});
-    ok('C.2 financials + نوساز carried into engine',D.rentB===180000000&&D.depB===2000000000&&D.hard===true,D);
+    ok('C.2 financials exact and non-mandatory نوساز never silently becomes hard',
+      D.rentB===180000000&&D.depB===20000000000&&D.hard===false&&D.age>=20,D);
     const errs=await u.page.evaluate(()=>window.__errs||[]);
     await u.ctx.close();
   }

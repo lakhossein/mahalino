@@ -9,7 +9,15 @@ const fs=require('fs');
 const path=require('path');
 
 const DIR=__dirname;
-const SRC=path.join(DIR,'..','V0.29','Mahalino+V0.29.html');
+const REPO_BASE=path.join(DIR,'..','V0.29','Mahalino+V0.29.html');
+const BUNDLED_BASE=path.join(DIR,'base','Mahalino+V0.29.html');
+/* A standalone V0.30 distribution includes its exact predecessor snapshot;
+   a full checkout may reuse V0.29, but must reproduce identical output. */
+const SRC=fs.existsSync(REPO_BASE)?REPO_BASE:BUNDLED_BASE;
+if(!fs.existsSync(SRC)){
+  console.error('BUILD FAILED: missing base template. Expected '+REPO_BASE+' or '+BUNDLED_BASE);
+  process.exit(1);
+}
 const OUT=path.join(DIR,'Mahalino+V0.30.html');
 const SRC_DIR=path.join(DIR,'src');
 
@@ -53,6 +61,40 @@ if(!S.paySession)S.paySession=null;
 if(!S.savedListings)S.savedListings=[];
 if(!S.ctx30)S.ctx30={fields:{},log:[]};`);
 
+/* The v30 discovery collector belongs to a conversation, not a global page.
+   Bind an archived conversation ID before E22 clears restoredId, reload the
+   corresponding context on sidebar restore, and reset only on New Chat. */
+rep("  CE.f=null;CE.i=0;CE.li=0;CE.hist=[];HIST=[];ctxReset();",
+    "  CE.f=null;CE.i=0;CE.li=0;CE.hist=[];HIST=[];if(window.E22)E22.restoredId=null;S.liveHistory=[];save();ctxReset();window.E30_HIST_VISIBLE=120;if(window.E30&&E30.discAPI&&E30.discAPI.reset)E30.discAPI.reset();");
+rep("  CE.f=null;CE.i=0;CE.li=0;CE.hist=[];\n  botC('گفت‌وگو بسته شد.",
+    "  CE.f=null;CE.i=0;CE.li=0;CE.hist=[];\n  if(window.E30&&E30.discAPI&&E30.discAPI.stop)E30.discAPI.stop();\n  botC('گفت‌وگو بسته شد.");
+rep("  if(users<2)return; /* گفت‌وگوی کمتر از دو پیام کاربر بایگانی نمی‌شود */",
+    "  if(users<1)return; /* حتی یک پیام کاربر ارزش بایگانی دارد */");
+rep("  E22.restoredId=null;\n  /* سقف ۱۲ برای غیرسنجاق‌شده‌ها؛ کهنه‌ترین حذف می‌شود — فقط اگر چیزی حذف شد */",
+    "  if(window.E30&&E30.discAPI&&E30.discAPI.bindChat){E30.discAPI.bindChat(updated?updated.id:S.chats[0].id)}\n  E22.restoredId=null;\n  /* سقف ۱۲ برای غیرسنجاق‌شده‌ها؛ کهنه‌ترین حذف می‌شود — فقط اگر چیزی حذف شد */");
+rep("  E22.restoredId=s.id;\n  setMenuOpen(false);",
+    "  E22.restoredId=s.id;\n  S.liveHistory=HIST.slice();save();\n  if(window.E30&&E30.discAPI&&E30.discAPI.useChat)E30.discAPI.useChat(s.id);\n  setMenuOpen(false);");
+rep("  if(E22.restoredId===id)E22.restoredId=null;\n  closeModal();",
+    "  if(E22.restoredId===id)E22.restoredId=null;\n  if(window.E30&&E30.discAPI&&E30.discAPI.forgetChat)E30.discAPI.forgetChat(id);\n  closeModal();");
+/* Never silently delete the early part of a conversation. Keep all history
+   in memory and archive; render a bounded window with a visible Load Older
+   button so long chats remain reasonably responsive. */
+rep("function botC(html,chips){HIST.push({r:'bot',h:html,c:chips||null});if(HIST.length>60){HIST=HIST.slice(-60)}cr()}",
+    "function botC(html,chips){HIST.push({r:'bot',h:html,c:chips||null});S.liveHistory=HIST.slice();save();cr()}");
+rep("function usrC(t){HIST.push({r:'user',h:esc(t)});cr()}",
+    "function usrC(t){HIST.push({r:'user',h:esc(t)});S.liveHistory=HIST.slice();save();cr()}");
+rep("var HIST=[];","var HIST=Array.isArray(S.liveHistory)?S.liveHistory.slice():[];");
+rep("    b.el.innerHTML=HIST.map(function(m,ix){",
+    "    var visible=window.E30_HIST_VISIBLE||120,from=Math.max(0,HIST.length-visible);\n    b.el.innerHTML=(from?'<button class=\"qbtn\" data-act=\"e30HistMore\" style=\"margin:8px auto;display:block\">نمایش '+fa(Math.min(120,from),0)+' پیام قدیمی‌تر</button>':'')+HIST.slice(from).map(function(m,ix){ix+=from;");
+rep("E22.CAP=12;    /* سقف گفت‌وگوهای غیرسنجاق‌شده */",
+    "E22.CAP=Number.MAX_SAFE_INTEGER; /* هیچ گفت‌وگویی خودکار پاک نمی‌شود */");
+rep("E22.MAXH=60;   /* سقف پیام در هر بایگانی (هم‌راستا با برش HIST در botC) */",
+    "E22.MAXH=Number.MAX_SAFE_INTEGER; /* نگه‌داری کامل پیام‌ها در بایگانی */");
+rep("    if(st.length>200)st.length=200;",
+    "    /* V0.30: do not silently delete older artifacts. Storage-quota failures are reported by save(). */");
+injectBefore("/* ═══ ۲۲) راه‌اندازی ═══ */",
+    "window.E30_HIST_VISIBLE=120;ACT.e30HistMore=function(){window.E30_HIST_VISIBLE=Math.min(HIST.length,(window.E30_HIST_VISIBLE||120)+120);cr()};");
+
 /* ═══ 4) boot: E30 init after E29 init ═══ */
 rep("try{E29.init()}catch(e){console.error('E29 init',e)}",
     "try{E29.init()}catch(e){console.error('E29 init',e)}\n    try{E30.init()}catch(e){console.error('E30 init',e)}");
@@ -66,6 +108,39 @@ rep("  var hard=all.filter(function(x){if(D.P.beds>0&&x.beds<D.P.beds)return fal
     "  var hard=all.filter(function(x){return E30.flowsAPI.rentPass(x,D)});");
 rep("  var hard=RLIST.filter(function(x){return x.hood===D.hood}).filter(function(x){if(D.P.beds>0&&x.beds<D.P.beds)return false;if(D.P.elev&&!x.elev)return false;if(D.P.park&&!x.park)return false;return true});",
     "  var hard=RLIST.filter(function(x){return x.hood===D.hood}).filter(function(x){return E30.flowsAPI.rentPass(x,D)});");
+/* Replace the legacy range parser with the independently testable, explicit
+   unit/magnitude parser. Unlike the old global multiplier it also handles
+   mixed magnitudes such as ۱ میلیارد تا ۵۰۰ میلیون تومان. */
+var rangeStart=H.indexOf('function parseMoneyRangeFA(input){');
+var rangeEnd=H.indexOf('function parseRangeFA(input){',rangeStart);
+if(rangeStart<0||rangeEnd<0){fail.push('money-range parser block missing')}
+else{rep(H.slice(rangeStart,rangeEnd),readSrc('v30-money-range.js')+'\n')}
+/* Cards under the 'all listings' heading remain visible for comparison, but
+   a failed hard constraint can never become the selected property. */
+rep("CBACT.selL=function(el){var D=wd('rent').data;D.listing=el.getAttribute('data-l');save();if(CURRENT==='rent')renderCurrent();botC('✓ انتخاب شد.',[['بازدید','!skp'],['مقایسه','!cmp']])};",
+    "CBACT.selL=function(el){var D=wd('rent').data,x=findL(el.getAttribute('data-l'));if(!x||!E30.flowsAPI.rentPass(x,D)){toast('این آگهی با الزام‌های قطعی شما منطبق نیست؛ ابتدا فیلترها را آگاهانه اصلاح کنید.');return}D.listing=x.id;save();if(CURRENT==='rent')renderCurrent();botC('✓ انتخاب شد.',[['بازدید','!skp'],['مقایسه','!cmp']])};");
+rep("CBACT.selB=function(el){var D=wd('buy').data;D.blist=el.getAttribute('data-l');save();if(CURRENT==='buy')renderCurrent();botC('✓ انتخاب شد.',[['حقوقی','!skp']])};",
+    "CBACT.selB=function(el){var D=wd('buy').data,x=findB(el.getAttribute('data-l'));if(!x||!E30.flowsAPI.buyPass(x,D)){toast('این آگهی با سقف بودجه یا الزام‌های قطعی شما منطبق نیست؛ ابتدا محدودیت‌ها را اصلاح کنید.');return}D.blist=x.id;save();if(CURRENT==='buy')renderCurrent();botC('✓ انتخاب شد.',[['حقوقی','!skp']])};");
+/* Full-deposit leases legitimately have monthly rent of zero. Neither blank
+   input, negative amounts, nor a zero-zero lease is valid. */
+rep("    var dep=+v('cp-dep'),rent=+v('cp-rent');\n    if(!dep||!rent){toast('ودیعه و اجاره را وارد کنید');return}",
+    "    var depText=v('cp-dep'),rentText=v('cp-rent'),dep=Number(depText),rent=Number(rentText);\n    if(!depText||!rentText||!Number.isFinite(dep)||!Number.isFinite(rent)||dep<0||rent<0||(dep===0&&rent===0)){toast('مبلغ‌های ودیعه و اجاره را درست وارد کنید؛ رهن کامل با اجارهٔ صفر پذیرفته است');return}");
+rep("((c.kind==='rent')?(!c.terms.rent||!c.terms.deposit):(!c.terms.price))",
+    "((c.kind==='rent')?(c.terms.rent==null||c.terms.deposit==null||!Number.isFinite(Number(c.terms.rent))||!Number.isFinite(Number(c.terms.deposit))||Number(c.terms.rent)<0||Number(c.terms.deposit)<0||(Number(c.terms.rent)===0&&Number(c.terms.deposit)===0)):(!c.terms.price))");
+rep("qesc(String(c.terms.rent||''))",
+    "qesc(String(c.terms.rent===0?0:(c.terms.rent||'')))");
+/* Explicit, per-request consent before sending national ID or postal code
+   to any configured external resolver. Local format validation stays offline. */
+rep("function lookupPostal(){\n  var D=wd(conKind()).data,c=conInit(D,conKind());",
+    "function lookupPostal(approved){\n  var D=wd(conKind()).data,c=conInit(D,conKind());");
+rep("  c.prop.postal=code;\n  lookupStatus('lk-postal','load','در حال استعلام نشانی...');",
+    "  if(approved!==true){openModal('<h3>رضایت برای استعلام بیرونی</h3><p class=\"note\">با تأیید، کد پستی به سرویس استعلام نشانی پیکربندی‌شده یا Photon/Nominatim ارسال می‌شود. برای حفظ حریم خصوصی می‌توانید نشانی را دستی وارد کنید.</p><div class=\"qr\"><button data-act=\"e30PostalConsent\">موافقم، استعلام کن</button><button data-act=\"closeModal\">انصراف</button></div>');return}\n  c.prop.postal=code;\n  lookupStatus('lk-postal','load','در حال استعلام نشانی...');");
+rep("function lookupIdentity(id,role){",
+    "function lookupIdentity(id,role,approved){");
+rep("  lookupStatus(box,'load','در حال استعلام هویت...');\n  lkIdentityName(v).then(function(r){",
+    "  if(approved!==true){openModal('<h3>رضایت برای استعلام هویت</h3><p class=\"note\">با تأیید شما، کد ملی به سرویس هویت پیکربندی‌شده ارسال می‌شود. این مرحله در نسخهٔ نمایشی جایگزین احراز هویت رسمی نیست.</p><div class=\"qr\"><button data-act=\"e30IdentityConsent\" data-role=\"'+qesc(role)+'\">موافقم، استعلام کن</button><button data-act=\"closeModal\">انصراف</button></div>');return false}\n  lookupStatus(box,'load','در حال استعلام هویت...');\n  lkIdentityName(v).then(function(r){");
+injectBefore("/* ═══ ۲۲) راه‌اندازی ═══ */",
+    "ACT.e30PostalConsent=function(){closeModal();lookupPostal(true)};ACT.e30IdentityConsent=function(el){var role=el&&el.getAttribute('data-role');closeModal();if(role==='me'||role==='owner')lookupIdentity(null,role,true)};");
 /* "all listings" act: matched-first, honest labeling of out-of-constraint items (§7.1) */
 rep("  all:function(D){botC('همه:<div class=\"chcards\">'+RLIST.filter(function(x){return x.hood===D.hood}).map(function(x){return chatListCard(x,D.listing===x.id)}).join('')+'</div>',[['برو به بازدید','!skp']])},",
     "  all:function(D){var ms=RLIST.filter(function(x){return x.hood===D.hood}),ok=ms.filter(function(x){return E30.flowsAPI.rentPass(x,D)}),no=ms.filter(function(x){return !E30.flowsAPI.rentPass(x,D)});botC('منطبق با الزام‌های شما: '+fa(ok.length,0)+' آگهی'+(no.length?' — '+fa(no.length,0)+' آگهی دیگرِ این محله خارج از الزام‌هاست و «انطباق» حساب نمی‌شود':'')+':<div class=\"chcards\">'+ok.concat(no).map(function(x){return chatListCard(x,D.listing===x.id)}).join('')+'</div>',[['برو به بازدید','!skp']])},");

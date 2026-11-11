@@ -1,6 +1,8 @@
 /* e2e-functional.js — V0.30 functional suite (spec §19.1) — real Chromium, fresh profile */
-const { chromium } = require('C:/Users/Sedreh/zqa/node_modules/playwright');
-const URL='http://127.0.0.1:8730/Mahalino%2BV0.30.html';
+const { chromium } = require('playwright');
+const fs=require('node:fs');
+const path=require('node:path');
+const URL=process.env.QA_BASE_URL||'http://127.0.0.1:8730/Mahalino%2BV0.30.html';
 let pass=0,fail=0;const fails=[];
 function ok(name,cond,extra){if(cond){pass++;console.log('  ✓ '+name)}else{fail++;fails.push(name);console.log('  ✗ '+name+(extra?' — '+JSON.stringify(extra).slice(0,200):''))}}
 async function send(page,t){await page.fill('#chatIn',t);await page.click('#chatSend');await page.waitForTimeout(700)}
@@ -13,8 +15,17 @@ async function walkTo(page,targetId,max){
     const v=await page.evaluate(()=>{
       const s=SCRIPTS[CE.f][CE.i];
       if(s.loop)return '3';
+      // When the app asks again for an already stated amount, replay the
+      // *same* real budget; the first preset chip (30M rent) is not the user's
+      // explicitly stated 70M and would produce a false empty-results test.
+      if(s.id==='dep')return '۳ میلیارد تومان';
+      if(s.id==='rentb')return '۷۰ میلیون تومان';
+      if(s.id==='beds')return '2';
       if(s.id==='m2')return '60';
-      if(s.id==='hoods')return 'نارمک';
+      // The user explicitly asked for Saadat Abad. Preserve that choice as
+      // the interaction proceeds; an unrelated hood here silently invalidates
+      // every expected rental match and all downstream visit assertions.
+      if(s.id==='hoods')return 'سعادت‌آباد';
       if(s.id==='mk')return 'ok';
       if(s.id==='age')return '10';
       if(s.id==='s_price')return '12000000000';
@@ -40,18 +51,18 @@ async function walkTo(page,targetId,max){
   return curStep(page);
 }
 async function drainDisc(page,final){
-  for(let i=0;i<12;i++){
-    const a=await page.evaluate(()=>E30.discAPI.active());
-    if(!a)break;
-    await send(page,'مهم نیست');
-    await page.waitForTimeout(350);
+  for(let i=0;i<35;i++){
+    const phase=await page.evaluate(()=>({active:E30.discAPI.active(),confirmation:S.ctx30Collectors&&S.ctx30Collectors[S.ctx30ActiveKey]&&S.ctx30Collectors[S.ctx30ActiveKey].confirming&&S.ctx30Collectors[S.ctx30ActiveKey].confirming.type}));
+    if(!phase.active)break;
+    // A known budget needs explicit consent before other free-form facts can
+    // be collected. Final profile requires a second, separate confirmation.
+    await send(page,phase.confirmation==='financial'||phase.confirmation==='final'?'درسته':'مهم نیست');
   }
-  await send(page,final||'درسته');
   await page.waitForTimeout(800);
 }
 
 (async()=>{
-  const b=await chromium.launch({executablePath:'C:/Users/Sedreh/AppData/Local/ms-playwright/chromium-1254/chrome-win64/chrome.exe',headless:true});
+  const b=await chromium.launch({headless:true,executablePath:process.env.QA_CHROMIUM_EXECUTABLE||undefined,args:process.env.QA_NO_SANDBOX==='1'?['--no-sandbox']:[]});
   const ctx=await b.newContext({viewport:{width:1366,height:860}});
   const page=await ctx.newPage();
   const errors=[];
@@ -64,10 +75,14 @@ async function drainDisc(page,final){
   await page.waitForTimeout(600);
 
   console.log('— T1 Rental: discovery → results (strict filter on screen) —');
-  await send(page,'می‌خوام خونه اجاره کنم. خانواده سه نفره‌ایم، بچه مدرسه‌ای داریم. کارم نارمکه. ودیعه تا ۱۰ میلیون تومان و اجاره تا ۳۰ میلیون تومان. حداقل دو خواب. پارکینگ الزامیه.');
+  await send(page,'می‌خوام آپارتمان دوخوابه در محلهٔ سعادت‌آباد اجاره کنم. خانواده سه نفره‌ایم، بچه مدرسه‌ای داریم، کارم سعادت‌آباده. ودیعه تا ۳ میلیارد تومان و اجاره تا ۷۰ میلیون تومان. حداقل دو خواب و پارکینگ الزامیه.');
   await drainDisc(page);
   let st=await page.evaluate(()=>({ce:CE.f,done:!E30.discAPI.active()}));
   ok('T1.1 rent flow handed off to engine',st.ce==='rent'&&st.done===true,st);
+  st=await page.evaluate(()=>({ctx:{dep:CTX.dep,rent:CTX.rent},
+    budget:JSON.parse(JSON.stringify(wd('rent').data.B||{})),beds:wd('rent').data.P?.beds}));
+  ok('T1.1a initial handoff retains the user’s 3B/70M Toman budget',
+    st.budget.depB===30000000000&&st.budget.rentB===700000000&&st.beds===2,st);
   await walkTo(page,'list');
   st=await page.evaluate(()=>({id:(SCRIPTS[CE.f][CE.i]||{}).id}));
   ok('T1.2 reached listing step',st.id==='list',st);
@@ -75,16 +90,35 @@ async function drainDisc(page,final){
     const D=wd('rent').data;
     return {D:{park:D.P?D.P.park:null,beds:D.P?D.P.beds:null,rentB:D.B?D.B.rentB:null,depB:D.B?D.B.depB:null}};
   });
-  ok('T1.3 hard constraints active (park/beds/budget)',st.D.park===true&&st.D.beds>=2&&st.D.rentB>0&&st.D.depB>0,st.D);
+  ok('T1.3 hard constraints active (park/beds/exact stated budget)',st.D.park===true&&st.D.beds===2&&
+    st.D.rentB===700000000&&st.D.depB===30000000000,st.D);
   st=await page.evaluate(()=>{
     const D=wd('rent').data;
     const bub=[...document.querySelectorAll('#chatB .msg.bot .bub')].pop();
-    const ids=[];bub.querySelectorAll('[data-l]').forEach(x=>{const l=x.getAttribute('data-l');if(l)ids.push(l)});
+    const ids=[];bub.querySelectorAll('[data-l]').forEach(x=>{const l=x.getAttribute('data-l');if(l&&!ids.includes(l))ids.push(l)});
     const viol=ids.filter(id=>{const x=RLIST.find(r=>r.id===id);return x?!E30.flowsAPI.rentPass(x,D):false});
-    return {checked:ids.length,viol:viol,head:bub.textContent.slice(0,80)};
+    const expected=RLIST.filter(x=>x.hood===D.hood&&E30.flowsAPI.rentPass(x,D)).length;
+    const candidate=RLIST.find(x=>x.id==='r5');
+    return {checked:ids.length,expected,viol:viol,head:bub.textContent.slice(0,80),
+      diagnostic:{hood:D.hood,preferences:{beds:D.P?.beds,bedsNum:D.P?.bedsNum,
+        maxAge:D.P?.maxAge,ageHard:D.P?._ageHard,minM2:D.P?.minM2,
+        floor:D.P?.floor,floorNum:D.P?.floorNum,requiredFloor:D.P?.requiredFloor,
+        elev:D.P?.elev,park:D.P?.park,prefRules:D.P?.prefRules},
+        budget:D.B,depOpen:D.depOpen,rentOpen:D.rentBOpen,
+        r5: candidate&&{eligible:E30.flowsAPI.rentPass(candidate,D),
+          hood:candidate.hood,beds:candidate.beds,age:candidate.age,area:candidate.m2,
+          floor:candidate.floor,elev:candidate.elev,park:candidate.park,
+          dep:candidate.dep,rent:candidate.rent}}};
   });
-  ok('T1.4 no violating listing rendered as match (defect 2.2)',st.checked===0||st.viol.length===0,st);
+  ok('T1.4 at least one real matched card (max 3), never a violating candidate',st.expected>=1&&st.checked>0&&st.checked===Math.min(3,st.expected)&&st.viol.length===0,st);
+  if(st.expected===0)console.log('  T1.4 FILTER DIAGNOSTIC: '+JSON.stringify(st.diagnostic));
   ok('T1.5 match count honestly shown',/منطبق/.test(st.head),st.head);
+  st=await page.evaluate(()=>{
+    const d=JSON.parse(JSON.stringify(wd('rent').data));
+    d.B={...(d.B||{}),depB:100000000,rentB:300000000};
+    return {qualifying:RLIST.filter(x=>E30.flowsAPI.rentPass(x,d)).map(x=>x.id),budget:d.B};
+  });
+  ok('T1.6 impossible 10M-Toman deposit has zero matches — no fabricated visit',st.qualifying.length===0,st);
 
   console.log('— T2 Visit booking via UI (20 بنا, explicit confirm) —');
   st=await page.evaluate(()=>{
@@ -102,7 +136,7 @@ async function drainDisc(page,final){
   await clickChip(page,'!go');
   await page.waitForTimeout(800);
   st=await page.evaluate(()=>({pay:!!S.paySession,cost:S.paySession?S.paySession.cost:0,state:S.paySession?S.paySession.state:null}));
-  ok('T2.2 visit books via explicit chip with cost shown (legacy direct path per payment audit)',st.pay===false||st.state==='completed',st);
+  ok('T2.2 visit requires centralized 20-Bana presented confirmation before debit',st.pay===true&&st.state==='presented'&&st.cost===20,st);
   await page.evaluate(()=>{const b=[...document.querySelectorAll('[data-paygo]')].pop();if(b)b.click()});
   await page.waitForTimeout(900);
   st=await page.evaluate(()=>({tok:S.tokens,req:S.reqs[0]||null,sess:(S.paySession||{}).state||null}));
@@ -209,7 +243,9 @@ async function drainDisc(page,final){
   const real=errors.filter(e=>!/picsum|favicon|net::|Failed to load resource/.test(e));
   ok('no unexpected page errors across suite',real.length===0,real.slice(0,3));
 
-  await page.screenshot({path:'screenshots/e2e-final.png'});
+  const screenshotDir=process.env.QA_RESULTS_DIR||path.resolve('screenshots');
+  fs.mkdirSync(screenshotDir,{recursive:true});
+  await page.screenshot({path:path.join(screenshotDir,'e2e-final.png')});
   await b.close();
   console.log('\nE2E-FUNCTIONAL RESULT: '+pass+' passed, '+fail+' failed');
   if(fails.length)console.log('FAILED: '+fails.join(' | '));

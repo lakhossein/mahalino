@@ -1,0 +1,49 @@
+name: Mahalino V0.30 required quality gate
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches: [main, 'fix/**']
+    paths:
+      - 'V0.30/**'
+      - '.github/workflows/mahalino-v030-quality-gate.yml'
+      - '.github/workflows/pages.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'V0.30/**'
+      - '.github/workflows/mahalino-v030-quality-gate.yml'
+      - '.github/workflows/pages.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  chromium-acceptance:
+    name: Browser acceptance and reproducible build
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: V0.30/qa/package-lock.json
+      - name: Install pinned test dependencies
+        run: npm ci --prefix V0.30/qa
+      - name: Install Chromium
+        run: V0.30/qa/node_modules/.bin/playwright install --with-deps chromium
+      - name: Run every V0.30 quality gate
+        run: bash V0.30/qa/run-quality-gate.sh
+      - name: Preserve logs, screen captures and JSON results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mahalino-v030-release-gate-results
+          path: V0.30/qa/results/
+          retention-days: 45
+          if-no-files-found: warn

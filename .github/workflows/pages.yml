@@ -20,7 +20,12 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  quality-gate:
+    # This job is a hard dependency: no successful browser/build check, no Pages upload.
+    uses: ./.github/workflows/mahalino-v030-quality-gate.yml
+
   publish:
+    needs: [quality-gate]
     runs-on: ubuntu-latest
     environment:
       name: github-pages

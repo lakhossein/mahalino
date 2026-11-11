@@ -6,24 +6,94 @@
    ═══════════════ */
 E30.disc=(function(){
   function nz(t){return normFa(String(t||'')).replace(/‌/g,' ')}
+  var BUY_VERB=/خرید|بخرم|بخریم|بخرید|بخرن|بخرند|می ?خریم|بخرم/;
+  function excludesInvestment(nt){return /نه[^.،؛]{0,18}سرمایه|سرمایه ?گذاری (نیست|نمی ?خوام|نمی ?خواهیم)|برای سرمایه ?گذاری نیست/.test(nt)}
 
   /* ── context model (§4.4): every fact = value + source + confidence + status ── */
+  function freshCtx(){return {fields:{},log:[],createdAt:Date.now()}}
+  function contextKey(){
+    if(!S.ctx30ActiveKey)S.ctx30ActiveKey='live:'+E30.uid('CTX');
+    return S.ctx30ActiveKey;
+  }
   function ctx(){
-    if(!S.ctx30)S.ctx30={fields:{},log:[]};
+    var key=contextKey();
+    if(!S.ctx30ByChat){
+      S.ctx30ByChat={};
+      /* Safe migration of the V0.30 single-chat state; it belongs only to the
+         currently active conversation and must never leak to the next one. */
+      S.ctx30ByChat[key]=S.ctx30&&S.ctx30.fields?S.ctx30:freshCtx();
+    }
+    if(!S.ctx30ByChat[key])S.ctx30ByChat[key]=freshCtx();
+    S.ctx30=S.ctx30ByChat[key];
     if(!S.ctx30.fields)S.ctx30.fields={};
+    if(!S.ctx30.log)S.ctx30.log=[];
     return S.ctx30;
   }
+  function persist(){
+    try{if(S.ctx30ByChat)S.ctx30ByChat[contextKey()]=S.ctx30;save()}catch(e){}
+  }
+  function useChat(id){
+    saveCollector();
+    COL={active:false,wf:null,fix:null,confirming:null,turns:0};
+    S.ctx30ActiveKey=id?'chat:'+id:'live:'+E30.uid('CTX');
+    if(!S.ctx30ByChat)S.ctx30ByChat={};
+    S.ctx30=S.ctx30ByChat[S.ctx30ActiveKey]||(S.ctx30ByChat[S.ctx30ActiveKey]=freshCtx());
+    resume();
+    persist();
+  }
+  function bindChat(id){
+    if(!id)return;
+    var key=contextKey(),newKey='chat:'+id,current=ctx();
+    if(key===newKey)return;
+    if(!S.ctx30ByChat)S.ctx30ByChat={};
+    S.ctx30ByChat[newKey]=current;
+    if(S.ctx30Collectors&&S.ctx30Collectors[key]){
+      S.ctx30Collectors[newKey]=S.ctx30Collectors[key];
+      delete S.ctx30Collectors[key];
+    }
+    delete S.ctx30ByChat[key];
+    /* Replace the temporary live conversation pointer in saved artifacts;
+       otherwise "open source chat" references a nonexistent archive item. */
+    function remapItem(it){if(it&&it.sourceChat===key)it.sourceChat=id}
+    (S.library||[]).forEach(remapItem);
+    (S.savedListings||[]).forEach(remapItem);
+    (S.projects||[]).forEach(function(p){
+      if(!p)return;
+      if(p.chatIds)p.chatIds=p.chatIds.map(function(ref){return ref===key?id:ref});
+      if(p._liveRefs)p._liveRefs.forEach(function(r){if(r&&r.id===key)r.id=id});
+    });
+    S.ctx30ActiveKey=newKey;persist();
+  }
+  function forgetChat(id){
+    if(!id)return;
+    var key='chat:'+id;
+    if(S.ctx30ActiveKey===key)useChat(null);
+    if(S.ctx30ByChat)delete S.ctx30ByChat[key];
+    if(S.ctx30Collectors)delete S.ctx30Collectors[key];
+    persist();
+  }
+  var evidenceText='',evidenceId='';
+  function evidence(t){evidenceText=String(t||'');evidenceId=E30.uid('MSG')}
   /* field kinds: money | moneyRange | count | text | enum | loc | prefs | bool */
   /* status: confirmed | inferred | unknown | contradictory | stale               */
   function setF(id,v,opts){
     opts=opts||{};
     var c=ctx(),f=c.fields[id],now=Date.now();
-    if(v===undefined||v===null||v===''){delete c.fields[id];return}
-    var conf={v:v,src:opts.src||'',conf:opts.conf!==undefined?opts.conf:1,
+    if(v===undefined||v===null||v===''){delete c.fields[id];persist();return}
+    var msgSource=/^(open|turn|answer|clarify|resolution)$/.test(opts.src||'');
+    var conf={v:v,src:opts.src||'',messageId:opts.messageId||(msgSource?evidenceId:null),
+      rawSpan:opts.rawSpan||(msgSource?evidenceText:''),
+      conf:opts.conf!==undefined?opts.conf:1,confidence:opts.conf!==undefined?opts.conf:1,
+      requiresConfirmation:!!opts.requiresConfirmation,
       status:opts.inferred?'inferred':'confirmed',kind:opts.hard?'hard':(opts.soft?'soft':'plain'),
-      ts:now};
+      ts:now,updatedAt:now};
     if(f&&f.status==='confirmed'&&JSON.stringify(f.v)!==JSON.stringify(conf.v)&&!opts.inferred){
-      if(f.src&&opts.src&&f.src!==opts.src){f.stale=f.v} /* keep previous as stale */
+      conf.previous={value:f.v,source:f.src,updatedAt:f.updatedAt||f.ts};
+      if(f.src&&opts.src&&f.src!==opts.src){conf.stale=f.v} /* preserve prior version for audit */
+    }
+    if((id==='budget_dep'||id==='budget_rent')&&COL&&f&&JSON.stringify(f.v)!==JSON.stringify(v)){
+      COL.finConfirmed=false;
+      COL.finPrompted=false;
     }
     c.fields[id]=conf;
     c.log.push({t:now,slot:id,v:v,inferred:!!opts.inferred,src:opts.src||''});
@@ -31,14 +101,17 @@ E30.disc=(function(){
     /* mirror into V0.29 profile so existing profile card / wfSummary keep working */
     try{
       if(!S.profile)S.profile={confirmed:{},inferred:{},stale:{},log:[]};
-      if(opts.inferred){if(S.profile.confirmed[id]===undefined)S.profile.inferred[id]=v}
-      else S.profile.confirmed[id]=v;
+      if(id!=='prefRules'&&id!=='floor_preference'){
+        if(opts.inferred){if(S.profile.confirmed[id]===undefined)S.profile.inferred[id]=v}
+        else S.profile.confirmed[id]=v;
+      }
     }catch(e){}
+    persist();
   }
   function getF(id){var f=ctx().fields[id];return f?f.v:null}
   function fMeta(id){return ctx().fields[id]||null}
   function isHard(id){var f=ctx().fields[id];return f&&f.kind==='hard'}
-  function markUnknown(id){setF(id,null);ctx().fields[id]={v:null,status:'unknown',conf:0,ts:Date.now(),kind:'plain',src:''}}
+  function markUnknown(id){setF(id,null);ctx().fields[id]={v:null,status:'unknown',conf:0,confidence:0,ts:Date.now(),kind:'plain',src:''};persist()}
 
   /* ── persona classification — DYNAMIC (re-run after every update; §6.1) ── */
   function personaOf(wf){
@@ -125,7 +198,9 @@ E30.disc=(function(){
     sale_urgency:{l:'فوریت فروش',kind:'enum'},
     expected_price:{l:'قیمت انتظاری',kind:'moneyRange',fin:true},
     min_price:{l:'کف قیمت',kind:'moneyRange',fin:true},
-    listing_intent:{l:'نوع آگهی',kind:'enum'}
+    listing_intent:{l:'نوع آگهی',kind:'enum'},
+    floor_preference:{l:'طبقات قابل قبول',kind:'enum'},
+    prefRules:{l:'سطح الزام ویژگی‌ها',kind:'prefs'}
   };
   var SLOT_LABEL={};Object.keys(FL).forEach(function(k){SLOT_LABEL[k]=FL[k].l});
 
@@ -143,9 +218,33 @@ E30.disc=(function(){
       .replace(/(\d)[.](\d)/g,'$1٫$2') /* protect decimals before punctuation strip */
       .replace(/[،,؛!?\.]/g,' ')
       .replace(/ودیعه|رهن|پول جلو|اجاره|کرایه|ماهانه|ماهی|بودجه|سرمایه|پول|قیمت|هستم|است|باشه/g,' ')
-      .replace(/\s+/g,' ').trim();
+      .replace(/\s+/g,' ').trim()
+      .replace(/^(?:تا|از|سقف|زیر|بالای|بیشتر از|کمتر از)\s+/,'');
     var r=parseMoneyRangeFA(clean);
     if(r&&r.ok){var p=r.value.split('|');return [+p[0],+p[1]]}
+    /* An invalid or incomplete range must never be silently reinterpreted as
+       additive money by shortening its prefix. In particular, a 20–25m rent
+       clause cannot contribute '20' to a preceding 1.5b deposit. */
+    if(/\s(?:تا|الی)\s/.test(clean))return null;
+    /* A full sentence can contain the next unrelated count after the money:
+       «۱٫۵ میلیارد تومان، حداقل ۲ خواب». parseNumberWords would otherwise
+       SUM that ۲ onto the money amount. Stop at the first explicit currency
+       unit (after giving valid multi-endpoint ranges precedence). */
+    var unit=clean.match(/تومان|تومن|ریال/);
+    if(unit){
+      var exact=parseMoneyFA(clean.slice(0,unit.index+unit[0].length));
+      if(exact&&exact.ok)return [exact.value,exact.value];
+    }
+    var magnitudes=[...clean.matchAll(/میلیارد|میلیون|هزار/g)];
+    if(!unit&&magnitudes.length){
+      var last=magnitudes[magnitudes.length-1];
+      var magMoney=parseMoneyFA(clean.slice(0,last.index+last[0].length));
+      if(magMoney&&magMoney.ok)return [magMoney.value,magMoney.value];
+    }
+    var firstNum=clean.match(/^\d+(?:[٫.]\d+)?(?=\s|$)/);
+    if(!unit&&!magnitudes.length&&firstNum){
+      var bare=parseMoneyFA(firstNum[0]);if(bare&&bare.ok)return [bare.value,bare.value];
+    }
     var m=parseMoneyFA(clean);
     if(m&&m.ok)return [m.value,m.value];
     /* progressive prefix: money sentences often carry trailing non-amount words */
@@ -164,13 +263,65 @@ E30.disc=(function(){
       var sgN=normFa(segs[i]).replace(/‌/g,' ');
       var isD=/ودیعه|رهن|پول جلو/.test(sgN),isR=/اجاره|کرایه|ماهی|ماهانه/.test(sgN);
       if(!isD&&!isR)continue;
-      var v=segMoney(sgN);
-      if(v){if(isD&&!out.dep)out.dep=v;else if(isR&&!out.rent)out.rent=v}
+      /* A natural sentence may precede the money clause, e.g. «کارم ... .
+         ودیعه تا ۳ میلیارد تومان» or «اجاره تا ۷۰ میلیون تومان. حداقل
+         دو خواب». Parse from the relevant label rather than the start of
+         the whole sentence; never substitute a chip or guessed budget. */
+      function valueNear(re){
+        var m=sgN.match(re);if(!m)return null;
+        /* Persian speakers place the label on either side of the amount:
+           «ودیعه ۱٫۵ میلیارد» AND «۱٫۵ میلیارد ودیعه». A trailing label
+           must not send the next labeled amount to the generic parser. */
+        return segMoney(sgN.slice(m.index+m[0].length))||segMoney(sgN.slice(0,m.index));
+      }
+      if(isD&&!out.dep){var dep=valueNear(/ودیعه|رهن|پول جلو/);if(dep)out.dep=dep}
+      if(isR&&!out.rent){var rent=valueNear(/اجاره|کرایه|ماهی|ماهانه/);if(rent)out.rent=rent}
     }
     return out;
   }
+  /* Explicit polarity for each property preference. Word presence is never a
+     hard requirement: «پارکینگ خوب است ولی ضروری نیست» must not drop listings. */
+  var PREF_NAMES={parking:/پارکینگ/,elevator:/آسانسور|اسانسور/,balcony:/بالکن|تراس/,
+    quiet:/سکوت|آرام/,metro:/مترو/,storage:/انباری/};
+  function preferenceLevel(fragment){
+    if(/نباید|مطلقاً نه|اصلا نباش|اصلاً نباش/.test(fragment))return 'forbidden';
+    if(/نمی ?خوام|نمی ?خواهم|لازم نیست|نیاز ندارم|مهم نیست|فرقی ندارد|فرقی نداره|بدون/.test(fragment))return 'irrelevant';
+    if(/ضروری نیست|الزامی نیست|اجباری نیست|ترجیح|خوبه|خوب است|بهتره|بهتر است/.test(fragment))return 'preferred';
+    if(/الزامی|اجباری|حتما|حتماً|باید|ضروریه|ضروری است|حتمن|لازمه|لازم است|حتما داشته/.test(fragment))return 'required';
+    return 'preferred';
+  }
+  function extractPrefs(nt,src){
+    var old=getF('prefRules')||{},rules=Object.assign({},old),keys=Object.keys(PREF_NAMES),changed=0;
+    var clauses=nt.split(/[،,؛]|\sو\s(?=پارکینگ|آسانسور|اسانسور|بالکن|تراس|مترو|انباری|سکوت|آرام)/);
+    clauses.forEach(function(cl){
+      keys.forEach(function(k){
+        if(!PREF_NAMES[k].test(cl))return;
+        var lev=preferenceLevel(cl);
+        if(rules[k]!==lev){rules[k]=lev;changed++}
+      });
+    });
+    if(changed){
+      setF('prefRules',rules,{src:src});
+      var required=keys.filter(function(k){return rules[k]==='required'});
+      if(required.length)setF('prefs',required,{src:src,hard:true});
+      else if(getF('prefs'))markUnknown('prefs');
+    }
+    var fl=nt.match(/طبقات?\s*(\d+)\s*(?:تا|الی|-)\s*(\d+)/)||nt.match(/طبقه(?:‌?های)?\s*(\d+)\s*(?:تا|الی|-)\s*(\d+)/);
+    var one=!fl&&nt.match(/(?:فقط |حداکثر )?طبقه\s*(\d+)/);
+    if(fl||one){
+      var a=+(fl?fl[1]:one[1]),b=+(fl?fl[2]:one[1]);
+      if(a>=0&&a<=b&&b<=100){
+        var level=preferenceLevel(nt);
+        if(/الزامی|باید|فقط|حداکثر|حتما|حتماً/.test(nt))level='required';
+        setF('floor_preference',{min:a,max:b,level:level},{src:src,hard:level==='required',soft:level!=='required'});
+        changed++;
+      }
+    }
+    return changed;
+  }
   function extract(text,src){
     var t=String(text||''),nt=nz(t),found=0,i;
+    evidence(t);
     /* household */
     if(/تنهایی|فقط خودم|یه نفر|یک نفر|مجردم/.test(nt)){if(getF('household')!=='single'){setF('household','single',{src:src});found++}}
     else if(/هم ?خانه|هم ?خونه|همخانه|هم ?اتاق/.test(nt)){if(getF('household')!=='roommates'){setF('household','roommates',{src:src});found++}}
@@ -184,7 +335,7 @@ E30.disc=(function(){
     if(/اولین بار|اولین تجربه|برای اولین/.test(nt)&&/اجاره/.test(nt)&&getF('life_stage')!=='first_rent'){setF('life_stage','first_rent',{src:src});found++}
     if(/اولین خانه|اولین بار.*خرید|اجاره ?نشین.*بخرم/.test(nt)&&getF('life_stage')!=='first_home'){setF('life_stage','first_home',{src:src});found++}
     /* occupation ONLY from explicit self-description — «دانشگاه» alone is a location, not a job (§4.2 no-wrong-inference) */
-    if(/دانشجو(ام|م| هستم| هستم)|من دانشجو|دانشجویd/.test(nt)&&getF('occupation')!=='دانشجو'){setF('occupation','دانشجو',{src:src});found++}
+    if(/دانشجو(ام|م| هستم| هستم)|من دانشجو|دانشجوی\s/.test(nt)&&getF('occupation')!=='دانشجو'){setF('occupation','دانشجو',{src:src});found++}
     if(/بازنشسته|سالمند/.test(nt)&&getF('occupation')!=='بازنشسته'){setF('occupation','بازنشسته',{src:src});found++}
     if(/انتقال[یی]? (شغل|اداره)|ماموریت|جابه ?جا شدم.*کار|شغل جدید/.test(nt)){if(!getF('relocating')){setF('relocating','yes',{src:src});found++}}
     if(/مهاجرت/.test(nt)&&!getF('migrating')){setF('migrating','yes',{src:src});found++}
@@ -193,9 +344,20 @@ E30.disc=(function(){
     var mm=nt.match(/(\d+|[۰-۹]+|یک|دو|سه|چهار|پنج)\s*خواب/);
     if(mm){var nb=pd(mm[1]);if(!nb&&WN[mm[1]])nb=WN[mm[1]];if(nb>0&&nb<9&&getF('rooms')!=+nb){setF('rooms',+nb,{src:src});found++}}
     var m2=nt.match(/(\d+|[۰-۹]+)\s*متر/);if(m2){var nm2=pd(m2[1]);if(nm2>=15&&nm2<2000&&getF('m2')!=+nm2){setF('m2',+nm2,{src:src});found++}}
-    if(/نوساز|تازه ?ساز|نو ساز/.test(nt)){if(getF('prop_new')!=='new'){setF('prop_new','new',{src:src,soft:true});found++}}
+    if(/نوساز|تازه ?ساز|نو ساز/.test(nt)&&!/نوساز (نمی ?خوام|نمی ?خواهم|مهم نیست|لازم نیست)/.test(nt)){
+      var newRequired=/نوساز.{0,22}(?:کاملا|کاملاً|الزامی|حتما|حتماً|باید|ضروری)|(?:کاملا|کاملاً|الزامی|حتما|حتماً|باید).{0,22}نوساز/.test(nt)&&
+        !/الزامی نیست|ضروری نیست|اجباری نیست/.test(nt);
+      if(getF('prop_new')!=='new'||newRequired&&!isHard('prop_new')){
+        setF('prop_new','new',{src:src,hard:newRequired,soft:!newRequired,requiresConfirmation:!newRequired});found++;
+        if(newRequired){setF('prop_age',3,{src:src,hard:true});fMeta('prop_new')._clar=true}
+      }
+    }
     if(/بازسازی/.test(nt)&&!getF('renov_ok')){setF('renov_ok','yes',{src:src,soft:true});found++}
-    var ag=nt.match(/حداکثر عمر[^\d۰-۹]*(\d+|[۰-۹]+)/);if(ag){var na=pd(ag[1]);if(na>0&&na<=40&&getF('prop_age')!=+na){setF('prop_age',+na,{src:src,hard:true});found++}}
+    var ag=nt.match(/حداکثر عمر[^\d۰-۹]*(\d+|[۰-۹]+)/)||
+      nt.match(/(?:عمر بنا|سال ساخت|ساختمان)[^\d۰-۹]{0,16}(\d+|[۰-۹]+)/)||
+      nt.match(/(?:تا|حداکثر)\s*(\d+|[۰-۹]+)\s*سال\s*(?:ساخت|عمر)/)||
+      nt.match(/(\d+|[۰-۹]+)\s*سال\s*(?:ساخت|عمر بنا)/);
+    if(ag){var na=pd(ag[1]);if(na>0&&na<=40&&getF('prop_age')!=+na){setF('prop_age',+na,{src:src,hard:true});found++}}
     /* work / university locations — matched CLAUSE-WISE so «محل کارم نزدیک ونک و دانشگاه حوالی انقلاب» binds each hood to its own context */
     var hl=(typeof HOODS!=='undefined')?HOODS:[];
     function locIn(txt){for(var j=0;j<hl.length;j++){if(txt.indexOf(hl[j].n)>=0)return hl[j].id}return null}
@@ -207,6 +369,10 @@ E30.disc=(function(){
       if(/محل کار|کارم|کارمون|اداره|شرکت|محل کارم/.test(cl)&&clHood){wl2=clHood}
       else if(/دانشگاه|دانشسر|تحصیل|فنی/.test(cl)&&clHood){ul2=clHood}
       else if(clHood&&!wl2&&!ul2){gl2=gl2||clHood}
+    }
+    if(/کارم عوض شد|محل کارم عوض شد|محل کار جدید|الان.*کار می ?کنم/.test(nt)){
+      var changedAt=nt.search(/الان|حالا|جدید/),changedArea=locIn(changedAt>=0?nt.slice(changedAt):nt);
+      if(changedArea)wl2=changedArea;
     }
     /* whole-message fallback when clauses lost the binding */
     if(!wl2&&/محل کار|کارم|کارمون|اداره|شرکت/.test(nt))wl2=locIn(nt)&&/محل کار|کارم/.test(nt.slice(0,nt.indexOf('دانشگاه')>=0?nt.indexOf('دانشگاه'):nt.length))?locIn(nt):null;
@@ -220,23 +386,34 @@ E30.disc=(function(){
     if(/هر دو/.test(nt)&&getF('work_loc')&&getF('uni_loc')&&!getF('work_weight')){setF('work_weight','both',{src:src});found++}
     /* money — module-level finScan/segMoney; single-amount budgets via word-window */
     var fs=finScan(t);
-    if(fs.dep&&getF('budget_dep')===null){setF('budget_dep',/بدون سقف|نامحدود/.test(nt)?{open:true}:{v:fs.dep},{src:src,fin:true});found++}
-    if(fs.rent&&getF('budget_rent')===null){setF('budget_rent',{v:fs.rent},{src:src,fin:true});found++}
+    if(fs.dep){var nextDep=/بدون سقف|نامحدود/.test(nt)?{open:true}:{v:fs.dep};if(JSON.stringify(getF('budget_dep'))!==JSON.stringify(nextDep)){setF('budget_dep',nextDep,{src:src,fin:true,requiresConfirmation:true});found++}}
+    if(fs.rent){var nextRent={v:fs.rent};if(JSON.stringify(getF('budget_rent'))!==JSON.stringify(nextRent)){setF('budget_rent',nextRent,{src:src,fin:true,requiresConfirmation:true});found++}}
     function moneyAfter(wordSrc){
       var re=new RegExp('(?:'+wordSrc+')');
       var m=nt.match(re);if(!m)return null;
-      var pos=m.index,i0=Math.max(0,pos-38),i1=Math.min(nt.length,pos+38);
+      var pos=m.index,after=nt.slice(pos,pos+105);
+      /* A direct money token is much safer than passing the entire adjacent
+         sentence to parseMoneyFA (e.g. «بودجه‌مون حداکثر ۳۰ میلیارد تومان»). */
+      var direct=after.match(/\d+(?:[٫.]\d+)?\s*(?:(?:تا|الی|-)\s*\d+(?:[٫.]\d+)?\s*)?(?:هزار|میلیون|میلیارد)\s*(?:تومان|ریال)?/);
+      if(direct){var parsed=segMoney(direct[0]);if(parsed)return parsed}
+      var i0=Math.max(0,pos-38),i1=Math.min(nt.length,pos+38);
       return segMoney(nt.slice(i0,i1));
     }
     if(!fs.dep&&!fs.rent){
-      if(/بودجه|سرمایه|پولم|میلیارد/.test(nt)&&/خرید|بخرم|سرمایه ?گذاری/.test(nt)){var bv=moneyAfter('بودجه|سرمایه|پولم');if(bv){setF(getF('purpose')==='invest'||/سرمایه ?گذاری/.test(nt)?'invest_capital':'buy_budget',{v:bv},{src:src,fin:true});found++}}
+      if(/بودجه|سرمایه|پولم|میلیارد/.test(nt)&&(BUY_VERB.test(nt)||/سرمایه ?گذاری/.test(nt))){var bv=moneyAfter('بودجه|سرمایه|پولم');if(bv){var bdId=(getF('purpose')==='invest'||(/سرمایه ?گذاری/.test(nt)&&!excludesInvestment(nt)))?'invest_capital':'buy_budget';if(JSON.stringify(getF(bdId))!==JSON.stringify({v:bv})){setF(bdId,{v:bv},{src:src,fin:true,requiresConfirmation:true});found++}}}
       else if(/ودیعه|رهن/.test(nt)){var dv=moneyAfter('ودیعه|رهن|پول جلو');if(dv){setF('budget_dep',/بدون سقف|نامحدود/.test(nt)?{open:true}:{v:dv},{src:src,fin:true});found++}}
       else if(/اجاره|کرایه|ماهانه/.test(nt)){var rv2=moneyAfter('اجاره|کرایه|ماهانه');if(rv2){setF('budget_rent',{v:rv2},{src:src,fin:true});found++}}
     }
-    if(/بودجه|سرمایه|می ?لیارد|میلیارد|پول/.test(nt)&&/خرید|بخرم|سرمایه ?گذاری|پولم/.test(nt)){var bv=moneyAfter(/بودجه|سرمایه|پول/);if(bv){setF(getF('purpose')==='invest'||/سرمایه ?گذاری/.test(nt)?'invest_capital':'buy_budget',{v:bv},{src:src,fin:true});found++}}
+    if(/بودجه|سقف|کل هزینه|خرج/.test(nt)&&BUY_VERB.test(nt)){
+      if(/خودِ? ملک|فقط ملک|سقف ملک|قیمت ملک/.test(nt)&&getF('budget_scope')!=='property'){
+        setF('budget_scope','property',{src:src});found++;
+      }else if(/کل هزینه|هزینه جانبی|کل معامله|همه هزینه/.test(nt)&&getF('budget_scope')!=='total'){
+        setF('budget_scope','total',{src:src});found++;
+      }
+    }
     /* purpose / objectives */
-    if(/سرمایه ?گذاری|سود|اجاره بدهم|درآمد اجاره/.test(nt)&&getF('purpose')!=='invest'){setF('purpose','invest',{src:src});found++}
-    if(/سکونت|برای خودم|زندگی/.test(nt)&&/خرید/.test(nt)&&getF('purpose')!=='residence'){setF('purpose','residence',{src:src});found++}
+    if(!excludesInvestment(nt)&&/سرمایه ?گذاری|سود|اجاره بدهم|درآمد اجاره/.test(nt)&&getF('purpose')!=='invest'){setF('purpose','invest',{src:src});found++}
+    if((/سکونت|برای خودم|برای خودمون|برای خودمان|زندگی/.test(nt)||excludesInvestment(nt))&&BUY_VERB.test(nt)&&getF('purpose')!=='residence'){setF('purpose','residence',{src:src});found++}
     if(/درآمد اجاره|اجاره بدهم|سود اجاره/.test(nt)&&!getF('invest_objective')){setF('invest_objective','rent_income',{src:src});found++}
     else if(/حفظ ارزش|تورم|ارزش پولم/.test(nt)&&!getF('invest_objective')){setF('invest_objective','inflation_hedge',{src:src});found++}
     else if(/رشد قیمت|بزرگ بشه|قیمتش بره بالا/.test(nt)&&!getF('invest_objective')){setF('invest_objective','appreciation',{src:src});found++}
@@ -248,21 +425,24 @@ E30.disc=(function(){
     if(!urgNeg&&/عجله|فوری|زود(تر)? بفروشم|زود(تر)? فروش|سریع فروش/.test(nt)&&getF('sale_urgency')!=='fast'){setF('sale_urgency','fast',{src:src,hard:true});found++}
     if(/مهاجرت/.test(nt)&&/فروش|بفروشم/.test(nt)&&getF('sale_motivation')!=='مهاجرت'){setF('sale_motivation','مهاجرت',{src:src});found++}
     if(/اجاره می ?دم|موجر|مستأجر دارم|مستاجر دارم|اجاره ? دادن/.test(nt)&&!getF('landlord')){setF('landlord','yes',{src:src});found++}
+    if(/اجاره\s*(?:بدم|می ?دم|دادن)|اجاره ?گذاری|موجر|مستأجر دارم|مستاجر دارم/.test(nt)&&
+       /ملکم|ملکمو|ملک خودم|مالک|موجر|اجاره بدم|اجاره می ?دم/.test(nt)&&getF('landlord')!=='yes'){
+      setF('landlord','yes',{src:src});found++;
+    }
+    if(/اقامتگاه|کوتاه ?مدت|اجاره شبانه|رزرو شبانه/.test(nt)&&getF('listing_intent')!=='stay'){
+      setF('listing_intent','stay',{src:src});found++;
+    }else if(/فقط قیمت|مشاوره قیمت|قیمت ?گذاری|ارزش ?گذاری/.test(nt)&&getF('listing_intent')!=='price'){
+      setF('listing_intent','price',{src:src});found++;
+    }else if(/ملکمو اجاره بدم|ملکم را اجاره بدم|اجاره مسکونی|آگهی اجاره/.test(nt)&&getF('listing_intent')!=='res'){
+      setF('listing_intent','res',{src:src});found++;
+    }
     /* timeline */
     var tm=nt.match(/تا (یک|دو|سه|یک ماه|۲|۳)[^\s،.؛]* (دیگه|دیگر|ماه)/);if(tm&&!getF('timeline')){setF('timeline',tm[0],{src:src});found++}
     if(/فوری|هرچه زودتر|هر چه زودتر/.test(nt)&&!getF('timeline')){setF('timeline','فوری',{src:src});found++}
     /* commute ceiling: «بیشتر از نیم ساعت در مسیر نباشم» */
     var cm=nt.match(/(نیم ساعت|۳۰ دقیقه|30 دقیقه|یک ساعت|ساعت)[^\s،.؛]{0,12}/);
     if(cm&&/مسیر|رفت ?و ?آمد|در راه/.test(nt)&&getF('commute_max')!==cm[1]){setF('commute_max',cm[1],{src:src});found++}
-    /* prefs */
-    var pf=[],base=ctx().fields.prefs?ctx().fields.prefs.v||[]:[];
-    if(/پارکینگ/.test(nt)&&base.indexOf('parking')<0)pf.push('parking');
-    if(/آسانسور|اسانسور/.test(nt)&&base.indexOf('elevator')<0)pf.push('elevator');
-    if(/بالکن|تراس/.test(nt)&&base.indexOf('balcony')<0)pf.push('balcony');
-    if(/سکوت|آرام/.test(nt)&&base.indexOf('quiet')<0)pf.push('quiet');
-    if(/مترو/.test(nt)&&base.indexOf('metro')<0)pf.push('metro');
-    if(/انباری/.test(nt)&&base.indexOf('storage')<0)pf.push('storage');
-    if(pf.length){setF('prefs',base.concat(pf),{src:src,soft:true});found++}
+    found+=extractPrefs(nt,src);
     return found;
   }
 
@@ -270,7 +450,7 @@ E30.disc=(function(){
   function missing(wf){
     var REQ={
       rent:[{id:'budget_dep',w:10},{id:'budget_rent',w:10},{id:'household',w:8},{id:'work_loc',w:6,cond:function(){return !getF('uni_loc')}},
-            {id:'uni_loc',w:6,cond:function(){return !getF('work_loc')}},
+            {id:'uni_loc',w:6,cond:function(){return !getF('work_loc')||personaOf('rent')==='student'}},
             {id:'work_weight',w:12,cond:function(){return !!getF('work_loc')&&!!getF('uni_loc')&&!getF('work_weight')}},
             {id:'hood',w:5,cond:function(){return !getF('work_loc')&&!getF('uni_loc')}},
             {id:'prop_new',w:5},{id:'rooms',w:4,cond:function(){return !!getF('household')}},{id:'m2',w:3},{id:'prop_age',w:3,cond:function(){return getF('prop_new')!=='new'}},
@@ -284,13 +464,28 @@ E30.disc=(function(){
       invest:[{id:'invest_objective',w:10},{id:'invest_capital',w:9},{id:'invest_horizon',w:6},{id:'invest_liquidity',w:5},
               {id:'invest_risk',w:5},{id:'hood',w:4},{id:'prop_new',w:2}]
     };
-    var list=REQ[wf]||[],out=[],i;
+    REQ.landlord=[{id:'listing_intent',w:12},{id:'hood',w:8},{id:'prop_area',w:7},
+      {id:'prop_rooms',w:3,cond:function(){return getF('listing_intent')==='res'}},
+      {id:'expected_price',w:2,cond:function(){return getF('listing_intent')==='res'}}];
+    var list=REQ[wf]||[],out=[],i,p=personaOf(wf);
     for(i=0;i<list.length;i++){
       var it=list[i];
       if(it.cond&&!it.cond())continue;
       var f=fMeta(it.id);
       if(f&&(f.status==='confirmed'||f.status==='unknown'))continue;
-      out.push({id:it.id,w:it.w+((f&&f.status==='inferred')?2:0)});
+      var score=it.w+((f&&f.status==='inferred')?2:0);
+      if(wf==='rent'){
+        if(p==='student'&&it.id==='uni_loc')score+=6;
+        if(p==='student'&&it.id==='budget_rent')score+=2;
+        if(p==='family'&&(it.id==='rooms'||it.id==='prefs'))score+=6;
+        if(p==='retiree'&&(it.id==='prop_new'||it.id==='prefs'))score+=6;
+        if(p==='roommates'&&it.id==='budget_dep')score+=3;
+      }
+      if(wf==='sell'){
+        if(p==='urgent_seller'&&it.id==='min_price')score+=10;
+        if(p==='heir'&&it.id==='docs')score+=8;
+      }
+      out.push({id:it.id,w:score});
     }
     out.sort(function(a,b){return b.w-a.w});
     return out;
@@ -367,15 +562,34 @@ E30.disc=(function(){
     min_price:{q:['پایین‌تر از چه قیمتی نمی‌فروشید؟'],
       why:'برای فیلتر پیشنهادها لازم است.'},
     work_weight:{q:['نزدیکی به محل کار مهم‌تر است یا دانشگاه؟ یا هر دو تقریباً برابر؟'],
-      why:'وزن هر کدام را در امتیاز محله می‌گذارم.'}
+      why:'وزن هر کدام را در امتیاز محله می‌گذارم.'},
+    listing_intent:{q:['برای ملک خودتان کدام را می‌خواهید: آگهی اجارهٔ مسکونی، اقامت کوتاه‌مدت یا فقط مشاورهٔ قیمت؟'],
+      why:'هرکدام مسیر و اطلاعات متفاوتی دارند و بدون درخواست شما آگهی ثبت نمی‌کنم.'}
   };
 
   /* ── collector state ── */
   var COL={active:false,wf:null,fix:null,confirming:null,turns:0};
+  function saveCollector(){
+    try{
+      if(!S.ctx30Collectors)S.ctx30Collectors={};
+      S.ctx30Collectors[contextKey()]=Object.assign({},COL);
+      persist();
+    }catch(e){}
+  }
+  function resume(){
+    try{
+      var saved=S.ctx30Collectors&&S.ctx30Collectors[contextKey()];
+      if(saved&&saved.active&&saved.wf)COL=Object.assign({},saved);
+      else COL={active:false,wf:null,fix:null,confirming:null,turns:0};
+    }catch(e){COL={active:false,wf:null,fix:null,confirming:null,turns:0}}
+    return COL.active;
+  }
   function active(){return COL.active}
 
   function start(wf,silent){
-    COL={active:true,wf:wf,fix:null,confirming:null,turns:0};
+    COL={active:true,wf:wf,fix:null,confirming:null,turns:0,finConfirmed:false};
+    _lastPersona=personaOf(wf);
+    saveCollector();
     if(!silent){
       var p=personaOf(wf),tone=P_TONE[p]||P_TONE.general;
       var greet='شنیدم. ';
@@ -438,15 +652,23 @@ E30.disc=(function(){
     if(id==='household')return {single:'تنهایی',couple:'دو نفره',family:'خانواده',roommates:'هم‌خانه'}[v]||String(v);
     if(id==='work_loc'||id==='uni_loc'||id==='hood'){try{return findH(v).n}catch(e){return String(v)}}
     if(id==='prefs')return (v||[]).map(function(x){return ({parking:'پارکینگ',elevator:'آسانسور',balcony:'بالکن',quiet:'سکوت',metro:'مترو',storage:'انباری'})[x]||x}).join('، ');
+    if(id==='prefRules'){
+      var marks={required:'الزامی',preferred:'ترجیحی',irrelevant:'بی‌اهمیت',forbidden:'نامطلوب'};
+      return Object.keys(v||{}).map(function(k){return ({parking:'پارکینگ',elevator:'آسانسور',balcony:'بالکن',quiet:'سکوت',metro:'مترو',storage:'انباری'})[k]+': '+marks[v[k]]}).join('؛ ');
+    }
+    if(id==='floor_preference')return 'طبقات '+fa(v.min,0)+' تا '+fa(v.max,0)+(v.level==='required'?' (الزامی)':' (ترجیحی)');
     if(id==='purpose')return v==='invest'?'سرمایه‌گذاری':'سکونت';
     if(id==='invest_objective')return ({rent_income:'درآمد اجاره',appreciation:'رشد قیمت',inflation_hedge:'حفظ ارزش',land_bank:'زمین',resale:'فروش سریع',commercial:'تجاری',development:'توسعه',diversify:'تنوع'})[v]||String(v);
-    if(id==='prop_new')return 'نوساز';
+    if(id==='prop_new')return v==='preferred'?'نوساز ترجیحی (غیرالزامی)':v==='recent'?'ساخت چند سال اخیر':'نوساز';
     if(typeof v==='number')return fa(v,0);
     return String(v);
   }
 
   function askNext(){
     if(!COL.active)return;
+    if(COL.confirming&&(/financial|contradiction|final/.test(COL.confirming.type)))return;
+    if(financialPending()){promptFinancial();return}
+    if(hardContradiction()){promptContradiction();return}
     var wf=COL.wf;
     var m=missing(wf);
     var cl=needClarify();
@@ -455,6 +677,7 @@ E30.disc=(function(){
       var f=fMeta(cl);f._clar=true;
       botC(ASK[cl].q[0],null);
       COL.confirming={type:'clarify',id:cl};
+      saveCollector();
       return;
     }
     if(!m.length){complete();return}
@@ -463,13 +686,43 @@ E30.disc=(function(){
     var q=a.q[Math.floor(Math.random()*a.q.length)];
     botC(tone.q+q+(a.why?'<div class="note" style="margin-top:4px">'+esc(a.why)+'</div>':''),null);
     COL.expecting=top.id;
+    saveCollector();
     try{a11yify($('#v-landing')||document.body)}catch(e){}
+  }
+  function financialPending(){
+    return COL.wf==='rent'&&!COL.finConfirmed&&!!getF('budget_dep')&&!!getF('budget_rent');
+  }
+  function promptFinancial(){
+    var dep=getF('budget_dep'),r=getF('budget_rent');
+    if(!dep||!r)return;
+    var dr=dep.open?'بدون سقف':(dep.v?rial(dep.v[0])+(dep.v[1]!==dep.v[0]?' تا '+rial(dep.v[1]):''):'نامعلوم');
+    var rr=r.open?'بدون سقف':(r.v?rial(r.v[0])+(r.v[1]!==r.v[0]?' تا '+rial(r.v[1]):''):'نامعلوم');
+    COL.confirming={type:'financial'};COL.expecting=null;
+    botC('تأیید مالی ضروری است: ودیعه <b>'+esc(dr)+'</b> و اجارهٔ ماهانه <b>'+esc(rr)+
+      '</b>. لطفاً «درسته» را بفرستید؛ برای تغییر هر مقدار بنویسید «اصلاح ودیعه» یا «اصلاح اجاره». تا تأیید شما ادامه نمی‌دهم.',null);
+    saveCollector();
+  }
+  function hardContradiction(){
+    return getF('prop_new')==='new'&&isHard('prop_new')&&getF('prop_age')!==null&&getF('prop_age')>5;
+  }
+  function promptContradiction(){
+    if(!hardContradiction())return;
+    COL.confirming={type:'contradiction'};COL.expecting=null;
+    botC('تناقضی در شرایط ملک دیدم: «نوساز» و «حداکثر عمر '+fa(getF('prop_age'),0)+
+      ' سال» هم‌زمان ثبت شده‌اند. «فقط نوساز» یا «تا '+fa(getF('prop_age'),0)+' سال» را انتخاب کنید؛ تا روشن شدن این شرط جست‌وجو را ادامه نمی‌دهم.',null);
+    saveCollector();
   }
 
   /* value clarification for «نوساز» (§4.4 example) */
   function clarify(text){
     var nt=nz(text);
-    if(/الزامی|فقط نوساز|حتماً نوساز|حتما نوساز|کاملاً/.test(nt)){setF('prop_age',3,{src:'clarify',hard:true});return true}
+    if(/الزامی نیست|ضروری نیست|اجباری نیست|ترجیحی|بهتره|خوبه|خوب است/.test(nt)){
+      setF('prop_new','preferred',{src:'clarify',soft:true});return true;
+    }
+    if(/الزامی|فقط نوساز|حتماً نوساز|حتما نوساز|کاملاً/.test(nt)){
+      setF('prop_new','new',{src:'clarify',hard:true});fMeta('prop_new')._clar=true;
+      setF('prop_age',3,{src:'clarify',hard:true});return true;
+    }
     if(/تا ۵|تا 5|پنج سال|زیر پنج|۵ سال|5 سال/.test(nt)){setF('prop_age',5,{src:'clarify',hard:true});return true}
     if(/بازسازی|باز ساز/.test(nt)){setF('prop_age',10,{src:'clarify',hard:true});setF('renov_ok','yes',{src:'clarify',soft:true});return true}
     if(/مهم نیست|فرقی ندارد|فرقی نداره/.test(nt)){markUnknown('prop_age');markUnknown('prop_new');return true}
@@ -479,6 +732,7 @@ E30.disc=(function(){
   /* parse an answer for a specific expected field */
   function answer(id,text){
     var nt=nz(text),t=String(text||'');
+    evidence(t);
     /* explicit skip is ALWAYS allowed — financials included; the deterministic step
        will still offer «بدون سقف» later, so nothing is silently defaulted (§2.1).
        «رد» must be standalone — it is a substring of «میلیارد». */
@@ -492,6 +746,10 @@ E30.disc=(function(){
         var fs2=finScan(t);
         if(id==='budget_dep'&&fs2.dep){setF(id,{v:fs2.dep},{src:'answer',fin:true});return {ok:true}}
         if(id==='budget_rent'&&fs2.rent){setF(id,{v:fs2.rent},{src:'answer',fin:true});return {ok:true}}
+        /* If the user explicitly distinguished two named financial slots,
+           a missing slot is a clarification request, never an invitation
+           to sum both values as a single deposit or rent. */
+        if(/ودیعه|رهن|پول جلو/.test(nt)&&/اجاره|کرایه|ماهی|ماهانه/.test(nt))return {ok:false};
         var clean=stripFin(t);
         var r=parseMoneyRangeFA(clean);
         if(r&&r.ok){var p=r.value.split('|');setF(id,{v:[+p[0],+p[1]]},{src:'answer',fin:true});return {ok:true}}
@@ -521,7 +779,13 @@ E30.disc=(function(){
         return {ok:false};
       }
       case 'prop_new':{
-        if(/الزامی|فقط نوساز|حتما/.test(nt)){setF('prop_new','new',{src:'answer',hard:true});setF('prop_age',3,{src:'answer',hard:true});return {ok:true}}
+        if(/الزامی نیست|ضروری نیست|اجباری نیست|ترجیح|خوبه|بهتره/.test(nt)){
+          setF('prop_new','preferred',{src:'answer',soft:true});return {ok:true};
+        }
+        if(/الزامی|فقط نوساز|حتما/.test(nt)){
+          setF('prop_new','new',{src:'answer',hard:true});fMeta('prop_new')._clar=true;
+          setF('prop_age',3,{src:'answer',hard:true});return {ok:true};
+        }
         if(/تا ۵|تا 5|پنج سال|۵ سال|5 سال/.test(nt)){setF('prop_new','recent',{src:'answer'});setF('prop_age',5,{src:'answer',hard:true});return {ok:true}}
         if(/مهم نیست|فرقی/.test(nt)){markUnknown('prop_new');return {ok:true,skip:true}}
         return {ok:false};
@@ -551,9 +815,11 @@ E30.disc=(function(){
         return {ok:false};
       }
       case 'invest_horizon':{
-        if(/کوتاه|۱ سال|یک سال|۲ سال|دو سال/.test(nt)){setF('invest_horizon','کوتاه‌مدت',{src:'answer'});return {ok:true}}
-        if(/۵|پنج|بلند|۱۰|ده/.test(nt)){setF('invest_horizon','بلندمدت',{src:'answer'});return {ok:true}}
-        if(/۳|سه/.test(nt)){setF('invest_horizon','میان‌مدت',{src:'answer'});return {ok:true}}
+        var yrs=nt.match(/(\d+)\s*سال/),num=yrs?+yrs[1]:
+          (/ده\s*سال/.test(nt)?10:/پنج\s*سال/.test(nt)?5:/سه\s*سال/.test(nt)?3:/دو\s*سال/.test(nt)?2:/یک\s*سال/.test(nt)?1:null);
+        if((num!==null&&num<=2)||/کوتاه/.test(nt)){setF('invest_horizon','کوتاه‌مدت',{src:'answer'});return {ok:true}}
+        if((num!==null&&num>=10)||/بلند/.test(nt)){setF('invest_horizon','بلندمدت',{src:'answer'});return {ok:true}}
+        if((num!==null&&num>=3&&num<10)||/میان/.test(nt)){setF('invest_horizon','میان‌مدت',{src:'answer'});return {ok:true}}
         return {ok:false};
       }
       case 'invest_liquidity':{
@@ -592,15 +858,14 @@ E30.disc=(function(){
         return {ok:false};
       }
       case 'prefs':{
-        var pf=[],base=(getF('prefs')||[]);
-        if(/پارکینگ/.test(nt)&&base.indexOf('parking')<0)pf.push('parking');
-        if(/آسانسور|اسانسور/.test(nt)&&base.indexOf('elevator')<0)pf.push('elevator');
-        if(/بالکن|تراس/.test(nt)&&base.indexOf('balcony')<0)pf.push('balcony');
-        if(/سکوت|آرام/.test(nt)&&base.indexOf('quiet')<0)pf.push('quiet');
-        if(/مترو/.test(nt)&&base.indexOf('metro')<0)pf.push('metro');
-        if(/انباری/.test(nt)&&base.indexOf('storage')<0)pf.push('storage');
-        if(/مهم نیست|هیچی|ندارم|نه/.test(nt)&&!pf.length){markUnknown('prefs');return {ok:true,skip:true}}
-        if(pf.length){setF('prefs',base.concat(pf),{src:'answer',soft:true});return {ok:true}}
+        if(extractPrefs(nt,'answer'))return {ok:true};
+        if(/مهم نیست|هیچی|ندارم|نه/.test(nt)){markUnknown('prefs');return {ok:true,skip:true}}
+        return {ok:false};
+      }
+      case 'listing_intent':{
+        if(/اقامت|کوتاه|شبانه/.test(nt)){setF('listing_intent','stay',{src:'answer'});return {ok:true}}
+        if(/مشاوره|قیمت|ارزش/.test(nt)&&!/آگهی/.test(nt)){setF('listing_intent','price',{src:'answer'});return {ok:true}}
+        if(/مسکونی|آگهی|اجاره|معمولی/.test(nt)){setF('listing_intent','res',{src:'answer'});return {ok:true}}
         return {ok:false};
       }
       case 'timeline':{
@@ -614,7 +879,7 @@ E30.disc=(function(){
   /* contradiction detection: a new answer clashing with a confirmed field */
   function contradictions(id){
     var out=[];
-    if(id==='prop_age'&&isHard('prop_age')&&getF('prop_new')==='new'&&getF('prop_age')>5){
+    if(id==='prop_age'&&isHard('prop_age')&&getF('prop_new')==='new'&&isHard('prop_new')&&getF('prop_age')>5){
       out.push('قبلاً «نوساز» را مهم گفته بودید؛ حالا حداکثر عمر '+fa(getF('prop_age'),0)+' سال ثبت شد — همین را ثبت کنم یا نوساز همچنان الزامی است؟');
     }
     return out;
@@ -626,27 +891,70 @@ E30.disc=(function(){
     var t=String(text),nt=nz(t);
     if(/^\s*(منو|راهنما|لغو|بستن|انصراف)\s*$/.test(nt)){usrC(t);stop();botC('جمع‌بندی همین‌جا نگه داشته شد — هر وقت خواستید دوباره شروع کنید. چیزی از دست نرفته است.',null);return true}
     usrC(t);
+    COL.turns++;
     /* mid-flow meta-questions get a brief honest answer, then the flow resumes (§4.6) */
-    if(/بنا چیست|بنا چیه|بنا چطور|چند بنا|موجودی|شارژ/.test(nt)&&COL.expecting){
+    if(/بنا چیست|بنا چیه|بنا چطور|چند بنا|موجودی|شارژ/.test(nt)&&
+       (COL.expecting||COL.confirming&&COL.confirming.type==='financial')){
       var bal=S.tokens||0;
       botC('بنا اعتبار سامانه برای سرویس‌های پیشرفته است — هر سرویس قبل از اجرا هزینه‌اش را نشان می‌دهد و فقط با تأیید شما کسر می‌شود. موجودی فعلی شما: '+fa(bal,0)+' بنا. شارژ از دکمهٔ «شارژ بنا» در بالای صفحه.',null);
       var expq=COL.expecting,aq=ASK[expq];
       if(aq)botC(aq.q[0],null);
+      else if(COL.confirming&&COL.confirming.type==='financial')promptFinancial();
       return true;
     }
     /* explicit fix mode */
     if(COL.fix){
       var id=COL.fix;COL.fix=null;
-      if(/پاک کن|حذف/.test(nt)){markUnknown(id);profileCard();return true}
+      if(/پاک کن|حذف/.test(nt)){markUnknown(id);profileCard();saveCollector();askNext();return true}
       var r=answer(id,t);
-      if(r.ok){profileCard();botC('اصلاح شد ✓',null)}
+      if(r.ok){
+        botC('اصلاح شد ✓',null);
+        if(id==='budget_dep'||id==='budget_rent'){COL.finConfirmed=false;COL.confirming=null;promptFinancial()}
+        else{profileCard();saveCollector();askNext()}
+      }
       else botC('متوجه مقدار نشدم — دوباره بنویسید یا «رد» بفرستید.',null);
       return true;
+    }
+    if(COL.confirming&&COL.confirming.type==='financial'){
+      if(/^(درسته|درست است|اوکی|بله|تایید|تأیید|همینه|همین است|صحیح)$/i.test(nt.trim())){
+        COL.finConfirmed=true;COL.finPrompted=true;COL.confirming=null;
+        ['budget_dep','budget_rent'].forEach(function(id){var f=fMeta(id);if(f)f.requiresConfirmation=false});
+        persist();saveCollector();botC('✓ هر دو مبلغ با تأیید شما ثبت شد.',null);askNext();return true;
+      }
+      if(/اصلاح|تغییر|اشتباه|غلط|نه/.test(nt)){
+        var isDep=/ودیعه|رهن|پول جلو/.test(nt),isRent=/اجاره|کرایه|ماهانه|ماهی/.test(nt);
+        if(isDep||isRent){
+          var editId=isDep?'budget_dep':'budget_rent';
+          var edited=answer(editId,t);
+          if(edited.ok){COL.confirming=null;promptFinancial();return true}
+          COL.fix=editId;
+          botC('مبلغ صحیح «'+esc(SLOT_LABEL[editId])+'» را بنویسید؛ تا اصلاح، ادامه نمی‌دهیم.',null);
+        }else botC('کدام مبلغ نیاز به اصلاح دارد؟ «اصلاح ودیعه» یا «اصلاح اجاره» را بنویسید.',null);
+        saveCollector();return true;
+      }
+      var otherFacts=extract(t,'turn');
+      if(otherFacts){
+        COL.confirming=null;
+        personaTurn();
+        botC('نکتهٔ جدید ثبت شد؛ تأیید مالی هنوز باقی است.',null);
+        promptFinancial();
+      }else botC('برای ادامه تأیید صریح لازم است: «درسته» یا «اصلاح ودیعه» / «اصلاح اجاره».',null);
+      return true;
+    }
+    if(COL.confirming&&COL.confirming.type==='contradiction'){
+      if(/فقط نوساز|نوساز الزامی|همان نوساز|حتما نوساز/.test(nt)){
+        setF('prop_age',3,{src:'resolution',hard:true});
+      }else if(/سال|عمر|حداکثر|جدید|نوساز مهم نیست/.test(nt)){
+        setF('prop_new','recent',{src:'resolution'});
+      }else{
+        botC('لطفاً یکی را مشخص کنید: «فقط نوساز» یا «تا '+fa(getF('prop_age'),0)+' سال».',null);return true;
+      }
+      COL.confirming=null;botC('تعارض برطرف شد ✓',null);saveCollector();askNext();return true;
     }
     /* clarification answer pending */
     if(COL.confirming&&COL.confirming.type==='clarify'){
       COL.confirming=null;
-      if(clarify(t)){botC('ثبت شد ✓',null);askNext();return true}
+      if(clarify(t)){botC('ثبت شد ✓',null);saveCollector();askNext();return true}
       /* not a clarity answer → treat as free extraction and keep going */
       extract(t,'turn');
       askNext();return true;
@@ -658,11 +966,19 @@ E30.disc=(function(){
     if(exp){
       res=answer(exp,t);
       if(res.ok){
+        if(res.skip)COL.skipCount=(COL.skipCount||0)+1;
         if(!res.skip&&FL[exp].fin){
           /* financial values are read back explicitly — never silent (§2.1) */
           botC('ثبت شد: <b>'+esc(show(exp,getF(exp)))+'</b>',null);
         }
         COL.expecting=null;
+        if(res.skip&&COL.skipCount>=8){
+          /* Avoid trapping an unsure user in an endless questionnaire. Keep
+             every unprovided field explicitly unknown; never invent money. */
+          missing(COL.wf).forEach(function(item){markUnknown(item.id)});
+          botC('چند مورد را نامشخص گذاشتید. اطلاعاتی را حدس نمی‌زنم؛ می‌توانید آن‌ها را در مرحلهٔ بعد تکمیل کنید.',null);
+          saveCollector();complete();return true;
+        }
       }else if((exp==='work_loc'||exp==='uni_loc'||exp==='hood')&&/نزدیک|حوالی|سمت|محله|محدوده|منطقه/.test(nt)){
         /* honest handling of areas outside the sample dataset (§ honesty rules) */
         var names=(typeof HOODS!=='undefined')?HOODS.map(function(h){return h.n}).join('، '):'';
@@ -672,7 +988,7 @@ E30.disc=(function(){
     }
     /* 3) contradiction surfacing */
     var cons=exp?contradictions(exp):[];
-    if(cons.length){botC('یک نکته: '+esc(cons[0]),null);COL.expecting=exp;/* re-ask same slot */}
+    if(cons.length||hardContradiction()){promptContradiction();return true}
     /* 4) dynamic persona check (§6.1) — announce reprioritization once per change */
     personaTurn();
     /* 5) ack + summary + next single question (§4.6) */
@@ -680,13 +996,8 @@ E30.disc=(function(){
     var p=personaOf(COL.wf);
     if(ack)botC(ack,null);
     /* 6) if both rent financials now known → confirm both explicitly */
-    if(COL.wf==='rent'&&getF('budget_dep')&&getF('budget_rent')&&!COL.finConf){
-      COL.finConf=true;
-      var d=getF('budget_dep'),rr=getF('budget_rent');
-      botC('پس مالی: ودیعه <b>'+(d.open?'بدون سقف':rial(d.v[0])+(d.v[1]!==d.v[0]?' تا '+rial(d.v[1]):''))+'</b> و اجارهٔ ماهانه <b>'+rial(rr.v[0])+(rr.v[1]!==rr.v[0]?' تا '+rial(rr.v[1]):'')+'</b> — درست است؟ اگر عددی اشتباه ثبت شده بگویید تا اصلاح کنم.',null);
-      askNext();
-      return true;
-    }
+    if(financialPending()){promptFinancial();return true}
+    saveCollector();
     askNext();
     return true;
   }
@@ -699,7 +1010,8 @@ E30.disc=(function(){
       botC('با این حرف‌هایتان، تصویرم از شرایط شما عوض شد — اولویت سؤال‌ها را هم بر همان اساس مرتب می‌کنم.',null);
     }else if(!_lastPersona)_lastPersona=p;
   }
-  function stop(){COL={active:false,wf:null,fix:null,confirming:null,turns:0}}
+  function stop(){COL={active:false,wf:null,fix:null,confirming:null,turns:0};saveCollector()}
+  function reset(){stop();useChat(null);saveCollector()}
 
   /* ── completion: profile card → explicit confirm → hand-off (§4.7) ── */
   function complete(){
@@ -710,19 +1022,25 @@ E30.disc=(function(){
       var f=fMeta(cl);f._clar=true;
       botC(ASK[cl].q[0],null);
       COL.confirming={type:'clarify'};
+      saveCollector();
       return;
     }
+    if(financialPending()){promptFinancial();return}
+    if(hardContradiction()){promptContradiction();return}
     profileCard();
     botC('اگر همه‌چیز درست است بنویسید <b>«درسته»</b> — یا هر موردی را اصلاح کنید.',null);
     COL.confirming={type:'final'};
+    saveCollector();
   }
   function profileCard(){
     var c=ctx().fields,keys=[],k;
-    for(k in c){if(c[k]&&c[k].status==='confirmed'&&c[k].v!==null)keys.push(k)}
+    for(k in c){if(c[k]&&c[k].status!=='unknown'&&c[k].v!==null)keys.push(k)}
     if(!keys.length)return;
     var h='<div class="e30-profcard"><b>آن‌چه تا الان از شرایطتان فهمیدم</b>';
-    keys.slice(0,9).forEach(function(id){
+    keys.forEach(function(id){
       h+='<div class="prow"><span>'+esc(SLOT_LABEL[id]||id)+':</span><b>'+esc(show(id,c[id].v))+
+        (c[id].status==='inferred'?' <small>برداشت غیرقطعی؛ نیازمند تأیید</small>':'')+
+        (c[id].requiresConfirmation?' <small>در انتظار تأیید</small>':'')+
         ' <span class="pact" data-cba="e30fix" data-slot="'+qesc(id)+'">اصلاح</span></b></div>';
     });
     h+='</div>';
@@ -732,7 +1050,7 @@ E30.disc=(function(){
   CBACT.e30fix=function(el){
     var slot=el.getAttribute('data-slot');
     if(!COL.active)COL={active:true,wf:COL.wf||guessWf(),fix:null,confirming:null,turns:0};
-    COL.fix=slot;COL.confirming=null;
+    COL.fix=slot;COL.confirming=null;saveCollector();
     botC('مقدار جدید برای «'+esc(SLOT_LABEL[slot]||slot)+'» را بنویسید (یا «پاک کن»):',null);
   };
   function guessWf(){return COL.wf||'rent'}
@@ -753,19 +1071,31 @@ E30.disc=(function(){
         if(p==='family'){P.school=5;P.quiet=4;P.metro=2;P.work=3;if(D.P.park!==true&&isFav('parking'))P.park=true}
         else if(p==='couple'){P.quiet=3;P.work=4;P.metro=3}
         else if(p==='student'){P.metro=5;P.school=1;P.work=4}
-        else if(p==='retiree'){P.quiet=5;P.school=1;P.work=1;P.elev=true}
+        else if(p==='retiree'){P.quiet=5;P.school=1;P.work=1}
         else {P.metro=4;P.work=4;P.school=2}
         P.persona=({family:'خانواده',couple:'دو نفره',student:'دانشجو/کاری',retiree:'موقت',roommates:'دانشجو/کاری'})[p]||'دانشجو/کاری';
         var v;
         if((v=getF('rooms'))!=null)P.beds=+v;
         if((v=getF('m2'))!=null)P.minM2=+v;
         if((v=getF('prop_age'))!=null){P.maxAge=+v;P._ageHard=true}
-        else if(getF('prop_new')==='new'){P.maxAge=5;P._ageHard=true} /* confirmed «نوساز», strictness never clarified → documented 5y reading */
+        else if(getF('prop_new')==='new'&&isHard('prop_new')){P.maxAge=3;P._ageHard=true}
+        else if(getF('prop_new')==='new'||getF('prop_new')==='preferred'){P.maxAge=30;P._ageHard=false;P._preferNew=true} /* soft preference, never silently harden */
         else{P.maxAge=30;P._ageHard=false} /* «مهم نیست» → wide, soft */
         (getF('prefs')||[]).forEach(function(x){
           if(x==='elevator')P.elev=true;else if(x==='parking')P.park=true;
           else if(x==='metro')P.metro=5;else if(x==='quiet')P.quiet=5;
+          else if(x==='balcony')P.balc=true;else if(x==='storage')P.storage=true;
         });
+        P.prefRules=Object.assign({},getF('prefRules')||{});
+        /* Persona may suggest accessible amenities for ranking, but cannot
+           silently convert an inferred need into a mandatory listing filter.
+           Respect even an explicit 'irrelevant' or 'forbidden' user answer. */
+        if(p==='retiree'&&!Object.prototype.hasOwnProperty.call(P.prefRules,'elevator')){
+          P.prefRules.elevator='preferred';
+          P._personaElevatorSuggested=true;
+        }
+        var floorRule=getF('floor_preference');
+        if(floorRule){P._floorRange=floorRule;if(floorRule.level==='required')P.requiredFloor={min:floorRule.min,max:floorRule.max}}
         var w=getF('work_weight');
         if(w==='work'&&getF('work_loc'))P.work=5;
         if(w==='uni'&&getF('uni_loc'))P.work=5;
@@ -787,17 +1117,30 @@ E30.disc=(function(){
           D2.budg=bud.v[1];D2.budgOpen=!!bud.open;D2._budgSet=1;
           /* §8.1: if the stated number covers the WHOLE transaction, keep a labeled
              ~5% side-cost allowance so total(m2×ppm) stays inside real capacity */
-          if(getF('budget_scope')==='total'){D2.budgIncSide=true;D2.budg=Math.round(bud.v[1]*0.95)}
+          if(getF('budget_scope')==='total'){
+            D2.budgIncSide=true;
+            /* The user's actual taxes/fees/financing were never supplied. We
+               cannot invent a uniform 5% deduction from the declared budget. */
+            D2.costBudgetUnknown=true;
+            botC('بودجهٔ کل معامله را ثبت کردم؛ مبلغ هزینه‌های جانبی هنوز مشخص نیست. فعلاً درصدی را خودسرانه کسر نمی‌کنم و نتایج نیازمند بازبینی هزینهٔ واقعی انتقال‌اند.',null);
+          }
         }
         if(getF('purpose')==='invest'){D2.P.metro=2;D2.P.school=2;D2.P.work=2}
         var v2;
         if((v2=getF('rooms'))!=null)D2.PR.beds=+v2;
         if((v2=getF('m2'))!=null)D2.PR.m2=[+v2,Math.max(+v2+30,120)];
         if((v2=getF('prop_age'))!=null)D2.PR.age=[0,+v2];
+        if(getF('prop_new')==='new'||getF('prop_new')==='preferred'){
+          if(isHard('prop_new'))D2.PR.age=[0,3];
+          else D2.PR._preferNew=true;
+        }
         (getF('prefs')||[]).forEach(function(x){
           if(x==='elevator')D2.PR.elev='yes';else if(x==='parking')D2.PR.park='yes';
           else if(x==='balcony')D2.PR.balc='yes';
         });
+        D2.PR.prefRules=getF('prefRules')||{};
+        var floorBuy=getF('floor_preference');
+        if(floorBuy){D2.PR._floorRange=floorBuy;if(floorBuy.level==='required')D2.PR.requiredFloor={min:floorBuy.min,max:floorBuy.max}}
         D2._e30=1;save();
         if(!bud||!bud.v)ceJump('budg');else ceJump('imps');
         return true;
@@ -829,6 +1172,17 @@ E30.disc=(function(){
         ceJump('i_obj');
         return true;
       }
+      if(wf==='landlord'){
+        ceStart('lndl');
+        var D5=wd('lndl').data;
+        var kind=getF('listing_intent');if(kind==='stay'||kind==='price'||kind==='res')D5.ltype=kind;
+        var lhood=getF('hood');if(lhood)D5.hood=lhood;
+        var la=getF('prop_area');if(la!=null){D5.area=+la;D5.m2=+la}
+        var lp=getF('expected_price');if(lp&&lp.v)D5.ask_price=lp.v[0];
+        D5._e30=1;save();
+        ceJump('l_role');
+        return true;
+      }
     }catch(e){console.error('E30 handoff',e)}
     return true;
   }
@@ -838,7 +1192,13 @@ E30.disc=(function(){
   function maybeFinal(text){
     if(!(COL.active&&COL.confirming&&COL.confirming.type==='final'))return false;
     var nt=nz(text);
-    if(/درسته|درست است|درست فع|اوکی|باشه|تأیید|تایید|همینه|همین/.test(nt)){usrC(text);handoff();return true}
+    if(/درسته|درست است|درست فع|اوکی|باشه|تأیید|تایید|همینه|همین/.test(nt)){
+      usrC(text);
+      if(financialPending()){promptFinancial();return true}
+      if(hardContradiction()){promptContradiction();return true}
+      handoff();return true;
+    }
+    COL.confirming=null;saveCollector();
     return false;
   }
 
@@ -852,17 +1212,28 @@ E30.disc=(function(){
       return false;
     }
     var nt=nz(t);
-    var wantsRealEstate=/خونه|خانه|ملک|آپارتمان|اجاره|کرایه|رهن|خرید|بخرم|فروش|بفروشم|سرمایه ?گذاری|زمین|مغازه|سویییت|سوئیت/.test(nt);
+    var wantsRealEstate=/خونه|خانه|ملک|آپارتمان|اجاره|کرایه|رهن|خرید|بخرم|بخریم|می ?خریم|فروش|بفروشم|سرمایه ?گذاری|زمین|مغازه|سویییت|سوئیت|موجر|مستأجر دارم|مستاجر دارم/.test(nt);
     if(!wantsRealEstate)return false;
     if(!/می ?خوام|می ?خواهم|می ?خوایم|می ?خواهیم|دنبال|اجاره ? نشین|هستم|هستیم|دارم|داریم|سالمه|سالانه|باید|لازم|زوج|خانواده|دانشجو|هم ?خونه/.test(nt)&&!getF('household'))return false;
     /* paid-service intents take precedence */
     if(/تحلیل (جامع )?محله/.test(nt)&&CE.f!=='rent'&&CE.f!=='buy'){return false} /* leave to flow/service */
     var intent=null;
-    if(/فروش|بفروشم|می ?فروشم|فروشنده/.test(nt)&&!/خرید|بخرم|اجاره/.test(nt))intent='sell';
-    else if(!/نه[^.،؛]{0,12}سرمایه|سرمایه ?گذاری نیست/.test(nt)&&(/سرمایه ?گذاری|سود|بخرم.*اجاره بدهم|حفظ ارزش/.test(nt)||(/بخرم|خرید/.test(nt)&&/سرمایه/.test(nt)&&!/نه.*سرمایه/.test(nt))))intent='invest';
+    if(/اجاره\s*(?:بدم|بدیم|می ?دم|می ?دیم|دادن)|اجاره ?گذاری|موجر|مستأجر دارم|مستاجر دارم/.test(nt)&&
+       /ملکم|ملکمو|ملک خودم|مالک|موجر|اجاره بدم|اجاره می ?دم|مستأجر دارم|مستاجر دارم/.test(nt))intent='landlord';
+    else if(/فروش|بفروشم|می ?فروشم|فروشنده/.test(nt)&&!/خرید|بخرم|اجاره/.test(nt))intent='sell';
+    else if(!excludesInvestment(nt)&&(/سرمایه ?گذاری|سود|بخرم.*اجاره بدهم|حفظ ارزش/.test(nt)||(BUY_VERB.test(nt)&&/سرمایه/.test(nt)&&!/نه.*سرمایه/.test(nt))))intent='invest';
     else if(/اجاره ? می ?دم|موجر|مستأجر دارم|مستاجر دارم/.test(nt))intent='landlord';
     else if(/اجاره|کرایه|استیجار|رهن/.test(nt))intent='rent';
-    else if(/خرید|بخرم|مبایعه/.test(nt))intent='buy';
+    else if(BUY_VERB.test(nt)||/مبایعه/.test(nt))intent='buy';
+    else if(/دنبال|نیاز|می ?خوام|می ?خواهم/.test(nt)&&
+       /سوییت|سویییت|سوئیت|خانه|خونه|آپارتمان/.test(nt)&&
+       /دانشجو|هم ?خانه|هم ?خونه|خوابگاه|پول پیش|ودیعه|اجاره ماهانه/.test(nt)){
+      /* Reasonable but non-binding interpretation: a student seeking a room or
+         house with roommates is likely renting. Clarify it in natural language
+         before any financial commitment; never treat it as a confirmed fact. */
+      intent='rent';
+      botC('از توضیحتان برداشت کردم دنبال اجاره هستید؛ اگر منظورتان خرید است، همان‌جا بگویید تا مسیر را عوض کنیم.',null);
+    }
     if(!intent)return false;
     usrC(t);
     extract(t,'open'); /* harvest the opening message (§4.2) */
@@ -870,9 +1241,38 @@ E30.disc=(function(){
     return start(intent);
   }
 
-  E30.discAPI={route:route,active:active,start:start,getF:getF,setF:setF,ctx:ctx,personaOf:personaOf,
+  E30.discAPI={route:route,active:active,start:start,stop:stop,reset:reset,bindChat:bindChat,useChat:useChat,forgetChat:forgetChat,resume:resume,
+    getF:getF,setF:setF,ctx:ctx,personaOf:personaOf,
     profileCard:profileCard,missing:missing,show:show,markUnknown:markUnknown,SLOT_LABEL:SLOT_LABEL,
     extract:extract,answer:answer};
   E30._dbg={normHalf:normHalf,segMoney:segMoney,finScan:finScan}; /* unit-debug surface */
   return E30.discAPI;
+})();
+
+/* A stated preference influences ordering, but never silently excludes listings.
+   Hard requirements are enforced by rentPass/buyPass, not by the score. */
+E30.softPreferenceBonus=function(x,P){
+  if(!x||!P)return 0;
+  var pref=P.prefRules||{},n=0;
+  if(pref.parking==='preferred'&&x.park)n+=4;
+  if(pref.elevator==='preferred'&&x.elev)n+=4;
+  if(pref.balcony==='preferred'&&x.balc)n+=3;
+  if(pref.storage==='preferred'&&x.storage)n+=2;
+  if(P._preferNew&&typeof x.age==='number'&&x.age<=5)n+=5;
+  var fl=P._floorRange;
+  if(fl&&fl.level==='preferred'&&typeof x.floor==='number'&&
+     (fl.min==null||x.floor>=fl.min)&&(fl.max==null||x.floor<=fl.max))n+=4;
+  return n;
+};
+(function(){
+  if(typeof lscore==='function'&&!lscore._e30Soft){
+    var baseLscore=lscore;
+    lscore=function(x,D){return Math.min(98,baseLscore(x,D)+E30.softPreferenceBonus(x,D&&D.P))};
+    lscore._e30Soft=true;
+  }
+  if(typeof bScore==='function'&&!bScore._e30Soft){
+    var baseBscore=bScore;
+    bScore=function(x,D){return Math.min(98,baseBscore(x,D)+E30.softPreferenceBonus(x,D&&D.PR))};
+    bScore._e30Soft=true;
+  }
 })();

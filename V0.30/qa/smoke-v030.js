@@ -1,7 +1,9 @@
 /* smoke-v030.js — boot + critical-path smoke test (real Chromium via Playwright) */
-const { chromium } = require('C:/Users/Sedreh/zqa/node_modules/playwright');
+const { chromium } = require('playwright');
+const fs=require('node:fs');
+const path=require('node:path');
 
-const URL='http://127.0.0.1:8730/Mahalino%2BV0.30.html';
+const URL=process.env.QA_BASE_URL||'http://127.0.0.1:8730/Mahalino%2BV0.30.html';
 let pass=0,fail=0;const fails=[];
 function ok(name,cond,extra){if(cond){pass++;console.log('  ✓ '+name)}else{fail++;fails.push(name);console.log('  ✗ '+name+(extra?' — '+JSON.stringify(extra).slice(0,220):''))}}
 
@@ -12,7 +14,7 @@ async function send(page,text){
 }
 
 (async()=>{
-  const b=await chromium.launch({executablePath:'C:/Users/Sedreh/AppData/Local/ms-playwright/chromium-1254/chrome-win64/chrome.exe',headless:true});
+  const b=await chromium.launch({headless:true,executablePath:process.env.QA_CHROMIUM_EXECUTABLE||undefined,args:process.env.QA_NO_SANDBOX==='1'?['--no-sandbox']:[]});
   const ctx=await b.newContext({viewport:{width:1280,height:800}});
   const page=await ctx.newPage();
   const errors=[];
@@ -80,11 +82,13 @@ async function send(page,text){
       disc:!!(window.E30&&E30.discAPI&&E30.discAPI.active()),
       fields:Object.keys(f),
       persona:E30.discAPI.personaOf('rent'),
+      newness:f.prop_new&&{value:f.prop_new.v,kind:f.prop_new.kind,needsConfirmation:f.prop_new.requiresConfirmation},
       bubbles:bubbles.map(b=>b.slice(0,150))
     };
   });
   ok('opening message starts discovery collector',st.disc===true,st);
   ok('multi-fact extraction (couple/first-rent/work/uni/نوساز)',st.fields.filter(x=>['household','life_stage','work_loc','uni_loc','prop_new','age'].indexOf(x)>=0).length>=5,st.fields);
+  ok('«نوساز مهمه» is an explicitly soft preference pending clarification, not a hard age limit',st.newness&&st.newness.value==='new'&&st.newness.kind==='soft',st.newness);
   ok('persona = couple (not student — دانشگاه is a location)',st.persona==='couple',st.persona);
   var weightKnown=st.fields.indexOf('work_weight')>=0;
   ok('first question adaptive: weighting OR budget when weighting pre-extracted (§4.8/4.5)',weightKnown?st.bubbles.some(b=>/ودیعه|بازه/.test(b)):st.bubbles.some(b=>/کدوم یکی|اولویت بیشتری|یک اندازه|مهم‌تره/.test(b)),{weightKnown,seen:st.bubbles.slice(-2)});
@@ -104,25 +108,43 @@ async function send(page,text){
     const f=S.ctx30.fields;
     return {
       dep:f.budget_dep?f.budget_dep.v:null,rent:f.budget_rent?f.budget_rent.v:null,
-      finConf:bubbles.some(b=>/مالی: ودیعه/.test(b)),
+      finConf:bubbles.some(b=>/تأیید مالی ضروری است.*ودیعه.*اجارهٔ ماهانه/.test(b)),
+      pending:S.ctx30Collectors&&S.ctx30Collectors[S.ctx30ActiveKey]&&S.ctx30Collectors[S.ctx30ActiveKey].confirming&&S.ctx30Collectors[S.ctx30ActiveKey].confirming.type,
       last:bubbles[bubbles.length-1].slice(-160)
     };
   });
   ok('BOTH deposit and rent captured from the two-amount sentence',!!st.dep&&!!st.rent,st);
-  ok('both financial values confirmed back explicitly (no silent defaults)',st.finConf===true,st);
+  ok('two-amount sentence keeps the trailing «ودیعه» label on 1.5b, separate from 20–25m rent',
+    st.dep?.v?.[0]===1500000000&&st.dep?.v?.[1]===1500000000&&
+    st.rent?.v?.[0]===20000000&&st.rent?.v?.[1]===25000000,st);
+  ok('both financial values read back and explicit confirmation awaited (no silent defaults)',st.finConf===true&&st.pending==='financial',st);
+  // The financial confirmation is a mandatory *separate user turn*. Text about
+  // parking/rooms must not be silently treated as confirmation or discarded.
+  await send(page,'درسته');
+  st=await page.evaluate(()=>({confirming:S.ctx30Collectors&&S.ctx30Collectors[S.ctx30ActiveKey]&&S.ctx30Collectors[S.ctx30ActiveKey].confirming&&S.ctx30Collectors[S.ctx30ActiveKey].confirming.type,
+    finConfirmed:S.ctx30Collectors&&S.ctx30Collectors[S.ctx30ActiveKey]&&S.ctx30Collectors[S.ctx30ActiveKey].finConfirmed}));
+  ok('explicit financial consent accepted before next discovery questions',st.finConfirmed===true&&st.confirming!=='financial',st);
 
   await send(page,'۲ خواب');
   await send(page,'حداقل ۶۰ متر');
   await send(page,'پارکینگ و آسانسور');
   await send(page,'تا یک ماه دیگه');
+  for(let i=0;i<22;i++){
+    const phase=await page.evaluate(()=>({active:E30.discAPI.active(),type:S.ctx30Collectors&&S.ctx30Collectors[S.ctx30ActiveKey]&&S.ctx30Collectors[S.ctx30ActiveKey].confirming&&S.ctx30Collectors[S.ctx30ActiveKey].confirming.type}));
+    if(!phase.active||phase.type==='final')break;
+    await send(page,phase.type==='financial'?'درسته':'مهم نیست');
+  }
   st=await page.evaluate(()=>{
     const bubbles=[...document.querySelectorAll('#chatB .msg.bot .bub')].map(b=>b.textContent);
     return {profile:bubbles.some(b=>/آن‌چه تا الان از شرایطتان فهمیدم/.test(b)),
       askFinal:bubbles.some(b=>/درسته/.test(b)),
-      prefs:(S.ctx30.fields.prefs||{}).v||null};
+      prefs:(S.ctx30.fields.prefs||{}).v||null,
+      prefRules:(S.ctx30.fields.prefRules||{}).v||null};
   });
   ok('reached completion profile card',st.profile===true,st);
-  ok('parking/elevator prefs captured',Array.isArray(st.prefs)&&st.prefs.indexOf('parking')>=0&&st.prefs.indexOf('elevator')>=0,st.prefs);
+  ok('parking/elevator are captured as soft preferences, not silently hardened',st.prefRules&&
+    st.prefRules.parking==='preferred'&&st.prefRules.elevator==='preferred'&&
+    !(Array.isArray(st.prefs)&&st.prefs.includes('parking')),st);
 
   await send(page,'درسته');
   st=await page.evaluate(()=>{
@@ -136,6 +158,7 @@ async function send(page,text){
       expDep:expDep&&expDep.ok?expDep.value:null,
       e30:!!D._e30,persona:D.P?D.P.persona:null,
       age:D.P?D.P.maxAge:null,ageHard:D.P?!!D.P._ageHard:null,
+      newFact:S.ctx30.fields.prop_new||null,
       wfStep:(function(){try{return wd('rent').step}catch(e){return null}})()
     };
   });
@@ -143,7 +166,7 @@ async function send(page,text){
   ok('confirmed rent EXACTLY as parsed — never the 500M default (defect 2.1)',st.rentB===st.expRentUp&&st.rentB!==500000000,{rentB:st.rentB,expected:st.expRentUp});
   ok('confirmed deposit preserved exactly',st.depB===st.expDep,{depB:st.depB,expected:st.expDep});
   ok('auto-advanced past known steps (imps/beds/who) to first unknown — no re-asking (§4.2)',st.stepId==='age'||st.stepId==='m2',st);
-  ok('نوساز → hard age bound (3 if clarified, 5 if clarify unanswered)',st.ageHard===true&&st.age>=3&&st.age<=5,st);
+  ok('ambiguous «نوساز مهمه» never creates a hard age cutoff after optional skip',st.ageHard===false&&st.age>=20,st);
   ok('workflow record step synced with conversation stage (defect 2.4)',st.wfStep===st.stepIx+1,{wfStep:st.wfStep,ix:st.stepIx});
 
   console.log('— Strict filters (defects 2.2/2.3) —');
@@ -209,12 +232,16 @@ async function send(page,text){
   });
   ok('superseded confirm card invalidated honestly',st.stale>=1&&st.live>=1,st);
   st=await page.evaluate(()=>{
-    S.paySession={payId:'PAY-x',key:'valuation',cost:40,title:'تخمین',state:'paid',paidFlag:true,executed:false,ts:Date.now()};
+    // Recovery must refund only a real debit with matching payId, never mint
+    // credit from a fabricated paidFlag/session.
+    const payId='PAY-SMOKE-'+Date.now(),txnId='TXN-SMOKE-'+Date.now();
+    S.log.unshift({t:Date.now(),d:'QA interrupted valuation',c:-40,cat:'bana',id:txnId,svc:'valuation',payId});
+    S.paySession={payId,txnId,key:'valuation',cost:40,title:'تخمین',state:'paid',paidFlag:true,executed:false,refunded:false,ts:Date.now()};
     save();var t0=S.tokens;
     E30.pay.recover();
-    return {refunded:S.tokens-t0,cleared:!S.paySession};
+    return {refunded:S.tokens-t0,cleared:!S.paySession,credits:S.log.filter(x=>x.payId===payId&&x.refund).length};
   });
-  ok('interrupted payment auto-refund on recovery (§11.6)',st.refunded===40&&st.cleared===true,st);
+  ok('journal-backed interrupted payment auto-refunded once (§11.6)',st.refunded===40&&st.cleared===true&&st.credits===1,st);
 
   console.log('— New flows —');
   st=await page.evaluate(()=>{
@@ -233,7 +260,9 @@ async function send(page,text){
   const realErrors=errors.filter(e=>!/picsum|favicon|net::|Failed to load resource/.test(e));
   ok('no unexpected page errors',realErrors.length===0,realErrors.slice(0,3));
 
-  await page.screenshot({path:'screenshots/smoke-final.png',fullPage:false});
+  const screenshotDir=process.env.QA_RESULTS_DIR||path.resolve('screenshots');
+  fs.mkdirSync(screenshotDir,{recursive:true});
+  await page.screenshot({path:path.join(screenshotDir,'smoke-final.png'),fullPage:false});
   await b.close();
   console.log('\nSMOKE RESULT: '+pass+' passed, '+fail+' failed');
   if(fails.length)console.log('FAILED: '+fails.join(' | '));
