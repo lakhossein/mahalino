@@ -76,13 +76,25 @@ async function check(name, run) {
     }
 
     await page.setViewportSize({ width: 1280, height: 800 });
-    await check('Landing service cards are keyboard operable', async () => {
-      const d = await page.evaluate(() => {
-        const cards = [...document.querySelectorAll('#v-splash .spl-card')];
-        const inaccessible = cards.filter(el => el.getAttribute('role') === 'button' && el.tabIndex < 0);
-        return { total: cards.length, inaccessible: inaccessible.length };
-      });
-      return { ok: d.total > 0 && d.inaccessible === 0, detail: d };
+    await check('Landing service cards actually activate with keyboard Enter', async () => {
+      const d = await page.evaluate(() => ({
+        total: document.querySelectorAll('#v-splash .spl-card').length,
+        firstTabIndex: document.querySelector('#v-splash .spl-card')?.tabIndex
+      }));
+      await page.locator('#v-splash .spl-card').first().focus();
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(100);
+      const opened = await page.locator('#modal-root.on .spl-modal').count();
+      if (opened) await page.evaluate(() => closeModal());
+      return { ok: d.total > 0 && opened > 0, detail: { ...d, modalOpenedOnEnter: Boolean(opened) } };
+    });
+
+    await check('Required local map and Yekan Bakh assets load without failure', async () => {
+      const broken = diagnostics.requestsFailed.filter(r =>
+        /^http:\/\/127\.0\.0\.1:8730\//.test(r.url) &&
+        (/\/assets\/leaflet\//.test(r.url) || /\/assets\/fonts\/yekan-bakh\//.test(r.url))
+      );
+      return { ok: broken.length === 0, detail: { failed: broken.map(x => x.url) } };
     });
 
     await check('No payment without service execution callback', async () => {
