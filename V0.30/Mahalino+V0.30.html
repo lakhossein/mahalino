@@ -16863,7 +16863,8 @@ E30.disc=(function(){
       var sum=SUM.start(wf);
       greet+=sum||'تا شناخته‌شدن شرایط‌تان، چند چیز کلیدی را یکی‌یکی می‌پرسم.';
       botC(greet,null);
-      if(!budgetFirst&&scenarioCard(wf)){saveCollector();return true}
+      var hasConcreteFacts=!!(getF('work_loc')||getF('uni_loc')||getF('household')||getF('hood')||getF('prop_new')||getF('rooms')||getF('budget_dep')||getF('budget_rent'));
+      if(!budgetFirst&&!hasConcreteFacts&&scenarioCard(wf)){saveCollector();return true}
       askNext();
     }
     return true;
@@ -16947,7 +16948,7 @@ E30.disc=(function(){
       }).join('');
     };
     var h='<div class="e30-budget-card" role="group" aria-label="بودجهٔ ودیعه و اجاره">'+
-      '<b>برای پیدا کردن گزینه‌های متناسب، بودجه‌ات را مشخص کن.</b>'+
+      '<b>برای پیدا کردن گزینه‌های متناسب، ودیعه و اجاره‌ات حدوداً چقدر است؟</b>'+
       '<p class="note">می‌توانی یکی از مبلغ‌های پیشنهادی را انتخاب کنی یا بودجهٔ خودت را در گفتگو بنویسی. هیچ مبلغی به‌صورت خودکار انتخاب نشده است.</p>';
     if(depMissing)h+='<fieldset><legend>حداکثر ودیعه (تومان)</legend>'+
       options('e30-dep',['۳۰۰ میلیون','۵۰۰ میلیون','۱ میلیارد','۱.۵ میلیارد'])+'</fieldset>';
@@ -17271,13 +17272,14 @@ E30.disc=(function(){
     usrC(t);
     COL.turns++;
     /* mid-flow meta-questions get a brief honest answer, then the flow resumes (§4.6) */
-    if(/کلید چیست|کلید چیه|چند کلید|کلید چیست|کلید چیه|کلید چطور|چند کلید|موجودی|شارژ/.test(nt)&&
-       (COL.expecting||COL.confirming&&COL.confirming.type==='financial')){
+    if(/کلید چیست|کلید چیه|کلید چطور|چند کلید|کلید چیست|کلید چیه|کلید چطور|چند کلید|موجودی|شارژ/.test(nt)){
       var bal=S.tokens||0;
       botC('کلید اعتبار سامانه برای سرویس‌های پیشرفته است. هزینهٔ هر خدمت پیش از اجرا نمایش داده می‌شود و فقط با تأیید شما کسر خواهد شد. موجودی: '+fa(bal,0)+' کلید. مدیریت اعتبار از منوی حساب در پایین سایدبار در دسترس است.',null);
       var expq=COL.expecting,aq=ASK[expq];
-      if(aq)botC(aq.q[0],null);
+      if(COL.wf==='rent'&&(expq==='budget_dep'||expq==='budget_rent'))budgetCard();
+      else if(aq)botC(aq.q[0],null);
       else if(COL.confirming&&COL.confirming.type==='financial')promptFinancial();
+      else if(COL.active&&!COL.expecting)scenarioCard(COL.wf);
       return true;
     }
     /* explicit fix mode */
