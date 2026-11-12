@@ -59,8 +59,10 @@ E30.disc=(function(){
     (S.savedListings||[]).forEach(remapItem);
     (S.projects||[]).forEach(function(p){
       if(!p)return;
-      if(p.chatIds)p.chatIds=p.chatIds.map(function(ref){return ref===key?id:ref});
-      if(p._liveRefs)p._liveRefs.forEach(function(r){if(r&&r.id===key)r.id=id});
+      var linked=(p.chatIds||[]).indexOf(key)>=0||(p._liveRefs||[]).some(function(r){return r&&r.id===key});
+      if(p.chatIds)p.chatIds=p.chatIds.map(function(ref){return ref===key?id:ref}).filter(function(ref,i,all){return all.indexOf(ref)===i});
+      if(linked){var archived=E22.findSess(id);if(archived)archived.projectId=p.id;}
+      if(p._liveRefs)p._liveRefs=p._liveRefs.filter(function(r){return r&&r.id!==key&&r.id!==id});
     });
     S.ctx30ActiveKey=newKey;persist();
   }

@@ -4789,6 +4789,7 @@ E27.sessRow=function(s){
     '<span class="e22-sess-acts">'+
     '<button class="e22-sact" type="button" data-act="sessPin" data-sess="'+qesc(s.id)+'" aria-pressed="'+(s.pinned?'true':'false')+'" aria-label="'+pinLab+'" title="'+pinLab+'">'+(s.pinned?E27_IC.pin:E27_IC.pinoff)+'</button>'+
     '<button class="e22-sact" type="button" data-act="sessRename" data-sess="'+qesc(s.id)+'" aria-label="تغییر نام گفت‌وگو" title="تغییر نام">'+E27_IC.pen+'</button>'+
+    '<button class="e22-sact" type="button" data-act="e31MoveChat" data-sess="'+qesc(s.id)+'" title="انتقال به پروژه" aria-label="انتقال به پروژه">'+E27_IC.pin+'</button>'+
     '<button class="e22-sact e22-sact-del" type="button" data-act="sessDel" data-sess="'+qesc(s.id)+'" aria-label="حذف گفت‌وگو" title="حذف گفت‌وگو">'+E27_IC.trash+'</button>'+
     '</span></div>';
 };
@@ -12513,7 +12514,8 @@ E22.sessHTML=function(){
       '<small class="e22-sess-time">'+E22.rel(s.ts)+' · '+fa((s.hist||[]).length,0)+' پیام</small></span>'+
       '<span class="e22-sess-acts">'+
       '<button class="e22-sact" type="button" data-act="sessPin" data-sess="'+qesc(s.id)+'" aria-pressed="'+(s.pinned?'true':'false')+'" aria-label="'+pinLab+'" title="'+pinLab+'">'+(s.pinned?E27_IC.pin:E27_IC.pinoff)+'</button>'+
-      '<button class="e22-sact e22-sact-del" type="button" data-act="sessDel" data-sess="'+qesc(s.id)+'" aria-label="حذف گفت‌وگو" title="حذف گفت‌وگو">×</button>'+
+      '<button class="e22-sact" type="button" data-act="e31MoveChat" data-sess="'+qesc(s.id)+'" title="انتقال به پروژه" aria-label="انتقال به پروژه">'+E27_IC.pin+'</button>'+
+    '<button class="e22-sact e22-sact-del" type="button" data-act="sessDel" data-sess="'+qesc(s.id)+'" aria-label="حذف گفت‌وگو" title="حذف گفت‌وگو">×</button>'+
       '</span></div>';
   }
   var h='<div class="sg">گفت‌وگوهای پیشین</div>'+
@@ -14919,12 +14921,14 @@ E29.proj=(function(){
   }
   function addChat(pid,chatId){
     var p=byId(pid),i;
-    if(!p||!S.chats)return;
+    if(!p||!S.chats||!S.chats.some(function(c){return c.id===chatId}))return false;
+    store().forEach(function(other){other.chatIds=(other.chatIds||[]).filter(function(id){return id!==chatId});if(other._liveRefs)other._liveRefs=other._liveRefs.filter(function(r){return r.id!==chatId})});
+    if(!p.chatIds)p.chatIds=[];
     var title=null;
     for(i=0;i<S.chats.length;i++){if(S.chats[i].id===chatId){S.chats[i].projectId=pid;title=S.chats[i].title}}
     if(p.chatIds.indexOf(chatId)<0)p.chatIds.push(chatId);
     store2().forEach(function(it){
-      if(it.sourceChat===chatId||(it.sourceChat==null&&title&&it.sourceTitle===title))it.projectId=pid;
+      if(it.sourceChat===chatId)it.projectId=pid;
     });
     save();
   }
@@ -14997,7 +15001,7 @@ E29.proj=(function(){
     });
     h+='</div>';
     h+='<h4>افزودن گفت‌وگوی موجود</h4><div class="sect">';
-    var free=(S.chats||[]).filter(function(c){return c&&!c.projectId&&!c.pinned});
+    var free=(S.chats||[]).filter(function(c){return c&&c.projectId!==p.id});
     if(!free.length)h+='<div class="note">گفت‌وگوی بدون پروژه‌ای نیست.</div>';
     free.slice(0,12).forEach(function(c){
       h+='<div class="kv"><span>'+esc((c.title||'بدون عنوان').slice(0,30))+'</span><b><button class="e29-cact" data-act="e29prjAddChat" data-prj="'+qesc(p.id)+'" data-sess="'+qesc(c.id)+'" title="افزودن">'+e29ico('plus',14)+'</button></b></div>';
@@ -15062,7 +15066,7 @@ E29.proj=(function(){
     if(v.replace(/\s/g,''))rename(el.getAttribute('data-prj'),v);
     closeModal();mountPanel(el.getAttribute('data-prj'));E29.shell.renderSidebarOnly();
   };
-  ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));toast('گفت‌وگو به پروژه اضافه شد')};
+  ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));E29.shell.renderSidebarOnly();toast('گفت‌وگو به پروژه منتقل شد')};
   ACT.e29prjRmChat=function(el){removeChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'))};
   ACT.e29prjDel=function(el){
     var p=byId(el.getAttribute('data-prj'));if(!p)return;
@@ -16347,8 +16351,10 @@ E30.disc=(function(){
     (S.savedListings||[]).forEach(remapItem);
     (S.projects||[]).forEach(function(p){
       if(!p)return;
-      if(p.chatIds)p.chatIds=p.chatIds.map(function(ref){return ref===key?id:ref});
-      if(p._liveRefs)p._liveRefs.forEach(function(r){if(r&&r.id===key)r.id=id});
+      var linked=(p.chatIds||[]).indexOf(key)>=0||(p._liveRefs||[]).some(function(r){return r&&r.id===key});
+      if(p.chatIds)p.chatIds=p.chatIds.map(function(ref){return ref===key?id:ref}).filter(function(ref,i,all){return all.indexOf(ref)===i});
+      if(linked){var archived=E22.findSess(id);if(archived)archived.projectId=p.id;}
+      if(p._liveRefs)p._liveRefs=p._liveRefs.filter(function(r){return r&&r.id!==key&&r.id!==id});
     });
     S.ctx30ActiveKey=newKey;persist();
   }
@@ -18405,6 +18411,7 @@ E30.ux=(function(){
   function addLive(pid){
     var p=E29.projAPI.byId(pid);if(!p)return false;
     var li=liveChatInfo();
+    if(!li.live){E29.projAPI.addChat(pid,li.id);return true}
     /* One live chat belongs to one project, consistent with S.chats.projectId. */
     (S.projects||[]).forEach(function(other){
       if(other.id===pid)return;
@@ -18423,10 +18430,17 @@ E30.ux=(function(){
       if(!found&&!p._liveRefs)p._liveRefs=[];
       if(!found&&!p._liveRefs.some(function(x){return x.id===li.id}))p._liveRefs.push({id:li.id,title:li.title});
     }
+    (S.library||[]).forEach(function(it){if(it.sourceChat===li.id)it.projectId=pid});
     save();
     return true;
   }
   function mountProjectPatch(){
+    ACT.e31MoveChat=function(el){
+      var id=el.getAttribute('data-sess'),projects=(S.projects||[]).filter(function(p){return !p.archived});
+      if(!E22.findSess(id))return;
+      openModal('<h3>انتقال گفت‌وگو به پروژه</h3>'+(!projects.length?'<p>ابتدا یک پروژه بسازید.</p>':projects.map(function(p){return '<button class="btn" data-act="e31MoveTo" data-sess="'+qesc(id)+'" data-prj="'+qesc(p.id)+'">'+esc(p.name)+'</button>'}).join('')));
+    };
+    ACT.e31MoveTo=function(el){var pid=el.getAttribute('data-prj'),id=el.getAttribute('data-sess');if(!E29.projAPI.byId(pid)||!E22.findSess(id))return;E29.projAPI.addChat(pid,id);closeModal();E29.shell.renderSidebarOnly();toast('گفت‌وگو به پروژه منتقل شد')};
     var _panel=E29.projAPI.mountPanel;
     E29.projAPI.mountPanel=function(pid){
       _panel(pid);

@@ -180,6 +180,13 @@ rep("  var st=sc[CE.i],D=wd(CE.f).data;\n  if(st.pre", "  var st=sc[CE.i],D=wd(C
 rep("var prg=parseRangeFA(v0);", "var prg=st.id==='age'?parseAgeRangeFA(v0):parseRangeFA(v0);");
 rep("var p=v.split('|');D.PR.age=[+p[0],+p[1]];", "defPR(D);var p=String(v).split('|');if(p.length!==2||!p.every(function(n){return Number.isFinite(+n)&&+n>=0})||+p[0]>+p[1])return 'ERR';D.PR.age=[+p[0],+p[1]];");
 
+/* A transfer keeps a single project owner and a stable archived conversation. */
+rep("    if(!p||!S.chats)return;\n    var title=null;", "    if(!p||!S.chats||!S.chats.some(function(c){return c.id===chatId}))return false;\n    store().forEach(function(other){other.chatIds=(other.chatIds||[]).filter(function(id){return id!==chatId});if(other._liveRefs)other._liveRefs=other._liveRefs.filter(function(r){return r.id!==chatId})});\n    if(!p.chatIds)p.chatIds=[];\n    var title=null;");
+rep("if(it.sourceChat===chatId||(it.sourceChat==null&&title&&it.sourceTitle===title))it.projectId=pid;", "if(it.sourceChat===chatId)it.projectId=pid;");
+rep("var free=(S.chats||[]).filter(function(c){return c&&!c.projectId&&!c.pinned});", "var free=(S.chats||[]).filter(function(c){return c&&c.projectId!==p.id});");
+rep("ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));toast('گفت‌وگو به پروژه اضافه شد')};", "ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));E29.shell.renderSidebarOnly();toast('گفت‌وگو به پروژه منتقل شد')};");
+rep("    '<button class=\"e22-sact e22-sact-del\"", "    '<button class=\"e22-sact\" type=\"button\" data-act=\"e31MoveChat\" data-sess=\"'+qesc(s.id)+'\" title=\"انتقال به پروژه\" aria-label=\"انتقال به پروژه\">'+E27_IC.pin+'</button>'+\n    '<button class=\"e22-sact e22-sact-del\"",2);
+
 /* ═══ 10) CSS injection ═══ */
 injectBefore('</style>',readSrc('v31.css')+'\n'+readSrc('v31-guided-ui.css'));
 

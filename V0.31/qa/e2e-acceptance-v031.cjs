@@ -431,6 +431,29 @@ const start=async b=>{
       await s.context.close();
       return {ok:v.rows.every(x=>x.step==='m2')&&v.rows[0].age[1]===3&&v.rows[1].age[1]===5&&v.rows[2].age[0]===5&&v.rows[2].age[1]===10&&v.invalid==='age'&&v.corrected==='m2',info:v};
     });
+    await check('A33','Project transfers preserve chat history, context and unrelated artifacts',async()=>{
+      const s=await start(browser);
+      const v=await s.page.evaluate(()=>{
+        doLogin('QA');const a=E29.projAPI.create('A'),b=E29.projAPI.create('B');
+        S.chats=[{id:'move-chat',title:'عنوان یکسان',pinned:true,hist:[{r:'user',h:'keep'}]}];
+        S.ctx30ByChat['chat:move-chat']={fields:{marker:{v:'keep'}},log:[]};
+        S.library=[{id:'related',sourceChat:'move-chat'},{id:'unrelated',sourceChat:null,sourceTitle:'عنوان یکسان',projectId:a.id}];
+        E29.projAPI.addChat(a.id,'move-chat');E29.projAPI.addChat(b.id,'move-chat');E29.projAPI.addChat(b.id,'move-chat');E29.projAPI.addChat(b.id,'missing');
+        return {old:a.chatIds,now:b.chatIds,chat:S.chats[0],context:S.ctx30ByChat['chat:move-chat'],artifacts:S.library,target:b.id,original:a.id,button:E27.sessRow(S.chats[0]).includes('e31MoveChat')};
+      });
+      await s.page.reload({waitUntil:'domcontentloaded'});
+      const restored=await s.page.evaluate(()=>({chat:S.chats.find(c=>c.id==='move-chat'),context:S.ctx30ByChat['chat:move-chat']}));
+      await s.context.close();
+      return {ok:v.old.length===0&&v.now.length===1&&v.now[0]==='move-chat'&&v.chat.projectId===v.target&&v.chat.hist[0].h==='keep'&&v.artifacts[0].projectId===v.target&&v.artifacts[1].projectId===v.original&&v.button&&restored.chat.projectId===v.target&&restored.context.fields.marker.v==='keep',info:{v,restored}};
+    });
+    await check('A34','Live project membership survives archival without stale references',async()=>{
+      const s=await start(browser);
+      const v=await s.page.evaluate(()=>{
+        doLogin('QA');usrC('گفتگوی پروژه');botC('حفظ تاریخچه');const p=E29.projAPI.create('پروژه');E30.ux.addLive(p.id);const live=p.chatIds[0];E22.collect();const chat=S.chats[0];
+        return {live,id:chat.id,project:chat.projectId,target:p.id,links:p.chatIds,refs:p._liveRefs||[],hist:chat.hist.length};
+      });
+      await s.context.close();return {ok:v.project===v.target&&v.links.length===1&&v.links[0]===v.id&&v.refs.length===0&&v.hist>=2,info:v};
+    });
     await check('A30','Every purchase price-range preset passes normalization without changing its rial endpoints',async()=>{
       const s=await start(browser);
       const v=await s.page.evaluate(()=>({
