@@ -36,6 +36,15 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
       assert(await page.locator('#chatB [data-e31-id="rent"]').count()===1,'rent starter prompt missing');
       assert(await page.locator('#chatB [data-e31-id="buy"]').count()===1,'buy starter prompt missing');
     });
+    await test('Starting rent from the onboarding suggestions exits the legacy gate',async page=>{
+      const choice=page.locator('#chatB [data-e31-id="rent"]').last();
+      assert(await choice.count()===1,'starter rent prompt missing');
+      await choice.click();
+      assert((await page.locator('#chatIn').inputValue()).includes('رهن و اجاره'),'starter prompt did not prefill the editor');
+      await page.locator('#chatSend').click();
+      const flow=await page.evaluate(()=>({collector:E30.discAPI.active(),step:CE.f,current:CURRENT}));
+      assert(flow.collector&&flow.step!=='gate'&&flow.current==='landing','old onboarding gate was not safely handed over: '+JSON.stringify(flow));
+    });
     await test('Ambiguous house request asks one essential clarifying question',async page=>{
       await send(page,'یه خونه برام پیدا کن.');
       const chat=await page.locator('#chatB').textContent();
