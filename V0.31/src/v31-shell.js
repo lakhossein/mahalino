@@ -642,6 +642,7 @@ E30.init=function(){
   /* 9) UX patches: saved listings, share independence, projects, reminders */
   try{E30.uxInit()}catch(e){console.error('E30 ux',e)}
   try{E30.uiTidyInit()}catch(e){console.error('E30 guided UI',e)}
+  try{E30.guide.install()}catch(e){console.error('E31 deterministic guide',e)}
 
   /* 9b) A burst of toasts used to cover the fixed chat composer. Deduplicate
          near-identical events and bound the simultaneous visible stack. */
