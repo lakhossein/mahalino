@@ -25,8 +25,12 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
   const send=async(page,s)=>{await page.locator('#chatIn').fill(s);await page.locator('#chatSend').click();await page.waitForTimeout(180)};
   try{
     await test('Empty chat offers prompt suggestions without polluting history',async page=>{
-      const state=await page.evaluate(()=>({history:HIST.length,guide:!!document.querySelector('#chatB .e31-guide')}));
-      assert(state.history===0&&state.guide,'the first-chat starter was not displayed independently of stored history');
+      const state=await page.evaluate(()=>({history:HIST.length,guide:!!document.querySelector('#chatB .e31-guide'),
+        current:CURRENT,auth:!!S.auth,chatExists:!!document.getElementById('chatB'),
+        chatHTML:document.getElementById('chatB')?.innerHTML?.slice(0,300),
+        lastMessages:HIST.slice(-3).map(x=>({role:x.r,text:String(x.h||'').slice(0,100)})),
+        hasGuide:!!(E30.guide&&E30.guide.registry),guideNode:E30.guide?.getCurrent?.()}));
+      assert(state.history===0&&state.guide,'the first-chat starter was not displayed independently of stored history: '+JSON.stringify(state));
       assert(await page.locator('#chatB [data-e31-id="rent"]').count()===1,'rent starter prompt missing');
       assert(await page.locator('#chatB [data-e31-id="buy"]').count()===1,'buy starter prompt missing');
     });
