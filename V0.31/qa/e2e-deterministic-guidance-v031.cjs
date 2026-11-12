@@ -24,6 +24,19 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
   }
   const send=async(page,s)=>{await page.locator('#chatIn').fill(s);await page.locator('#chatSend').click();await page.waitForTimeout(180)};
   try{
+    await test('Empty chat offers prompt suggestions without polluting history',async page=>{
+      const state=await page.evaluate(()=>({history:HIST.length,guide:!!document.querySelector('#chatB .e31-guide')}));
+      assert(state.history===0&&state.guide,'the first-chat starter was not displayed independently of stored history');
+      assert(await page.locator('#chatB [data-e31-id="rent"]').count()===1,'rent starter prompt missing');
+      assert(await page.locator('#chatB [data-e31-id="buy"]').count()===1,'buy starter prompt missing');
+    });
+    await test('Ambiguous house request asks one essential clarifying question',async page=>{
+      await send(page,'یه خونه برام پیدا کن.');
+      const chat=await page.locator('#chatB').textContent();
+      assert(chat.includes('خرید خانه است یا رهن و اجاره'),'ambiguous intent was treated as a confirmed transaction type');
+      assert(await page.locator('#chatB [data-e31-id="rent"]').count()>0,'rent clarification option missing');
+      assert(await page.locator('#chatB [data-e31-id="buy"]').count()>0,'buy clarification option missing');
+    });
     await test('Prompt suggestions prefill the editor but never submit automatically',async page=>{
       await send(page,'می‌خوام در تهران یه خونه رهن و اجاره پیدا کنم.');
       const card=page.locator('#chatB .e31-guide').last();
