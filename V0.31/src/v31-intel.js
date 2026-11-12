@@ -115,6 +115,7 @@ E30.disc=(function(){
 
   /* ── persona classification — DYNAMIC (re-run after every update; §6.1) ── */
   function personaOf(wf){
+    if(getF('persona'))return getF('persona');
     var hh=getF('household'),kids=getF('children'),occ=getF('occupation')||'',stage=getF('life_stage')||'';
     var n=ctx();
     if(wf==='rent'||wf==='buy'){
@@ -170,6 +171,7 @@ E30.disc=(function(){
     household:{l:'ترکیب خانوار',kind:'enum'},
     family_members:{l:'تعداد افراد',kind:'count'},
     children:{l:'فرزند',kind:'bool'},
+    persona:{l:'پرسونا',kind:'enum'},
     work_loc:{l:'محل کار',kind:'loc'},
     uni_loc:{l:'دانشگاه',kind:'loc'},
     work_weight:{l:'اهمیت محل کار',kind:'enum'},
@@ -441,16 +443,14 @@ E30.disc=(function(){
   /* ── adaptive question selection (§4.5) — impact-scored, not list-ordered ── */
   function missing(wf){
     var REQ={
-      rent:[{id:'budget_dep',w:10},{id:'budget_rent',w:10},{id:'household',w:8},{id:'work_loc',w:6,cond:function(){return !getF('uni_loc')}},
-            {id:'uni_loc',w:6,cond:function(){return !getF('work_loc')||personaOf('rent')==='student'}},
-            {id:'work_weight',w:12,cond:function(){return !!getF('work_loc')&&!!getF('uni_loc')&&!getF('work_weight')}},
-            {id:'hood',w:5,cond:function(){return !getF('work_loc')&&!getF('uni_loc')}},
-            {id:'prop_new',w:5},{id:'rooms',w:4,cond:function(){return !!getF('household')}},{id:'m2',w:3},{id:'prop_age',w:3,cond:function(){return getF('prop_new')!=='new'}},
-            {id:'prefs',w:3},{id:'timeline',w:2}],
-      buy:[{id:'buy_budget',w:10},
-           {id:'budget_scope',w:9.5,cond:function(){var b=getF('buy_budget');return !!(b&&b.v)&&!getF('budget_scope')}},
-           {id:'purpose',w:9},{id:'household',w:6},{id:'hood',w:5},{id:'rooms',w:4,cond:function(){return !!getF('household')}},
-           {id:'prop_new',w:3},{id:'m2',w:3},{id:'prop_age',w:3},{id:'prefs',w:2},{id:'timeline',w:2}],
+      rent:[{id:'budget_dep',w:20},{id:'budget_rent',w:20},{id:'hood',w:19},
+            {id:'persona',w:18},{id:'household',w:17},{id:'m2',w:16},{id:'rooms',w:15},
+            {id:'floor_preference',w:14},{id:'prop_age',w:13},{id:'prefs',w:12},{id:'timeline',w:11},
+            {id:'work_loc',w:2,cond:function(){return getF('work_commute')===true}},
+            {id:'uni_loc',w:2,cond:function(){return getF('persona')==='student'}}],
+      buy:[{id:'buy_budget',w:20},{id:'purpose',w:19},{id:'persona',w:18},
+           {id:'household',w:17},{id:'hood',w:16},{id:'m2',w:15},{id:'rooms',w:14},
+           {id:'prop_age',w:13},{id:'floor_preference',w:12},{id:'prefs',w:11},{id:'timeline',w:10}],
       sell:[{id:'prop_area',w:9},{id:'hood',w:9},{id:'prop_rooms',w:6},{id:'ownership',w:7},{id:'docs',w:5,cond:function(){return getF('ownership')==='inherited'}},
             {id:'sale_motivation',w:6},{id:'sale_urgency',w:7},{id:'expected_price',w:5},{id:'min_price',w:4,cond:function(){return getF('sale_urgency')==='fast'}}],
       invest:[{id:'invest_objective',w:10},{id:'invest_capital',w:9},{id:'invest_horizon',w:6},{id:'invest_liquidity',w:5},
@@ -466,13 +466,6 @@ E30.disc=(function(){
       var f=fMeta(it.id);
       if(f&&(f.status==='confirmed'||f.status==='unknown'))continue;
       var score=it.w+((f&&f.status==='inferred')?2:0);
-      if(wf==='rent'){
-        if(p==='student'&&it.id==='uni_loc')score+=6;
-        if(p==='student'&&it.id==='budget_rent')score+=2;
-        if(p==='family'&&(it.id==='rooms'||it.id==='prefs'))score+=6;
-        if(p==='retiree'&&(it.id==='prop_new'||it.id==='prefs'))score+=6;
-        if(p==='roommates'&&it.id==='budget_dep')score+=3;
-      }
       if(wf==='sell'){
         if(p==='urgent_seller'&&it.id==='min_price')score+=10;
         if(p==='heir'&&it.id==='docs')score+=8;
@@ -579,21 +572,47 @@ E30.disc=(function(){
   function active(){return COL.active}
 
   function start(wf,silent,budgetFirst){
-    COL={active:true,wf:wf,fix:null,confirming:null,turns:0,finConfirmed:false};
+    COL={active:true,optional:true,wf:wf,fix:null,confirming:null,turns:0,finConfirmed:false};
     _lastPersona=personaOf(wf);
     saveCollector();
-    if(!silent){
-      var p=personaOf(wf),tone=P_TONE[p]||P_TONE.general;
-      var greet='شنیدم. ';
-      if(tone.why&&/family|student|retiree|roommates|firstrent|firsttime/.test(p))greet+='('+tone.why+') ';
-      var sum=SUM.start(wf);
-      greet+=sum||'تا شناخته‌شدن شرایط‌تان، چند چیز کلیدی را یکی‌یکی می‌پرسم.';
-      botC(greet,null);
-      var hasConcreteFacts=!!(getF('work_loc')||getF('uni_loc')||getF('household')||getF('hood')||getF('prop_new')||getF('rooms')||getF('budget_dep')||getF('budget_rent'));
-      if(!budgetFirst&&!hasConcreteFacts&&scenarioCard(wf)){saveCollector();return true}
-      askNext();
-    }
+    if(!silent)optionalHub();
     return true;
+  }
+
+  function optionalHub(){
+    COL.expecting=null;COL.confirming=null;saveCollector();
+    botC((SUM.start(COL.wf)||'چه خدمتی می‌خواهید دریافت کنید؟')+
+      '<p class="note">شناخت نیاز اختیاری است. می‌توانید از پیشنهادها شرایط را تکمیل کنید یا همین حالا خدمت موردنظر را انتخاب کنید.</p>',null);
+  }
+  function preference(id){
+    COL.optional=true;COL.active=true;COL.expecting=id;COL.confirming=null;saveCollector();
+    var question=id==='budget_pair'?'سقف ودیعه و اجارهٔ ماهانه را با هم بنویسید؛ واحد پیش‌فرض تومان است.':
+      id==='persona'?'کدام توصیف برای جست‌وجوی شما مناسب است؟ دانشجو، زوج، جوان، خانواده یا توصیف خودتان.':
+      id==='floor_preference'?'طبقهٔ دلخواه یا بازهٔ طبقات را بنویسید.':
+      (ASK[id]?ASK[id].q[0]:'ترجیح خود را بنویسید.');
+    botC(question+'<p class="note">اختیاری؛ می‌توانید «رد» بفرستید یا نتیجه را با اطلاعات فعلی ببینید.</p>',null);
+  }
+  function feedOptional(text){
+    var t=String(text),nt=nz(t),id=COL.fix||COL.expecting;usrC(t);evidence(t);
+    if(/^(منو|لغو|بستن|انصراف)$/.test(nt)){stop();botC('اطلاعات گفتگو حفظ شد؛ خدمت دیگری انتخاب کنید.',null);return true}
+    if(id&&/^(رد|رد کردن|مهم نیست|بعدا|بعداً|فرقی ندارد)$/.test(nt)){
+      (id==='budget_pair'?['budget_dep','budget_rent']:[id]).forEach(markUnknown);
+      COL.expecting=null;COL.fix=null;saveCollector();botC('این ترجیح نامشخص باقی ماند؛ می‌توانید خدمت دلخواه را دریافت کنید.',null);return true;
+    }
+    var found=extract(t,'turn'),ok=!!found;
+    if(id==='budget_pair'){
+      var fs=finScan(t);ok=!!(fs.dep&&fs.rent);
+      if(fs.dep)setF('budget_dep',{v:fs.dep},{src:'answer'});
+      if(fs.rent)setF('budget_rent',{v:fs.rent},{src:'answer'});
+    }else if(id==='persona'){
+      var v=/دانشجو/.test(nt)?'student':/زوج/.test(nt)?'couple':/جوان/.test(nt)?'young':/خانواده/.test(nt)?'family':null;
+      if(v){setF('persona',v,{src:'answer'});ok=true}
+    }else if(id==='floor_preference'){
+      var nums=nt.match(/\d+/g);if(nums){setF(id,{min:+nums[0],max:+(nums[1]||nums[0]),level:/الزام|حتما|فقط/.test(nt)?'required':'preferred'},{src:'answer'});ok=true}
+    }else if(id){ok=answer(id,t).ok||ok}
+    if(id&&!ok){botC('این مقدار برای «'+esc(SLOT_LABEL[id]||id)+'» قابل تشخیص نبود؛ دوباره بنویسید یا «رد» بفرستید.',null);return true}
+    COL.expecting=null;COL.fix=null;COL.finConfirmed=true;saveCollector();
+    botC(ok?(SUM.turn()||'ترجیح شما ثبت شد.'):'برای ادامه یک خدمت یا پیشنهاد مرتبط انتخاب کنید.',null);return true;
   }
 
   /* summarize understanding (§4.6 part 2) — only what's actually known */
@@ -774,6 +793,7 @@ E30.disc=(function(){
 
   function askNext(){
     if(!COL.active)return;
+    if(COL.optional){optionalHub();return}
     if(COL.confirming&&(/financial|contradiction|final/.test(COL.confirming.type)))return;
     if(financialPending()){promptFinancial();return}
     if(hardContradiction()){promptContradiction();return}
@@ -998,6 +1018,7 @@ E30.disc=(function(){
   /* per-turn feed: returns true if consumed */
   function feed(text){
     if(!COL.active)return false;
+    if(COL.optional)return feedOptional(text);
     var t=String(text),nt=nz(t);
     if(/^\s*(منو|راهنما|لغو|بستن|انصراف)\s*$/.test(nt)){usrC(t);stop();botC('جمع‌بندی همین‌جا نگه داشته شد — هر وقت خواستید دوباره شروع کنید. چیزی از دست نرفته است.',null);return true}
     usrC(t);
@@ -1358,7 +1379,7 @@ E30.disc=(function(){
   }
 
   E30.discAPI={route:route,active:active,start:start,stop:stop,reset:reset,bindChat:bindChat,useChat:useChat,forgetChat:forgetChat,resume:resume,
-    getF:getF,setF:setF,ctx:ctx,personaOf:personaOf,
+    getF:getF,setF:setF,ctx:ctx,personaOf:personaOf,preference:preference,collector:function(){return COL},
     profileCard:profileCard,missing:missing,show:show,markUnknown:markUnknown,SLOT_LABEL:SLOT_LABEL,
     extract:extract,answer:answer};
   E30._dbg={normHalf:normHalf,segMoney:segMoney,finScan:finScan}; /* unit-debug surface */
