@@ -269,6 +269,11 @@ E30.guide=(function(){
   var installed=false;
   function install(){
     if(installed)return;installed=true;
+    ACT.e31MoveChat=function(el){
+      var id=el.getAttribute('data-sess'),projects=(S.projects||[]).filter(function(p){return !p.archived});
+      openModal('<h3>انتقال گفت‌وگو به پروژه</h3>'+(!projects.length?'<p>ابتدا یک پروژه بسازید.</p>':projects.map(function(p){return '<button class="btn" data-act="e31MoveTo" data-sess="'+qesc(id)+'" data-prj="'+qesc(p.id)+'">'+esc(p.name)+'</button>'}).join('')));
+    };
+    ACT.e31MoveTo=function(el){E29.projAPI.addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));closeModal();E29.shell.renderSidebarOnly();toast('گفت‌وگو به پروژه منتقل شد')};
     CBACT.e31Prefill=function(el){
       var r=BY_ID[el.getAttribute('data-e31-id')];
       var s=state();

@@ -182,7 +182,6 @@ rep("var p=v.split('|');D.PR.age=[+p[0],+p[1]];", "defPR(D);var p=String(v).spli
 /* Transfers are atomic: one chat, one owning project, no history rewriting. */
 rep("    if(!p||!S.chats)return;\n    var title=null;", "    if(!p||!S.chats||!S.chats.some(function(c){return c.id===chatId}))return false;\n    store().forEach(function(other){other.chatIds=(other.chatIds||[]).filter(function(id){return id!==chatId})});\n    if(!p.chatIds)p.chatIds=[];\n    var title=null;");
 rep("var free=(S.chats||[]).filter(function(c){return c&&!c.projectId&&!c.pinned});", "var free=(S.chats||[]).filter(function(c){return c&&c.projectId!==p.id});");
-rep("ACT.e29prjNew=function(){E29.shell.openPanel('projects')};", "ACT.e29prjNew=function(){sessArchive();E29.shell.openPanel('projects')};");
 rep("ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));toast('گفت‌وگو به پروژه اضافه شد')};", "ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));E29.shell.renderSidebarOnly();toast('گفت‌وگو به پروژه منتقل شد')};");
 
 /* The entry gate routes requests and never collects personal locations. */
@@ -201,17 +200,28 @@ H=H.replace("[' درآمد اجاره','F:invr']", "[' سرمایه‌گذاری
 
 rep("var prg=parseRangeFA(v0);", "var prg=st.id==='age'?parseAgeRangeFA(v0):parseRangeFA(v0);");
 
+rep("    '<button class=\"e22-sact e22-sact-del\"", "    '<button class=\"e22-sact\" type=\"button\" data-act=\"e31MoveChat\" data-sess=\"'+qesc(s.id)+'\" title=\"انتقال به پروژه\" aria-label=\"انتقال به پروژه\">'+E27_IC.pin+'</button>'+\n    '<button class=\"e22-sact e22-sact-del\"");
+
 /* Currency boundary: old persisted financial records remain in canonical rial.
    Human input defaults to toman; explicit rial and machine preset values retain
    their units. This avoids mutating historical transactions or repeated scaling. */
 rep("function rial(v){return fa(v,0)+' ریال'}", "function rial(v){return fa(v/10,0)+' تومان'}");
-rep("var value=pr.value*(toman?10:1);", "var value=pr.value*(hasRial?1:10);");
+rep("var value=pr.value*(toman?10:1);", "var value=pr.value*((hasRial||(window.__E31CanonicalMoney&&!toman))?1:10);");
 var ambiguityStart=H.indexOf('  if(!toman&&!hasRial&&!pr.multi&&value<1000000){');
 var ambiguityEnd=H.indexOf('  var note=null;',ambiguityStart);
 if(ambiguityStart<0||ambiguityEnd<0)fail.push('money ambiguity block missing');
 else H=H.slice(0,ambiguityStart)+H.slice(ambiguityEnd);
 /* Machine chip values are canonical rial, typed strings are human input. */
 rep("if(st.money){\n    var pm=parseMoneyFA(v0);", "if(st.money){\n    var pm=parseMoneyFA(v0);\n    if(st.chips&&st.chips(D).some(function(c){return String(c[1])===v0&&/^[0-9]+$/.test(v0)}))pm={ok:true,value:+v0};");
+
+rep("if(st.set){done=st.set(D,v)}", "if(st.set){var previousMoneyUnit=window.__E31CanonicalMoney;try{window.__E31CanonicalMoney=!!st.money;done=st.set(D,v)}finally{window.__E31CanonicalMoney=previousMoneyUnit}}");
+/* Remove the retired investment page and its project picker as well as scripts. */
+var retiredView=H.indexOf('VIEWS.invest=function(){'),retiredViewEnd=H.indexOf('/* ═══ ۱۴) مارکت',retiredView);
+if(retiredView<0||retiredViewEnd<0)fail.push('retired investment view missing');
+else H=H.slice(0,retiredView)+"VIEWS.invest=function(){go('landing');E30.discAPI.start('invest',false)};\n"+H.slice(retiredViewEnd);
+var retiredPicker=H.indexOf('CBACT.ipset=function(el){'),retiredPickerEnd=H.indexOf('var CBT={};',retiredPicker);
+if(retiredPicker<0||retiredPickerEnd<0)fail.push('retired picker missing');
+else H=H.slice(0,retiredPicker)+H.slice(retiredPickerEnd);
 
 /* Contract form controls expose toman; the historical record boundary uses rial. */
 rep("qesc(String(c.terms.deposit||''))", "qesc(c.terms.deposit==null?'':String(c.terms.deposit/10))");
