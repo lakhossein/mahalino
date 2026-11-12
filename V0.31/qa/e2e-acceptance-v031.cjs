@@ -417,6 +417,20 @@ const start=async b=>{
         v.zero.dep?.[1]===10000000000&&v.zero.rent?.[1]===0&&
         !v.ambiguous.dep,info:v};
     });
+    await check('A32','Purchase resumes at age with valid, skipped and corrected inputs',async()=>{
+      const s=await start(browser);
+      const v=await s.page.evaluate(()=>{
+        doLogin('QA');const rows=[];
+        for(const input of ['نوساز','تا ۵ سال','۵ تا ۱۰ سال','مهم نیست']){
+          delete wd('buy').data.PR;ceStart('buy');ceJump('age');ceVal(input);
+          rows.push({input,step:SCRIPTS.buy[CE.i].id,age:wd('buy').data.PR.age});
+        }
+        ceJump('age');ceVal('نامعتبر');const invalid=SCRIPTS.buy[CE.i].id;ceVal('تا ۵ سال');
+        return {rows,invalid,corrected:SCRIPTS.buy[CE.i].id};
+      });
+      await s.context.close();
+      return {ok:v.rows.every(x=>x.step==='m2')&&v.rows[0].age[1]===3&&v.rows[1].age[1]===5&&v.rows[2].age[0]===5&&v.rows[2].age[1]===10&&v.invalid==='age'&&v.corrected==='m2',info:v};
+    });
     await check('A30','Every purchase price-range preset passes normalization without changing its rial endpoints',async()=>{
       const s=await start(browser);
       const v=await s.page.evaluate(()=>({

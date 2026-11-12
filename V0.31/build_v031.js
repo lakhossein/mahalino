@@ -113,7 +113,7 @@ rep("  var hard=RLIST.filter(function(x){return x.hood===D.hood}).filter(functio
 var rangeStart=H.indexOf('function parseMoneyRangeFA(input){');
 var rangeEnd=H.indexOf('function parseRangeFA(input){',rangeStart);
 if(rangeStart<0||rangeEnd<0){fail.push('money-range parser block missing')}
-else{rep(H.slice(rangeStart,rangeEnd),readSrc('v31-money-range.js')+'\n')}
+else{rep(H.slice(rangeStart,rangeEnd),readSrc('v31-money-range.js')+'\n'+readSrc('v31-age-range.js')+'\n')}
 /* Cards under the 'all listings' heading remain visible for comparison, but
    a failed hard constraint can never become the selected property. */
 rep("CBACT.selL=function(el){var D=wd('rent').data;D.listing=el.getAttribute('data-l');save();if(CURRENT==='rent')renderCurrent();botC('✓ انتخاب شد.',[['بازدید','!skp'],['مقایسه','!cmp']])};",
@@ -174,6 +174,11 @@ rep("ppm:4300000000,elev:true,park:true,balc:true,rate:4.6}];",
     "ppm:4300000000,elev:true,park:true,balc:true,rate:4.6},\n"+
     "{id:'b11',hood:'h7',seed:'c11',t:'۶۰ م نوساز — ونک',m2:60,age:2,floor:5,beds:2,ppm:5400000000,elev:true,park:true,balc:true,rate:4.6},\n"+
     "{id:'b12',hood:'h8',seed:'c12',t:'۷۰ م ۹ساله — انقلاب',m2:70,age:9,floor:3,beds:2,ppm:2700000000,elev:true,park:false,balc:false,rate:4.1}];");
+
+/* Purchase preferences can be entered directly or resumed after reload. */
+rep("  var st=sc[CE.i],D=wd(CE.f).data;\n  if(st.pre", "  var st=sc[CE.i],D=wd(CE.f).data;\n  if(CE.f==='buy'){defP(D);defPR(D)}\n  if(st.pre");
+rep("var prg=parseRangeFA(v0);", "var prg=st.id==='age'?parseAgeRangeFA(v0):parseRangeFA(v0);");
+rep("var p=v.split('|');D.PR.age=[+p[0],+p[1]];", "defPR(D);var p=String(v).split('|');if(p.length!==2||!p.every(function(n){return Number.isFinite(+n)&&+n>=0})||+p[0]>+p[1])return 'ERR';D.PR.age=[+p[0],+p[1]];");
 
 /* ═══ 10) CSS injection ═══ */
 injectBefore('</style>',readSrc('v31.css')+'\n'+readSrc('v31-guided-ui.css'));
