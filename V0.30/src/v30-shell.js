@@ -14,7 +14,7 @@ E30.autoAnswer=function(f){
   var id=st.id,map={
     rent:{
       beds:function(){var v=G('rooms');return v!=null?String(v):null},
-      who:function(){var h=G('household');return h==='family'?'خانواده':(h==='couple'?'دو نفره':(h==='single'||h==='roommates'?'دانشجو/کاری':null))},
+      who:function(){var c=E30.discAPI.ctx(),state=c&&c.fields&&c.fields.household;if(state&&state.status==='unknown')return 'رد کردن';var h=G('household');return h==='family'?'خانواده':(h==='couple'?'دو نفره':(h==='single'||h==='roommates'?'دانشجو/کاری':null))},
       age:function(){var v=G('prop_age');return v!=null?String(v):null},
       m2:function(){var v=G('m2');return v!=null?String(v):null},
       elev:function(){return P('elevator')?'yes':null},
