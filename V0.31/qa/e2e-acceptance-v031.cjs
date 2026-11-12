@@ -470,6 +470,16 @@ const start=async b=>{
       });
       await s.context.close();return {ok:rows.every(r=>r.users===1&&r.bots===1&&r.body.length>20&&r.rendered===r.stored)&&entry.users===1&&entry.bots===1&&historical.join('|')==='keep-A|keep-B',info:{rows,entry,historical}};
     });
+    await check('A36','Entry skips personal gates and retired investment engines cannot execute',async()=>{
+      const s=await start(browser);
+      const v=await s.page.evaluate(()=>{
+        doLogin('QA');ceStart('gate');ceVal('!pskip');
+        return {steps:SCRIPTS.gate.map(x=>x.id),step:SCRIPTS.gate[CE.i].id,
+          legacy:!!(SCRIPTS.invb||SCRIPTS.invr||CBACT.ipset),active:!!SCRIPTS.invp,
+          source:[...document.scripts].map(x=>x.textContent).join('')};
+      });
+      await s.context.close();return {ok:v.steps.join('|')==='hello|menu'&&v.step==='menu'&&!v.legacy&&v.active&&!v.source.includes('function sellTok('),info:{steps:v.steps,step:v.step,legacy:v.legacy,active:v.active}};
+    });
     await check('A30','Every purchase price-range preset passes normalization without changing its rial endpoints',async()=>{
       const s=await start(browser);
       const v=await s.page.evaluate(()=>({

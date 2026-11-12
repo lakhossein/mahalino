@@ -187,6 +187,22 @@ rep("var free=(S.chats||[]).filter(function(c){return c&&!c.projectId&&!c.pinned
 rep("ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));toast('گفت‌وگو به پروژه اضافه شد')};", "ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));E29.shell.renderSidebarOnly();toast('گفت‌وگو به پروژه منتقل شد')};");
 rep("    '<button class=\"e22-sact e22-sact-del\"", "    '<button class=\"e22-sact\" type=\"button\" data-act=\"e31MoveChat\" data-sess=\"'+qesc(s.id)+'\" title=\"انتقال به پروژه\" aria-label=\"انتقال به پروژه\">'+E27_IC.pin+'</button>'+\n    '<button class=\"e22-sact e22-sact-del\"",2);
 
+/* Remove retired runtime branches rather than leaving disabled copies.
+   Historical workflow data remains untouched for archive restoration. */
+function retireBetween(start,end,replacement){
+  var a=H.indexOf(start),b=H.indexOf(end,a);
+  if(a<0||b<0){fail.push('retired block missing: '+start);return}
+  rep(H.slice(a,b),replacement||'');
+}
+retireBetween("{id:'work',q:'محل کارتان", "{id:'menu',q:");
+rep("if(v==='!menu'){ceStart('gate');CE.i=3;ceStep();return}","if(v==='!menu'){ceStart('gate');CE.i=1;ceStep();return}");
+rep("pskip:function(){CE.i=3;ceStep()}","pskip:function(){CE.i=1;ceStep()}");
+rep("[' درآمد اجاره','F:invr']","[' سرمایه‌گذاری','F:invp']");
+retireBetween('SCRIPTS.invb=[','SCRIPTS.mkt=[');
+retireBetween('CBACT.ipset=function(el){','var CBT={};');
+retireBetween('VIEWS.invest=function(){','/* ═══ ۱۴) مارکت',
+  "VIEWS.invest=function(){go('landing');if(window.E30&&E30.discAPI)E30.discAPI.start('invest','مشاوره سرمایه‌گذاری')};\n\n");
+
 /* ═══ 10) CSS injection ═══ */
 injectBefore('</style>',readSrc('v31.css')+'\n'+readSrc('v31-guided-ui.css'));
 

@@ -5040,7 +5040,7 @@ function ceImpSet(k,v){try{var m=CE.f;if(!m)return;var D=wd(m).data;if(!D.P)D.P=
 function ceSmart(t){t=String(t||'');var has=function(){var a=arguments,i;for(i=0;i<a.length;i++){if(t.indexOf(a[i])>=0)return true}return false};if(has('تضمینی')){go('grt');CE.f=null;botC('اجارهٔ تضمینی در صفحهٔ اختصاصی خودش قدم‌به‌قدم پیش می‌رود؛ بازش کردم.',null);return true}if(has('اجاره','رهن')||((!CE.f||CE.f==='rent')&&has('بازدید'))){botC('فلوی اجاره را شروع می‌کنم.',null);ceStart('rent');return true}if(has('خرید','مبایعه')){botC('فلوی خرید را شروع می‌کنم.',null);ceStart('buy');return true}if(has('قرارداد','کد رهگیری')){S.ui.atab='contracts';save();go('profile');CE.f=null;botC('قراردادها در تنظیمات حساب باز شد.',null);return true}if(has('رزرو','اقامت','سفر')){botC('فلوی اقامت را شروع می‌کنم.',null);ceStart('stay');return true}if(has('پروژه')){go('mkt');CE.f=null;botC('بخش پروژه‌ها را باز کردم.',null);return true}if(has('ساخت','مصالح')){go('build');CE.f=null;botC('بخش ساخت را باز کردم.',null);return true}if(has('خدمات','تعمیر','نظافت')){go('svc');CE.f=null;botC('بخش خدمات ملک را باز کردم.',null);return true}if(has('خواب')){var m2=t.match(/[0-9]+/);if(m2&&CE.f){var nb=+pd(m2[0]);if(nb>=1&&nb<=5){var DD=wd(CE.f).data;DD.beds=nb;botC('تعداد خواب ثبت شد.',null);cePush();CE.i++;ceStep();return true}}botC('تعداد خواب را با عدد مشخص کنید (1 تا 5).',null);return true}if(has('منو','داشبورد')){ceVal('!menu');CE.f=null;return true}return false}
 
 function ceVal(v){
-  if(v==='!menu'){ceStart('gate');CE.i=3;ceStep();return}
+  if(v==='!menu'){ceStart('gate');CE.i=1;ceStep();return}
   if(v==='!help'){
     botC('فرمان‌ها: «ادامه»، «محله‌ها»، «مقایسه»، «امضا»، «فسخ»، «چند کلید دارم»، «کیف پول»، «نقشه»، «منو».',[['منوی اصلی','!menu']]);
     return;
@@ -5236,45 +5236,9 @@ var PERSONA_NOTE={'خانواده':'برای خانواده‌ها وزن پار
 SCRIPTS.gate=[
 {id:'hello',q:function(){return 'سلام! چه کاری برایتان انجام دهم؟'+E28.discoverChips()},
  chips:function(){return [[' الان مشخص می‌کنم','!pnow'],[' بعداً','!pskip']]},
- acts:{pnow:function(){CE.i=1;ceStep()},pskip:function(){CE.i=3;ceStep()}}},
-{id:'work',q:'محل کارتان را انتخاب کنید (یا روی نقشه مشخص کنید):',
- chips:function(){var c=HOODS.map(function(h){return [h.n,h.id]});c.push(['انتخاب روی نقشه','!wmap'],['دورکاری','none']);return c},
- err:'نام محله را از فهرست انتخاب کنید یا روی نقشه مشخص کنید.',
- set:function(D,v){
-   if(v==='none'){
-     S.prof.work=null;S.prof.workLL=null;
-     S.prof.places=initPlaces().filter(function(p){return p.kind!=='work'});syncLegacyFromPlaces();save();return null;
-   }
-   var hid=hoodFromText(v)||v;var h=findH(hid);if(!h)return 'ERR';
-   upsertPlace('work','محل کار',h.ll,hid,1);return null;
- },
- acts:{wmap:function(){
-   openPickMap('محل کار',function(ll){
-     upsertPlace('work','محل کار',ll,null,1);
-     botC('محل کار روی نقشه ثبت شد؛ فاصله‌های املاک به‌روز شد.');
-     CE.i++;ceStep();
-   });
- }}},
-{id:'school',q:'مدرسهٔ فرزندانتان کدام محدوده است؟ (یا روی نقشه)',
- chips:function(){var c=HOODS.map(function(h){return [h.n,h.id]});c.push(['انتخاب روی نقشه','!smap'],['ندارم','none']);return c},
- err:'نام محله را از فهرست انتخاب کنید یا روی نقشه مشخص کنید.',
- set:function(D,v){
-   if(v==='none'){
-     S.prof.school=null;S.prof.schoolLL=null;
-     S.prof.places=initPlaces().filter(function(p){return p.kind!=='school'});syncLegacyFromPlaces();save();return null;
-   }
-   var hid=hoodFromText(v)||v;var h=findH(hid);if(!h)return 'ERR';
-   upsertPlace('school','مدرسه',h.ll,hid,2);return null;
- },
- acts:{smap:function(){
-   openPickMap('مدرسهٔ فرزندان',function(ll){
-     upsertPlace('school','مدرسه',ll,null,2);
-     botC('مدرسه روی نقشه ثبت شد؛ فاصله‌های املاک به‌روز شد.');
-     CE.i++;ceStep();
-   });
- }}},
+ acts:{pnow:function(){CE.i=1;ceStep()},pskip:function(){CE.i=1;ceStep()}}},
 {id:'menu',q:'عالی! چه کاری می‌خواهید انجام دهید؟<br><small>کل فلو را می‌توانید همین‌جا گفت‌وگو‌محور انجام دهید.</small>',
- chips:function(){return [[' اجاره','F:rent'],[' خرید','F:buy'],[' درآمد اجاره','F:invr'],[' پروژه‌ها','F:mkt'],[' اقامتگاه','F:stay'],['نقشه','F:dashx'],[' راهنما','!help']]}}
+ chips:function(){return [[' اجاره','F:rent'],[' خرید','F:buy'],[' سرمایه‌گذاری','F:invp'],[' پروژه‌ها','F:mkt'],[' اقامتگاه','F:stay'],['نقشه','F:dashx'],[' راهنما','!help']]}}
 ];
 SCRIPTS.rent=[
 {id:'dep',money:true,q:' <b>مبلغ ودیعهٔ شما</b> چقدر است؟ (ریال — عدد دقیق وارد کنید)',kind:'num',
@@ -5629,121 +5593,6 @@ SCRIPTS.buy=[
    ceEnd();
  }}}
 ];
-SCRIPTS.invb=[
-{id:'prjs',q:' پروژه‌های در حال ساخت / تأمین مالی:',
- cards:function(D){
-  return INPRJ.map(function(p,i){
-    return '<div class="ccard"><div class="cthumb">'+ph('inv'+i,150,94,'')+'</div>'+
-    '<div class="cb"><b>'+p.t+'</b><small>'+p.loc+' • '+p.units+' • تحویل: '+p.del+'<br>فیزیکی ٪'+fa(p.prog,0)+' • مالی ٪'+fa(p.fin,0)+' • '+p.lic+'</small></div>'+
-    '<button class="btn btn-xs btn-primary" data-cba="ipset" data-i="'+i+'">انتخاب</button></div>';
-  }).join('')},
- chips:function(){return [['مقایسه و بازدهی','ok']]},
- set:function(D,v){if(D.ip===undefined)D.ip=0;return null}},
-{id:'scn',q:' کدام حالت بازار؟',chips:function(){return [['بدبینانه','bad'],['معقول','mid'],['خوش‌بینانه','good']]},set:function(D,v){if(!SCN[v])return 'ERR';D.scn=v;return null},err:'حالت بازار را از گزینه‌ها انتخاب کنید: بدبینانه، معقول یا خوش‌بینانه.'},
-{id:'cap',money:true,q:' سرمایهٔ شما چقدر است؟ (ریال — تایپ کنید)',kind:'num',
- chips:function(){return [['۲ میلیارد','2000000000'],['۵ میلیارد','5000000000'],['۷ میلیارد','7000000000'],['۱۰ میلیارد','10000000000']]},
- set:function(D,v){
-   var n=+pd(v);
-   if(!n)return 'ERR';
-   D.cap=n;return null}},
-{id:'yld',q:function(D){return ' بازدهی درصدی در بازه‌های مختلف:<br>'+yieldTable(D)+'<br><small>نرخ بازدهی (درصد) — بدون عدد مطلق.</small>'},
- chips:function(){return [['ادامه','ok']]},set:function(){return null}},
-{id:'price',money:true,q:function(D){return ' قیمت هر متر را <b>سامانه لحظه‌ای</b> تعیین می‌کند: <b>'+rial(PPM.v)+'</b> — قابل تغییر نیست.<br>مبلغ پرداخت (ریال — تایپ کنید):'},kind:'num',
- chips:function(D){return [['همهٔ سرمایه',String(D.cap)],['نصف',String(Math.round(D.cap/2))],['۱ میلیارد','1000000000'],['۵ میلیارد','5000000000']]},
- set:function(D,v){
-   var n=+pd(v);
-   if(!n||n<100000000)return 'ERR';
-   D.payAmt=String(n);return null}},
-{id:'pay',q:function(D){return ' خرید <b>'+fa(Math.floor(+D.payAmt/PPM.v),0)+' متر</b> ('+rial(+D.payAmt)+' + ۰٫۵٪) — انتقال به درگاه؟'},
- chips:function(){return [['پرداخت','!p'],['تغییر مبلغ','!back']]},
- acts:{
-  back:function(){ceJump('price')},
-  p:function(D){
-    var amt=+D.payAmt||0;
-    openGateway(amt,'خرید سهم متری — '+INPRJ[D.ip||0].t,function(){
-      var m=Math.floor(amt/PPM.v);
-      if(m<1){botC('مبلغ برای ۱ متر کافی نیست.');return}
-      D.bought=true;D.meters=m;
-      addReq('invb','پرداخت','خرید '+fa(m,0)+' متر','کامل شد',rial(amt)+' + ۰٫۵٪');
-      save();if(CURRENT==='invest')renderCurrent();
-      botC(' خرید با موفقیت انجام شد — دارایی شما: <b>'+fa(m,0)+' متر</b>',[['پیگیری و فروش','!nx']]);
-    });
-  }}},
-{id:'trk',q:function(D){
-  return ' دارایی: '+fa(D.meters||0,0)+' متر — پیشرفت: اسکلت طبقهٔ ۷ (گزارش هفتگی). فروش با قیمت روز ('+rial(SPRIX)+' / متر) و واریز به <b>کیف پول</b>.'},
- chips:function(){return [['فروش همه','!sa'],['فروش نصف','!sh'],['نگه می‌دارم','!e']]},
- acts:{
-  sa:function(D){sellInv(D,D.meters||0)},
-  sh:function(D){sellInv(D,Math.floor((D.meters||0)/2))},
-  e:function(D){
-    var d=wd('invb');
-    d.done=true;addReq('invb','پیگیری','پایان فلو','کامل شد');save();
-    if(CURRENT==='invest')renderCurrent();ceEnd()
-  }}}
-];
-function sellInv(D,m){
-  if(!m||m<1){botC('متری برای فروش نیست.');return}
-  var net=Math.round(m*SPRIX*0.995);
-  walletIn(net,'فروش '+fa(m,0)+' متر سهم متری');
-  D.meters=(D.meters||0)-m;
-  addReq('invb','فروش','فروش '+fa(m,0)+' متر — واریز به کیف پول','کامل شد',rial(net));
-  save();if(CURRENT==='invest')renderCurrent();
-  botC(' '+rial(net)+' به کیف پول واریز شد (قابل برداشت).',[['منوی اصلی','!menu']]);
-  CE.f=null;
-}
-SCRIPTS.invr=[
-{id:'props',q:' دارایی‌های صندوق (در حال اجاره):',
- cards:function(D){
-  return RPROPS.map(function(p){
-    return '<div class="ccard"><div class="cthumb">'+ph(p.seed,150,94,'')+'</div>'+
-    '<div class="cb"><b>'+p.t+'</b><small>'+p.addr+'<br>'+(p.rent?('اجاره: '+rial(p.rent)+' • رهن: '+rial(p.dep)):'در حال مستأجریابی')+' • ★ '+fa(p.rate,1)+'</small></div>'+
-    '<span class="badge '+(p.rent?'b-ok':'b-warn')+'">'+p.st+'</span></div>';
-  }).join('')},
- chips:function(){return [['مقایسه با بانک','ok']]},set:function(){return null}},
-{id:'cap',money:true,q:' سرمایهٔ شما چقدر است؟ (ریال)',kind:'num',
- chips:function(){return [['۱۰ میلیارد','10000000000'],['۲۰ میلیارد','20000000000'],['۳۰ میلیارد','30000000000']]},
- set:function(D,v){D.cap=+pd(v)||20000000000;return null}},
-{id:'cmp',q:function(D){return finChatHTML(D.cap,S.ui.navg)},
- chips:function(){return [['ادامه','ok']]},set:function(){return null}},
-{id:'fund',money:true,q:function(D){return 'مبلغ خرید کلید؟ (ارزش پایهٔ هر کلید: '+rial(13200000)+') — فروش لحظه‌ای و جزئی است و به کیف پول واریز می‌شود.'},kind:'num',
- chips:function(D){return [['همهٔ سرمایه',String(D.cap)],['۵۰۰ کلید','6600000000'],['۱٬۰۰۰ کلید','13200000000'],['۲ میلیارد','2000000000']]},
- set:function(D,v){
-   var amt=+pd(v);
-   if(!amt)return 'ERR';
-   D.amt=amt;return null}},
-{id:'pay',q:function(D){return ' خرید <b>'+fa(Math.floor(D.amt/13200000),0)+' کلید</b> ('+rial(D.amt)+' + ۰٫۵٪) — درگاه؟'},
- chips:function(){return [['پرداخت','!p'],['تغییر مبلغ','!back']]},
- acts:{
-  back:function(){ceJump('fund')},
-  p:function(D){
-    openGateway(D.amt,'خرید کلید صندوق',function(){
-      var cnt=Math.floor(D.amt/13200000);
-      if(cnt<1){botC('مبلغ برای ۱ کلید کافی نیست.');return}
-      D.cnt=cnt;D.fund=true;
-      addReq('invr','پرداخت','خرید '+fa(cnt,0)+' کلید','کامل شد',rial(D.amt)+' + ۰٫۵٪');
-      save();if(CURRENT==='invest')renderCurrent();
-      ceJump('end');
-    });
-  }}},
-{id:'end',q:function(D){return ' درآمد ماهانهٔ شما: <b>'+rial(D.cnt*54000)+'</b> — واریز خودکار + افزایش ارزش ملک. فروش جزئی لحظه‌ای.'},
- chips:function(){return [['فروش همه','!sa'],['فروش نصف','!sh'],['نگه می‌دارم','!e']]},
- acts:{
-  sa:function(D){sellTok(D,D.cnt)},
-  sh:function(D){sellTok(D,Math.floor(D.cnt/2))},
-  e:function(){ACT.irdone();ceEnd()}
- }}
-];
-function sellTok(D,n){
-  if(!n||n<1){botC('کلیدی نیست.');return}
-  var net=Math.round(n*13200000*0.995);
-  walletIn(net,'فروش '+fa(n,0)+' کلید');
-  D.cnt-=n;
-  addReq('invr','فروش','فروش '+fa(n,0)+' کلید — کیف پول','کامل شد',rial(net));
-  if(D.cnt<1){wd('invr').done=true}
-  save();if(CURRENT==='invest')renderCurrent();
-  botC(' '+rial(net)+' به کیف پول واریز شد. باقی: '+fa(D.cnt,0)+' کلید.',[['منوی اصلی','!menu']]);
-  CE.f=null;
-}
 SCRIPTS.mkt=[
 {id:'role',q:' نقش شما در مارکت‌پلیس؟',
  chips:function(){return [[' پیمانکار — پیشنهاد + ثبت پروژهٔ جدید','con'],[' کارفرما — تأیید پیمانکار','emp']]},
@@ -5998,12 +5847,6 @@ CBACT.vcT=function(el){
   if(D.vlist[i]){D.vlist[i].ok=!D.vlist[i].ok;save()}
   if(CE.f==='rent'){ceStep()}
   if(CURRENT==='rent'){renderCurrent()}
-};
-CBACT.ipset=function(el){
-  var D=wd('invb').data;
-  D.ip=+el.getAttribute('data-i');save();
-  if(CURRENT==='invest'){renderCurrent()}
-  botC('✓ پروژهٔ «'+INPRJ[D.ip].t+'» انتخاب شد.');
 };
 var CBT={};
 CBT.tok=function(){
@@ -7254,173 +7097,7 @@ VIEWS.buy=function(){
 };
 
 /* ═══ ۱۳) سرمایه‌گذاری ═══ */
-VIEWS.invest=function(){
-  var el=document.getElementById('v-invest'),m='invr',d=wd(m),D=d.data,st=d.step,i;
-  var h='<div class="seg" style="margin-bottom:16px"><button class="'+(m==='invr'?'on':'')+'" data-act="sinv" data-t="r"> درآمد اجاره</button></div>';
-  h+=flowReqBlock('invest');
-  if(false&&m==='invb'){
-    h+=wtop('invb','فلوی سرمایه‌گذاری در ساخت','پروژه‌ها ← مبلغ (قیمت سامانه) ← پرداخت ← پیگیری');
-    if(st===1){
-      if(D.scn===undefined){D.scn='mid'}
-      if(D.cap===undefined){D.cap=7000000000}
-      if(D.ip===undefined){D.ip=0}
-      var yh=S.ui.yh||24;
-      h+='<div class="card" style="margin-bottom:14px"><div class="ct"> پروژه‌های در حال ساخت</div><div class="grid g3">'+INPRJ.map(function(p,i2){
-        return '<div class="card tight'+(D.ip===i2?' sel':'')+'" style="border-color:'+(D.ip===i2?'var(--brand)':'var(--line)')+'">'+
-        '<div style="border-radius:10px;overflow:hidden;height:110px;margin-bottom:8px">'+ph('inv'+i2,300,188,'')+'</div>'+
-        '<b>'+p.t+'</b><div class="adr"> '+p.loc+' • '+p.units+'</div>'+
-        '<div class="kv"><span>فیزیکی</span><b>٪'+fa(p.prog,0)+'</b></div>'+
-        '<div class="kv"><span>مالی</span><b>٪'+fa(p.fin,0)+'</b></div>'+
-        '<div class="kv"><span>تحویل</span><b>'+p.del+'</b></div>'+
-        '<div class="kv"><span>اسناد</span><b class="badge b-ok">'+p.lic+'</b></div>'+
-        '<button class="btn btn-sm'+(D.ip===i2?'':' btn-primary')+'" style="margin-top:6px" data-act="ipset" data-i="'+i2+'">'+(D.ip===i2?'✓ انتخاب':'انتخاب')+'</button></div>';
-      }).join('')+'</div></div>';
-      h+='<div class="card"><div class="ct"> بازدهی در حالت‌های مختلف — درصد (افق '+fa(yh,0)+' ماه)</div>'+
-      '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">'+
-      '<div class="seg">'+[['bad','بدبینانه'],['mid','معقول'],['good','خوش‌بینانه']].map(function(s){return '<button class="'+(D.scn===s[0]?'on':'')+'" data-act="iscn" data-v="'+s[0]+'">'+s[1]+'</button>'}).join('')+'</div>'+
-      '<div class="chips">'+[[6,'۶ ماه'],[12,'۱۲'],[24,'۲۴'],[36,'۳۶']].map(function(x){return '<span class="chip'+(yh===x[0]?' on':'')+'" data-act="yhz" data-v="'+x[0]+'">'+x[1]+'</span>'}).join('')+'</div></div>';
-      h+=rng('cap','سرمایهٔ شما',1000000000,20000000000,500000000,D.cap);
-      h+='<div id="scnchart"></div><p class="note" id="scnnote"></p></div>';
-      h+='<div class="card" style="margin-top:14px"><div class="ct"> بازدهی در بازه‌ها (درصد)</div><div id="yldchart"></div><p class="note">سهم متری = سبز • طلا • دلار • سپرده — با چیپ‌ها بازه را عوض کنید.</p></div>';
-      h+=wnav('invb',true,'');
-    }else if(st===2){
-      if(D.cap===undefined){D.cap=7000000000}
-      window.__cap=D.cap;
-      h+='<div class="card"><div class="ct"> مبلغ و متراژ — '+INPRJ[D.ip||0].t+'</div>';
-      h+='<div class="kv"><span>قیمت لحظه‌ای هر متر (سامانه)</span><b id="ppmlive" style="color:var(--brand)">'+rial(PPM.v)+'</b></div>';
-      h+='<p class="note"> هر چند ثانیه به‌روز می‌شود — قابل تغییر توسط کاربر نیست.</p>';
-      h+=rng('cap','سرمایهٔ شما',1000000000,20000000000,500000000,D.cap);
-      h+='<div class="kv"><span>متراژ قابل خرید</span><b id="mlive" style="color:var(--brand)">'+fa(Math.floor(D.cap/PPM.v),0)+' متر</b></div></div>';
-      h+=wnav('invb',true,'');
-    }else if(st===3){
-      if(!D.payAmt){D.payAmt=String(D.cap||7000000000)}
-      PAYM={mode:'invb',ctx:{rate:PPM.v,unit:'متر'},amt:D.payAmt};
-      var sugg=[{l:'همهٔ سرمایه',v:(D.cap||7000000000)},{l:'نصف',v:Math.round((D.cap||7000000000)/2)},{l:'۱ میلیارد',v:1000000000},{l:'۵ میلیارد',v:5000000000}];
-      h+='<div class="card">'+payPanel('invb','متر',PPM.v,D.payAmt,sugg,'خرید سهم متری — '+INPRJ[D.ip||0].t)+'</div>';
-      h+=wnav('invb',!!D.bought,D.bought?'✓ پرداخت انجام شد':'مبلغ را تنظیم و پرداخت کنید');
-    }else{
-      h+='<div class="grid g2"><div class="card"><div class="ct"> پیگیری</div><div class="tl">'+
-      '<div class="tli done"><span class="dot">✓</span>پی‌سازی</div><div class="tli done"><span class="dot">✓</span>اسکلت تا ۶</div><div class="tli act"><span class="dot">•</span>اسکلت ۷</div><div class="tli"><span class="dot"></span>نازک‌کاری</div><div class="tli"><span class="dot"></span>پایان‌کار + سند</div></div>'+
-      '<div class="alert al-warn">با رسیدن به یک واحد کامل: حق انتخاب طبقه </div></div>';
-      h+='<div class="card"><div class="ct"> فروش و کیف پول</div>';
-      h+='<div class="kv"><span>قیمت روز هر متر</span><b>'+rial(SPRIX)+'</b></div>';
-      h+='<div class="kv"><span>دارایی شما</span><b>'+fa(D.meters||0,0)+' متر — '+rial((D.meters||0)*SPRIX)+'</b></div>';
-      h+='<div class="kv"><span> کیف پول</span><b>'+rial(S.wallet||0)+' <button class="btn btn-xs" data-act="wallet">برداشت</button></b></div>';
-      h+='<div class="srow" style="margin-top:10px"><div class="slab"><span>متراژ فروش (تایپ کنید)</span></div><input class="inp" type="number" id="sellm" min="1" max="'+(D.meters||1)+'" value="'+Math.min(5,D.meters||1)+'"></div><div id="sellout"></div>';
-      h+='<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn btn-primary" data-act="isell">فروش (کیف پول)</button><button class="btn" data-act="ibdone">نگه می‌دارم</button></div></div></div>';
-      h+=wnav('invb',false,'');
-    }
-  }else{
-    h+=wtop('invr','فلوی درآمد از اجاره','خرید دارایی، درآمد ماهانه و فروش جزئی');
-    if(st===1){
-      if(D.cap===undefined){D.cap=20000000000}
-      h+='<div class="card" style="margin-bottom:14px"><div class="ct"> ملک‌های در حال اجاره</div><div class="grid g3">'+RPROPS.map(function(p){
-        return '<div class="lcard"><div class="lart">'+ph(p.seed,400,250,'')+'</div>'+
-        '<div class="lbody"><h4>'+p.t+'</h4><div class="adr"> '+p.addr+'</div>'+
-        '<div class="kv"><span>'+(p.rent?'اجاره':'وضعیت')+'</span><b>'+(p.rent?rial(p.rent):p.st)+'</b></div>'+
-        (p.dep?('<div class="kv"><span>رهن</span><b>'+rial(p.dep)+'</b></div>'):'')+
-        '<div class="chips"><span class="badge '+(p.rent?'b-ok':'b-warn')+'">'+p.st+'</span><span class="badge b-info">★ '+fa(p.rate,1)+'</span></div></div></div>';
-      }).join('')+'</div></div>';
-      h+='<div class="card"><div class="ct">مقایسهٔ بازدهی</div>'+rng('cap','سرمایهٔ شما',5000000000,50000000000,1000000000,D.cap)+
-      '<div class="chips" style="margin:10px 0 4px"><span class="note">سناریوی افزایش ارزش ملک:</span>'+[0.20,0.30,0.32,0.40].map(function(v){return '<span class="chip'+((S.ui.navg||FIN.nav.default)===v?' on':'')+'" data-act="navscn" data-v="'+v+'">'+fa(v*100,0)+'٪</span>'}).join('')+'</div>'+
-      '<div id="irbars"></div><p class="note" style="text-align:center;margin-top:2px">مقادیر نمودار: میلیون ریال در ماه</p><div id="fintable" style="margin-top:10px"></div><div id="finnote"></div><div class="alert al-warn" id="irnote"></div></div>'+wnav('invr',true,'');
-    }else if(st===2){
-      h+='<div class="grid g2"><div class="card"><div class="ct"> سابقهٔ واریز — ۱۲ از ۱۲</div>'+
-      '<p class="note">به‌ازای هر ۱۰۰ کلید: واریز یکم هر ماه.</p><div class="chips">'+
-      MFULL.map(function(mm){return '<span class="chip on">'+mm+' ✓</span>'}).join('')+
-      '</div><div class="alert al-ok">✓ هر ۱۲ ماه، بدون تأخیر — پیگیری با تیم سامانه.</div></div>'+
-      '<div class="card"><div class="ct"> شناسنامهٔ دارایی پایه</div>'+
-      '<div class="kv"><span>ناظر</span><b>فرابورس</b></div>'+
-      '<div class="kv"><span>سبد</span><b>۱۱ ملک — تک‌برگ</b></div>'+
-      '<div class="kv"><span>مستأجر</span><b>۹ واحد</b></div>'+
-      '<div class="kv"><span>ذخیره</span><b>'+rial(900000000)+'</b></div></div></div>'+wnav('invr',true,'');
-    }else if(st===3){
-      if(D.cnt===undefined){D.cnt=500}
-      var trq=openReqOf('invr','پرداخت',S.active.invr);
-      h+='<div class="card"><div class="ct">خرید کلید</div>'+
-      (D.fund?'<div class="kv"><span>تعداد کلید</span><b>'+fa(D.cnt,0)+'</b></div>':rng('cnt','تعداد کلید',50,2000,50,D.cnt,function(v){return fa(v,0)+' کلید'}))+
-      '<div class="kv"><span>ارزش پایهٔ هر کلید</span><b>'+rial(13200000)+'</b></div>';
-      if(D.fund){
-        h+='<div class="alert al-ok"><b>خرید انجام شد</b>'+(trq?' • وضعیت: '+trq.status:'')+'<div style="margin-top:6px"><button class="btn btn-xs" data-act="dt" data-t="req" data-cat="invr">پیگیری در درخواست‌ها</button></div></div>';
-      }else{
-        h+='<button class="btn btn-primary" style="margin-top:12px" data-act="irbuy">پرداخت و خرید</button>';
-      }
-      h+='</div>'+wnav('invr',!!D.fund,'');
-    }else{
-      var NR=S.ui.nrng||12;
-      h+='<div class="grid g2"><div class="card"><div class="ct"> درآمد ماهانه</div>'+
-      '<div class="kv"><span>درآمد شما</span><b>'+rial(D.cnt*54000)+'</b></div>'+
-      '<div class="kv"><span>افزایش ارزش ملک (فرضی)</span><b style="color:var(--ok)">'+fa((S.ui.navg||FIN.nav.default)*100,0)+'٪</b></div>'+
-      '<div class="kv"><span>دارایی</span><b>'+fa(D.cnt,0)+' کلید</b></div>'+
-      '<div class="chips" style="margin-top:10px">'+[[6,'۶ ماه'],[12,'۱۲ ماه']].map(function(x){return '<span class="chip'+(NR===x[0]?' on':'')+'" data-act="nrng" data-v="'+x[0]+'">'+x[1]+'</span>'}).join('')+'</div>'+
-      '<div id="navchart"></div></div>'+
-      '<div class="card"><div class="ct"> فروش لحظه‌ای و جزئی</div>'+
-      '<div class="kv"><span>قیمت هر کلید</span><b>'+rial(13200000)+'</b></div>'+
-      '<div class="kv"><span> کیف پول</span><b>'+rial(S.wallet||0)+' <button class="btn btn-xs" data-act="wallet">برداشت</button></b></div>'+
-      '<div class="srow" style="margin-top:10px"><div class="slab"><span>تعداد فروش (تایپ)</span></div><input class="inp" type="number" id="selln" min="1" max="'+(D.cnt||1)+'" value="'+Math.min(100,D.cnt||1)+'"></div><div id="slout"></div>'+
-      '<div class="fs-actions" style="margin-top:12px"><button class="btn btn-primary" data-act="irsell">فروش فوری</button><button class="btn" data-act="irdone">نگه می‌دارم</button>'+(d.done?'<button class="btn" data-act="flowNew" data-m="invr">درخواست جدید</button>':'')+'</div></div></div>'+wnav('invr',false,'');
-    }
-  }
-  el.innerHTML=h;
-  if(false&&m==='invb'&&st===1){
-    var yh=S.ui.yh||24;
-    var updS=function(){
-      var y=yieldPct(D,yh);
-      bars(document.getElementById('scnchart'),[y.p,y.g,y.u,y.d],['سهم متری','طلا','دلار','سپرده'],function(v){return '٪'+fa(v,0)},CC);
-      document.getElementById('scnnote').textContent=(D.scn==='bad'?'بدبینانه: توقف پروژه سود را می‌خواباند.':(D.scn==='good'?'خوش‌بینانه: جهش تورمی به نفع دارایی فیزیکی.':'معقول.'))+' بازده در افق '+fa(yh,0)+' ماه.';
-      bars(document.getElementById('yldchart'),[6,12,24,36].map(function(t){return yieldPct(D,t).p}),['۶','۱۲','۲۴','۳۶'],function(v){return '٪'+fa(v,0)},CC);
-    };
-    $$('#v-invest [data-rk]').forEach(function(r){r.addEventListener('input',function(){D.cap=+r.value;save();updS()})});
-    updS();
-  }
-  if(false&&m==='invb'&&st===2){
-    var updM=function(){
-      window.__cap=D.cap;
-      var e=document.getElementById('mlive');
-      if(e){e.textContent=fa(Math.floor(D.cap/PPM.v),0)+' متر'}
-    };
-    $$('#v-invest [data-rk]').forEach(function(r){r.addEventListener('input',function(){D.cap=+r.value;save();updM()})});
-    updM();
-  }
-  if(false&&m==='invb'&&st===4){
-    var sm=document.getElementById('sellm');
-    var updSe=function(){
-      var v=Math.min(D.meters||0,Math.max(1,+((sm&&sm.value)||1)));
-      document.getElementById('sellout').innerHTML='<div class="kv"><span>مبلغ '+fa(v,0)+' متر × '+rial(SPRIX)+'</span><b>'+rial(v*SPRIX)+'</b></div>'+
-      '<div class="kv"><span>کارمزد ۰٫۵٪ → کیف پول</span><b>'+rial(Math.round(v*SPRIX*0.995))+'</b></div>';
-    };
-    if(sm){sm.addEventListener('input',updSe)}
-    updSe();
-  }
-  if(m==='invr'&&st===1){
-    var updR=function(){
-      var nav=(S.ui.navg||FIN.nav.default),rows=finRows(D.cap,nav);
-      bars(document.getElementById('irbars'),rows.map(function(r){return r.amount}),rows.map(function(r){return r.short}),function(v){return fa(v/1000000,0)+' م'},CC2);
-      var tb=document.getElementById('fintable');if(tb)tb.innerHTML=finTableHTML(D.cap,nav);
-      var fn=document.getElementById('finnote');if(fn)fn.innerHTML=finNoteHTML(true);
-      var rent=rows.filter(function(r){return r.k==='rent'})[0],bank=rows.filter(function(r){return r.k==='bank'})[0],total=rows.filter(function(r){return r.k==='total'})[0];
-      document.getElementById('irnote').innerHTML='درآمد نقدی اجاره ('+rial(rent.amount)+' در ماه) از سود نقدی بانک ('+rial(bank.amount)+') کمتر است؛ افزایش ارزش ملک یک فرض است و تضمین نمی‌شود. مجموع با فرض سرمایه‌گذاری مجدد اجاره: <b>'+rial(total.amount)+'</b>.';
-    };
-    $$('#v-invest [data-rk]').forEach(function(r){r.addEventListener('input',function(){D.cap=+r.value;save();updR()})});
-    updR();
-  }
-  if(m==='invr'&&st===4){
-    var NR=S.ui.nrng||12;
-    var nav=[];
-    for(i=1;i<=12;i++){nav.push(2*Math.pow(1.32,i/12))}
-    nav=nav.slice(12-NR);
-    spark(document.getElementById('navchart'),nav,MFULL.slice(12-NR),function(v){return fa(v,1)+'م'});
-    var sn=document.getElementById('selln');
-    var updSl=function(){
-      var v=Math.min(D.cnt||0,Math.max(1,+((sn&&sn.value)||1)));
-      document.getElementById('slout').innerHTML='<div class="kv"><span>مبلغ '+fa(v,0)+' کلید</span><b>'+rial(v*13200000)+'</b></div>'+
-      '<div class="kv"><span>کارمزد → کیف پول</span><b>'+rial(Math.round(v*13200000*0.995))+'</b></div>'+
-      '<div class="kv"><span>باقی</span><b>'+fa((D.cnt||0)-v,0)+'</b></div>';
-    };
-    if(sn){sn.addEventListener('input',updSl)}
-    updSl();
-  }
-};
+VIEWS.invest=function(){go('landing');if(window.E30&&E30.discAPI)E30.discAPI.start('invest','مشاوره سرمایه‌گذاری')};
 
 /* ═══ ۱۴) مارکت‌پلیس ═══ */
 function mktPrj(){
@@ -18142,7 +17819,7 @@ E30.flows=(function(){
     if(!MODBY.sell)MODBY.sell={v:'landing',t:'فروش ملک'};
     if(!MODBY.invp)MODBY.invp={v:'landing',t:'سرمایه‌گذاری ملکی'};
     if(!MODBY.lndl)MODBY.lndl={v:'landing',t:'اجاره‌دهی'};
-    FRC.sell=['sell'];FRC.invest=['invp','invb','invr'];FRC.rent=['rent','lndl'];
+    FRC.sell=['sell'];FRC.invest=['invp'];FRC.rent=['rent','lndl'];
     WSTEPS.sell=SELL.map(function(s){return s.id});
     WSTEPS.invp=INVP.map(function(s){return s.id});
     WSTEPS.lndl=LNDL.map(function(s){return s.id});
