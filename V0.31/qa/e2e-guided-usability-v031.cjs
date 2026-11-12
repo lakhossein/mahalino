@@ -1,11 +1,11 @@
-/* Real Chromium checks for the November V0.30 usability regression:
+/* Real Chromium checks for the November V0.31 usability regression:
    compact account menu, full-screen Library, future-only reminders and
    combined budget choices from a natural-language rent request. */
 'use strict';
 const {chromium}=require('playwright');
 const fs=require('node:fs');
 const path=require('node:path');
-const base=process.env.QA_BASE_URL||'http://127.0.0.1:8730/Mahalino%2BV0.30.html';
+const base=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.31.html';
 const output=process.env.QA_RESULTS_DIR||path.join(__dirname,'results');
 const results=[];
 (async()=>{

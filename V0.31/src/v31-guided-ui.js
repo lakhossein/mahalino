@@ -1,4 +1,4 @@
-/* V0.30 usability repair: compact sidebar, account menu, full-width library and valid reminders.
+/* V0.31 usability repair: compact sidebar, account menu, full-width library and valid reminders.
    No storage keys or monetary balances are changed here. */
 E30.uiTidyInit=function(){
   if(E30._uiTidyReady)return;
