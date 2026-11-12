@@ -5,7 +5,7 @@ E30.guide=(function(){
   'use strict';
   var REGISTRY=[
     {id:'rent',group:'search',title:'جست‌وجوی رهن و اجاره',prompt:'می‌خوام در تهران یه خونه رهن و اجاره پیدا کنم.',aliases:['میخوام خونه اجاره کنم','دنبال خانه اجاره‌ای هستم'],action:'discover:rent',slots:['city','budget_dep','budget_rent','m2','rooms','hood'],result:'شروع کشف نیاز اجاره',next:['rent-budget','rent-area','rent-specs'],test:'guide-rent'},
-    {id:'rent-budget',group:'search',title:'ثبت بودجهٔ اجاره',prompt:'بودجه‌ام ۱.۲ میلیارد ودیعه و ۱۰ میلیون اجاره ماهانه است.',aliases:['۱.۲ میلیارد رهن و ماهی ۱۰ میلیون'],action:'native',slots:['budget_dep','budget_rent'],result:'ثبت با پارسر مالی و درخواست تأیید',next:['rent-specs','rent-area','sample'],test:'guide-budget'},
+    {id:'rent-budget',group:'search',title:'ثبت بودجهٔ اجاره',prompt:'می‌خواهم سقف ودیعه و اجاره ماهانه را مشخص کنم.',aliases:['۱.۲ میلیارد رهن و ماهی ۱۰ میلیون'],action:'native',slots:['budget_dep','budget_rent'],result:'ثبت با پارسر مالی و درخواست تأیید',next:['rent-specs','rent-area','sample'],test:'guide-budget'},
     {id:'rent-specs',group:'search',title:'شرایط ملک',prompt:'حداقل ۶۰ متر و یک خواب می‌خوام.',aliases:['حداقل ۶۰ متر و ۱ خواب'],action:'native',slots:['m2','rooms'],result:'به‌روزرسانی قیود جست‌وجو',next:['sample','rent-area','map'],test:'guide-specs'},
     {id:'rent-area',group:'neighborhood',title:'تمرکز بر محدودهٔ انقلاب',prompt:'اول محله‌های اطراف انقلاب رو برای اجاره ارزیابی کن.',aliases:['گفتم دیگه سمت انقلاب','اطراف انقلاب رو بررسی کن'],action:'compare',slots:['area_reference'],result:'مقایسهٔ شفاف دادهٔ نمونه، بدون تثبیت محله به‌عنوان شرط قطعی',next:['compare','sample','map'],test:'guide-area'},
     {id:'sample',group:'search',title:'نمایش آگهی نمونه',prompt:'با همین شرایط آگهی‌های نمونه رو نشون بده.',aliases:['نمونه ملک‌ها را نشان بده'],action:'sample',slots:['budget_dep','budget_rent','m2','rooms','hood'],result:'کارت‌های صریحاً ساختگی از دادهٔ موجود',next:['rent-area','map','rent'],test:'guide-sample'},
@@ -30,6 +30,29 @@ E30.guide=(function(){
     {id:'build',group:'special',title:'ساخت و مصالح',prompt:'می‌خوام مسیر ساخت و مصالح رو بررسی کنم.',aliases:['خدمات ساخت و مصالح میخوام'],action:'flow:build',slots:['project_type','budget'],result:'فلو داخلی موجود، در صورت نصب',next:['services','projects'],test:'guide-build'},
     {id:'development',group:'special',title:'پروژه‌های ساختمانی',prompt:'می‌خوام پروژه‌های ساختمانی رو بررسی کنم.',aliases:['پروژه‌های ساختمانی جدید'],action:'flow:mkt',slots:['project_type','hood'],result:'فلو داخلی موجود، در صورت نصب',next:['invest','projects'],test:'guide-development'}
   ];
+  var PREFS={
+    budget_pair:['سقف ودیعه و اجاره','می‌خواهم سقف ودیعه و اجاره ماهانه را مشخص کنم.'],
+    persona:['پرسونا','می‌خواهم پرسونای جست‌وجویم را مشخص کنم.'],
+    household:['ترکیب خانوار','می‌خواهم ترکیب خانوار را مشخص کنم.'],
+    hood:['محدوده','می‌خواهم محدوده جست‌وجو را مشخص کنم.'],
+    m2:['متراژ','می‌خواهم حداقل متراژ را مشخص کنم.'],rooms:['تعداد خواب','می‌خواهم تعداد خواب را مشخص کنم.'],
+    prop_age:['عمر بنا','می‌خواهم عمر بنای دلخواه را مشخص کنم.'],
+    floor_preference:['طبقه','می‌خواهم طبقه دلخواه را مشخص کنم.'],
+    prefs:['امکانات','می‌خواهم امکانات دلخواه را مشخص کنم.']
+  };
+  function add(r){REGISTRY.push(Object.assign({group:'search',aliases:[],slots:[],next:[],test:'journey-'+r.id,result:'خروجی داخلی با پایان مشخص'},r))}
+  Object.keys(PREFS).forEach(function(slot){var x=PREFS[slot];add({id:'need-'+slot.replace(/_/g,'-'),title:x[0],prompt:x[1],action:'preference:'+slot,slots:[slot]})});
+  add({id:'skip-preference',title:'رد ترجیح',prompt:'رد',action:'skip'});
+  add({id:'results',title:'آگهی‌های منطبق',prompt:'با اطلاعات فعلی آگهی‌ها را نشان بده.',action:'results'});
+  add({id:'hood-results',title:'محله‌های مناسب',prompt:'با اطلاعات فعلی محله‌های مناسب را نشان بده.',action:'hood-results'});
+  add({id:'resume',title:'بازگشت به خدمت',prompt:'به خدمت قبلی برگرد.',action:'resume'});
+  ['student','couple','young','family'].forEach(function(v,i){add({id:'persona-'+v,title:['دانشجو','زوج','جوان','خانواده'][i],prompt:['دانشجو هستم.','برای یک زوج جست‌وجو می‌کنم.','برای یک جوان جست‌وجو می‌کنم.','برای خانواده جست‌وجو می‌کنم.'][i],action:'persona:'+v})});
+  REGISTRY.forEach(function(r){
+    if(r.id==='rent-budget'){r.prompt=PREFS.budget_pair[1];r.action='preference:budget_pair'}
+    if(r.id==='rent-specs'){r.prompt='می‌خواهم متراژ و تعداد خواب را مشخص کنم.';r.action='preference:m2'}
+    if(r.id==='rent-area'){r.prompt='محله‌های دارای داده را برای اجاره ارزیابی کن.'}
+    if(r.id==='compare'){r.prompt='محله‌های دارای داده را از نظر قیمت مقایسه کن.'}
+  });
   var BY_ID={},BY_PROMPT={};
   function norm(s){return String(s||'').replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/[\u200c\u200f]/g,' ').replace(/\s+/g,' ').replace(/[.!؟?]+$/g,'').trim().toLowerCase()}
   REGISTRY.forEach(function(r){
@@ -71,6 +94,13 @@ E30.guide=(function(){
   }
   function can(r){
     if(!r)return false;
+    if(r.id==='saved')return !!(S.savedListings||[]).length;
+    if(r.id==='library')return !!(S.library||[]).length;
+    if(r.id==='projects')return !!(S.projects||[]).length;
+    if(r.id==='resume')return !!state().suspended;
+    if(r.id==='skip-preference')return !!E30.discAPI.collector().expecting;
+    if(r.id==='build')return !!wd('mkt').data.active;
+    if(r.id==='termination')return (S.contracts||[]).some(function(c){return c&&c.code});
     if(r.action.indexOf('flow:')===0)return !!(typeof SCRIPTS!=='undefined'&&SCRIPTS[r.action.split(':')[1]]);
     if(r.action==='valuation')return typeof CBACT.e30ValOpen==='function';
     if(r.action==='contracts')return typeof CBACT.e30ContractList==='function';
@@ -103,8 +133,19 @@ E30.guide=(function(){
     return node;
   }
   function suggestions(){
-    var node=effectiveNode(),ids=GROUPS[node]||GROUPS.home;
-    return ids.map(function(k){return BY_ID[k]}).filter(can).slice(0,node==='home'?4:3);
+    var col=E30.discAPI.collector(),st=state(),ids=[];
+    if(col.active){
+      if(col.expecting==='persona')ids=['persona-student','persona-couple','persona-young','persona-family','skip-preference','results'];
+      else if(col.expecting||col.fix)ids=['skip-preference','results'];
+      else{
+        var fields=E30.discAPI.missing(col.wf),seen={};
+        fields.forEach(function(f){var id=f.id==='budget_dep'||f.id==='budget_rent'?'rent-budget':'need-'+f.id.replace(/_/g,'-');if(!seen[id]&&BY_ID[id]){ids.push(id);seen[id]=1}});
+        ids=ids.slice(0,4).concat(['hood-results','results']);
+      }
+    }else if(CE.f&&CE.f!=='gate'){return []}
+    else ids=GROUPS[effectiveNode()]||GROUPS.home;
+    if(st.suspended)ids=ids.concat(['resume']);
+    return ids.map(function(k){return BY_ID[k]}).filter(can);
   }
   function card(){
     if(!S.auth||CURRENT!=='landing')return '';
@@ -125,26 +166,52 @@ E30.guide=(function(){
     botC('<b>'+esc(heading)+'</b><div class="sect">'+arr.slice(0,5).map(fmt).join('')+
       '</div><p class="note">اطلاعات از همین مرورگر خوانده شده است؛ هیچ داده‌ای ساخته نشده.</p>',null);
   }
+  function queryData(){
+    var flow=E30.discAPI.collector().wf||(CE.f==='buy'?'buy':'rent'),f=E30.discAPI.getF,D=wd(flow==='buy'?'buy':'rent').data;
+    defP(D);if(flow==='buy')defPR(D);
+    var dep=f('budget_dep'),rent=f('budget_rent'),bud=f('buy_budget'),rules=f('prefRules')||{};
+    if(flow==='buy'){
+      D.budg=bud&&bud.v?bud.v[1]:0;D.budgOpen=!bud||!!bud.open;
+      D.PR={age:[0,f('prop_age')==null?100:+f('prop_age')],m2:[f('m2')||0,1e6],ppm:[0,Infinity],beds:f('rooms')||0,floorR:[0,100],prefRules:rules};
+    }else{
+      D.B={depB:dep&&dep.v?dep.v[1]:Infinity,rentB:rent&&rent.v?rent.v[1]:Infinity};
+      D.depOpen=!dep||!!dep.open;D.rentBOpen=!rent||!!rent.open;
+      D.P.beds=f('rooms')||0;D.P.minM2=f('m2')||0;D.P.maxAge=f('prop_age')==null?100:+f('prop_age');D.P._ageHard=f('prop_age')!=null;D.P.prefRules=rules;
+    }
+    D.hood=f('hood')||null;
+    var floor=f('floor_preference');if(floor&&floor.level==='required'){if(flow==='buy')D.PR.requiredFloor=floor;else D.P.requiredFloor=floor}
+    return {flow:flow,D:D};
+  }
   function compare(text){
-    var list=(typeof HOODS!=='undefined'&&Array.isArray(HOODS))?HOODS:[];
-    var near=/انقلاب/.test(norm(text));
-    var focus=list.filter(function(h){return near&&/انقلاب/.test(norm(h.n||''))});
-    var picks=(focus.length?focus:list.slice(0,3));
-    var rows=picks.map(function(h){
-      var price=(typeof h.buyBase==='number'&&typeof rial==='function')?rial(h.buyBase):'دادهٔ قابل نمایش موجود نیست';
-      return '<div class="kv"><span>'+esc(h.n||'محلهٔ نمونه')+'</span><b>'+esc(price)+'</b></div>';
-    }).join('');
-    botC('<b>مقایسهٔ نمایشی محله‌ها</b><p class="note">فقط دادهٔ داخلی و ساختگی Mahalino، نه تحلیل زندهٔ بازار. ارقام در صورت وجود، مبنای نمونهٔ قیمت خرید به‌ازای هر متر هستند؛ دادهٔ دسترسی و زمان سفر تأیید نشده است.</p>'+
-      (rows?'<div class="sect">'+rows+'</div>':'<p>دادهٔ نمونهٔ محله در دسترس نیست.</p>'),null);
+    var list=HOODS.filter(function(h){return Number.isFinite(h.buyBase)}),q=queryData();
+    if(/اطراف|نزدیک/.test(text)&&/انقلاب/.test(text)){
+      botC('رابطهٔ جغرافیایی معتبر برای «اطراف انقلاب» در دادهٔ نمونه موجود نیست؛ مقایسهٔ محله‌های اطراف قابل اجرا نیست. می‌توانید محله‌های دارای داده را مقایسه کنید.',null);return;
+    }
+    botC('<b>مقایسهٔ نمایشی محله‌ها</b><p class="note">دادهٔ داخلی ساختگی؛ قیمت زنده یا زمان سفر تأییدشده نیست.</p><div class="chcards">'+list.map(function(h){return chatHoodCard(h,q.flow==='buy'?'buy':'rent',q.D)}).join('')+'</div>',null);
   }
   function sample(){
-    var a=(typeof RLIST!=='undefined'&&Array.isArray(RLIST))?RLIST:[];
-    var opts=a.slice(0,3);
-    botC('<b>آگهی‌های ساختگی برای پیش‌نمایش کارت ملک</b><p class="note">این موارد آگهی زنده نیستند و به معنی انطباق تأییدشده با بودجه یا شرایط شما نیستند.</p>'+
-      (opts.length?'<div class="sect">'+opts.map(function(x){return '<div class="kv"><span>'+esc(x.t||'ملک آزمایشی')+'</span><b>'+esc(String(x.m2||'—'))+' متر · '+esc(String(x.beds||'—'))+' خواب</b></div>'}).join('')+'</div>':'<p>دادهٔ آزمایشی برای نمایش در دسترس نیست.</p>'),null);
+    var q=queryData(),a=q.flow==='buy'?BLIST:RLIST;
+    var opts=a.filter(function(x){return (!q.D.hood||x.hood===q.D.hood)&&(q.flow==='buy'?E30.flowsAPI.buyPass(x,q.D):E30.flowsAPI.rentPass(x,q.D))});
+    botC('<b>آگهی‌های منطبق با اطلاعات فعلی: '+fa(opts.length,0)+'</b><p class="note">آگهی‌های ساختگی نمونه؛ ترجیحات اعلام‌نشده اعمال نمی‌شوند.</p>'+
+      (opts.length?'<div class="chcards">'+opts.map(function(x){return q.flow==='buy'?chatBCard(x,q.D.blist===x.id):chatListCard(x,q.D.listing===x.id)}).join('')+'</div>':'<p>آگهی منطبق پیدا نشد. برای تغییر محدودیت‌ها، ترجیح موردنظر را آگاهانه اصلاح کنید.</p>'),null);
+  }
+  function suspend(){
+    var st=state();if(st.suspended)return;
+    if(E30.discAPI.active()||(CE.f&&CE.f!=='gate'))st.suspended={collector:Object.assign({},E30.discAPI.collector()),ce:JSON.parse(JSON.stringify(CE))};
+    E30.discAPI.stop();CE.f=null;save();
   }
   function exec(r,t){
     var a=r.action;
+    if(a.indexOf('preference:')===0){usrC(t);if(!E30.discAPI.active())E30.discAPI.start(CE.f==='buy'?'buy':'rent',true);E30.discAPI.preference(a.split(':')[1]);return true}
+    if(a.indexOf('persona:')===0){usrC(t);E30.discAPI.setF('persona',a.split(':')[1],{src:'answer'});E30.discAPI.collector().expecting=null;save();botC('پرسونای انتخابی ثبت شد؛ ترکیب خانوار جداگانه و اختیاری است.',null);return true}
+    if(a==='skip')return E30.discAPI.route('رد');
+    if(a==='results'||a==='sample'){usrC(t);sample();return true}
+    if(a==='hood-results'){usrC(t);compare(t);return true}
+    if(a==='resume'){
+      usrC(t);var prev=state().suspended;if(!prev){botC('خدمت معلقی وجود ندارد.',null);return true}
+      Object.assign(CE,prev.ce);S.ctx30Collectors[S.ctx30ActiveKey]=prev.collector;E30.discAPI.resume();delete state().suspended;save();
+      if(E30.discAPI.active()){var slot=E30.discAPI.collector().expecting;if(slot)E30.discAPI.preference(slot);else botC('به شناخت نیاز قبلی برگشتید؛ اطلاعات حفظ شده است.',null)}else ceStep();return true;
+    }
     if(a.indexOf('discover:')===0){
       var flow=a.split(':')[1];
       /* Guided prompts may start directly from the legacy onboarding gate.
@@ -158,20 +225,15 @@ E30.guide=(function(){
     }
     if(a==='native')return false; /* Existing engine owns the answer and validation. */
     usrC(t);
+    if(['valuation','contracts','contract-start','termination','services','guaranteed'].indexOf(a)>=0||a.indexOf('flow:')===0)suspend();
     if(a==='compare'){compare(t);return true}
     if(a==='sample'){sample();return true}
     if(a==='map'){E30.chatMap({hood:E30.discAPI.getF('hood')||undefined});return true}
     if(a==='valuation'){CBACT.e30ValOpen();return true}
     if(a==='contracts'){CBACT.e30ContractList();return true}
-    if(a==='contract-start'){
-      botC('برای تنظیم قرارداد اجاره، ابتدا اطلاعات ملک و شرایط مالی را در مسیر اجاره مشخص می‌کنیم. ثبت یا امضای قرارداد بدون تأیید شما انجام نمی‌شود.',null);
-      if(E30.discAPI.active())E30.discAPI.stop();
-      E30.discAPI.start('rent',false);return true;
-    }
+    if(a==='contract-start'){E28.ctrStart('rent');return true}
     if(a==='termination'){
-      var all=S.contracts||[],c=all.filter(function(x){return x&&x.code})[0];
-      if(c&&E29&&typeof E29.termAI==='function'){E29.termAI(c.code);return true}
-      botC('قرارداد قابل ارجاعی در این مرورگر پیدا نشد. فسخ خودکار انجام نمی‌شود؛ ابتدا قرارداد را در همین گفت‌وگو پیدا یا ثبت کنید.',null);return true;
+      CBACT.e30ContractList();return true;
     }
     if(a==='services'){CBACT.e30RequestService();return true}
     if(a==='guaranteed'){CBACT.e30RequestGRT();return true}
@@ -189,10 +251,10 @@ E30.guide=(function(){
     var nt=norm(t),r=BY_PROMPT[nt];
     if(!r&&/^(یه|یک) (خونه|خانه) (برام|برای من )? ?پیدا کن$/.test(nt)){
       setNode('home');usrC(String(t));
-      botC('برای شروع، منظورتان خرید خانه است یا رهن و اجاره؟ یک پرامپت از پیشنهادهای همین گفت‌وگو انتخاب کنید.'+card(),null);
+      botC('برای شروع، منظورتان خرید خانه است یا رهن و اجاره؟ یک پرامپت از پیشنهادهای همین گفت‌وگو انتخاب کنید.',null);
       return true;
     }
-    if(!r||!can(r))return false;
+    if(!r)return false;
     setNode(r.id);
     return exec(r,String(t));
   }
@@ -209,15 +271,17 @@ E30.guide=(function(){
       input.dispatchEvent(new Event('input',{bubbles:true}));
       input.focus();
     };
-    var previousBot=botC;
-    botC=function(h,chips){
-      var html=String(h||''),skip=/(تأیید مالی ضروری|تعارضی در شرایط|e30-paycard|e30-budget-card|e30-persona-card|e31-guide|data-e28ctr|e30-val-hood)/.test(html);
-      var startup=CE.f==='gate'&&state().node==='home'&&CE.i===0;
-      if(!skip&&S.auth&&CURRENT==='landing'&&(startup||!(CE.f&&!E30.discAPI.active()))){
-        html+=card();
-      }
+    var previousBot=botC,depth=0,pending=[];
+    function deliver(h,chips){
+      var html=String(h||'');
+      if(S.auth&&CURRENT==='landing'&&!/e31-guide/.test(html))html+=card();
       return previousBot(html,chips);
-    };
+    }
+    botC=function(h,chips){if(depth){pending.push({h:String(h||''),c:chips});return}return deliver(h,chips)};
+    function turn(fn){return function(){depth++;try{return fn.apply(this,arguments)}finally{depth--;if(!depth&&pending.length){var items=pending;pending=[];deliver(items.map(function(x){return x.h}).join('<div class="e31-turn-part"></div>'),items[items.length-1].c)}}}}
+    E30.chatTurn=turn;
+    ceVal=turn(ceVal);ceStart=turn(ceStart);
+    Object.keys(CBACT).forEach(function(k){if(k!=='e31Prefill')CBACT[k]=turn(CBACT[k])});
     /* Empty-chat starter: visible in the chat canvas without creating a fake
        persisted assistant message or navigating away from the conversation. */
     var previousCr=cr;
@@ -235,11 +299,11 @@ E30.guide=(function(){
     var previousLogin=doLogin;
     doLogin=function(name){var value=previousLogin(name);if(S.auth&&CURRENT==='landing')cr();return value};
     var previousSend=ceSend;
-    ceSend=function(t){
+    ceSend=turn(function(t){
       /* Free text keeps the original deterministic parser and its validations. */
       if(route(t))return;
       return previousSend(t);
-    };
+    });
   }
-  return {registry:REGISTRY,install:install,route:route,suggestions:suggestions,normalize:norm,getCurrent:function(){return state().node},actions:BY_ID};
+  return {registry:REGISTRY,install:install,route:route,suggestions:suggestions,normalize:norm,getCurrent:function(){return state().node},queryData:queryData,actions:BY_ID};
 })();
