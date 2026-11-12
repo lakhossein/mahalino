@@ -49,3 +49,6 @@ body.sidefold .e29-sbot .e30-account-trigger{width:44px;justify-content:center;p
   .e30-library-fullscreen #e29-ltabs{padding-inline:12px;flex-wrap:nowrap;overflow-x:auto}
   .e30-library-fullscreen .e29-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
 }
+
+/* Credit and account metadata live in the profile menu, not a permanent header chip. */
+body.authed #tokchip{display:none!important}
