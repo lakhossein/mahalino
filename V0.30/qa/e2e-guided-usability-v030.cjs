@@ -119,6 +119,20 @@ const results=[];
       await page.waitForTimeout(250);
       assert(await page.locator('#chatB .e30-budget-card').count()===1,'budget-first scenario did not continue inside chat');
     });
+    await test('Rent and purchase entry buttons start guided chat instead of the old step form',async page=>{
+      await page.evaluate(()=>botC('<button type="button" data-cf="rent">اجاره</button>',null));
+      await page.locator('#chatB [data-cf="rent"]').last().click();
+      await page.waitForTimeout(200);
+      assert(await page.locator('#chatB [data-cba="e30ChooseScenario"]').count()===3,
+        'rent click did not offer three recommended scenarios');
+      assert(await page.evaluate(()=>E30.discAPI.active()),'rent click did not start discovery');
+      await page.evaluate(()=>{E30.discAPI.stop();botC('<button type="button" data-cf="buy">خرید</button>',null)});
+      await page.locator('#chatB [data-cf="buy"]').last().click();
+      await page.waitForTimeout(180);
+      assert(await page.evaluate(()=>E30.discAPI.active()),'buy click did not start discovery');
+      assert(await page.locator('#chatB [data-cba="e30ChooseScenario"]').count()===6,
+        'purchase click did not add three tailored choices to chat');
+    });
   }finally{await browser.close()}
   const pathOut=path.join(output,'guided-usability.json');
   fs.writeFileSync(pathOut,JSON.stringify(results,null,2));
