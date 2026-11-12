@@ -257,26 +257,18 @@ E30.disc=(function(){
     return null;
   }
   function finScan(raw){
-    /* split the RAW text — normFa swallows «،» so normalized text has no separators */
-    var out={},segs=String(raw||'').split(/،|,|؛|\sو\s(?=\s?(?:ماهی|ماهانه|اجاره|کرایه))/),i;
-    for(i=0;i<segs.length;i++){
-      var sgN=normFa(segs[i]).replace(/‌/g,' ');
-      var isD=/ودیعه|رهن|پول جلو/.test(sgN),isR=/اجاره|کرایه|ماهی|ماهانه/.test(sgN);
-      if(!isD&&!isR)continue;
-      /* A natural sentence may precede the money clause, e.g. «کارم ... .
-         ودیعه تا ۳ میلیارد تومان» or «اجاره تا ۷۰ میلیون تومان. حداقل
-         دو خواب». Parse from the relevant label rather than the start of
-         the whole sentence; never substitute a chip or guessed budget. */
-      function valueNear(re){
-        var m=sgN.match(re);if(!m)return null;
-        /* Persian speakers place the label on either side of the amount:
-           «ودیعه ۱٫۵ میلیارد» AND «۱٫۵ میلیارد ودیعه». A trailing label
-           must not send the next labeled amount to the generic parser. */
-        return segMoney(sgN.slice(m.index+m[0].length))||segMoney(sgN.slice(0,m.index));
-      }
-      if(isD&&!out.dep){var dep=valueNear(/ودیعه|رهن|پول جلو/);if(dep)out.dep=dep}
-      if(isR&&!out.rent){var rent=valueNear(/اجاره|کرایه|ماهی|ماهانه/);if(rent)out.rent=rent}
+    var out={},t=normFa(String(raw||'')).replace(/‌/g,' ');
+    var amount='[0-9]+(?:[.٫][0-9]+)?(?:\\s*(?:میلیارد|میلیون|هزار))?(?:\\s*(?:تومان|تومن|ریال))?';
+    function read(label){
+      var before=new RegExp('('+amount+')\\s*(?:'+label+')').exec(t);
+      var after=new RegExp('(?:'+label+')\\s*(?:ماهانه|ماهی|تا|حداکثر|حدود|من|ام|است|:)*\\s*('+amount+')').exec(t);
+      var m=before||after;
+      if(!m)return null;
+      if(/^(?:0|۰)$/.test(m[1]))return [0,0];
+      var p=parseMoneyFA(m[1]);return p.ok?[p.value,p.value]:null;
     }
+    var dep=read('ودیعه|رهن|پول جلو'),rent=read('اجاره|کرایه|ماهی|ماهانه');
+    if(dep)out.dep=dep;if(rent)out.rent=rent;
     return out;
   }
   /* Explicit polarity for each property preference. Word presence is never a

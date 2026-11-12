@@ -175,6 +175,18 @@ rep("ppm:4300000000,elev:true,park:true,balc:true,rate:4.6}];",
     "{id:'b11',hood:'h7',seed:'c11',t:'۶۰ م نوساز — ونک',m2:60,age:2,floor:5,beds:2,ppm:5400000000,elev:true,park:true,balc:true,rate:4.6},\n"+
     "{id:'b12',hood:'h8',seed:'c12',t:'۷۰ م ۹ساله — انقلاب',m2:70,age:9,floor:3,beds:2,ppm:2700000000,elev:true,park:false,balc:false,rate:4.1}];");
 
+/* Currency boundary: old persisted financial records remain in canonical rial.
+   Human input defaults to toman; explicit rial and machine preset values retain
+   their units. This avoids mutating historical transactions or repeated scaling. */
+rep("function rial(v){return fa(v,0)+' ریال'}", "function rial(v){return fa(v/10,0)+' تومان'}");
+rep("var value=pr.value*(toman?10:1);", "var value=pr.value*(hasRial?1:10);");
+var ambiguityStart=H.indexOf('  if(!toman&&!hasRial&&!pr.multi&&value<1000000){');
+var ambiguityEnd=H.indexOf('  var note=null;',ambiguityStart);
+if(ambiguityStart<0||ambiguityEnd<0)fail.push('money ambiguity block missing');
+else H=H.slice(0,ambiguityStart)+H.slice(ambiguityEnd);
+/* Machine chip values are canonical rial, typed strings are human input. */
+rep("if(st.money){\n    var pm=parseMoneyFA(v0);", "if(st.money){\n    var pm=parseMoneyFA(v0);\n    if(st.chips&&st.chips(D).some(function(c){return String(c[1])===v0&&/^[0-9]+$/.test(v0)}))pm={ok:true,value:+v0};");
+
 /* ═══ 10) CSS injection ═══ */
 injectBefore('</style>',readSrc('v31.css')+'\n'+readSrc('v31-guided-ui.css'));
 
