@@ -179,6 +179,12 @@ rep("ppm:4300000000,elev:true,park:true,balc:true,rate:4.6}];",
 rep("  var st=sc[CE.i],D=wd(CE.f).data;\n  if(st.pre", "  var st=sc[CE.i],D=wd(CE.f).data;\n  if(CE.f==='buy'){defP(D);defPR(D)}\n  if(st.pre");
 rep("var p=v.split('|');D.PR.age=[+p[0],+p[1]];", "defPR(D);var p=String(v).split('|');if(p.length!==2||!p.every(function(n){return Number.isFinite(+n)&&+n>=0})||+p[0]>+p[1])return 'ERR';D.PR.age=[+p[0],+p[1]];");
 
+/* Transfers are atomic: one chat, one owning project, no history rewriting. */
+rep("    if(!p||!S.chats)return;\n    var title=null;", "    if(!p||!S.chats||!S.chats.some(function(c){return c.id===chatId}))return false;\n    store().forEach(function(other){other.chatIds=(other.chatIds||[]).filter(function(id){return id!==chatId})});\n    if(!p.chatIds)p.chatIds=[];\n    var title=null;");
+rep("var free=(S.chats||[]).filter(function(c){return c&&!c.projectId&&!c.pinned});", "var free=(S.chats||[]).filter(function(c){return c&&c.projectId!==p.id});");
+rep("ACT.e29prjNew=function(){E29.shell.openPanel('projects')};", "ACT.e29prjNew=function(){sessArchive();E29.shell.openPanel('projects')};");
+rep("ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));toast('گفت‌وگو به پروژه اضافه شد')};", "ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));E29.shell.renderSidebarOnly();toast('گفت‌وگو به پروژه منتقل شد')};");
+
 /* Currency boundary: old persisted financial records remain in canonical rial.
    Human input defaults to toman; explicit rial and machine preset values retain
    their units. This avoids mutating historical transactions or repeated scaling. */
