@@ -1,0 +1,261 @@
+{
+  "schemaVersion": 1,
+  "policy": "mandatory-requirements-must-all-have-passing-e2e-coverage",
+  "source": "Mahalino Plus V0.30.md §19.1 (requirements inherited by V0.31)",
+  "requirements": [
+    {
+      "id": 1,
+      "name": "اجارهٔ کامل، از کشف نیاز تا قرارداد و پایان",
+      "status": "automated",
+      "evidence": [
+        "T1.1",
+        "T1.1a",
+        "T1.4",
+        "H06"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 2,
+      "name": "خرید کامل",
+      "status": "automated",
+      "evidence": [
+        "H14"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 3,
+      "name": "فروش کامل",
+      "status": "automated",
+      "evidence": [
+        "A19",
+        "A20",
+        "H15"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 4,
+      "name": "سرمایه‌گذاری کامل",
+      "status": "automated",
+      "evidence": [
+        "A21",
+        "H16"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 5,
+      "name": "تولید قرارداد",
+      "status": "automated",
+      "evidence": [
+        "A16",
+        "A17",
+        "S04",
+        "H06",
+        "H07"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 6,
+      "name": "پرداخت ثبت قرارداد",
+      "status": "automated",
+      "evidence": [
+        "H06"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 7,
+      "name": "فسخ قرارداد",
+      "status": "automated",
+      "evidence": [
+        "S09",
+        "H06"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 8,
+      "name": "پرداخت تحلیل جامع محله",
+      "status": "automated",
+      "evidence": [
+        "T4.1",
+        "T4.2"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 9,
+      "name": "پرداخت ارزش‌گذاری",
+      "status": "automated",
+      "evidence": [
+        "H12",
+        "H13"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 10,
+      "name": "تأیید همهٔ خدمات پولی",
+      "status": "automated",
+      "evidence": [
+        "A06",
+        "H17"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 11,
+      "name": "یادآور از طریق چت",
+      "status": "automated",
+      "evidence": [
+        "H01"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 12,
+      "name": "یادآور از پنل",
+      "status": "automated",
+      "evidence": [
+        "A23",
+        "H02",
+        "H10"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 13,
+      "name": "ایجاد پروژه",
+      "status": "automated",
+      "evidence": [
+        "A24",
+        "H03"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 14,
+      "name": "افزودن چت فعال به پروژه",
+      "status": "automated",
+      "evidence": [
+        "A24",
+        "T7.1"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 15,
+      "name": "افزودن چت بایگانی‌شده به پروژه",
+      "status": "automated",
+      "evidence": [
+        "S08",
+        "H03"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 16,
+      "name": "ذخیرهٔ آگهی و بازگشایی",
+      "status": "automated",
+      "evidence": [
+        "A13",
+        "T5.1",
+        "T5.4"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 17,
+      "name": "اشتراک کل گفت‌وگو",
+      "status": "automated",
+      "evidence": [
+        "S01",
+        "S02"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 18,
+      "name": "اشتراک PDF",
+      "status": "automated",
+      "evidence": [
+        "S04",
+        "H07",
+        "H18"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 19,
+      "name": "اشتراک گزارش ساخته‌شده",
+      "status": "automated",
+      "evidence": [
+        "S03"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 20,
+      "name": "Resume فلو",
+      "status": "automated",
+      "evidence": [
+        "S05",
+        "H04",
+        "H11"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 21,
+      "name": "ماندگاری پیشرفت فلو",
+      "status": "automated",
+      "evidence": [
+        "S05",
+        "S11"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 22,
+      "name": "قفل‌شدن Slider پس از ثبت",
+      "status": "automated",
+      "evidence": [
+        "S07",
+        "H05"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 23,
+      "name": "موجودی ناکافی",
+      "status": "automated",
+      "evidence": [
+        "A11"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 24,
+      "name": "پرداخت شکست‌خورده",
+      "status": "automated",
+      "evidence": [
+        "A10"
+      ],
+      "gap": ""
+    },
+    {
+      "id": 25,
+      "name": "بازپرداخت پس از قطع فرایند",
+      "status": "automated",
+      "evidence": [
+        "A12",
+        "S06"
+      ],
+      "gap": ""
+    }
+  ]
+}

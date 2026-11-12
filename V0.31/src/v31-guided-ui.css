@@ -1,4 +1,4 @@
-/* V0.30 account-first sidebar and full-width library: light and dark theme compatible */
+/* V0.31 account-first sidebar and full-width library: light and dark theme compatible */
 body.authed.widemain main{max-width:none;margin:0;padding:0!important}
 body.authed.widemain #appwrap{gap:0;grid-template-columns:272px minmax(0,1fr)}
 body.authed.widemain .side{top:52px;max-height:calc(100dvh - 52px);border-radius:0;border-top:0;border-right:0;margin:0;align-self:stretch;padding:8px 10px}

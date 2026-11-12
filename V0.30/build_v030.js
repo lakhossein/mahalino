@@ -177,10 +177,10 @@ rep("ppm:4300000000,elev:true,park:true,balc:true,rate:4.6}];",
     "{id:'b12',hood:'h8',seed:'c12',t:'۷۰ م ۹ساله — انقلاب',m2:70,age:9,floor:3,beds:2,ppm:2700000000,elev:true,park:false,balc:false,rate:4.1}];");
 
 /* ═══ 10) CSS injection ═══ */
-injectBefore('</style>',readSrc('v30.css')+'\n'+readSrc('v30-guided-ui.css'));
+injectBefore('</style>',readSrc('v30.css'));
 
 /* ═══ 11) JS injection before boot ═══ */
-var jsOrder=['v30-core.js','v30-intel.js','v30-flows.js','v30-ux.js','v30-landing.js','v30-guided-ui.js','v30-shell.js'];
+var jsOrder=['v30-core.js','v30-intel.js','v30-flows.js','v30-ux.js','v30-landing.js','v30-shell.js'];
 var js=jsOrder.map(readSrc).join('\n\n');
 injectBefore('/* ═══ ۲۲) راه‌اندازی ═══ */',js);
 
@@ -189,19 +189,6 @@ injectBefore('/* ═══ ۲۲) راه‌اندازی ═══ */',js);
 H=H.split('توکن‌ها').join('بناها');
 H=H.split('توکنی').join('بنایی');
 H=H.split('توکن').join('بنا');
-count++;
-
-/* ═══ 13) user-selected credit name «کلید» (display text only).
-   Preserve «عمر بنا» / «سن بنا» and full words such as «زیربنا»;
-   numeric amounts, balance records, persistence keys and service IDs stay unchanged. */
-H=H.replace(/هزینهٔ بنایی/g,'هزینهٔ کلید');
-H=H.replace(/(^|[^\p{L}\p{N}\u200c])(بناها|بنایی|بنا)(?=$|[^\p{L}\p{N}\u200c])/gu,
-  function(full,before,word,index,source){
-    var preceding=source.slice(Math.max(0,index-24),index);
-    if(/(?:عمر|سن|ساخت|ارتفاع|نمای|بافت)\s*$/.test(preceding))return full;
-    return before+({بنا:'کلید',بناها:'کلیدها',بنایی:'کلیدی'}[word]||word);
-  });
-H=H.replace('۵۰۰ کلید هدیه کلید','۵۰۰ کلید هدیه');
 count++;
 
 /* ═══ write ═══ */

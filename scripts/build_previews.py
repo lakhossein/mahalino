@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Package archived V0.* prototypes as shareable GitHub Pages previews and ZIPs.
 
-Original version folders are read-only inputs. This script does not inspect
-whether V0.30's HTML dependencies work at runtime.
+Original version folders are read-only inputs. Runtime/build dependency gates
+for V0.30 and V0.31 are enforced by their separate GitHub Actions workflows.
 """
 from __future__ import annotations
 
@@ -40,7 +40,8 @@ def entry_file(folder: Path) -> Path:
 
 def exclude(directory: str, names: list[str]) -> set[str]:
     ignored = set()
-    is_v030_root = Path(directory).name == "V0.30"
+    version_root = Path(directory).name
+    retained_builder = {"V0.30": "build_v030.js", "V0.31": "build_v031.js"}.get(version_root)
     for name in names:
         path = Path(directory) / name
         lower = name.lower()
@@ -50,8 +51,8 @@ def exclude(directory: str, names: list[str]) -> set[str]:
             ignored.add(name)
         elif path.is_file() and (
             lower in EXCLUDED_FILES
-            or (lower.endswith((".md", ".ps1", ".cmd", ".log")) and not (is_v030_root and lower == "readme.md"))
-            or (lower.startswith("build_v0") and not (is_v030_root and lower == "build_v030.js"))
+            or (lower.endswith((".md", ".ps1", ".cmd", ".log")) and not (retained_builder and lower == "readme.md"))
+            or (lower.startswith("build_v0") and not (retained_builder and lower == retained_builder))
         ):
             ignored.add(name)
     return ignored

@@ -20,12 +20,16 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  quality-gate:
-    # This job is a hard dependency: no successful browser/build check, no Pages upload.
+  quality-v030:
+    # Preserve V0.30's original release gate after restoring that archive.
     uses: ./.github/workflows/mahalino-v030-quality-gate.yml
 
+  quality-v031:
+    # The new version cannot publish until all Chromium and standalone checks pass.
+    uses: ./.github/workflows/mahalino-v031-quality-gate.yml
+
   publish:
-    needs: [quality-gate]
+    needs: [quality-v030, quality-v031]
     runs-on: ubuntu-latest
     environment:
       name: github-pages
