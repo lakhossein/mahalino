@@ -17,6 +17,7 @@ E30.flows=(function(){
     if(pref.elevator==='forbidden'&&x.elev)return false;
     if(pref.parking==='forbidden'&&x.park)return false;
     if(pref.balcony==='forbidden'&&x.balc)return false;
+    if(P.minAge!=null&&x.age<P.minAge)return false;
     /* Every explicit maximum age is hard unless the collector deliberately marked it soft. */
     if(P._ageHard!==false&&Number.isFinite(Number(P.maxAge))&&P.maxAge!==''&&P.maxAge!=null&&x.age>Number(P.maxAge))return false;
     if(P.minM2!==''&&P.minM2!=null&&Number(P.minM2)>0&&x.m2<Number(P.minM2))return false;
@@ -432,7 +433,7 @@ E30.flows=(function(){
     if(!MODBY.sell)MODBY.sell={v:'landing',t:'فروش ملک'};
     if(!MODBY.invp)MODBY.invp={v:'landing',t:'سرمایه‌گذاری ملکی'};
     if(!MODBY.lndl)MODBY.lndl={v:'landing',t:'اجاره‌دهی'};
-    FRC.sell=['sell'];FRC.invest=['invp','invb','invr'];FRC.rent=['rent','lndl'];
+    FRC.sell=['sell'];FRC.invest=['invp'];FRC.rent=['rent','lndl'];
     WSTEPS.sell=SELL.map(function(s){return s.id});
     WSTEPS.invp=INVP.map(function(s){return s.id});
     WSTEPS.lndl=LNDL.map(function(s){return s.id});

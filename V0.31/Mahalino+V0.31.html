@@ -2941,6 +2941,14 @@ body.splash-active #v-splash{width:100%}
 .rsld[data-locked="1"]{opacity:.75}
 .rsld[data-locked="1"] input[type=range]{pointer-events:none;opacity:.55}
 
+/* Wider cards and charts, with readable text and a mobile-safe composer. */
+#v-landing .ch-main{max-width:1200px}
+#v-landing .msg.bot{max-width:100%}
+#v-landing .msg.bot .bub{max-width:100%;overflow-wrap:anywhere}
+#v-landing .chcards{grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px}
+.e31-guide{max-width:100%}.e31-turn-part{margin-top:12px}
+@media(max-width:700px){#v-landing .ch-main{width:100%;max-width:100%}#v-landing .chcards{grid-template-columns:1fr}}
+
 /* V0.31 account-first sidebar and full-width library: light and dark theme compatible */
 body.authed.widemain main{max-width:none;margin:0;padding:0!important}
 body.authed.widemain #appwrap{gap:0;grid-template-columns:272px minmax(0,1fr)}
@@ -3048,7 +3056,7 @@ window.onerror=function(m,s,l){var e=document.getElementById('errbar');if(e){e.s
 function $(s){return document.querySelector(s)}
 function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
 function fa(n,d){if(d===undefined)d=0;n=Number(n);if(isNaN(n))n=0;return n.toLocaleString('fa-IR',{maximumFractionDigits:d})}
-function rial(v){return fa(v,0)+' ریال'}
+function rial(v){return fa(v/10,0)+' تومان'}
 function dt(t){try{return new Date(t).toLocaleDateString('fa-IR',{month:'long',day:'numeric'})}catch(e){return ''}}
 function fd(t){try{return new Date(t).toLocaleDateString('fa-IR',{year:'numeric',month:'long',day:'numeric'})}catch(e){return ''}}
 function dateFa(v){if(!v)return '—';var n=(typeof v==='number')?v:Date.parse(v);return isNaN(n)?String(v):fd(n)}
@@ -3104,11 +3112,8 @@ function parseMoneyFA(input){
   if(/بین\s|\sتا\s|\sالی\s|[0-9]\s*[-–—]\s*[0-9]/.test(cleaned))return {ok:false,msg:'برای این فیلد یک مبلغ مشخص بدهید، نه بازه (مثلاً «۳ میلیارد»).'};
   var pr=parseNumberWords(cleaned);
   if(!pr.ok)return {ok:false,msg:'مبلغ را با عدد یا عبارتی مثل «۳ میلیارد» یا «۳ میلیون تومان» بنویسید.'};
-  var value=pr.value*(toman?10:1);
+  var value=pr.value*((hasRial||(window.__E31CanonicalMoney&&!toman))?1:10);
   if(!isFinite(value)||value<=0)return {ok:false,msg:'مبلغ معتبر نیست؛ یک عدد مثبت وارد کنید.'};
-  if(!toman&&!hasRial&&!pr.multi&&value<1000000){
-    return {ok:false,msg:'مبلغ «'+t+'» مبهم است. اگر منظورتان ۳ میلیارد ریال است «۳ میلیارد» و اگر ۳ میلیون است «۳ میلیون» بنویسید.'};
-  }
   var note=null;
   if(toman)note='✓ '+t+' = '+rial(Math.round(value))+' ثبت شد.';
   else if(pr.multi||/[آ-ی]/.test(cleaned))note='✓ مبلغ تفسیرشده: '+rial(Math.round(value));
@@ -3152,7 +3157,7 @@ function parseMoneyRangeFA(input){
     var v=Number(p.value);
     if(!explicit&&inherited&&v<1e6)v*=inherited;
     /* parseNumberWords already evaluates explicit million/billion words. */
-    if(toman)v*=10;
+    if(!rialUnit&&!/^\d+\s*\|\s*\d+$/.test(body))v*=10;
     return v;
   }
   var lo=endpoint(parts[0],m0),hi=endpoint(parts[1],m1);
@@ -3160,12 +3165,22 @@ function parseMoneyRangeFA(input){
       !Number.isSafeInteger(Math.round(lo))||!Number.isSafeInteger(Math.round(hi))){
     return {ok:false,msg:'بازه یا واحد پول معتبر نیست؛ دو مبلغ مثبت با مرتبهٔ روشن وارد کنید.'};
   }
-  if(!toman&&!rialUnit&&!inherited&&lo<1e6&&hi<1e6){
-    return {ok:false,msg:'واحد مبلغ مبهم است؛ تومان، ریال یا میلیون/میلیارد را بنویسید.'};
-  }
   lo=Math.round(lo);hi=Math.round(hi);
   return {ok:true,value:Math.min(lo,hi)+'|'+Math.max(lo,hi),
-    note:'✓ بازهٔ ریالی: '+rial(Math.min(lo,hi))+' تا '+rial(Math.max(lo,hi)),unit:toman?'toman':'rial'};
+    note:'✓ بازهٔ ثبت‌شده: '+rial(Math.min(lo,hi))+' تا '+rial(Math.max(lo,hi)),unit:toman?'toman':'rial'};
+}
+
+/* Building age accepts zero (new), an upper bound, a range, or an explicit skip. */
+function parseAgeRangeFA(input){
+  var t=normFa(String(input||'')).trim();
+  if(/^(?:مهم نیست|هرچه|هر چی|رد|رد کردن)$/.test(t))return {ok:true,value:'0|100',skip:true};
+  if(/^(?:نوساز|فقط نوساز)$/.test(t))return {ok:true,value:'0|3'};
+  var clean=t.replace(/سال|ساله|ساخت|عمر|بنا|حداکثر|حداقل/g,' ').trim();
+  var range=parseRangeFA(clean);
+  if(range.ok){var p=range.value.split('|').map(Number);if(p.length===2&&p.every(function(n){return Number.isFinite(n)&&n>=0&&n<=100})&&p[0]<=p[1])return range}
+  var count=parseCountFA(clean.replace(/^تا\s+/,''));
+  if(count.ok&&count.value>=0&&count.value<=100)return {ok:true,value:'0|'+count.value};
+  return {ok:false,msg:'عمر بنا را مانند «نوساز»، «تا ۵ سال»، «۵ تا ۱۰ سال» یا «مهم نیست» بنویسید.'};
 }
 
 function parseRangeFA(input){
@@ -3750,7 +3765,7 @@ function ser12(base){var m=[.86,.875,.89,.885,.905,.925,.935,.95,.945,.965,.985,
 var REP=[['پکیج / آبگرمکن','o'],['نشت لولهٔ اصلی','o'],['ایزوگام و نم‌گیری','o'],['پمپ آب مشاعات','o'],['شارژ گاز کولر','t'],['شیرآلات و واشر','t'],['قفل و درب واحد','t'],['لامپ و کلید واحد','t']];
 var LGD={
 ok:{lbl:'سند تک‌برگ',est:'۷ روز کاری',rows:[['سند','تک‌برگ رسمی','ok'],['رهن / بازداشت','ندارد','ok'],['تفکیک رسمی','صورت شده','ok'],['مادهٔ ۱۰۰','ندارد','ok'],['وقف / ملی','ندارد','ok']],risk:''},
-mort:{lbl:'رهن بانکی + مادهٔ ۱۰۰',est:'۲۵ تا ۴۰ روز',rows:[['سند','تک‌برگ رسمی','ok'],['رهن بانکی','۱۲٬۰۰۰٬۰۰۰٬۰۰۰ ریال — فک رهن ~۱۵ روز','warn'],['مادهٔ ۱۰۰','جریمه: ۸۰۰٬۰۰۰٬۰۰۰ ریال','bad'],['وقف','ندارد','ok']],risk:'تا رفع موانع، وجه فقط در حساب امانی آزاد می‌شود.'},
+mort:{lbl:'رهن بانکی + مادهٔ ۱۰۰',est:'۲۵ تا ۴۰ روز',rows:[['سند','تک‌برگ رسمی','ok'],['رهن بانکی','۱۲٬۰۰۰٬۰۰۰٬۰۰۰ تومان — فک رهن ~۱۵ روز','warn'],['مادهٔ ۱۰۰','جریمه: ۸۰۰٬۰۰۰٬۰۰۰ ریال','bad'],['وقف','ندارد','ok']],risk:'تا رفع موانع، وجه فقط در حساب امانی آزاد می‌شود.'},
 heir:{lbl:'ورثه‌ای و وقفی',est:'بیش از ۴۵ روز',rows:[['سند','منگوله‌دار','warn'],['وقف','استعلام اوقاف لازم','warn'],['وراثت','گواهی انحصار وراثت نیست','bad'],['وکالت','اعتبار نامشخص','bad'],['مالیات ارث','مفاصاحساب نیست','bad']],risk:'فروش ملک ورثه‌ای بدون رضایت همهٔ ورثه باطل است — مگر با پرداخت مرحله‌ای امانی.'}};
 var SCN={bad:{p:.06,g:.08,u:.05,d:.225},mid:{p:.24,g:.26,u:.31,d:.225},good:{p:.42,g:.48,u:.6,d:.225}};
 var SLIST=[
@@ -3807,7 +3822,7 @@ var FIN={
   },
   rent:{
     cashAnnual:(54000*12)/13200000,
-    source:'دادهٔ داخلی سامانه: ۵۴٬۰۰۰ ریال درآمد ماهانه به‌ازای هر کلید با ارزش پایهٔ ۱۳٬۲۰۰٬۰۰۰ ریال'
+    source:'دادهٔ داخلی سامانه: ۵۴٬۰۰۰ تومان درآمد ماهانه به‌ازای هر کلید با ارزش پایهٔ ۱۳٬۲۰۰٬۰۰۰ ریال'
   },
   nav:{default:0.32,source:'فرض افزایش ارزش ملک پیش‌فرض سامانه؛ قابل تغییر و غیرتضمینی'}
 };
@@ -4287,7 +4302,7 @@ function prRangeBlock(D,m){
   var P=D.PR,h='<div class="card"><div class="ct"> بازهٔ اولویت‌های ملک</div>';
   h+=drrow('age','عمر بنا (سال)',0,30,1,P.age);
   h+=drrow('m2','متراژ (متر)',40,140,5,P.m2);
-  h+=drrow('ppm','قیمت هر متر (ریال)',1800000000,5500000000,50000000,P.ppm);
+  h+=drrow('ppm','قیمت هر متر (تومان)',1800000000,5500000000,50000000,P.ppm);
   h+=drrow('floorR','طبقه',1,10,1,P.floorR);
   h+='<div class="srow"><div class="slab"><span>حداقل خواب</span></div><div class="chips">'+[[0,'۰'],[1,'۱'],[2,'۲'],[3,'۳+']].map(function(b){return '<span class="chip'+(P.beds===b[0]?' on':'')+'" data-act="prset" data-m="'+m+'" data-k="beds" data-v="'+b[0]+'">'+b[1]+'</span>'}).join('')+'</div></div>';
   h+='<div class="srow"><div class="slab"><span>ویژگی‌های الزامی</span></div><div class="chips">'+[['elev','آسانسور'],['park','پارکینگ'],['balc','بالکن']].map(function(f){return '<span class="chip'+(P[f[0]]==='yes'?' on':'')+'" data-act="prtog" data-m="'+m+'" data-k="'+f[0]+'">'+f[1]+'</span>'}).join('')+'</div></div>';
@@ -4467,7 +4482,7 @@ function lcard2(x,D,sel,sc,fb){
   '<div class="pcard-art">'+ph(x.seed,480,360,'')+'<span class="pcard-type">اجارهٔ ماهانه</span>'+
   '<div class="pcard-badges"><span class="match" style="position:static">'+(fb?'نزدیک‌ترین پیشنهاد':'تطبیق ٪'+fa(sc,0))+'</span>'+srcBadge(x)+'</div></div>'+
   '<div class="pcard-body">'+
-  '<div class="pcard-price">'+rial(x.rent)+'<small>ریال در ماه</small></div>'+
+  '<div class="pcard-price">'+rial(x.rent)+'<small>تومان در ماه</small></div>'+
   '<div style="font-size:12px;color:var(--ink2)">ودیعه (رهن): <b style="color:var(--ink)">'+rial(x.dep)+'</b></div>'+
   '<div class="pcard-title">'+esc(x.t)+'</div>'+
   '<div class="pcard-adr">'+ico('map',12)+' '+esc(findH(x.hood).n)+'</div>'+
@@ -4581,7 +4596,7 @@ function payPanel(mode,unit,rate,amtStr,sugg,title){
   var amt=+(amtStr||'0'),units=Math.floor(amt/rate),fee=Math.round(amt*0.005);
   var h='<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><b style="font-size:14px">'+title+'</b><span class="note">فاکتور ۰٫۵٪</span></div>';
   h+='<div class="payamt">مبلغ<b id="pay-amt">'+rial(amt)+'</b></div>';
-  h+='<div class="srow"><input class="inp" data-paytxt value="'+(amtStr||'')+'" placeholder="مبلغ را تایپ کنید (ریال) — ارقام فارسی هم پذیرفته" style="direction:ltr;text-align:left"></div>';
+  h+='<div class="srow"><input class="inp" data-paytxt value="'+(amtStr||'')+'" placeholder="مبلغ را تایپ کنید (تومان) — ارقام فارسی هم پذیرفته" style="direction:ltr;text-align:left"></div>';
   h+='<div class="kv"><span>دریافت شما</span><b id="pay-units">'+fa(units,0)+' '+unit+'</b></div>';
   h+='<div class="kv"><span>کارمزد (۰٫۵٪)</span><b id="pay-fee">'+rial(fee)+'</b></div>';
   h+='<div class="kv"><span>مبلغ نهایی</span><b id="pay-total">'+rial(amt+fee)+'</b></div>';
@@ -4777,6 +4792,7 @@ E27.sessRow=function(s){
     '<span class="e22-sess-acts">'+
     '<button class="e22-sact" type="button" data-act="sessPin" data-sess="'+qesc(s.id)+'" aria-pressed="'+(s.pinned?'true':'false')+'" aria-label="'+pinLab+'" title="'+pinLab+'">'+(s.pinned?E27_IC.pin:E27_IC.pinoff)+'</button>'+
     '<button class="e22-sact" type="button" data-act="sessRename" data-sess="'+qesc(s.id)+'" aria-label="تغییر نام گفت‌وگو" title="تغییر نام">'+E27_IC.pen+'</button>'+
+    '<button class="e22-sact" type="button" data-act="e31MoveChat" data-sess="'+qesc(s.id)+'" title="انتقال به پروژه" aria-label="انتقال به پروژه">'+E27_IC.pin+'</button>'+
     '<button class="e22-sact e22-sact-del" type="button" data-act="sessDel" data-sess="'+qesc(s.id)+'" aria-label="حذف گفت‌وگو" title="حذف گفت‌وگو">'+E27_IC.trash+'</button>'+
     '</span></div>';
 };
@@ -5005,6 +5021,7 @@ function ceStep(){
   if(!sc){CE.f=null;renderChatMeta();return}
   if(CE.i>=sc.length){ceEnd();return}
   var st=sc[CE.i],D=wd(CE.f).data;
+  if(CE.f==='buy'){defP(D);defPR(D)}
   if(st.pre&&st.pre(D)===false){cePush();CE.i++;ceStep();return}
   if(st.loop){botC(st.loop[CE.li].t,CHIP5());return}
   var q=st.q;
@@ -5026,7 +5043,7 @@ function ceImpSet(k,v){try{var m=CE.f;if(!m)return;var D=wd(m).data;if(!D.P)D.P=
 function ceSmart(t){t=String(t||'');var has=function(){var a=arguments,i;for(i=0;i<a.length;i++){if(t.indexOf(a[i])>=0)return true}return false};if(has('تضمینی')){go('grt');CE.f=null;botC('اجارهٔ تضمینی در صفحهٔ اختصاصی خودش قدم‌به‌قدم پیش می‌رود؛ بازش کردم.',null);return true}if(has('اجاره','رهن')||((!CE.f||CE.f==='rent')&&has('بازدید'))){botC('فلوی اجاره را شروع می‌کنم.',null);ceStart('rent');return true}if(has('خرید','مبایعه')){botC('فلوی خرید را شروع می‌کنم.',null);ceStart('buy');return true}if(has('قرارداد','کد رهگیری')){S.ui.atab='contracts';save();go('profile');CE.f=null;botC('قراردادها در تنظیمات حساب باز شد.',null);return true}if(has('رزرو','اقامت','سفر')){botC('فلوی اقامت را شروع می‌کنم.',null);ceStart('stay');return true}if(has('پروژه')){go('mkt');CE.f=null;botC('بخش پروژه‌ها را باز کردم.',null);return true}if(has('ساخت','مصالح')){go('build');CE.f=null;botC('بخش ساخت را باز کردم.',null);return true}if(has('خدمات','تعمیر','نظافت')){go('svc');CE.f=null;botC('بخش خدمات ملک را باز کردم.',null);return true}if(has('خواب')){var m2=t.match(/[0-9]+/);if(m2&&CE.f){var nb=+pd(m2[0]);if(nb>=1&&nb<=5){var DD=wd(CE.f).data;DD.beds=nb;botC('تعداد خواب ثبت شد.',null);cePush();CE.i++;ceStep();return true}}botC('تعداد خواب را با عدد مشخص کنید (1 تا 5).',null);return true}if(has('منو','داشبورد')){ceVal('!menu');CE.f=null;return true}return false}
 
 function ceVal(v){
-  if(v==='!menu'){ceStart('gate');CE.i=3;ceStep();return}
+  if(v==='!menu'){ceStart('gate');CE.i=1;ceStep();return}
   if(v==='!help'){
     botC('فرمان‌ها: «ادامه»، «محله‌ها»، «مقایسه»، «امضا»، «فسخ»، «چند کلید دارم»، «کیف پول»، «نقشه»، «منو».',[['منوی اصلی','!menu']]);
     return;
@@ -5060,6 +5077,7 @@ function ceVal(v){
   }
   if(st.money){
     var pm=parseMoneyFA(v0);
+    if(st.chips&&st.chips(D).some(function(c){return String(c[1])===v0&&/^[0-9]+$/.test(v0)}))pm={ok:true,value:+v0};
     if(!pm.ok){
       var p27=null;
       try{p27=E27.budgParse(v0)}catch(e27x){}
@@ -5071,7 +5089,7 @@ function ceVal(v){
     if(!pc.ok){botC(pc.msg);return}
     v=String(pc.value);
   }else if(st.range){
-    var prg=parseRangeFA(v0);
+    var prg=st.id==='age'?parseAgeRangeFA(v0):parseRangeFA(v0);
     if(!prg.ok){botC(prg.msg);return}
     v=prg.value;
   }else if(st.moneyRange){
@@ -5080,7 +5098,7 @@ function ceVal(v){
     v=pmr.value;note=pmr.note;
   }
   var done=null;
-  if(st.set){done=st.set(D,v)}
+  if(st.set){var previousMoneyUnit=window.__E31CanonicalMoney;try{window.__E31CanonicalMoney=!!st.money;done=st.set(D,v)}finally{window.__E31CanonicalMoney=previousMoneyUnit}}
   else if(st.key){D[st.key]=v}
   if(done==='ERR'){botC(st.err||('این مقدار در بازهٔ مجاز نیست. '+(st.hint||'یک مقدار معتبر وارد کنید.')));return}
   try{ctxFromStep(CE.f,st,D)}catch(e){}
@@ -5165,7 +5183,7 @@ function chatListCard(x,sel){
   return '<div class="pcard'+(sel?' sel':'')+'">'+
   '<div class="pcard-art">'+ph(x.seed,480,360,'')+'<span class="pcard-type">اجارهٔ ماهانه</span></div>'+
   '<div class="pcard-body">'+
-  '<div class="pcard-price">'+rial(x.rent)+'<small>ریال در ماه</small></div>'+
+  '<div class="pcard-price">'+rial(x.rent)+'<small>تومان در ماه</small></div>'+
   '<div style="font-size:12px;color:var(--ink2)">ودیعه (رهن): <b style="color:var(--ink)">'+rial(x.dep)+'</b></div>'+
   '<div class="pcard-title">'+esc(x.t)+'</div>'+
   '<div class="pcard-adr">'+ico('map',12)+' '+esc(findH(x.hood).n)+'</div>'+
@@ -5222,48 +5240,12 @@ var PERSONA_NOTE={'خانواده':'برای خانواده‌ها وزن پار
 SCRIPTS.gate=[
 {id:'hello',q:function(){return 'سلام! چه کاری برایتان انجام دهم؟'+E28.discoverChips()},
  chips:function(){return [[' الان مشخص می‌کنم','!pnow'],[' بعداً','!pskip']]},
- acts:{pnow:function(){CE.i=1;ceStep()},pskip:function(){CE.i=3;ceStep()}}},
-{id:'work',q:'محل کارتان را انتخاب کنید (یا روی نقشه مشخص کنید):',
- chips:function(){var c=HOODS.map(function(h){return [h.n,h.id]});c.push(['انتخاب روی نقشه','!wmap'],['دورکاری','none']);return c},
- err:'نام محله را از فهرست انتخاب کنید یا روی نقشه مشخص کنید.',
- set:function(D,v){
-   if(v==='none'){
-     S.prof.work=null;S.prof.workLL=null;
-     S.prof.places=initPlaces().filter(function(p){return p.kind!=='work'});syncLegacyFromPlaces();save();return null;
-   }
-   var hid=hoodFromText(v)||v;var h=findH(hid);if(!h)return 'ERR';
-   upsertPlace('work','محل کار',h.ll,hid,1);return null;
- },
- acts:{wmap:function(){
-   openPickMap('محل کار',function(ll){
-     upsertPlace('work','محل کار',ll,null,1);
-     botC('محل کار روی نقشه ثبت شد؛ فاصله‌های املاک به‌روز شد.');
-     CE.i++;ceStep();
-   });
- }}},
-{id:'school',q:'مدرسهٔ فرزندانتان کدام محدوده است؟ (یا روی نقشه)',
- chips:function(){var c=HOODS.map(function(h){return [h.n,h.id]});c.push(['انتخاب روی نقشه','!smap'],['ندارم','none']);return c},
- err:'نام محله را از فهرست انتخاب کنید یا روی نقشه مشخص کنید.',
- set:function(D,v){
-   if(v==='none'){
-     S.prof.school=null;S.prof.schoolLL=null;
-     S.prof.places=initPlaces().filter(function(p){return p.kind!=='school'});syncLegacyFromPlaces();save();return null;
-   }
-   var hid=hoodFromText(v)||v;var h=findH(hid);if(!h)return 'ERR';
-   upsertPlace('school','مدرسه',h.ll,hid,2);return null;
- },
- acts:{smap:function(){
-   openPickMap('مدرسهٔ فرزندان',function(ll){
-     upsertPlace('school','مدرسه',ll,null,2);
-     botC('مدرسه روی نقشه ثبت شد؛ فاصله‌های املاک به‌روز شد.');
-     CE.i++;ceStep();
-   });
- }}},
+ acts:{pnow:function(){CE.i=1;ceStep()},pskip:function(){CE.i=1;ceStep()}}},
 {id:'menu',q:'عالی! چه کاری می‌خواهید انجام دهید؟<br><small>کل فلو را می‌توانید همین‌جا گفت‌وگو‌محور انجام دهید.</small>',
- chips:function(){return [[' اجاره','F:rent'],[' خرید','F:buy'],[' درآمد اجاره','F:invr'],[' پروژه‌ها','F:mkt'],[' اقامتگاه','F:stay'],['نقشه','F:dashx'],[' راهنما','!help']]}}
+ chips:function(){return [[' اجاره','F:rent'],[' خرید','F:buy'],[' سرمایه‌گذاری ملکی','F:invp'],[' پروژه‌ها','F:mkt'],[' اقامتگاه','F:stay'],['نقشه','F:dashx'],[' راهنما','!help']]}}
 ];
 SCRIPTS.rent=[
-{id:'dep',money:true,q:' <b>مبلغ ودیعهٔ شما</b> چقدر است؟ (ریال — عدد دقیق وارد کنید)',kind:'num',
+{id:'dep',money:true,q:' <b>مبلغ ودیعهٔ شما</b> چقدر است؟ (تومان — عدد دقیق وارد کنید)',kind:'num',
  pre:function(D){if(CTX.dep&&!D._depSet){if(!D.B){D.B={inc:1500000000,depB:CTX.dep,rentB:0,chg:50000000,incr:100000000}}D.B.depB=CTX.dep;D._depSet=1;botC('✓ ودیعه از گفت‌وگوی قبلی به‌کار رفت: <b>'+rial(CTX.dep)+'</b> — برای تغییر، «بازگشت» را بزنید.');return false}return true},
  chips:function(){return [['۵۰۰ میلیون تومان','5000000000'],['۱ میلیارد تومان','10000000000'],['۳ میلیارد تومان','30000000000'],['بدون سقف','بدون سقف']]},
  set:function(D,v){
@@ -5274,8 +5256,8 @@ SCRIPTS.rent=[
    if(p.mode==='open'){D.depOpen=true;D.B.depB=D.B.depB||15000000000;return null}
    if(p.n<=0)return 'ERR';
    D.depOpen=false;D.B.depB=p.n;return null},
- err:'ودیعه را به ریال بنویسید (مثلاً «۱۵ میلیارد» یا «۱٫۵ میلیارد تومان») — بدون سقف؛ یا «بدون سقف» بفرستید.'},
-{id:'rentb',money:true,q:' <b>اجارهٔ ماهانهٔ شما</b> چقدر است؟ (ریال)',kind:'num',
+ err:'ودیعه را به تومان بنویسید (مثلاً «۱۵ میلیارد» یا «۱٫۵ میلیارد تومان») — بدون سقف؛ یا «بدون سقف» بفرستید.'},
+{id:'rentb',money:true,q:' <b>اجارهٔ ماهانهٔ شما</b> چقدر است؟ (تومان)',kind:'num',
  pre:function(D){if(CTX.rent&&!D._rentbSet){D.B=D.B||{inc:1500000000,depB:CTX.dep||15000000000,rentB:CTX.rent,chg:50000000,incr:100000000};D.B.rentB=CTX.rent;D._rentbSet=1;botC('✓ سقف اجاره از گفت‌وگوی قبلی: <b>'+rial(CTX.rent)+'</b>');return false}return true},
  chips:function(){return [['۳۰ میلیون تومان','300000000'],['۵۰ میلیون تومان','500000000'],['۸۰ میلیون تومان','800000000'],['بدون سقف','بدون سقف']]},
  set:function(D,v){
@@ -5284,7 +5266,7 @@ SCRIPTS.rent=[
    if(p.mode==='open'){D.rentBOpen=true;D._rentbSet=1;return null}
    if(p.n<=0)return 'ERR';
    D.rentBOpen=false;D._rentbSet=1;D.B.rentB=p.n;return null},
- err:'اجارهٔ ماهانه را به ریال بنویسید (مثلاً «۸۰ میلیون تومان») — بدون سقف؛ یا «بدون سقف» بفرستید.'},
+ err:'اجارهٔ ماهانه را به تومان بنویسید (مثلاً «۸۰ میلیون تومان») — بدون سقف؛ یا «بدون سقف» بفرستید.'},
 {id:'imps',loop:[{k:'metro',t:' اهمیت دسترسی به مترو (۱–۵)؟'},{k:'school',t:' اهمیت نزدیکی به مدرسه؟'},{k:'work',t:' اهمیت کوتاه‌بودن رفت‌وآمد به کار'+wLabel()+'؟'}],pre:function(D){defP(D);return true}},
 {id:'beds',count:true,q:' حداقل چند خواب؟',chips:function(){return [['۰','0'],['۱','1'],['۲','2'],['۳ یا بیشتر','3']]},pre:function(D){if(CTX.beds&&D._bedsSet===undefined){defP(D);D.P.beds=CTX.beds;D._bedsSet=1;botC('✓ حداقل خواب از گفت‌وگوی قبلی: <b>'+fa(CTX.beds,0)+'</b>');return false}return true},set:function(D,v){defP(D);D.P.beds=+v;D._bedsSet=1;return null}},
 {id:'who',kind:'text',q:'و برای تنظیم بهتر پیشنهادها — این خانه بیشتر برای چه موقعیتی مناسب است؟ (اختیاری؛ می‌توانید رد کنید)',
@@ -5464,7 +5446,7 @@ SCRIPTS.rent=[
  acts:{pay:function(){ACT.tpay();ceEnd()}}}
 ];
 SCRIPTS.buy=[
-{id:'budg',money:true,q:' بودجهٔ کل خرید شما چقدر است؟ (ریال — تایپ کنید)',kind:'num',
+{id:'budg',money:true,q:' بودجهٔ کل خرید شما چقدر است؟ (تومان — تایپ کنید)',kind:'num',
  pre:function(D){if(CTX.budg&&!D._budgSet&&CTX.budg>=50000000000){D.budg=CTX.budg;D._budgSet=1;botC('✓ بودجه از گفت‌وگوی قبلی: <b>'+rial(CTX.budg)+'</b> — برای تغییر، «بازگشت» را بزنید.');return false}return true},
  chips:function(){return [['۱۵ میلیارد تومان','150000000000'],['۳۰ میلیارد تومان','300000000000'],['۵۰ میلیارد تومان','500000000000'],['بدون بودجهٔ مشخص','بدون بودجهٔ مشخص'],['۵ میلیارد به بالا','۵ میلیارد به بالا']]},
  set:function(D,v){
@@ -5476,11 +5458,11 @@ SCRIPTS.buy=[
    if(p.mode==='max'){D.budgOpen=false;D.budg=p.n;botC('✓ سقف بودجه '+rial(p.n)+' ثبت شد — بدون کف.');return null}
    if(p.n<=0)return 'ERR';
    D.budgOpen=false;D.budg=p.n;return null},
- err:'بودجه را به ریال بنویسید (مثلاً «۳۰ میلیارد» یا «۵ میلیارد به بالا» یا «بدون بودجهٔ مشخص»).'},
+ err:'بودجه را به تومان بنویسید (مثلاً «۳۰ میلیارد» یا «۵ میلیارد به بالا» یا «بدون بودجهٔ مشخص»).'},
 {id:'imps',loop:[{k:'metro',t:' اهمیت مترو؟'},{k:'school',t:' اهمیت مدرسه؟'},{k:'work',t:' اهمیت رفت‌وآمد'+wLabel()+'؟'}],pre:function(D){defP(D);defPR(D);return true}},
-{id:'age',range:true,q:' بازهٔ عمر بنا؟',chips:function(){return [['نوساز','0|3'],['۰–۵','0|5'],['۳–۱۰','3|10'],['تا ۲۰','0|20'],['هرچه','0|30']]},set:function(D,v){var p=v.split('|');D.PR.age=[+p[0],+p[1]];return null}},
+{id:'age',range:true,q:' بازهٔ عمر بنا؟',chips:function(){return [['نوساز','0|3'],['۰–۵','0|5'],['۳–۱۰','3|10'],['تا ۲۰','0|20'],['هرچه','0|30']]},set:function(D,v){defPR(D);var p=String(v).split('|');if(p.length!==2||!p.every(function(n){return Number.isFinite(+n)&&+n>=0})||+p[0]>+p[1])return 'ERR';D.PR.age=[+p[0],+p[1]];return null}},
 {id:'m2',range:true,q:' بازهٔ متراژ؟ (بنویسید 45-60)',kind:'text',chips:function(){return [['۴۵–۶۰','45|60'],['۵۰–۷۰','50|70'],['۶۰–۹۰','60|90'],['۷۰+','70|130']]},set:function(D,v){var p=pd(v).split(/[-|]/);if(p.length<2||!+p[1])return 'ERR';D.PR.m2=[+p[0],+p[1]];return null}},
-{id:'ppm',moneyRange:true,q:' بازهٔ قیمت هر متر (ریال)؟ (بنویسید 2000000000-3000000000)',kind:'text',chips:function(){return [['۲–۲٫۵ میلیارد','2000000000|2500000000'],['۲٫۵–۳٫۵ میلیارد','2500000000|3500000000'],['مهم نیست','1800000000|5500000000']]},set:function(D,v){var p=pd(v).split(/[-|]/);if(p.length<2||!+p[1])return 'ERR';D.PR.ppm=[+p[0],+p[1]];return null}},
+{id:'ppm',moneyRange:true,q:' بازهٔ قیمت هر متر (تومان)؟ (بنویسید 2000000000-3000000000)',kind:'text',chips:function(){return [['۲–۲٫۵ میلیارد','2000000000|2500000000'],['۲٫۵–۳٫۵ میلیارد','2500000000|3500000000'],['مهم نیست','1800000000|5500000000']]},set:function(D,v){var p=pd(v).split(/[-|]/);if(p.length<2||!+p[1])return 'ERR';D.PR.ppm=[+p[0],+p[1]];return null}},
 {id:'floor',range:true,q:' بازهٔ طبقه؟ (بنویسید 1-3 یا «همه»)',kind:'text',chips:function(){return [['۱–۳','1|3'],['۴–۱۰','4|10'],['همه','1|10']]},set:function(D,v){if(/همه/.test(v)){D.PR.floorR=[1,10];return null}var p=pd(v).split(/[-|]/);if(p.length<2||!+p[1])return 'ERR';D.PR.floorR=[Math.max(1,+p[0]),Math.min(10,+p[1])];return null}},
 {id:'beds',count:true,q:' حداقل خواب؟',chips:function(){return [['۰','0'],['۱','1'],['۲','2'],['۳+','3']]},set:function(D,v){D.PR.beds=+v;return null}},
 {id:'feat',q:' ویژگی الزامی؟ (آسانسور/پارکینگ/بالکن/هیچ)',kind:'text',
@@ -5615,121 +5597,6 @@ SCRIPTS.buy=[
    ceEnd();
  }}}
 ];
-SCRIPTS.invb=[
-{id:'prjs',q:' پروژه‌های در حال ساخت / تأمین مالی:',
- cards:function(D){
-  return INPRJ.map(function(p,i){
-    return '<div class="ccard"><div class="cthumb">'+ph('inv'+i,150,94,'')+'</div>'+
-    '<div class="cb"><b>'+p.t+'</b><small>'+p.loc+' • '+p.units+' • تحویل: '+p.del+'<br>فیزیکی ٪'+fa(p.prog,0)+' • مالی ٪'+fa(p.fin,0)+' • '+p.lic+'</small></div>'+
-    '<button class="btn btn-xs btn-primary" data-cba="ipset" data-i="'+i+'">انتخاب</button></div>';
-  }).join('')},
- chips:function(){return [['مقایسه و بازدهی','ok']]},
- set:function(D,v){if(D.ip===undefined)D.ip=0;return null}},
-{id:'scn',q:' کدام حالت بازار؟',chips:function(){return [['بدبینانه','bad'],['معقول','mid'],['خوش‌بینانه','good']]},set:function(D,v){if(!SCN[v])return 'ERR';D.scn=v;return null},err:'حالت بازار را از گزینه‌ها انتخاب کنید: بدبینانه، معقول یا خوش‌بینانه.'},
-{id:'cap',money:true,q:' سرمایهٔ شما چقدر است؟ (ریال — تایپ کنید)',kind:'num',
- chips:function(){return [['۲ میلیارد','2000000000'],['۵ میلیارد','5000000000'],['۷ میلیارد','7000000000'],['۱۰ میلیارد','10000000000']]},
- set:function(D,v){
-   var n=+pd(v);
-   if(!n)return 'ERR';
-   D.cap=n;return null}},
-{id:'yld',q:function(D){return ' بازدهی درصدی در بازه‌های مختلف:<br>'+yieldTable(D)+'<br><small>نرخ بازدهی (درصد) — بدون عدد مطلق.</small>'},
- chips:function(){return [['ادامه','ok']]},set:function(){return null}},
-{id:'price',money:true,q:function(D){return ' قیمت هر متر را <b>سامانه لحظه‌ای</b> تعیین می‌کند: <b>'+rial(PPM.v)+'</b> — قابل تغییر نیست.<br>مبلغ پرداخت (ریال — تایپ کنید):'},kind:'num',
- chips:function(D){return [['همهٔ سرمایه',String(D.cap)],['نصف',String(Math.round(D.cap/2))],['۱ میلیارد','1000000000'],['۵ میلیارد','5000000000']]},
- set:function(D,v){
-   var n=+pd(v);
-   if(!n||n<100000000)return 'ERR';
-   D.payAmt=String(n);return null}},
-{id:'pay',q:function(D){return ' خرید <b>'+fa(Math.floor(+D.payAmt/PPM.v),0)+' متر</b> ('+rial(+D.payAmt)+' + ۰٫۵٪) — انتقال به درگاه؟'},
- chips:function(){return [['پرداخت','!p'],['تغییر مبلغ','!back']]},
- acts:{
-  back:function(){ceJump('price')},
-  p:function(D){
-    var amt=+D.payAmt||0;
-    openGateway(amt,'خرید سهم متری — '+INPRJ[D.ip||0].t,function(){
-      var m=Math.floor(amt/PPM.v);
-      if(m<1){botC('مبلغ برای ۱ متر کافی نیست.');return}
-      D.bought=true;D.meters=m;
-      addReq('invb','پرداخت','خرید '+fa(m,0)+' متر','کامل شد',rial(amt)+' + ۰٫۵٪');
-      save();if(CURRENT==='invest')renderCurrent();
-      botC(' خرید با موفقیت انجام شد — دارایی شما: <b>'+fa(m,0)+' متر</b>',[['پیگیری و فروش','!nx']]);
-    });
-  }}},
-{id:'trk',q:function(D){
-  return ' دارایی: '+fa(D.meters||0,0)+' متر — پیشرفت: اسکلت طبقهٔ ۷ (گزارش هفتگی). فروش با قیمت روز ('+rial(SPRIX)+' / متر) و واریز به <b>کیف پول</b>.'},
- chips:function(){return [['فروش همه','!sa'],['فروش نصف','!sh'],['نگه می‌دارم','!e']]},
- acts:{
-  sa:function(D){sellInv(D,D.meters||0)},
-  sh:function(D){sellInv(D,Math.floor((D.meters||0)/2))},
-  e:function(D){
-    var d=wd('invb');
-    d.done=true;addReq('invb','پیگیری','پایان فلو','کامل شد');save();
-    if(CURRENT==='invest')renderCurrent();ceEnd()
-  }}}
-];
-function sellInv(D,m){
-  if(!m||m<1){botC('متری برای فروش نیست.');return}
-  var net=Math.round(m*SPRIX*0.995);
-  walletIn(net,'فروش '+fa(m,0)+' متر سهم متری');
-  D.meters=(D.meters||0)-m;
-  addReq('invb','فروش','فروش '+fa(m,0)+' متر — واریز به کیف پول','کامل شد',rial(net));
-  save();if(CURRENT==='invest')renderCurrent();
-  botC(' '+rial(net)+' به کیف پول واریز شد (قابل برداشت).',[['منوی اصلی','!menu']]);
-  CE.f=null;
-}
-SCRIPTS.invr=[
-{id:'props',q:' دارایی‌های صندوق (در حال اجاره):',
- cards:function(D){
-  return RPROPS.map(function(p){
-    return '<div class="ccard"><div class="cthumb">'+ph(p.seed,150,94,'')+'</div>'+
-    '<div class="cb"><b>'+p.t+'</b><small>'+p.addr+'<br>'+(p.rent?('اجاره: '+rial(p.rent)+' • رهن: '+rial(p.dep)):'در حال مستأجریابی')+' • ★ '+fa(p.rate,1)+'</small></div>'+
-    '<span class="badge '+(p.rent?'b-ok':'b-warn')+'">'+p.st+'</span></div>';
-  }).join('')},
- chips:function(){return [['مقایسه با بانک','ok']]},set:function(){return null}},
-{id:'cap',money:true,q:' سرمایهٔ شما چقدر است؟ (ریال)',kind:'num',
- chips:function(){return [['۱۰ میلیارد','10000000000'],['۲۰ میلیارد','20000000000'],['۳۰ میلیارد','30000000000']]},
- set:function(D,v){D.cap=+pd(v)||20000000000;return null}},
-{id:'cmp',q:function(D){return finChatHTML(D.cap,S.ui.navg)},
- chips:function(){return [['ادامه','ok']]},set:function(){return null}},
-{id:'fund',money:true,q:function(D){return 'مبلغ خرید کلید؟ (ارزش پایهٔ هر کلید: '+rial(13200000)+') — فروش لحظه‌ای و جزئی است و به کیف پول واریز می‌شود.'},kind:'num',
- chips:function(D){return [['همهٔ سرمایه',String(D.cap)],['۵۰۰ کلید','6600000000'],['۱٬۰۰۰ کلید','13200000000'],['۲ میلیارد','2000000000']]},
- set:function(D,v){
-   var amt=+pd(v);
-   if(!amt)return 'ERR';
-   D.amt=amt;return null}},
-{id:'pay',q:function(D){return ' خرید <b>'+fa(Math.floor(D.amt/13200000),0)+' کلید</b> ('+rial(D.amt)+' + ۰٫۵٪) — درگاه؟'},
- chips:function(){return [['پرداخت','!p'],['تغییر مبلغ','!back']]},
- acts:{
-  back:function(){ceJump('fund')},
-  p:function(D){
-    openGateway(D.amt,'خرید کلید صندوق',function(){
-      var cnt=Math.floor(D.amt/13200000);
-      if(cnt<1){botC('مبلغ برای ۱ کلید کافی نیست.');return}
-      D.cnt=cnt;D.fund=true;
-      addReq('invr','پرداخت','خرید '+fa(cnt,0)+' کلید','کامل شد',rial(D.amt)+' + ۰٫۵٪');
-      save();if(CURRENT==='invest')renderCurrent();
-      ceJump('end');
-    });
-  }}},
-{id:'end',q:function(D){return ' درآمد ماهانهٔ شما: <b>'+rial(D.cnt*54000)+'</b> — واریز خودکار + افزایش ارزش ملک. فروش جزئی لحظه‌ای.'},
- chips:function(){return [['فروش همه','!sa'],['فروش نصف','!sh'],['نگه می‌دارم','!e']]},
- acts:{
-  sa:function(D){sellTok(D,D.cnt)},
-  sh:function(D){sellTok(D,Math.floor(D.cnt/2))},
-  e:function(){ACT.irdone();ceEnd()}
- }}
-];
-function sellTok(D,n){
-  if(!n||n<1){botC('کلیدی نیست.');return}
-  var net=Math.round(n*13200000*0.995);
-  walletIn(net,'فروش '+fa(n,0)+' کلید');
-  D.cnt-=n;
-  addReq('invr','فروش','فروش '+fa(n,0)+' کلید — کیف پول','کامل شد',rial(net));
-  if(D.cnt<1){wd('invr').done=true}
-  save();if(CURRENT==='invest')renderCurrent();
-  botC(' '+rial(net)+' به کیف پول واریز شد. باقی: '+fa(D.cnt,0)+' کلید.',[['منوی اصلی','!menu']]);
-  CE.f=null;
-}
 SCRIPTS.mkt=[
 {id:'role',q:' نقش شما در مارکت‌پلیس؟',
  chips:function(){return [[' پیمانکار — پیشنهاد + ثبت پروژهٔ جدید','con'],[' کارفرما — تأیید پیمانکار','emp']]},
@@ -5758,7 +5625,7 @@ SCRIPTS.mkt=[
   }
  }},
 {id:'bid',money:true,pre:function(D){return D.role==='con'},
- q:' قیمت پایهٔ پیشنهاد (ریال — تایپ کنید)؟',kind:'num',
+ q:' قیمت پایهٔ پیشنهاد (تومان — تایپ کنید)؟',kind:'num',
  chips:function(){return [['۸ میلیارد','8000000000'],['۱۰ میلیارد','10000000000'],['۱۲ میلیارد','12000000000']]},
  set:function(D,v){D.bidAmt=+pd(v)||8000000000;return null}},
 {id:'adj',pre:function(D){return D.role==='con'},
@@ -5985,12 +5852,6 @@ CBACT.vcT=function(el){
   if(CE.f==='rent'){ceStep()}
   if(CURRENT==='rent'){renderCurrent()}
 };
-CBACT.ipset=function(el){
-  var D=wd('invb').data;
-  D.ip=+el.getAttribute('data-i');save();
-  if(CURRENT==='invest'){renderCurrent()}
-  botC('✓ پروژهٔ «'+INPRJ[D.ip].t+'» انتخاب شد.');
-};
 var CBT={};
 CBT.tok=function(){
   var neg=0;
@@ -6016,7 +5877,7 @@ function ctxFromStep(f,st,D){
   }catch(e){}
 }
 /* ── نمایش‌سازها ── */
-function rShort(v){v=+v||0;if(v>=1e9)return fa(v/1e9,1)+' میلیارد';if(v>=1e6)return fa(v/1e6,0)+' میلیون';return fa(v,0)}
+function rShort(v){v=(+v||0)/10;if(v>=1e9)return fa(v/1e9,1)+' میلیارد';if(v>=1e6)return fa(v/1e6,0)+' میلیون';return fa(v,0)}
 function rcard(t,v,sub,cls,full){return '<div class="rcard'+(full?' full':'')+'"><small>'+esc(t)+'</small><span class="rv '+(cls||'')+'">'+v+'</span>'+(sub?'<span class="sub">'+sub+'</span>':'')+'</div>'}
 function rcards(a){return '<div class="rcards">'+a.join('')+'</div>'}
 function rcNote(t){return '<div class="rnote">'+t+'</div>'}
@@ -6685,11 +6546,11 @@ function conPropHTML(D,kind){
   if(isRent){
     h+='<div class="srow"><div class="slab"><span>تاریخ شروع</span></div><input class="inp" id="cp-start" type="date" value="'+qesc(c.terms.start||'')+'" style="direction:ltr;text-align:left"></div>'+
     '<div class="srow"><div class="slab"><span>مدت</span></div><select class="inp" id="cp-dur"><option'+(c.terms.duration==='یک‌ساله'?' selected':'')+'>یک‌ساله</option><option'+(c.terms.duration==='دوساله'?' selected':'')+'>دوساله</option></select></div>'+
-    '<div class="srow"><div class="slab"><span>ودیعه (ریال)</span></div><input class="inp" id="cp-dep" type="number" value="'+qesc(String(c.terms.deposit||''))+'" style="direction:ltr;text-align:left"></div>'+
-    '<div class="srow"><div class="slab"><span>اجارهٔ ماهانه (ریال)</span></div><input class="inp" id="cp-rent" type="number" value="'+qesc(String(c.terms.rent===0?0:(c.terms.rent||'')))+'" style="direction:ltr;text-align:left"></div>'+
+    '<div class="srow"><div class="slab"><span>ودیعه (تومان)</span></div><input class="inp" id="cp-dep" type="number" value="'+qesc(c.terms.deposit==null?'':String(c.terms.deposit/10))+'" style="direction:ltr;text-align:left"></div>'+
+    '<div class="srow"><div class="slab"><span>اجارهٔ ماهانه (تومان)</span></div><input class="inp" id="cp-rent" type="number" value="'+qesc(c.terms.rent==null?'':String(c.terms.rent/10))+'" style="direction:ltr;text-align:left"></div>'+
     '<div class="srow"><div class="slab"><span>روز پرداخت</span></div><select class="inp" id="cp-pay"><option'+(c.terms.paymentDay==='پنجم هر ماه'?' selected':'')+'>پنجم هر ماه</option><option'+(c.terms.paymentDay==='اول هر ماه'?' selected':'')+'>اول هر ماه</option><option'+(c.terms.paymentDay==='توافقی'?' selected':'')+'>توافقی</option></select></div>';
   }else{
-    h+='<div class="srow"><div class="slab"><span>قیمت توافق‌شده (ریال)</span></div><input class="inp" id="cp-price" type="number" value="'+qesc(String(c.terms.price||''))+'" style="direction:ltr;text-align:left"></div>'+
+    h+='<div class="srow"><div class="slab"><span>قیمت توافق‌شده (تومان)</span></div><input class="inp" id="cp-price" type="number" value="'+qesc(c.terms.price==null?'':String(c.terms.price/10))+'" style="direction:ltr;text-align:left"></div>'+
     '<div class="srow"><div class="slab"><span>تاریخ تحویل</span></div><input class="inp" id="cp-delivery" type="date" value="'+qesc(c.terms.delivery||'')+'" style="direction:ltr;text-align:left"></div>'+
     '<div class="srow"><div class="slab"><span>نحوهٔ پرداخت</span></div><select class="inp" id="cp-payment"><option'+(c.terms.payment==='مرحله‌ای'?' selected':'')+'>مرحله‌ای</option><option'+(c.terms.payment==='یکجا'?' selected':'')+'>یکجا</option></select></div>';
   }
@@ -7091,7 +6952,7 @@ VIEWS.buy=function(){
     '<div class="grid g2" style="margin-top:12px">'+
     '<div>'+drrow('age','عمر بنا (سال)',0,30,1,D.PR.age)+'</div>'+
     '<div>'+drrow('m2','متراژ',40,140,5,D.PR.m2)+'</div>'+
-    '<div>'+drrow('ppm','هر متر (ریال)',1800000000,5500000000,50000000,D.PR.ppm)+'</div>'+
+    '<div>'+drrow('ppm','هر متر (تومان)',1800000000,5500000000,50000000,D.PR.ppm)+'</div>'+
     '<div>'+drrow('floorR','طبقه',1,10,1,D.PR.floorR)+'</div></div>'+
     '<div class="chips" style="margin-top:8px">'+
     [[0,'۰ خواب+'],[1,'۱+'],[2,'۲+'],[3,'۳+']].map(function(b){return '<span class="chip'+(D.PR.beds===b[0]?' on':'')+'" data-act="prset" data-m="buy" data-k="beds" data-v="'+b[0]+'">'+b[1]+'</span>'}).join('')+
@@ -7240,174 +7101,7 @@ VIEWS.buy=function(){
 };
 
 /* ═══ ۱۳) سرمایه‌گذاری ═══ */
-VIEWS.invest=function(){
-  var el=document.getElementById('v-invest'),m='invr',d=wd(m),D=d.data,st=d.step,i;
-  var h='<div class="seg" style="margin-bottom:16px"><button class="'+(m==='invr'?'on':'')+'" data-act="sinv" data-t="r"> درآمد اجاره</button></div>';
-  h+=flowReqBlock('invest');
-  if(false&&m==='invb'){
-    h+=wtop('invb','فلوی سرمایه‌گذاری در ساخت','پروژه‌ها ← مبلغ (قیمت سامانه) ← پرداخت ← پیگیری');
-    if(st===1){
-      if(D.scn===undefined){D.scn='mid'}
-      if(D.cap===undefined){D.cap=7000000000}
-      if(D.ip===undefined){D.ip=0}
-      var yh=S.ui.yh||24;
-      h+='<div class="card" style="margin-bottom:14px"><div class="ct"> پروژه‌های در حال ساخت</div><div class="grid g3">'+INPRJ.map(function(p,i2){
-        return '<div class="card tight'+(D.ip===i2?' sel':'')+'" style="border-color:'+(D.ip===i2?'var(--brand)':'var(--line)')+'">'+
-        '<div style="border-radius:10px;overflow:hidden;height:110px;margin-bottom:8px">'+ph('inv'+i2,300,188,'')+'</div>'+
-        '<b>'+p.t+'</b><div class="adr"> '+p.loc+' • '+p.units+'</div>'+
-        '<div class="kv"><span>فیزیکی</span><b>٪'+fa(p.prog,0)+'</b></div>'+
-        '<div class="kv"><span>مالی</span><b>٪'+fa(p.fin,0)+'</b></div>'+
-        '<div class="kv"><span>تحویل</span><b>'+p.del+'</b></div>'+
-        '<div class="kv"><span>اسناد</span><b class="badge b-ok">'+p.lic+'</b></div>'+
-        '<button class="btn btn-sm'+(D.ip===i2?'':' btn-primary')+'" style="margin-top:6px" data-act="ipset" data-i="'+i2+'">'+(D.ip===i2?'✓ انتخاب':'انتخاب')+'</button></div>';
-      }).join('')+'</div></div>';
-      h+='<div class="card"><div class="ct"> بازدهی در حالت‌های مختلف — درصد (افق '+fa(yh,0)+' ماه)</div>'+
-      '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">'+
-      '<div class="seg">'+[['bad','بدبینانه'],['mid','معقول'],['good','خوش‌بینانه']].map(function(s){return '<button class="'+(D.scn===s[0]?'on':'')+'" data-act="iscn" data-v="'+s[0]+'">'+s[1]+'</button>'}).join('')+'</div>'+
-      '<div class="chips">'+[[6,'۶ ماه'],[12,'۱۲'],[24,'۲۴'],[36,'۳۶']].map(function(x){return '<span class="chip'+(yh===x[0]?' on':'')+'" data-act="yhz" data-v="'+x[0]+'">'+x[1]+'</span>'}).join('')+'</div></div>';
-      h+=rng('cap','سرمایهٔ شما',1000000000,20000000000,500000000,D.cap);
-      h+='<div id="scnchart"></div><p class="note" id="scnnote"></p></div>';
-      h+='<div class="card" style="margin-top:14px"><div class="ct"> بازدهی در بازه‌ها (درصد)</div><div id="yldchart"></div><p class="note">سهم متری = سبز • طلا • دلار • سپرده — با چیپ‌ها بازه را عوض کنید.</p></div>';
-      h+=wnav('invb',true,'');
-    }else if(st===2){
-      if(D.cap===undefined){D.cap=7000000000}
-      window.__cap=D.cap;
-      h+='<div class="card"><div class="ct"> مبلغ و متراژ — '+INPRJ[D.ip||0].t+'</div>';
-      h+='<div class="kv"><span>قیمت لحظه‌ای هر متر (سامانه)</span><b id="ppmlive" style="color:var(--brand)">'+rial(PPM.v)+'</b></div>';
-      h+='<p class="note"> هر چند ثانیه به‌روز می‌شود — قابل تغییر توسط کاربر نیست.</p>';
-      h+=rng('cap','سرمایهٔ شما',1000000000,20000000000,500000000,D.cap);
-      h+='<div class="kv"><span>متراژ قابل خرید</span><b id="mlive" style="color:var(--brand)">'+fa(Math.floor(D.cap/PPM.v),0)+' متر</b></div></div>';
-      h+=wnav('invb',true,'');
-    }else if(st===3){
-      if(!D.payAmt){D.payAmt=String(D.cap||7000000000)}
-      PAYM={mode:'invb',ctx:{rate:PPM.v,unit:'متر'},amt:D.payAmt};
-      var sugg=[{l:'همهٔ سرمایه',v:(D.cap||7000000000)},{l:'نصف',v:Math.round((D.cap||7000000000)/2)},{l:'۱ میلیارد',v:1000000000},{l:'۵ میلیارد',v:5000000000}];
-      h+='<div class="card">'+payPanel('invb','متر',PPM.v,D.payAmt,sugg,'خرید سهم متری — '+INPRJ[D.ip||0].t)+'</div>';
-      h+=wnav('invb',!!D.bought,D.bought?'✓ پرداخت انجام شد':'مبلغ را تنظیم و پرداخت کنید');
-    }else{
-      h+='<div class="grid g2"><div class="card"><div class="ct"> پیگیری</div><div class="tl">'+
-      '<div class="tli done"><span class="dot">✓</span>پی‌سازی</div><div class="tli done"><span class="dot">✓</span>اسکلت تا ۶</div><div class="tli act"><span class="dot">•</span>اسکلت ۷</div><div class="tli"><span class="dot"></span>نازک‌کاری</div><div class="tli"><span class="dot"></span>پایان‌کار + سند</div></div>'+
-      '<div class="alert al-warn">با رسیدن به یک واحد کامل: حق انتخاب طبقه </div></div>';
-      h+='<div class="card"><div class="ct"> فروش و کیف پول</div>';
-      h+='<div class="kv"><span>قیمت روز هر متر</span><b>'+rial(SPRIX)+'</b></div>';
-      h+='<div class="kv"><span>دارایی شما</span><b>'+fa(D.meters||0,0)+' متر — '+rial((D.meters||0)*SPRIX)+'</b></div>';
-      h+='<div class="kv"><span> کیف پول</span><b>'+rial(S.wallet||0)+' <button class="btn btn-xs" data-act="wallet">برداشت</button></b></div>';
-      h+='<div class="srow" style="margin-top:10px"><div class="slab"><span>متراژ فروش (تایپ کنید)</span></div><input class="inp" type="number" id="sellm" min="1" max="'+(D.meters||1)+'" value="'+Math.min(5,D.meters||1)+'"></div><div id="sellout"></div>';
-      h+='<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn btn-primary" data-act="isell">فروش (کیف پول)</button><button class="btn" data-act="ibdone">نگه می‌دارم</button></div></div></div>';
-      h+=wnav('invb',false,'');
-    }
-  }else{
-    h+=wtop('invr','فلوی درآمد از اجاره','خرید دارایی، درآمد ماهانه و فروش جزئی');
-    if(st===1){
-      if(D.cap===undefined){D.cap=20000000000}
-      h+='<div class="card" style="margin-bottom:14px"><div class="ct"> ملک‌های در حال اجاره</div><div class="grid g3">'+RPROPS.map(function(p){
-        return '<div class="lcard"><div class="lart">'+ph(p.seed,400,250,'')+'</div>'+
-        '<div class="lbody"><h4>'+p.t+'</h4><div class="adr"> '+p.addr+'</div>'+
-        '<div class="kv"><span>'+(p.rent?'اجاره':'وضعیت')+'</span><b>'+(p.rent?rial(p.rent):p.st)+'</b></div>'+
-        (p.dep?('<div class="kv"><span>رهن</span><b>'+rial(p.dep)+'</b></div>'):'')+
-        '<div class="chips"><span class="badge '+(p.rent?'b-ok':'b-warn')+'">'+p.st+'</span><span class="badge b-info">★ '+fa(p.rate,1)+'</span></div></div></div>';
-      }).join('')+'</div></div>';
-      h+='<div class="card"><div class="ct">مقایسهٔ بازدهی</div>'+rng('cap','سرمایهٔ شما',5000000000,50000000000,1000000000,D.cap)+
-      '<div class="chips" style="margin:10px 0 4px"><span class="note">سناریوی افزایش ارزش ملک:</span>'+[0.20,0.30,0.32,0.40].map(function(v){return '<span class="chip'+((S.ui.navg||FIN.nav.default)===v?' on':'')+'" data-act="navscn" data-v="'+v+'">'+fa(v*100,0)+'٪</span>'}).join('')+'</div>'+
-      '<div id="irbars"></div><p class="note" style="text-align:center;margin-top:2px">مقادیر نمودار: میلیون ریال در ماه</p><div id="fintable" style="margin-top:10px"></div><div id="finnote"></div><div class="alert al-warn" id="irnote"></div></div>'+wnav('invr',true,'');
-    }else if(st===2){
-      h+='<div class="grid g2"><div class="card"><div class="ct"> سابقهٔ واریز — ۱۲ از ۱۲</div>'+
-      '<p class="note">به‌ازای هر ۱۰۰ کلید: واریز یکم هر ماه.</p><div class="chips">'+
-      MFULL.map(function(mm){return '<span class="chip on">'+mm+' ✓</span>'}).join('')+
-      '</div><div class="alert al-ok">✓ هر ۱۲ ماه، بدون تأخیر — پیگیری با تیم سامانه.</div></div>'+
-      '<div class="card"><div class="ct"> شناسنامهٔ دارایی پایه</div>'+
-      '<div class="kv"><span>ناظر</span><b>فرابورس</b></div>'+
-      '<div class="kv"><span>سبد</span><b>۱۱ ملک — تک‌برگ</b></div>'+
-      '<div class="kv"><span>مستأجر</span><b>۹ واحد</b></div>'+
-      '<div class="kv"><span>ذخیره</span><b>'+rial(900000000)+'</b></div></div></div>'+wnav('invr',true,'');
-    }else if(st===3){
-      if(D.cnt===undefined){D.cnt=500}
-      var trq=openReqOf('invr','پرداخت',S.active.invr);
-      h+='<div class="card"><div class="ct">خرید کلید</div>'+
-      (D.fund?'<div class="kv"><span>تعداد کلید</span><b>'+fa(D.cnt,0)+'</b></div>':rng('cnt','تعداد کلید',50,2000,50,D.cnt,function(v){return fa(v,0)+' کلید'}))+
-      '<div class="kv"><span>ارزش پایهٔ هر کلید</span><b>'+rial(13200000)+'</b></div>';
-      if(D.fund){
-        h+='<div class="alert al-ok"><b>خرید انجام شد</b>'+(trq?' • وضعیت: '+trq.status:'')+'<div style="margin-top:6px"><button class="btn btn-xs" data-act="dt" data-t="req" data-cat="invr">پیگیری در درخواست‌ها</button></div></div>';
-      }else{
-        h+='<button class="btn btn-primary" style="margin-top:12px" data-act="irbuy">پرداخت و خرید</button>';
-      }
-      h+='</div>'+wnav('invr',!!D.fund,'');
-    }else{
-      var NR=S.ui.nrng||12;
-      h+='<div class="grid g2"><div class="card"><div class="ct"> درآمد ماهانه</div>'+
-      '<div class="kv"><span>درآمد شما</span><b>'+rial(D.cnt*54000)+'</b></div>'+
-      '<div class="kv"><span>افزایش ارزش ملک (فرضی)</span><b style="color:var(--ok)">'+fa((S.ui.navg||FIN.nav.default)*100,0)+'٪</b></div>'+
-      '<div class="kv"><span>دارایی</span><b>'+fa(D.cnt,0)+' کلید</b></div>'+
-      '<div class="chips" style="margin-top:10px">'+[[6,'۶ ماه'],[12,'۱۲ ماه']].map(function(x){return '<span class="chip'+(NR===x[0]?' on':'')+'" data-act="nrng" data-v="'+x[0]+'">'+x[1]+'</span>'}).join('')+'</div>'+
-      '<div id="navchart"></div></div>'+
-      '<div class="card"><div class="ct"> فروش لحظه‌ای و جزئی</div>'+
-      '<div class="kv"><span>قیمت هر کلید</span><b>'+rial(13200000)+'</b></div>'+
-      '<div class="kv"><span> کیف پول</span><b>'+rial(S.wallet||0)+' <button class="btn btn-xs" data-act="wallet">برداشت</button></b></div>'+
-      '<div class="srow" style="margin-top:10px"><div class="slab"><span>تعداد فروش (تایپ)</span></div><input class="inp" type="number" id="selln" min="1" max="'+(D.cnt||1)+'" value="'+Math.min(100,D.cnt||1)+'"></div><div id="slout"></div>'+
-      '<div class="fs-actions" style="margin-top:12px"><button class="btn btn-primary" data-act="irsell">فروش فوری</button><button class="btn" data-act="irdone">نگه می‌دارم</button>'+(d.done?'<button class="btn" data-act="flowNew" data-m="invr">درخواست جدید</button>':'')+'</div></div></div>'+wnav('invr',false,'');
-    }
-  }
-  el.innerHTML=h;
-  if(false&&m==='invb'&&st===1){
-    var yh=S.ui.yh||24;
-    var updS=function(){
-      var y=yieldPct(D,yh);
-      bars(document.getElementById('scnchart'),[y.p,y.g,y.u,y.d],['سهم متری','طلا','دلار','سپرده'],function(v){return '٪'+fa(v,0)},CC);
-      document.getElementById('scnnote').textContent=(D.scn==='bad'?'بدبینانه: توقف پروژه سود را می‌خواباند.':(D.scn==='good'?'خوش‌بینانه: جهش تورمی به نفع دارایی فیزیکی.':'معقول.'))+' بازده در افق '+fa(yh,0)+' ماه.';
-      bars(document.getElementById('yldchart'),[6,12,24,36].map(function(t){return yieldPct(D,t).p}),['۶','۱۲','۲۴','۳۶'],function(v){return '٪'+fa(v,0)},CC);
-    };
-    $$('#v-invest [data-rk]').forEach(function(r){r.addEventListener('input',function(){D.cap=+r.value;save();updS()})});
-    updS();
-  }
-  if(false&&m==='invb'&&st===2){
-    var updM=function(){
-      window.__cap=D.cap;
-      var e=document.getElementById('mlive');
-      if(e){e.textContent=fa(Math.floor(D.cap/PPM.v),0)+' متر'}
-    };
-    $$('#v-invest [data-rk]').forEach(function(r){r.addEventListener('input',function(){D.cap=+r.value;save();updM()})});
-    updM();
-  }
-  if(false&&m==='invb'&&st===4){
-    var sm=document.getElementById('sellm');
-    var updSe=function(){
-      var v=Math.min(D.meters||0,Math.max(1,+((sm&&sm.value)||1)));
-      document.getElementById('sellout').innerHTML='<div class="kv"><span>مبلغ '+fa(v,0)+' متر × '+rial(SPRIX)+'</span><b>'+rial(v*SPRIX)+'</b></div>'+
-      '<div class="kv"><span>کارمزد ۰٫۵٪ → کیف پول</span><b>'+rial(Math.round(v*SPRIX*0.995))+'</b></div>';
-    };
-    if(sm){sm.addEventListener('input',updSe)}
-    updSe();
-  }
-  if(m==='invr'&&st===1){
-    var updR=function(){
-      var nav=(S.ui.navg||FIN.nav.default),rows=finRows(D.cap,nav);
-      bars(document.getElementById('irbars'),rows.map(function(r){return r.amount}),rows.map(function(r){return r.short}),function(v){return fa(v/1000000,0)+' م'},CC2);
-      var tb=document.getElementById('fintable');if(tb)tb.innerHTML=finTableHTML(D.cap,nav);
-      var fn=document.getElementById('finnote');if(fn)fn.innerHTML=finNoteHTML(true);
-      var rent=rows.filter(function(r){return r.k==='rent'})[0],bank=rows.filter(function(r){return r.k==='bank'})[0],total=rows.filter(function(r){return r.k==='total'})[0];
-      document.getElementById('irnote').innerHTML='درآمد نقدی اجاره ('+rial(rent.amount)+' در ماه) از سود نقدی بانک ('+rial(bank.amount)+') کمتر است؛ افزایش ارزش ملک یک فرض است و تضمین نمی‌شود. مجموع با فرض سرمایه‌گذاری مجدد اجاره: <b>'+rial(total.amount)+'</b>.';
-    };
-    $$('#v-invest [data-rk]').forEach(function(r){r.addEventListener('input',function(){D.cap=+r.value;save();updR()})});
-    updR();
-  }
-  if(m==='invr'&&st===4){
-    var NR=S.ui.nrng||12;
-    var nav=[];
-    for(i=1;i<=12;i++){nav.push(2*Math.pow(1.32,i/12))}
-    nav=nav.slice(12-NR);
-    spark(document.getElementById('navchart'),nav,MFULL.slice(12-NR),function(v){return fa(v,1)+'م'});
-    var sn=document.getElementById('selln');
-    var updSl=function(){
-      var v=Math.min(D.cnt||0,Math.max(1,+((sn&&sn.value)||1)));
-      document.getElementById('slout').innerHTML='<div class="kv"><span>مبلغ '+fa(v,0)+' کلید</span><b>'+rial(v*13200000)+'</b></div>'+
-      '<div class="kv"><span>کارمزد → کیف پول</span><b>'+rial(Math.round(v*13200000*0.995))+'</b></div>'+
-      '<div class="kv"><span>باقی</span><b>'+fa((D.cnt||0)-v,0)+'</b></div>';
-    };
-    if(sn){sn.addEventListener('input',updSl)}
-    updSl();
-  }
-};
-
+VIEWS.invest=function(){go('landing');E30.discAPI.start('invest',false)};
 /* ═══ ۱۴) مارکت‌پلیس ═══ */
 function mktPrj(){
   var M=wd('mkt').data;
@@ -8518,7 +8212,7 @@ ACT.nprj=function(){
   '<div class="srow"><div class="slab"><span>موقعیت</span></div><input class="inp" id="np-loc" placeholder="تهران، ..."></div>'+
   '<div class="grid g2"><div class="srow"><div class="slab"><span>زیربنا (متر)</span></div><input class="inp" id="np-area" type="number" value="3000" style="direction:ltr;text-align:left"></div>'+
   '<div class="srow"><div class="slab"><span>مدت (ماه)</span></div><input class="inp" id="np-dur" type="number" value="18" style="direction:ltr;text-align:left"></div></div>'+
-  '<div class="srow"><div class="slab"><span>بودجه (ریال)</span></div><input class="inp" id="np-amt" type="number" value="8000000000" step="500000000" style="direction:ltr;text-align:left"></div>'+
+  '<div class="srow"><div class="slab"><span>بودجه (تومان)</span></div><input class="inp" id="np-amt" type="number" value="8000000000" step="500000000" style="direction:ltr;text-align:left"></div>'+
   '<div class="srow"><div class="slab"><span>محدودهٔ کار</span></div><select class="inp" id="np-scope"><option>از صفر (گودبرداری)</option><option>ادامهٔ کار</option><option>بهسازی</option></select></div>'+
   '<button class="btn btn-primary" data-act="npOk">ثبت در مارکت‌پلیس</button> <button class="btn" data-act="closeModal">انصراف</button>');
 };
@@ -8739,10 +8433,10 @@ function conCapture(D,kind){
     if(po)c.prop.postal=po;if(ar)c.prop.area=ar;if(v('cp-addr')!==null)c.prop.addr=v('cp-addr');
     if(kind==='rent'){
       if(v('cp-start'))c.terms.start=v('cp-start');if(v('cp-dur'))c.terms.duration=v('cp-dur');
-      var dp=+v('cp-dep'),rn=+v('cp-rent');if(dp)c.terms.deposit=dp;if(rn)c.terms.rent=rn;
+      var dp=10*Number(v('cp-dep')),rn=10*Number(v('cp-rent'));if(dp)c.terms.deposit=dp;if(rn)c.terms.rent=rn;
       if(v('cp-pay'))c.terms.paymentDay=v('cp-pay');
     }else{
-      var pr=+v('cp-price');if(pr)c.terms.price=pr;if(v('cp-delivery'))c.terms.delivery=v('cp-delivery');if(v('cp-payment'))c.terms.payment=v('cp-payment');
+      var pr=10*Number(v('cp-price'));if(pr)c.terms.price=pr;if(v('cp-delivery'))c.terms.delivery=v('cp-delivery');if(v('cp-payment'))c.terms.payment=v('cp-payment');
     }
     if(v('cp-notes')!==null)c.terms.notes=v('cp-notes');
   }
@@ -8784,13 +8478,13 @@ ACT.cpropSave=function(){
   if(!area||area<10){toast('متراژ را درست وارد کنید');return}
   c.prop.postal=postal;c.prop.addr=addr;c.prop.area=area;
   if(ctx.kind==='rent'){
-    var depText=v('cp-dep'),rentText=v('cp-rent'),dep=Number(depText),rent=Number(rentText);
+    var depText=v('cp-dep'),rentText=v('cp-rent'),dep=10*Number(depText),rent=10*Number(rentText);
     if(!depText||!rentText||!Number.isFinite(dep)||!Number.isFinite(rent)||dep<0||rent<0||(dep===0&&rent===0)){toast('مبلغ‌های ودیعه و اجاره را درست وارد کنید؛ رهن کامل با اجارهٔ صفر پذیرفته است');return}
     c.terms.start=v('cp-start');if(!c.terms.start){toast('تاریخ شروع را انتخاب کنید');return}
     c.terms.duration=v('cp-dur')||'یک‌ساله';c.terms.deposit=dep;c.terms.rent=rent;c.terms.paymentDay=v('cp-pay')||'پنجم هر ماه';
     ctx.D.B.depB=dep;ctx.D.dur=c.terms.duration;
   }else{
-    var price=+v('cp-price'),delivery=v('cp-delivery');
+    var price=10*Number(v('cp-price')),delivery=v('cp-delivery');
     if(!price){toast('قیمت را وارد کنید');return}
     if(!delivery){toast('تاریخ تحویل را انتخاب کنید');return}
     c.terms.price=price;c.terms.delivery=delivery;c.terms.payment=v('cp-payment')||'مرحله‌ای';
@@ -9109,7 +8803,7 @@ ACT.irdone=function(){var d=wd('invr');d.done=true;addReq('invr','درآمد','�
 ACT.wallet=function(){S.ui.atab='wallet';save();if(CURRENT==='profile'){renderCurrent()}else{go('profile')}};
 ACT.wdraw=function(){
   openModal('<h3> برداشت</h3><div class="payamt">موجودی<b>'+rial(S.wallet||0)+'</b></div>'+
-  '<div class="srow"><div class="slab"><span>مبلغ (ریال)</span></div><input class="inp" id="wd-amt" type="number" min="100000" step="100000" value="'+Math.max(100000,Math.floor(S.wallet||0))+'"></div>'+
+  '<div class="srow"><div class="slab"><span>مبلغ (تومان)</span></div><input class="inp" id="wd-amt" type="number" min="100000" step="100000" value="'+Math.max(100000,Math.floor(S.wallet||0))+'"></div>'+
   '<div class="srow"><div class="slab"><span>شبا</span></div><input class="inp" id="wd-iba" placeholder="IR..." style="direction:ltr;text-align:left" value="IR"></div>'+
   '<button class="btn btn-primary" data-act="wdOk">ثبت درخواست</button> <button class="btn" data-act="closeModal">انصراف</button>');
 };
@@ -9180,7 +8874,7 @@ ACT.pbid=function(el){
   D.prjI=i;
   var adjSel=(D.adj||'full');
   openModal('<h3>ارسال پیشنهاد — '+PRJ[i].t+'</h3>'+
-  '<div class="srow"><div class="slab"><span>قیمت (ریال — تایپ کنید)</span></div><input class="inp" id="bid-amt" type="number" value="8000000000" step="500000000" style="direction:ltr;text-align:left"></div>'+
+  '<div class="srow"><div class="slab"><span>قیمت (تومان — تایپ کنید)</span></div><input class="inp" id="bid-amt" type="number" value="8000000000" step="500000000" style="direction:ltr;text-align:left"></div>'+
   '<div class="srow"><div class="slab"><span>مدت (ماه)</span></div><input class="inp" id="bid-dur" type="number" value="18" style="direction:ltr;text-align:left"></div>'+
   '<div class="srow"><div class="slab"><span>شرط تعدیل</span></div><select class="inp" id="bid-adj"><option value="none"'+(adjSel==='none'?' selected':'')+'>بدون تعدیل</option><option value="full"'+(adjSel==='full'?' selected':'')+'>نرخ رسمی مصالح (توصیه)</option><option value="cap10"'+(adjSel==='cap10'?' selected':'')+'>سقف ۱۰٪</option></select></div>'+
   '<div class="srow"><div class="slab"><span>توضیح</span></div><textarea class="inp" id="bid-note" rows="2"></textarea></div>'+
@@ -12500,7 +12194,8 @@ E22.sessHTML=function(){
       '<small class="e22-sess-time">'+E22.rel(s.ts)+' · '+fa((s.hist||[]).length,0)+' پیام</small></span>'+
       '<span class="e22-sess-acts">'+
       '<button class="e22-sact" type="button" data-act="sessPin" data-sess="'+qesc(s.id)+'" aria-pressed="'+(s.pinned?'true':'false')+'" aria-label="'+pinLab+'" title="'+pinLab+'">'+(s.pinned?E27_IC.pin:E27_IC.pinoff)+'</button>'+
-      '<button class="e22-sact e22-sact-del" type="button" data-act="sessDel" data-sess="'+qesc(s.id)+'" aria-label="حذف گفت‌وگو" title="حذف گفت‌وگو">×</button>'+
+      '<button class="e22-sact" type="button" data-act="e31MoveChat" data-sess="'+qesc(s.id)+'" title="انتقال به پروژه" aria-label="انتقال به پروژه">'+E27_IC.pin+'</button>'+
+    '<button class="e22-sact e22-sact-del" type="button" data-act="sessDel" data-sess="'+qesc(s.id)+'" aria-label="حذف گفت‌وگو" title="حذف گفت‌وگو">×</button>'+
       '</span></div>';
   }
   var h='<div class="sg">گفت‌وگوهای پیشین</div>'+
@@ -13433,7 +13128,7 @@ E27.marketHTML=function(o){
   var kpis;
   if(isBuy){
     kpis=kpi('میانگین آگهی هر متر',rial(h.buyBase),null)+kpi('تغییر یک‌ساله','',yoy)+kpi('تغییر ماهانه','',mom)+
-      '<div class="mkti-kpi"><small>بازهٔ آگهی‌ها</small><b>'+rShort(m.low)+' – '+rShort(m.high)+'</b><span class="delta" style="color:var(--ink2)">ریال بر متر</span></div>';
+      '<div class="mkti-kpi"><small>بازهٔ آگهی‌ها</small><b>'+rShort(m.low)+' – '+rShort(m.high)+'</b><span class="delta" style="color:var(--ink2)">تومان بر متر</span></div>';
   }else{
     kpis=kpi('اجارهٔ نمونهٔ ماهانه',rial(h.avgRent),null)+kpi('ودیعهٔ نمونه',rial(h.avgDep),null)+kpi('تغییر یک‌ساله بازار','',yoy)+kpi('تغییر ماهانه بازار','',mom);
   }
@@ -13455,7 +13150,7 @@ E27.marketHTML=function(o){
     var v=isBuy?x.buyBase:x.avgRent;
     return {l:x.n,v:v,fmt:rShort(v),cur:x.id===h.id};
   }).sort(function(a,b){return b.v-a.v});
-  var cmp='<div class="mkti-box"><h5>'+(isBuy?'هر متر (آگهی) در محله‌ها':'اجارهٔ نمونه در محله‌ها')+' — ریال</h5><div class="mkti-cmp">'+
+  var cmp='<div class="mkti-box"><h5>'+(isBuy?'هر متر (آگهی) در محله‌ها':'اجارهٔ نمونه در محله‌ها')+' — تومان</h5><div class="mkti-cmp">'+
   bars.map(function(b){
     return '<div class="mkti-cmp-row'+(b.cur?' cur':'')+'"><span>'+esc(b.l)+'</span><span class="mkti-cmp-bar" style="width:'+Math.max(3,Math.round(b.v/bars[0].v*100))+'%"></span><b title="'+rial(b.v)+'">'+b.fmt+'</b></div>';
   }).join('')+'</div></div>';
@@ -13467,9 +13162,9 @@ E27.marketHTML=function(o){
   }
   var chart='';
   if(isBuy){
-    chart='<div>'+rcLine('روند برآوردی هر متر — '+fa(period,0)+' ماه','ریال · برآورد از تغییر یک‌سالهٔ اعلامی (دادهٔ نمونه)',series,labels,null)+'</div>';
+    chart='<div>'+rcLine('روند برآوردی هر متر — '+fa(period,0)+' ماه','تومان · برآورد از تغییر یک‌سالهٔ اعلامی (دادهٔ نمونه)',series,labels,null)+'</div>';
   }else{
-    chart='<div>'+rcLine('روند برآوردی اجاره — '+fa(period,0)+' ماه','ریال · برآورد از تغییر یک‌سالهٔ اعلامی (دادهٔ نمونه)',series,labels,null)+'</div>';
+    chart='<div>'+rcLine('روند برآوردی اجاره — '+fa(period,0)+' ماه','تومان · برآورد از تغییر یک‌سالهٔ اعلامی (دادهٔ نمونه)',series,labels,null)+'</div>';
   }
   return '<div class="mkti" data-h="'+h.id+'" data-mode="'+mode+'" data-period="'+period+'">'+
   '<div class="mkti-h"><b>'+ico('map',14)+' بازار '+esc(h.n)+' <small style="color:var(--ink2);font-weight:400">· '+esc(MARKET.asOf)+'</small></b>'+
@@ -13484,7 +13179,7 @@ E27.marketHTML=function(o){
   '<div style="margin-top:12px">'+cmp+'</div>'+
   '<button class="mkti-more-btn" data-cba="mktMore">توضیح بیشتر و اعداد دقیق ▾</button>'+
   '<div class="mkti-more">'+
-  '<b>اعداد دقیق (ریال):</b><br>'+
+  '<b>اعداد دقیق (تومان):</b><br>'+
   'میانگین هر متر (آگهی): '+rial(h.buyBase)+' · بازه: '+rial(m.low)+' تا '+rial(m.high)+'<br>'+
   'اجارهٔ نمونه: '+rial(h.avgRent)+' · ودیعهٔ نمونه: '+rial(h.avgDep)+'<br>'+
   '<b>روش و منبع:</b> قیمت‌ها «آگهی»اند، نه معاملهٔ قطعی. منبع اعلامی: '+esc(m.src||'کیلید')+' · تاریخ داده: '+esc(MARKET.asOf)+' · محدوده: محلهٔ '+esc(h.n)+'.<br>'+
@@ -14906,7 +14601,9 @@ E29.proj=(function(){
   }
   function addChat(pid,chatId){
     var p=byId(pid),i;
-    if(!p||!S.chats)return;
+    if(!p||!S.chats||!S.chats.some(function(c){return c.id===chatId}))return false;
+    store().forEach(function(other){other.chatIds=(other.chatIds||[]).filter(function(id){return id!==chatId})});
+    if(!p.chatIds)p.chatIds=[];
     var title=null;
     for(i=0;i<S.chats.length;i++){if(S.chats[i].id===chatId){S.chats[i].projectId=pid;title=S.chats[i].title}}
     if(p.chatIds.indexOf(chatId)<0)p.chatIds.push(chatId);
@@ -14984,7 +14681,7 @@ E29.proj=(function(){
     });
     h+='</div>';
     h+='<h4>افزودن گفت‌وگوی موجود</h4><div class="sect">';
-    var free=(S.chats||[]).filter(function(c){return c&&!c.projectId&&!c.pinned});
+    var free=(S.chats||[]).filter(function(c){return c&&c.projectId!==p.id});
     if(!free.length)h+='<div class="note">گفت‌وگوی بدون پروژه‌ای نیست.</div>';
     free.slice(0,12).forEach(function(c){
       h+='<div class="kv"><span>'+esc((c.title||'بدون عنوان').slice(0,30))+'</span><b><button class="e29-cact" data-act="e29prjAddChat" data-prj="'+qesc(p.id)+'" data-sess="'+qesc(c.id)+'" title="افزودن">'+e29ico('plus',14)+'</button></b></div>';
@@ -15049,7 +14746,7 @@ E29.proj=(function(){
     if(v.replace(/\s/g,''))rename(el.getAttribute('data-prj'),v);
     closeModal();mountPanel(el.getAttribute('data-prj'));E29.shell.renderSidebarOnly();
   };
-  ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));toast('گفت‌وگو به پروژه اضافه شد')};
+  ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));E29.shell.renderSidebarOnly();toast('گفت‌وگو به پروژه منتقل شد')};
   ACT.e29prjRmChat=function(el){removeChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'))};
   ACT.e29prjDel=function(el){
     var p=byId(el.getAttribute('data-prj'));if(!p)return;
@@ -16390,6 +16087,7 @@ E30.disc=(function(){
 
   /* ── persona classification — DYNAMIC (re-run after every update; §6.1) ── */
   function personaOf(wf){
+    if(getF('persona'))return getF('persona');
     var hh=getF('household'),kids=getF('children'),occ=getF('occupation')||'',stage=getF('life_stage')||'';
     var n=ctx();
     if(wf==='rent'||wf==='buy'){
@@ -16445,6 +16143,7 @@ E30.disc=(function(){
     household:{l:'ترکیب خانوار',kind:'enum'},
     family_members:{l:'تعداد افراد',kind:'count'},
     children:{l:'فرزند',kind:'bool'},
+    persona:{l:'پرسونا',kind:'enum'},
     work_loc:{l:'محل کار',kind:'loc'},
     uni_loc:{l:'دانشگاه',kind:'loc'},
     work_weight:{l:'اهمیت محل کار',kind:'enum'},
@@ -16532,26 +16231,18 @@ E30.disc=(function(){
     return null;
   }
   function finScan(raw){
-    /* split the RAW text — normFa swallows «،» so normalized text has no separators */
-    var out={},segs=String(raw||'').split(/،|,|؛|\sو\s(?=\s?(?:ماهی|ماهانه|اجاره|کرایه))/),i;
-    for(i=0;i<segs.length;i++){
-      var sgN=normFa(segs[i]).replace(/‌/g,' ');
-      var isD=/ودیعه|رهن|پول جلو/.test(sgN),isR=/اجاره|کرایه|ماهی|ماهانه/.test(sgN);
-      if(!isD&&!isR)continue;
-      /* A natural sentence may precede the money clause, e.g. «کارم ... .
-         ودیعه تا ۳ میلیارد تومان» or «اجاره تا ۷۰ میلیون تومان. حداقل
-         دو خواب». Parse from the relevant label rather than the start of
-         the whole sentence; never substitute a chip or guessed budget. */
-      function valueNear(re){
-        var m=sgN.match(re);if(!m)return null;
-        /* Persian speakers place the label on either side of the amount:
-           «ودیعه ۱٫۵ میلیارد» AND «۱٫۵ میلیارد ودیعه». A trailing label
-           must not send the next labeled amount to the generic parser. */
-        return segMoney(sgN.slice(m.index+m[0].length))||segMoney(sgN.slice(0,m.index));
-      }
-      if(isD&&!out.dep){var dep=valueNear(/ودیعه|رهن|پول جلو/);if(dep)out.dep=dep}
-      if(isR&&!out.rent){var rent=valueNear(/اجاره|کرایه|ماهی|ماهانه/);if(rent)out.rent=rent}
+    var out={},t=normFa(String(raw||'')).replace(/‌/g,' ');
+    var amount='[0-9]+(?:[.٫][0-9]+)?(?:\\s*(?:میلیارد|میلیون|هزار))?(?:\\s*(?:تومان|تومن|ریال))?';
+    function read(label){
+      var before=new RegExp('('+amount+')\\s*(?:'+label+')').exec(t);
+      var after=new RegExp('(?:'+label+')\\s*(?:ماهانه|ماهی|تا|حداکثر|حدود|من|ام|است|:)*\\s*('+amount+')').exec(t);
+      var m=before||after;
+      if(!m)return null;
+      if(/^(?:0|۰)$/.test(m[1]))return [0,0];
+      var p=parseMoneyFA(m[1]);return p.ok?[p.value,p.value]:null;
     }
+    var dep=read('ودیعه|رهن|پول جلو'),rent=read('اجاره|کرایه|ماهی|ماهانه');
+    if(dep)out.dep=dep;if(rent)out.rent=rent;
     return out;
   }
   /* Explicit polarity for each property preference. Word presence is never a
@@ -16724,16 +16415,14 @@ E30.disc=(function(){
   /* ── adaptive question selection (§4.5) — impact-scored, not list-ordered ── */
   function missing(wf){
     var REQ={
-      rent:[{id:'budget_dep',w:10},{id:'budget_rent',w:10},{id:'household',w:8},{id:'work_loc',w:6,cond:function(){return !getF('uni_loc')}},
-            {id:'uni_loc',w:6,cond:function(){return !getF('work_loc')||personaOf('rent')==='student'}},
-            {id:'work_weight',w:12,cond:function(){return !!getF('work_loc')&&!!getF('uni_loc')&&!getF('work_weight')}},
-            {id:'hood',w:5,cond:function(){return !getF('work_loc')&&!getF('uni_loc')}},
-            {id:'prop_new',w:5},{id:'rooms',w:4,cond:function(){return !!getF('household')}},{id:'m2',w:3},{id:'prop_age',w:3,cond:function(){return getF('prop_new')!=='new'}},
-            {id:'prefs',w:3},{id:'timeline',w:2}],
-      buy:[{id:'buy_budget',w:10},
-           {id:'budget_scope',w:9.5,cond:function(){var b=getF('buy_budget');return !!(b&&b.v)&&!getF('budget_scope')}},
-           {id:'purpose',w:9},{id:'household',w:6},{id:'hood',w:5},{id:'rooms',w:4,cond:function(){return !!getF('household')}},
-           {id:'prop_new',w:3},{id:'m2',w:3},{id:'prop_age',w:3},{id:'prefs',w:2},{id:'timeline',w:2}],
+      rent:[{id:'budget_dep',w:20},{id:'budget_rent',w:20},{id:'hood',w:19},
+            {id:'persona',w:18},{id:'household',w:17},{id:'m2',w:16},{id:'rooms',w:15},
+            {id:'floor_preference',w:14},{id:'prop_age',w:13},{id:'prefs',w:12},{id:'timeline',w:11},
+            {id:'work_loc',w:2,cond:function(){return getF('work_commute')===true}},
+            {id:'uni_loc',w:2,cond:function(){return getF('persona')==='student'}}],
+      buy:[{id:'buy_budget',w:20},{id:'purpose',w:19},{id:'persona',w:18},
+           {id:'household',w:17},{id:'hood',w:16},{id:'m2',w:15},{id:'rooms',w:14},
+           {id:'prop_age',w:13},{id:'floor_preference',w:12},{id:'prefs',w:11},{id:'timeline',w:10}],
       sell:[{id:'prop_area',w:9},{id:'hood',w:9},{id:'prop_rooms',w:6},{id:'ownership',w:7},{id:'docs',w:5,cond:function(){return getF('ownership')==='inherited'}},
             {id:'sale_motivation',w:6},{id:'sale_urgency',w:7},{id:'expected_price',w:5},{id:'min_price',w:4,cond:function(){return getF('sale_urgency')==='fast'}}],
       invest:[{id:'invest_objective',w:10},{id:'invest_capital',w:9},{id:'invest_horizon',w:6},{id:'invest_liquidity',w:5},
@@ -16749,13 +16438,6 @@ E30.disc=(function(){
       var f=fMeta(it.id);
       if(f&&(f.status==='confirmed'||f.status==='unknown'))continue;
       var score=it.w+((f&&f.status==='inferred')?2:0);
-      if(wf==='rent'){
-        if(p==='student'&&it.id==='uni_loc')score+=6;
-        if(p==='student'&&it.id==='budget_rent')score+=2;
-        if(p==='family'&&(it.id==='rooms'||it.id==='prefs'))score+=6;
-        if(p==='retiree'&&(it.id==='prop_new'||it.id==='prefs'))score+=6;
-        if(p==='roommates'&&it.id==='budget_dep')score+=3;
-      }
       if(wf==='sell'){
         if(p==='urgent_seller'&&it.id==='min_price')score+=10;
         if(p==='heir'&&it.id==='docs')score+=8;
@@ -16854,7 +16536,7 @@ E30.disc=(function(){
   function resume(){
     try{
       var saved=S.ctx30Collectors&&S.ctx30Collectors[contextKey()];
-      if(saved&&saved.active&&saved.wf)COL=Object.assign({},saved);
+      if(saved&&saved.active&&saved.wf){COL=Object.assign({},saved);if(!COL.optional){COL.expecting=null;COL.confirming=null;COL.fix=null}COL.optional=true;}
       else COL={active:false,wf:null,fix:null,confirming:null,turns:0};
     }catch(e){COL={active:false,wf:null,fix:null,confirming:null,turns:0}}
     return COL.active;
@@ -16862,21 +16544,47 @@ E30.disc=(function(){
   function active(){return COL.active}
 
   function start(wf,silent,budgetFirst){
-    COL={active:true,wf:wf,fix:null,confirming:null,turns:0,finConfirmed:false};
+    COL={active:true,optional:true,wf:wf,fix:null,confirming:null,turns:0,finConfirmed:false};
     _lastPersona=personaOf(wf);
     saveCollector();
-    if(!silent){
-      var p=personaOf(wf),tone=P_TONE[p]||P_TONE.general;
-      var greet='شنیدم. ';
-      if(tone.why&&/family|student|retiree|roommates|firstrent|firsttime/.test(p))greet+='('+tone.why+') ';
-      var sum=SUM.start(wf);
-      greet+=sum||'تا شناخته‌شدن شرایط‌تان، چند چیز کلیدی را یکی‌یکی می‌پرسم.';
-      botC(greet,null);
-      var hasConcreteFacts=!!(getF('work_loc')||getF('uni_loc')||getF('household')||getF('hood')||getF('prop_new')||getF('rooms')||getF('budget_dep')||getF('budget_rent'));
-      if(!budgetFirst&&!hasConcreteFacts&&scenarioCard(wf)){saveCollector();return true}
-      askNext();
-    }
+    if(!silent)optionalHub();
     return true;
+  }
+
+  function optionalHub(){
+    COL.expecting=null;COL.confirming=null;saveCollector();
+    botC((SUM.start(COL.wf)||'چه خدمتی می‌خواهید دریافت کنید؟')+
+      '<p class="note">شناخت نیاز اختیاری است. می‌توانید از پیشنهادها شرایط را تکمیل کنید یا همین حالا خدمت موردنظر را انتخاب کنید.</p>',null);
+  }
+  function preference(id){
+    COL.optional=true;COL.active=true;COL.expecting=id;COL.confirming=null;saveCollector();
+    var question=id==='budget_pair'?'سقف ودیعه و اجارهٔ ماهانه را با هم بنویسید؛ واحد پیش‌فرض تومان است.':
+      id==='persona'?'کدام توصیف برای جست‌وجوی شما مناسب است؟ دانشجو، زوج، جوان، خانواده یا توصیف خودتان.':
+      id==='floor_preference'?'طبقهٔ دلخواه یا بازهٔ طبقات را بنویسید.':
+      (ASK[id]?ASK[id].q[0]:'ترجیح خود را بنویسید.');
+    botC(question+'<p class="note">اختیاری؛ می‌توانید «رد» بفرستید یا نتیجه را با اطلاعات فعلی ببینید.</p>',null);
+  }
+  function feedOptional(text){
+    var t=String(text),nt=nz(t),id=COL.fix||COL.expecting;usrC(t);evidence(t);
+    if(/^(منو|لغو|بستن|انصراف)$/.test(nt)){stop();botC('اطلاعات گفتگو حفظ شد؛ خدمت دیگری انتخاب کنید.',null);return true}
+    if(id&&/^(رد|رد کردن|مهم نیست|بعدا|بعداً|فرقی ندارد)$/.test(nt)){
+      (id==='budget_pair'?['budget_dep','budget_rent']:[id]).forEach(markUnknown);
+      COL.expecting=null;COL.fix=null;saveCollector();botC('این ترجیح نامشخص باقی ماند؛ می‌توانید خدمت دلخواه را دریافت کنید.',null);return true;
+    }
+    var found=extract(t,'turn'),ok=!!found;
+    if(id==='budget_pair'){
+      var fs=finScan(t);ok=!!(fs.dep&&fs.rent);
+      if(fs.dep)setF('budget_dep',{v:fs.dep},{src:'answer'});
+      if(fs.rent)setF('budget_rent',{v:fs.rent},{src:'answer'});
+    }else if(id==='persona'){
+      var v=/دانشجو/.test(nt)?'student':/زوج/.test(nt)?'couple':/جوان/.test(nt)?'young':/خانواده/.test(nt)?'family':null;
+      if(v){setF('persona',v,{src:'answer'});ok=true}
+    }else if(id==='floor_preference'){
+      var nums=nt.match(/\d+/g);if(nums){setF(id,{min:+nums[0],max:+(nums[1]||nums[0]),level:/الزام|حتما|فقط/.test(nt)?'required':'preferred'},{src:'answer'});ok=true}
+    }else if(id){ok=answer(id,t).ok||ok}
+    if(id&&!ok){botC('این مقدار برای «'+esc(SLOT_LABEL[id]||id)+'» قابل تشخیص نبود؛ دوباره بنویسید یا «رد» بفرستید.',null);return true}
+    COL.expecting=null;COL.fix=null;COL.finConfirmed=true;saveCollector();
+    botC(ok?(SUM.turn()||'ترجیح شما ثبت شد.'):'برای ادامه یک خدمت یا پیشنهاد مرتبط انتخاب کنید.',null);return true;
   }
 
   /* summarize understanding (§4.6 part 2) — only what's actually known */
@@ -16894,14 +16602,14 @@ E30.disc=(function(){
       }else if(wf==='buy'){
         v=getF('purpose');if(v)parts.push(v==='invest'?'سرمایه‌گذاری':'سکونت');
         v=getF('household');if(v)parts.push({single:'استفادهٔ شخصی',couple:'دو نفره',family:'خانوادگی',roommates:'هم‌خانه‌ای'}[v]);
-        if(getF('buy_budget'))parts.push('بودجه تا '+rial(getF('buy_budget').v[1]));
+        if(getF('buy_budget')&&getF('buy_budget').v)parts.push('بودجه تا '+rial(getF('buy_budget').v[1]));
       }else if(wf==='sell'){
         v=getF('hood');if(v)parts.push('ملک در '+findH(v).n);
         v=getF('prop_area');if(v)parts.push(fa(v,0)+' متر');
         v=getF('sale_urgency');if(v)parts.push(v==='fast'?'فروش فوری':'بدون عجله، حداکثر قیمت');
       }else if(wf==='invest'){
         v=getF('invest_objective');if(v)parts.push({rent_income:'درآمد اجاره',appreciation:'رشد قیمت',inflation_hedge:'حفظ ارزش',land_bank:'زمین',resale:'فروش کوتاه‌مدت',commercial:'اجارهٔ تجاری',development:'پتانسیل توسعه',diversify:'تنوع پرتفوی'}[v]);
-        v=getF('invest_capital');if(v)parts.push('سرمایه تا '+rial(v.v[1]));
+        v=getF('invest_capital');if(v&&v.v)parts.push('سرمایه تا '+rial(v.v[1]));
       }
       if(!parts.length)return '';
       return 'پس فعلاً این‌ها را از حرف‌هایتان برداشت کردم: <b>'+parts.map(esc).join('، ')+'</b>.';
@@ -17057,6 +16765,7 @@ E30.disc=(function(){
 
   function askNext(){
     if(!COL.active)return;
+    if(COL.optional){optionalHub();return}
     if(COL.confirming&&(/financial|contradiction|final/.test(COL.confirming.type)))return;
     if(financialPending()){promptFinancial();return}
     if(hardContradiction()){promptContradiction();return}
@@ -17183,7 +16892,8 @@ E30.disc=(function(){
         if(/مهم نیست|فرقی/.test(nt)){markUnknown('prop_new');return {ok:true,skip:true}}
         return {ok:false};
       }
-      case 'prop_age': case 'rooms': case 'm2': case 'prop_area': case 'prop_rooms': case 'family_members':{
+      case 'prop_age':{var ar=parseAgeRangeFA(t);if(!ar.ok)return {ok:false};if(ar.skip){markUnknown(id);markUnknown('prop_age_range');return {ok:true,skip:true}}var av=ar.value.split('|').map(Number);setF(id,av[1],{src:'answer',hard:true});setF('prop_age_range',av,{src:'answer',hard:true});return {ok:true}}
+      case 'rooms': case 'm2': case 'prop_area': case 'prop_rooms': case 'family_members':{
         var c=parseCountFA(stripFin(t));
         if(c&&c.ok&&c.value>0&&c.value<2000){setF(id,c.value,{src:'answer',hard:id==='prop_age'});return {ok:true}}
         return {ok:false};
@@ -17281,6 +16991,7 @@ E30.disc=(function(){
   /* per-turn feed: returns true if consumed */
   function feed(text){
     if(!COL.active)return false;
+    if(COL.optional)return feedOptional(text);
     var t=String(text),nt=nz(t);
     if(/^\s*(منو|راهنما|لغو|بستن|انصراف)\s*$/.test(nt)){usrC(t);stop();botC('جمع‌بندی همین‌جا نگه داشته شد — هر وقت خواستید دوباره شروع کنید. چیزی از دست نرفته است.',null);return true}
     usrC(t);
@@ -17443,7 +17154,7 @@ E30.disc=(function(){
   }
   CBACT.e30fix=function(el){
     var slot=el.getAttribute('data-slot');
-    if(!COL.active)COL={active:true,wf:COL.wf||guessWf(),fix:null,confirming:null,turns:0};
+    if(!COL.active)COL={active:true,optional:true,wf:COL.wf||guessWf(),fix:null,confirming:null,turns:0};
     COL.fix=slot;COL.confirming=null;saveCollector();
     botC('مقدار جدید برای «'+esc(SLOT_LABEL[slot]||slot)+'» را بنویسید (یا «پاک کن»):',null);
   };
@@ -17641,7 +17352,7 @@ E30.disc=(function(){
   }
 
   E30.discAPI={route:route,active:active,start:start,stop:stop,reset:reset,bindChat:bindChat,useChat:useChat,forgetChat:forgetChat,resume:resume,
-    getF:getF,setF:setF,ctx:ctx,personaOf:personaOf,
+    getF:getF,setF:setF,ctx:ctx,personaOf:personaOf,preference:preference,collector:function(){return COL},
     profileCard:profileCard,missing:missing,show:show,markUnknown:markUnknown,SLOT_LABEL:SLOT_LABEL,
     extract:extract,answer:answer};
   E30._dbg={normHalf:normHalf,segMoney:segMoney,finScan:finScan}; /* unit-debug surface */
@@ -17696,6 +17407,7 @@ E30.flows=(function(){
     if(pref.elevator==='forbidden'&&x.elev)return false;
     if(pref.parking==='forbidden'&&x.park)return false;
     if(pref.balcony==='forbidden'&&x.balc)return false;
+    if(P.minAge!=null&&x.age<P.minAge)return false;
     /* Every explicit maximum age is hard unless the collector deliberately marked it soft. */
     if(P._ageHard!==false&&Number.isFinite(Number(P.maxAge))&&P.maxAge!==''&&P.maxAge!=null&&x.age>Number(P.maxAge))return false;
     if(P.minM2!==''&&P.minM2!=null&&Number(P.minM2)>0&&x.m2<Number(P.minM2))return false;
@@ -18111,7 +17823,7 @@ E30.flows=(function(){
     if(!MODBY.sell)MODBY.sell={v:'landing',t:'فروش ملک'};
     if(!MODBY.invp)MODBY.invp={v:'landing',t:'سرمایه‌گذاری ملکی'};
     if(!MODBY.lndl)MODBY.lndl={v:'landing',t:'اجاره‌دهی'};
-    FRC.sell=['sell'];FRC.invest=['invp','invb','invr'];FRC.rent=['rent','lndl'];
+    FRC.sell=['sell'];FRC.invest=['invp'];FRC.rent=['rent','lndl'];
     WSTEPS.sell=SELL.map(function(s){return s.id});
     WSTEPS.invp=INVP.map(function(s){return s.id});
     WSTEPS.lndl=LNDL.map(function(s){return s.id});
@@ -19161,7 +18873,7 @@ E30.guide=(function(){
   'use strict';
   var REGISTRY=[
     {id:'rent',group:'search',title:'جست‌وجوی رهن و اجاره',prompt:'می‌خوام در تهران یه خونه رهن و اجاره پیدا کنم.',aliases:['میخوام خونه اجاره کنم','دنبال خانه اجاره‌ای هستم'],action:'discover:rent',slots:['city','budget_dep','budget_rent','m2','rooms','hood'],result:'شروع کشف نیاز اجاره',next:['rent-budget','rent-area','rent-specs'],test:'guide-rent'},
-    {id:'rent-budget',group:'search',title:'ثبت بودجهٔ اجاره',prompt:'بودجه‌ام ۱.۲ میلیارد ودیعه و ۱۰ میلیون اجاره ماهانه است.',aliases:['۱.۲ میلیارد رهن و ماهی ۱۰ میلیون'],action:'native',slots:['budget_dep','budget_rent'],result:'ثبت با پارسر مالی و درخواست تأیید',next:['rent-specs','rent-area','sample'],test:'guide-budget'},
+    {id:'rent-budget',group:'search',title:'ثبت بودجهٔ اجاره',prompt:'می‌خواهم سقف ودیعه و اجاره ماهانه را مشخص کنم.',aliases:['۱.۲ میلیارد رهن و ماهی ۱۰ میلیون'],action:'native',slots:['budget_dep','budget_rent'],result:'ثبت با پارسر مالی و درخواست تأیید',next:['rent-specs','rent-area','sample'],test:'guide-budget'},
     {id:'rent-specs',group:'search',title:'شرایط ملک',prompt:'حداقل ۶۰ متر و یک خواب می‌خوام.',aliases:['حداقل ۶۰ متر و ۱ خواب'],action:'native',slots:['m2','rooms'],result:'به‌روزرسانی قیود جست‌وجو',next:['sample','rent-area','map'],test:'guide-specs'},
     {id:'rent-area',group:'neighborhood',title:'تمرکز بر محدودهٔ انقلاب',prompt:'اول محله‌های اطراف انقلاب رو برای اجاره ارزیابی کن.',aliases:['گفتم دیگه سمت انقلاب','اطراف انقلاب رو بررسی کن'],action:'compare',slots:['area_reference'],result:'مقایسهٔ شفاف دادهٔ نمونه، بدون تثبیت محله به‌عنوان شرط قطعی',next:['compare','sample','map'],test:'guide-area'},
     {id:'sample',group:'search',title:'نمایش آگهی نمونه',prompt:'با همین شرایط آگهی‌های نمونه رو نشون بده.',aliases:['نمونه ملک‌ها را نشان بده'],action:'sample',slots:['budget_dep','budget_rent','m2','rooms','hood'],result:'کارت‌های صریحاً ساختگی از دادهٔ موجود',next:['rent-area','map','rent'],test:'guide-sample'},
@@ -19186,6 +18898,35 @@ E30.guide=(function(){
     {id:'build',group:'special',title:'ساخت و مصالح',prompt:'می‌خوام مسیر ساخت و مصالح رو بررسی کنم.',aliases:['خدمات ساخت و مصالح میخوام'],action:'flow:build',slots:['project_type','budget'],result:'فلو داخلی موجود، در صورت نصب',next:['services','projects'],test:'guide-build'},
     {id:'development',group:'special',title:'پروژه‌های ساختمانی',prompt:'می‌خوام پروژه‌های ساختمانی رو بررسی کنم.',aliases:['پروژه‌های ساختمانی جدید'],action:'flow:mkt',slots:['project_type','hood'],result:'فلو داخلی موجود، در صورت نصب',next:['invest','projects'],test:'guide-development'}
   ];
+  var PREFS={
+    budget_pair:['سقف ودیعه و اجاره','می‌خواهم سقف ودیعه و اجاره ماهانه را مشخص کنم.'],
+    persona:['پرسونا','می‌خواهم پرسونای جست‌وجویم را مشخص کنم.'],
+    household:['ترکیب خانوار','می‌خواهم ترکیب خانوار را مشخص کنم.'],
+    hood:['محدوده','می‌خواهم محدوده جست‌وجو را مشخص کنم.'],
+    m2:['متراژ','می‌خواهم حداقل متراژ را مشخص کنم.'],rooms:['تعداد خواب','می‌خواهم تعداد خواب را مشخص کنم.'],
+    prop_age:['عمر بنا','می‌خواهم عمر بنای دلخواه را مشخص کنم.'],
+    floor_preference:['طبقه','می‌خواهم طبقه دلخواه را مشخص کنم.'],
+    prefs:['امکانات','می‌خواهم امکانات دلخواه را مشخص کنم.']
+  };
+  function add(r){REGISTRY.push(Object.assign({group:'search',aliases:[],slots:[],next:[],test:'journey-'+r.id,result:'خروجی داخلی با پایان مشخص'},r))}
+  Object.keys(PREFS).filter(function(slot){return slot!=='budget_pair'}).forEach(function(slot){var x=PREFS[slot];add({id:'need-'+slot.replace(/_/g,'-').replace('m2','size'),title:x[0],prompt:x[1],action:'preference:'+slot,slots:[slot]})});
+  add({id:'skip-preference',title:'رد ترجیح',prompt:'این ترجیح را فعلاً رد کن.',action:'skip'});
+  add({id:'results',title:'آگهی‌های منطبق',prompt:'با اطلاعات فعلی آگهی‌ها را نشان بده.',action:'results'});
+  add({id:'hood-results',title:'محله‌های مناسب',prompt:'با اطلاعات فعلی محله‌های مناسب را نشان بده.',action:'hood-results'});
+  add({id:'resume',title:'بازگشت به خدمت',prompt:'به خدمت قبلی برگرد.',action:'resume'});
+  ['student','couple','young','family'].forEach(function(v,i){add({id:'persona-'+v,title:['دانشجو','زوج','جوان','خانواده'][i],prompt:['دانشجو هستم.','برای یک زوج جست‌وجو می‌کنم.','برای یک جوان جست‌وجو می‌کنم.','برای خانواده جست‌وجو می‌کنم.'][i],action:'persona:'+v})});
+  REGISTRY.forEach(function(r){
+    if(r.id==='rent-budget'){r.prompt=PREFS.budget_pair[1];r.action='preference:budget_pair';r.aliases=[]}
+    if(r.id==='rent-specs'){r.aliases=[];r.prompt='می‌خواهم متراژ و تعداد خواب را مشخص کنم.';r.action='preference:m2'}
+    if(r.id==='rent-area'){r.title='محله‌های دارای داده';r.prompt='محله‌های دارای داده را برای اجاره ارزیابی کن.'}
+    if(r.id==='compare'){r.prompt='محله‌های دارای داده را از نظر قیمت مقایسه کن.'}
+  });
+  Object.keys(E30.discAPI?E30.discAPI.SLOT_LABEL:{}).forEach(function(slot){
+    if(PREFS[slot]||slot==='budget_dep'||slot==='budget_rent')return;
+    var id='need-'+slot.replace(/_/g,'-').replace('m2','size');
+    add({id:id,title:E30.discAPI.SLOT_LABEL[slot],prompt:'می‌خواهم «'+E30.discAPI.SLOT_LABEL[slot]+'» را مشخص کنم.',action:'preference:'+slot,slots:[slot]});
+  });
+  add({id:'start-service',title:'شروع خدمت',prompt:'خدمت این مسیر را با اطلاعات فعلی شروع کن.',action:'start-service'});
   var BY_ID={},BY_PROMPT={};
   function norm(s){return String(s||'').replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/[\u200c\u200f]/g,' ').replace(/\s+/g,' ').replace(/[.!؟?]+$/g,'').trim().toLowerCase()}
   REGISTRY.forEach(function(r){
@@ -19227,6 +18968,13 @@ E30.guide=(function(){
   }
   function can(r){
     if(!r)return false;
+    if(r.id==='saved')return !!(S.savedListings||[]).length;
+    if(r.id==='library')return !!(S.library||[]).length;
+    if(r.id==='projects')return !!(S.projects||[]).length;
+    if(r.id==='resume')return !!state().suspended;
+    if(r.id==='skip-preference')return !!E30.discAPI.collector().expecting;
+    if(r.id==='build')return !!(wd('mkt').data.bid||wd('mkt').data.chosen);
+    if(r.id==='termination')return (S.contracts||[]).some(function(c){return c&&c.code});
     if(r.action.indexOf('flow:')===0)return !!(typeof SCRIPTS!=='undefined'&&SCRIPTS[r.action.split(':')[1]]);
     if(r.action==='valuation')return typeof CBACT.e30ValOpen==='function';
     if(r.action==='contracts')return typeof CBACT.e30ContractList==='function';
@@ -19259,8 +19007,19 @@ E30.guide=(function(){
     return node;
   }
   function suggestions(){
-    var node=effectiveNode(),ids=GROUPS[node]||GROUPS.home;
-    return ids.map(function(k){return BY_ID[k]}).filter(can).slice(0,node==='home'?4:3);
+    var col=E30.discAPI.collector(),st=state(),ids=[];
+    if(col.active){
+      if(col.expecting==='persona')ids=['persona-student','persona-couple','persona-young','persona-family','skip-preference','results'];
+      else if(col.expecting||col.fix)ids=['skip-preference'].concat(col.wf==='rent'||col.wf==='buy'?['results']:['start-service']);
+      else{
+        var fields=E30.discAPI.missing(col.wf),seen={};
+        fields.forEach(function(f){var id=f.id==='budget_dep'||f.id==='budget_rent'?'rent-budget':'need-'+f.id.replace(/_/g,'-').replace('m2','size');if(!seen[id]&&BY_ID[id]){ids.push(id);seen[id]=1}});
+        ids=ids.slice(0,4).concat(col.wf==='rent'||col.wf==='buy'?['hood-results','results']:['start-service']);
+      }
+    }else if(CE.f&&CE.f!=='gate'){return st.suspended?[BY_ID.resume]:[]}
+    else ids=GROUPS[effectiveNode()]||GROUPS.home;
+    if(st.suspended)ids=ids.concat(['resume']);
+    return ids.map(function(k){return BY_ID[k]}).filter(can);
   }
   function card(){
     if(!S.auth||CURRENT!=='landing')return '';
@@ -19281,26 +19040,68 @@ E30.guide=(function(){
     botC('<b>'+esc(heading)+'</b><div class="sect">'+arr.slice(0,5).map(fmt).join('')+
       '</div><p class="note">اطلاعات از همین مرورگر خوانده شده است؛ هیچ داده‌ای ساخته نشده.</p>',null);
   }
+  function queryData(){
+    var flow=E30.discAPI.collector().wf||(CE.f==='buy'?'buy':'rent'),f=E30.discAPI.getF,D=wd(flow==='buy'?'buy':'rent').data;
+    defP(D);if(flow==='buy')defPR(D);
+    var dep=f('budget_dep'),rent=f('budget_rent'),bud=f('buy_budget'),rules=f('prefRules')||{};
+    if(flow==='buy'){
+      D.budg=bud&&bud.v?bud.v[1]:0;D.budgOpen=!bud||!!bud.open;
+      D.PR={age:f('prop_age_range')||[0,f('prop_age')==null?100:+f('prop_age')],m2:[f('m2')||0,1e6],ppm:[0,Number.MAX_SAFE_INTEGER],beds:f('rooms')||0,floorR:[0,100],prefRules:rules};
+    }else{
+      D.B={depB:dep&&dep.v?dep.v[1]:Number.MAX_SAFE_INTEGER,rentB:rent&&rent.v?rent.v[1]:Number.MAX_SAFE_INTEGER};
+      D.depOpen=!dep||!!dep.open;D.rentBOpen=!rent||!!rent.open;
+      D.P.beds=f('rooms')||0;D.P.minM2=f('m2')||0;D.P.maxAge=f('prop_age')==null?100:+f('prop_age');D.P._ageHard=f('prop_age')!=null;D.P.minAge=(f('prop_age_range')||[0])[0];D.P.prefRules=rules;D.P.elev=rules.elevator==='required';D.P.park=rules.parking==='required';D.P.floor='any';delete D.P.requiredFloor;
+    }
+    D.hood=f('hood')||null;
+    var floor=f('floor_preference');if(floor&&floor.level==='required'){if(flow==='buy')D.PR.requiredFloor=floor;else D.P.requiredFloor=floor}
+    return {flow:flow,D:D};
+  }
   function compare(text){
-    var list=(typeof HOODS!=='undefined'&&Array.isArray(HOODS))?HOODS:[];
-    var near=/انقلاب/.test(norm(text));
-    var focus=list.filter(function(h){return near&&/انقلاب/.test(norm(h.n||''))});
-    var picks=(focus.length?focus:list.slice(0,3));
-    var rows=picks.map(function(h){
-      var price=(typeof h.buyBase==='number'&&typeof rial==='function')?rial(h.buyBase):'دادهٔ قابل نمایش موجود نیست';
-      return '<div class="kv"><span>'+esc(h.n||'محلهٔ نمونه')+'</span><b>'+esc(price)+'</b></div>';
-    }).join('');
-    botC('<b>مقایسهٔ نمایشی محله‌ها</b><p class="note">فقط دادهٔ داخلی و ساختگی Mahalino، نه تحلیل زندهٔ بازار. ارقام در صورت وجود، مبنای نمونهٔ قیمت خرید به‌ازای هر متر هستند؛ دادهٔ دسترسی و زمان سفر تأیید نشده است.</p>'+
-      (rows?'<div class="sect">'+rows+'</div>':'<p>دادهٔ نمونهٔ محله در دسترس نیست.</p>'),null);
+    var list=HOODS.filter(function(h){return Number.isFinite(h.buyBase)}),q=queryData();
+    if(/اطراف|نزدیک/.test(text)&&/انقلاب/.test(text)){
+      botC('رابطهٔ جغرافیایی معتبر برای «اطراف انقلاب» در دادهٔ نمونه موجود نیست؛ مقایسهٔ محله‌های اطراف قابل اجرا نیست. می‌توانید محله‌های دارای داده را مقایسه کنید.',null);return;
+    }
+    botC('<b>مقایسهٔ نمایشی محله‌ها</b><p class="note">دادهٔ داخلی ساختگی؛ قیمت زنده یا زمان سفر تأییدشده نیست.</p><div class="chcards">'+list.map(function(h){return chatHoodCard(h,q.flow==='buy'?'buy':'rent',q.D)}).join('')+'</div>',null);
   }
   function sample(){
-    var a=(typeof RLIST!=='undefined'&&Array.isArray(RLIST))?RLIST:[];
-    var opts=a.slice(0,3);
-    botC('<b>آگهی‌های ساختگی برای پیش‌نمایش کارت ملک</b><p class="note">این موارد آگهی زنده نیستند و به معنی انطباق تأییدشده با بودجه یا شرایط شما نیستند.</p>'+
-      (opts.length?'<div class="sect">'+opts.map(function(x){return '<div class="kv"><span>'+esc(x.t||'ملک آزمایشی')+'</span><b>'+esc(String(x.m2||'—'))+' متر · '+esc(String(x.beds||'—'))+' خواب</b></div>'}).join('')+'</div>':'<p>دادهٔ آزمایشی برای نمایش در دسترس نیست.</p>'),null);
+    var q=queryData(),a=q.flow==='buy'?BLIST:RLIST;
+    var opts=a.filter(function(x){return (!q.D.hood||x.hood===q.D.hood)&&(q.flow==='buy'?E30.flowsAPI.buyPass(x,q.D):E30.flowsAPI.rentPass(x,q.D))});
+    botC('<b>آگهی‌های منطبق با اطلاعات فعلی: '+fa(opts.length,0)+'</b><p class="note">آگهی‌های ساختگی نمونه؛ ترجیحات اعلام‌نشده اعمال نمی‌شوند.</p>'+
+      (opts.length?'<div class="chcards">'+opts.map(function(x){return q.flow==='buy'?chatBCard(x,q.D.blist===x.id):chatListCard(x,q.D.listing===x.id)}).join('')+'</div>':'<p>آگهی منطبق پیدا نشد. برای تغییر محدودیت‌ها، ترجیح موردنظر را آگاهانه اصلاح کنید.</p>'),null);
+  }
+  function suspend(){
+    var st=state();if(st.suspended)return;
+    if(E30.discAPI.active()||(CE.f&&CE.f!=='gate'))st.suspended={collector:Object.assign({},E30.discAPI.collector()),ce:JSON.parse(JSON.stringify(CE))};
+    E30.discAPI.stop();CE.f=null;save();
   }
   function exec(r,t){
     var a=r.action;
+    if(a.indexOf('preference:')===0){usrC(t);if(!E30.discAPI.active())E30.discAPI.start(CE.f==='buy'?'buy':'rent',true);E30.discAPI.preference(a.split(':')[1]);return true}
+    if(a.indexOf('persona:')===0){usrC(t);E30.discAPI.setF('persona',a.split(':')[1],{src:'answer'});E30.discAPI.collector().expecting=null;save();botC('پرسونای انتخابی ثبت شد؛ ترکیب خانوار جداگانه و اختیاری است.',null);return true}
+    if(a==='start-service'){
+      var flow=E30.discAPI.collector().wf,m={sell:'sell',invest:'invp',landlord:'lndl'}[flow],f=E30.discAPI.getF;
+      usrC(t);if(!m){sample();return true}
+      var D=wd(m).data;
+      if(m==='invp'){
+        var fields={invest_objective:'objective',invest_horizon:'horizon',invest_risk:'risk',invest_liquidity:'liquidity',hood:'hood'};
+        Object.keys(fields).forEach(function(k){D[fields[k]]=f(k)||null});
+        var cap=f('invest_capital');D.cap=cap&&cap.v?cap.v[1]:null;
+      }else if(m==='sell'){
+        ['prop_area','prop_rooms','prop_age','hood','ownership','sale_urgency'].forEach(function(k){D[k]=f(k)||null});
+        D._optionalNeeds=true;
+      }else{D.hood=f('hood')||null;D.ltype=f('listing_intent')||null}
+      suspend();CE.f=m;CE.li=0;CE.hist=[];
+      CE.i=m==='invp'?SCRIPTS.invp.findIndex(function(x){return x.id==='i_an'}):m==='sell'?SCRIPTS.sell.findIndex(function(x){return x.id==='s_area'}):0;
+      ceStep();return true;
+    }
+    if(a==='skip')return E30.discAPI.route('رد');
+    if(a==='results'||a==='sample'){usrC(t);sample();return true}
+    if(a==='hood-results'){usrC(t);compare(t);return true}
+    if(a==='resume'){
+      usrC(t);var prev=state().suspended;if(!prev){botC('خدمت معلقی وجود ندارد.',null);return true}
+      Object.assign(CE,prev.ce);S.ctx30Collectors[S.ctx30ActiveKey]=prev.collector;E30.discAPI.resume();delete state().suspended;save();
+      if(E30.discAPI.active()){var slot=E30.discAPI.collector().expecting;if(slot)E30.discAPI.preference(slot);else botC('به شناخت نیاز قبلی برگشتید؛ اطلاعات حفظ شده است.',null)}else ceStep();return true;
+    }
     if(a.indexOf('discover:')===0){
       var flow=a.split(':')[1];
       /* Guided prompts may start directly from the legacy onboarding gate.
@@ -19314,20 +19115,15 @@ E30.guide=(function(){
     }
     if(a==='native')return false; /* Existing engine owns the answer and validation. */
     usrC(t);
+    if(['valuation','contracts','contract-start','termination','services','guaranteed'].indexOf(a)>=0||a.indexOf('flow:')===0)suspend();
     if(a==='compare'){compare(t);return true}
     if(a==='sample'){sample();return true}
     if(a==='map'){E30.chatMap({hood:E30.discAPI.getF('hood')||undefined});return true}
     if(a==='valuation'){CBACT.e30ValOpen();return true}
     if(a==='contracts'){CBACT.e30ContractList();return true}
-    if(a==='contract-start'){
-      botC('برای تنظیم قرارداد اجاره، ابتدا اطلاعات ملک و شرایط مالی را در مسیر اجاره مشخص می‌کنیم. ثبت یا امضای قرارداد بدون تأیید شما انجام نمی‌شود.',null);
-      if(E30.discAPI.active())E30.discAPI.stop();
-      E30.discAPI.start('rent',false);return true;
-    }
+    if(a==='contract-start'){E28.ctrStart('rent');return true}
     if(a==='termination'){
-      var all=S.contracts||[],c=all.filter(function(x){return x&&x.code})[0];
-      if(c&&E29&&typeof E29.termAI==='function'){E29.termAI(c.code);return true}
-      botC('قرارداد قابل ارجاعی در این مرورگر پیدا نشد. فسخ خودکار انجام نمی‌شود؛ ابتدا قرارداد را در همین گفت‌وگو پیدا یا ثبت کنید.',null);return true;
+      CBACT.e30ContractList();return true;
     }
     if(a==='services'){CBACT.e30RequestService();return true}
     if(a==='guaranteed'){CBACT.e30RequestGRT();return true}
@@ -19336,6 +19132,7 @@ E30.guide=(function(){
     if(a==='projects'){showList(S.projects,'پروژه‌های فعلی','هنوز پروژه‌ای در این مرورگر ثبت نشده است.',function(x){return '<div class="kv"><span>'+esc(x.name||x.title||'پروژه')+'</span><b>ذخیره‌شده</b></div>'});return true}
     if(a.indexOf('flow:')===0){
       var f=a.split(':')[1];
+      if(f==='build'&&!can(r)){botC('برای سفارش تأمین، ابتدا پروژهٔ فعال را در مسیر پروژه‌ها انتخاب کنید.',null);return true}
       if(SCRIPTS[f]){botC('این فلو در همین محیط گفت‌وگو اجرا می‌شود. وضعیت و اطلاعات نهایی فقط در مراحل صریح ثبت خواهد شد.',null);ceStart(f);return true}
     }
     return false;
@@ -19345,16 +19142,21 @@ E30.guide=(function(){
     var nt=norm(t),r=BY_PROMPT[nt];
     if(!r&&/^(یه|یک) (خونه|خانه) (برام|برای من )? ?پیدا کن$/.test(nt)){
       setNode('home');usrC(String(t));
-      botC('برای شروع، منظورتان خرید خانه است یا رهن و اجاره؟ یک پرامپت از پیشنهادهای همین گفت‌وگو انتخاب کنید.'+card(),null);
+      botC('برای شروع، منظورتان خرید خانه است یا رهن و اجاره؟ یک پرامپت از پیشنهادهای همین گفت‌وگو انتخاب کنید.',null);
       return true;
     }
-    if(!r||!can(r))return false;
+    if(!r)return false;
     setNode(r.id);
     return exec(r,String(t));
   }
   var installed=false;
   function install(){
     if(installed)return;installed=true;
+    ACT.e31MoveChat=function(el){
+      var id=el.getAttribute('data-sess'),projects=(S.projects||[]).filter(function(p){return !p.archived});
+      openModal('<h3>انتقال گفت‌وگو به پروژه</h3>'+(!projects.length?'<p>ابتدا یک پروژه بسازید.</p>':projects.map(function(p){return '<button class="btn" data-act="e31MoveTo" data-sess="'+qesc(id)+'" data-prj="'+qesc(p.id)+'">'+esc(p.name)+'</button>'}).join('')));
+    };
+    ACT.e31MoveTo=function(el){E29.projAPI.addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));closeModal();E29.shell.renderSidebarOnly();toast('گفت‌وگو به پروژه منتقل شد')};
     CBACT.e31Prefill=function(el){
       var r=BY_ID[el.getAttribute('data-e31-id')];
       var s=state();
@@ -19365,15 +19167,33 @@ E30.guide=(function(){
       input.dispatchEvent(new Event('input',{bubbles:true}));
       input.focus();
     };
-    var previousBot=botC;
-    botC=function(h,chips){
-      var html=String(h||''),skip=/(تأیید مالی ضروری|تعارضی در شرایط|e30-paycard|e30-budget-card|e30-persona-card|e31-guide|data-e28ctr|e30-val-hood)/.test(html);
-      var startup=CE.f==='gate'&&state().node==='home'&&CE.i===0;
-      if(!skip&&S.auth&&CURRENT==='landing'&&(startup||!(CE.f&&!E30.discAPI.active()))){
-        html+=card();
-      }
+    (SCRIPTS.sell||[]).forEach(function(st){
+      var optional=['s_role','s_own','s_docs','s_note','s_rooms','s_age','s_floor','s_motiv','s_urg','s_min'].indexOf(st.id)>=0,previous=st.pre;
+      if(optional)st.pre=function(D){if(D._optionalNeeds)return false;return previous?previous(D):true};
+      if(st.id==='s_area')st.pre=function(D){return !D.prop_area};
+      if(st.id==='s_hood')st.pre=function(D){return !D.hood};
+    });
+    ['selL','selB'].forEach(function(key){
+      var original=CBACT[key];
+      CBACT[key]=function(el){
+        var q=queryData(),id=el.getAttribute('data-l'),x=key==='selL'?findL(id):findB(id);
+        if(x&&(key==='selL'?E30.flowsAPI.rentPass(x,q.D):E30.flowsAPI.buyPass(x,q.D))){
+          suspend();CE.f=key==='selL'?'rent':'buy';CE.i=SCRIPTS[CE.f].findIndex(function(st){return st.id==='list'});CE.li=0;
+        }
+        return original(el);
+      };
+    });
+    var previousBot=botC,depth=0,pending=[];
+    function deliver(h,chips){
+      var html=String(h||'');
+      if(S.auth&&CURRENT==='landing'&&!/e31-guide/.test(html))html+=card();
       return previousBot(html,chips);
-    };
+    }
+    botC=function(h,chips){if(depth){pending.push({h:String(h||''),c:chips});return}return deliver(h,chips)};
+    function turn(fn){return function(){depth++;try{return fn.apply(this,arguments)}finally{depth--;if(!depth&&pending.length){var items=pending;pending=[];deliver(items.map(function(x){return x.h}).join('<div class="e31-turn-part"></div>'),items[items.length-1].c)}}}}
+    E30.chatTurn=turn;
+    ceVal=turn(ceVal);ceStart=turn(ceStart);
+    Object.keys(CBACT).forEach(function(k){if(k!=='e31Prefill')CBACT[k]=turn(CBACT[k])});
     /* Empty-chat starter: visible in the chat canvas without creating a fake
        persisted assistant message or navigating away from the conversation. */
     var previousCr=cr;
@@ -19391,13 +19211,13 @@ E30.guide=(function(){
     var previousLogin=doLogin;
     doLogin=function(name){var value=previousLogin(name);if(S.auth&&CURRENT==='landing')cr();return value};
     var previousSend=ceSend;
-    ceSend=function(t){
+    ceSend=turn(function(t){
       /* Free text keeps the original deterministic parser and its validations. */
       if(route(t))return;
       return previousSend(t);
-    };
+    });
   }
-  return {registry:REGISTRY,install:install,route:route,suggestions:suggestions,normalize:norm,getCurrent:function(){return state().node},actions:BY_ID};
+  return {registry:REGISTRY,install:install,route:route,suggestions:suggestions,normalize:norm,getCurrent:function(){return state().node},queryData:queryData,actions:BY_ID};
 })();
 
 /* ═══════════════ V0.31 — E30 SHELL: init glue — wraps engine entry points ═══════════════ */

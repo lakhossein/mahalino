@@ -169,3 +169,11 @@ body.splash-active #v-splash{width:100%}
 /* locked slider */
 .rsld[data-locked="1"]{opacity:.75}
 .rsld[data-locked="1"] input[type=range]{pointer-events:none;opacity:.55}
+
+/* Wider cards and charts, with readable text and a mobile-safe composer. */
+#v-landing .ch-main{max-width:1200px}
+#v-landing .msg.bot{max-width:100%}
+#v-landing .msg.bot .bub{max-width:100%;overflow-wrap:anywhere}
+#v-landing .chcards{grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px}
+.e31-guide{max-width:100%}.e31-turn-part{margin-top:12px}
+@media(max-width:700px){#v-landing .ch-main{width:100%;max-width:100%}#v-landing .chcards{grid-template-columns:1fr}}

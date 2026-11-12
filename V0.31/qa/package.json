@@ -11,9 +11,11 @@
     "test:acceptance": "node e2e-acceptance-v031.cjs",
     "test:scenarios": "node e2e-scenarios-v031.cjs",
     "test:guided": "node e2e-guided-usability-v031.cjs",
-    "test:quality": "bash run-quality-gate.sh"
+    "test:quality": "bash run-quality-gate.sh",
+    "test:audit": "node --test audit-logic.test.cjs"
   },
   "devDependencies": {
+    "jsdom": "^26.1.0",
     "playwright": "1.65.0"
   }
 }

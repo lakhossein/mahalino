@@ -29,7 +29,7 @@ function parseMoneyRangeFA(input){
     var v=Number(p.value);
     if(!explicit&&inherited&&v<1e6)v*=inherited;
     /* parseNumberWords already evaluates explicit million/billion words. */
-    if(toman)v*=10;
+    if(!rialUnit&&!/^\d+\s*\|\s*\d+$/.test(body))v*=10;
     return v;
   }
   var lo=endpoint(parts[0],m0),hi=endpoint(parts[1],m1);
@@ -37,10 +37,7 @@ function parseMoneyRangeFA(input){
       !Number.isSafeInteger(Math.round(lo))||!Number.isSafeInteger(Math.round(hi))){
     return {ok:false,msg:'بازه یا واحد پول معتبر نیست؛ دو مبلغ مثبت با مرتبهٔ روشن وارد کنید.'};
   }
-  if(!toman&&!rialUnit&&!inherited&&lo<1e6&&hi<1e6){
-    return {ok:false,msg:'واحد مبلغ مبهم است؛ تومان، ریال یا میلیون/میلیارد را بنویسید.'};
-  }
   lo=Math.round(lo);hi=Math.round(hi);
   return {ok:true,value:Math.min(lo,hi)+'|'+Math.max(lo,hi),
-    note:'✓ بازهٔ ریالی: '+rial(Math.min(lo,hi))+' تا '+rial(Math.max(lo,hi)),unit:toman?'toman':'rial'};
+    note:'✓ بازهٔ ثبت‌شده: '+rial(Math.min(lo,hi))+' تا '+rial(Math.max(lo,hi)),unit:toman?'toman':'rial'};
 }
