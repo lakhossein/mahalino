@@ -37,6 +37,11 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
       assert(await page.locator('#chatB [data-e31-id="rent"]').count()>0,'rent clarification option missing');
       assert(await page.locator('#chatB [data-e31-id="buy"]').count()>0,'buy clarification option missing');
     });
+    await test('Free-form rental intent activates the same relevant prompts',async page=>{
+      await send(page,'دنبال خانه اجاره‌ای هستم');
+      assert(await page.locator('#chatB .e31-guide [data-e31-id="rent-budget"]').count()>0,
+        'generic free text was incorrectly treated as a home-stage prompt');
+    });
     await test('Prompt suggestions prefill the editor but never submit automatically',async page=>{
       await send(page,'می‌خوام در تهران یه خونه رهن و اجاره پیدا کنم.');
       const card=page.locator('#chatB .e31-guide').last();
