@@ -50,7 +50,7 @@ E30.guide=(function(){
   REGISTRY.forEach(function(r){
     if(r.id==='rent-budget'){r.prompt=PREFS.budget_pair[1];r.action='preference:budget_pair';r.aliases=[]}
     if(r.id==='rent-specs'){r.aliases=[];r.prompt='می‌خواهم متراژ و تعداد خواب را مشخص کنم.';r.action='preference:m2'}
-    if(r.id==='rent-area'){r.prompt='محله‌های دارای داده را برای اجاره ارزیابی کن.'}
+    if(r.id==='rent-area'){r.title='محله‌های دارای داده';r.prompt='محله‌های دارای داده را برای اجاره ارزیابی کن.'}
     if(r.id==='compare'){r.prompt='محله‌های دارای داده را از نظر قیمت مقایسه کن.'}
   });
   Object.keys(E30.discAPI?E30.discAPI.SLOT_LABEL:{}).forEach(function(slot){
@@ -178,11 +178,11 @@ E30.guide=(function(){
     var dep=f('budget_dep'),rent=f('budget_rent'),bud=f('buy_budget'),rules=f('prefRules')||{};
     if(flow==='buy'){
       D.budg=bud&&bud.v?bud.v[1]:0;D.budgOpen=!bud||!!bud.open;
-      D.PR={age:f('prop_age_range')||[0,f('prop_age')==null?100:+f('prop_age')],m2:[f('m2')||0,1e6],ppm:[0,Infinity],beds:f('rooms')||0,floorR:[0,100],prefRules:rules};
+      D.PR={age:f('prop_age_range')||[0,f('prop_age')==null?100:+f('prop_age')],m2:[f('m2')||0,1e6],ppm:[0,Number.MAX_SAFE_INTEGER],beds:f('rooms')||0,floorR:[0,100],prefRules:rules};
     }else{
-      D.B={depB:dep&&dep.v?dep.v[1]:Infinity,rentB:rent&&rent.v?rent.v[1]:Infinity};
+      D.B={depB:dep&&dep.v?dep.v[1]:Number.MAX_SAFE_INTEGER,rentB:rent&&rent.v?rent.v[1]:Number.MAX_SAFE_INTEGER};
       D.depOpen=!dep||!!dep.open;D.rentBOpen=!rent||!!rent.open;
-      D.P.beds=f('rooms')||0;D.P.minM2=f('m2')||0;D.P.maxAge=f('prop_age')==null?100:+f('prop_age');D.P._ageHard=f('prop_age')!=null;D.P.minAge=(f('prop_age_range')||[0])[0];D.P.prefRules=rules;
+      D.P.beds=f('rooms')||0;D.P.minM2=f('m2')||0;D.P.maxAge=f('prop_age')==null?100:+f('prop_age');D.P._ageHard=f('prop_age')!=null;D.P.minAge=(f('prop_age_range')||[0])[0];D.P.prefRules=rules;D.P.elev=rules.elevator==='required';D.P.park=rules.parking==='required';D.P.floor='any';delete D.P.requiredFloor;
     }
     D.hood=f('hood')||null;
     var floor=f('floor_preference');if(floor&&floor.level==='required'){if(flow==='buy')D.PR.requiredFloor=floor;else D.P.requiredFloor=floor}

@@ -564,7 +564,7 @@ E30.disc=(function(){
   function resume(){
     try{
       var saved=S.ctx30Collectors&&S.ctx30Collectors[contextKey()];
-      if(saved&&saved.active&&saved.wf)COL=Object.assign({},saved);
+      if(saved&&saved.active&&saved.wf){COL=Object.assign({},saved);if(!COL.optional){COL.expecting=null;COL.confirming=null;COL.fix=null}COL.optional=true;}
       else COL={active:false,wf:null,fix:null,confirming:null,turns:0};
     }catch(e){COL={active:false,wf:null,fix:null,confirming:null,turns:0}}
     return COL.active;
@@ -630,14 +630,14 @@ E30.disc=(function(){
       }else if(wf==='buy'){
         v=getF('purpose');if(v)parts.push(v==='invest'?'سرمایه‌گذاری':'سکونت');
         v=getF('household');if(v)parts.push({single:'استفادهٔ شخصی',couple:'دو نفره',family:'خانوادگی',roommates:'هم‌خانه‌ای'}[v]);
-        if(getF('buy_budget'))parts.push('بودجه تا '+rial(getF('buy_budget').v[1]));
+        if(getF('buy_budget')&&getF('buy_budget').v)parts.push('بودجه تا '+rial(getF('buy_budget').v[1]));
       }else if(wf==='sell'){
         v=getF('hood');if(v)parts.push('ملک در '+findH(v).n);
         v=getF('prop_area');if(v)parts.push(fa(v,0)+' متر');
         v=getF('sale_urgency');if(v)parts.push(v==='fast'?'فروش فوری':'بدون عجله، حداکثر قیمت');
       }else if(wf==='invest'){
         v=getF('invest_objective');if(v)parts.push({rent_income:'درآمد اجاره',appreciation:'رشد قیمت',inflation_hedge:'حفظ ارزش',land_bank:'زمین',resale:'فروش کوتاه‌مدت',commercial:'اجارهٔ تجاری',development:'پتانسیل توسعه',diversify:'تنوع پرتفوی'}[v]);
-        v=getF('invest_capital');if(v)parts.push('سرمایه تا '+rial(v.v[1]));
+        v=getF('invest_capital');if(v&&v.v)parts.push('سرمایه تا '+rial(v.v[1]));
       }
       if(!parts.length)return '';
       return 'پس فعلاً این‌ها را از حرف‌هایتان برداشت کردم: <b>'+parts.map(esc).join('، ')+'</b>.';
@@ -1182,7 +1182,7 @@ E30.disc=(function(){
   }
   CBACT.e30fix=function(el){
     var slot=el.getAttribute('data-slot');
-    if(!COL.active)COL={active:true,wf:COL.wf||guessWf(),fix:null,confirming:null,turns:0};
+    if(!COL.active)COL={active:true,optional:true,wf:COL.wf||guessWf(),fix:null,confirming:null,turns:0};
     COL.fix=slot;COL.confirming=null;saveCollector();
     botC('مقدار جدید برای «'+esc(SLOT_LABEL[slot]||slot)+'» را بنویسید (یا «پاک کن»):',null);
   };
