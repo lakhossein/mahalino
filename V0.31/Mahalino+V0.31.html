@@ -19239,7 +19239,7 @@ E30.guide=(function(){
   }
   function suggestions(){
     var ids=GROUPS[state().node]||GROUPS.home;
-    return ids.map(function(k){return BY_ID[k]}).filter(can).slice(0,3);
+    return ids.map(function(k){return BY_ID[k]}).filter(can).slice(0,state().node==='home'?4:3);
   }
   function card(){
     if(!S.auth||CURRENT!=='landing')return '';
@@ -19264,7 +19264,7 @@ E30.guide=(function(){
     var list=(typeof HOODS!=='undefined'&&Array.isArray(HOODS))?HOODS:[];
     var near=/انقلاب/.test(norm(text));
     var focus=list.filter(function(h){return near&&/انقلاب/.test(norm(h.n||''))});
-    var picks=(focus.length?focus.concat(list.filter(function(h){return !/انقلاب/.test(norm(h.n||''))}).slice(0,2)):list.slice(0,3));
+    var picks=(focus.length?focus:list.slice(0,3));
     var rows=picks.map(function(h){
       var price=(typeof h.buyBase==='number'&&typeof rial==='function')?rial(h.buyBase):'دادهٔ قابل نمایش موجود نیست';
       return '<div class="kv"><span>'+esc(h.n||'محلهٔ نمونه')+'</span><b>'+esc(price)+'</b></div>';
@@ -19297,7 +19297,8 @@ E30.guide=(function(){
     if(a==='contracts'){CBACT.e30ContractList();return true}
     if(a==='contract-start'){
       botC('برای تنظیم قرارداد اجاره، ابتدا اطلاعات ملک و شرایط مالی را در مسیر اجاره مشخص می‌کنیم. ثبت یا امضای قرارداد بدون تأیید شما انجام نمی‌شود.',null);
-      CBACT.e30StartRent();return true;
+      if(E30.discAPI.active())E30.discAPI.stop();
+      E30.discAPI.start('rent',false);return true;
     }
     if(a==='termination'){
       var all=S.contracts||[],c=all.filter(function(x){return x&&x.code})[0];
@@ -19317,7 +19318,12 @@ E30.guide=(function(){
   }
   function route(t){
     if(!S.auth||CURRENT!=='landing')return false;
-    var r=BY_PROMPT[norm(t)];
+    var nt=norm(t),r=BY_PROMPT[nt];
+    if(!r&&/^(یه|یک) (خونه|خانه) (برام|برای من )? ?پیدا کن$/.test(nt)){
+      setNode('home');usrC(String(t));
+      botC('برای شروع، منظورتان خرید خانه است یا رهن و اجاره؟ یک پرامپت از پیشنهادهای همین گفت‌وگو انتخاب کنید.',null);
+      return true;
+    }
     if(!r||!can(r))return false;
     setNode(r.id);
     return exec(r,String(t));
@@ -19343,6 +19349,22 @@ E30.guide=(function(){
       }
       return previousBot(html,chips);
     };
+    /* Empty-chat starter: visible in the chat canvas without creating a fake
+       persisted assistant message or navigating away from the conversation. */
+    var previousCr=cr;
+    cr=function(){
+      var value=previousCr.apply(this,arguments);
+      if(S.auth&&CURRENT==='landing'&&HIST.length===0){
+        var box=document.getElementById('chatB');
+        if(box&&box.offsetParent&&!box.querySelector('.e31-guide')){
+          box.innerHTML='<div class="msg bot"><span class="who">دستیار</span><div class="bub">برای مشاهدهٔ مسیرهای نمایشی محلینو یکی از این درخواست‌ها را وارد کنید.'+
+            card()+'</div></div>';
+        }
+      }
+      return value;
+    };
+    var previousLogin=doLogin;
+    doLogin=function(name){var value=previousLogin(name);if(S.auth&&CURRENT==='landing')cr();return value};
     var previousSend=ceSend;
     ceSend=function(t){
       /* Free text keeps the original deterministic parser and its validations. */
