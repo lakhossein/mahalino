@@ -115,12 +115,13 @@ E30.uiTidyInit=function(){
   function decorateDate(id,edit){
     var input=document.getElementById(id);
     if(!input)return;
+    var previousValue=input.value;
     input.type='datetime-local';
     input.setAttribute('aria-label','تاریخ و ساعت یادآور، از اکنون به بعد');
     input.setAttribute('step','60');
     input.min=localStamp(Date.now()+60000);
     if(edit){
-      var current=input.value.replace(' ','T');
+      var current=previousValue.replace(' ','T');
       var parsed=Date.parse(current);
       input.value=Number.isFinite(parsed)?localStamp(parsed):localStamp(Date.now()+3600000);
     }else if(!input.value){
