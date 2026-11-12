@@ -191,7 +191,7 @@ rep("    '<button class=\"e22-sact e22-sact-del\"", "    '<button class=\"e22-sa
 injectBefore('</style>',readSrc('v31.css')+'\n'+readSrc('v31-guided-ui.css'));
 
 /* ═══ 11) JS injection before boot ═══ */
-var jsOrder=['v31-core.js','v31-intel.js','v31-flows.js','v31-ux.js','v31-landing.js','v31-guided-ui.js','v31-guidance.js','v31-shell.js'];
+var jsOrder=['v31-core.js','v31-intel.js','v31-flows.js','v31-ux.js','v31-landing.js','v31-guided-ui.js','v31-guidance.js','v31-turns.js','v31-shell.js'];
 var js=jsOrder.map(readSrc).join('\n\n');
 injectBefore('/* ═══ ۲۲) راه‌اندازی ═══ */',js);
 

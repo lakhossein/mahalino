@@ -83,7 +83,7 @@ async function send(page,text){
       fields:Object.keys(f),
       persona:E30.discAPI.personaOf('rent'),
       newness:f.prop_new&&{value:f.prop_new.v,kind:f.prop_new.kind,needsConfirmation:f.prop_new.requiresConfirmation},
-      bubbles:bubbles.map(b=>b.slice(0,150))
+      bubbles:bubbles
     };
   });
   ok('opening message starts discovery collector',st.disc===true,st);

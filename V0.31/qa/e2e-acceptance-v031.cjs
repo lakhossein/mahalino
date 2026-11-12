@@ -454,6 +454,22 @@ const start=async b=>{
       });
       await s.context.close();return {ok:v.project===v.target&&v.links.length===1&&v.links[0]===v.id&&v.refs.length===0&&v.hist>=2,info:v};
     });
+    await check('A35','One user submission produces one persisted and rendered assistant message',async()=>{
+      const s=await start(browser);await s.page.evaluate(()=>doLogin('QA'));
+      const rows=[];
+      for(const text of ['می‌خوام در تهران یه خونه رهن و اجاره پیدا کنم.','ودیعه ۱ میلیارد تومان اجاره ۲۰ میلیون تومان']){
+        rows.push(await s.page.evaluate(text=>{const before=HIST.length;ceSend(text);const added=HIST.slice(before);return {users:added.filter(x=>x.r==='user').length,bots:added.filter(x=>x.r==='bot').length,body:added.filter(x=>x.r==='bot').map(x=>x.h).join(''),rendered:document.querySelectorAll('#chatB .msg.bot').length,stored:JSON.parse(localStorage.getItem('mahalino_v31')).liveHistory.filter(x=>x.r==='bot').length}},text));
+      }
+      const beforeEntry=await s.page.evaluate(()=>HIST.length);
+      await s.page.locator('#chatB [data-cf="buy"]').first().click();
+      const entry=await s.page.evaluate(n=>({users:HIST.slice(n).filter(x=>x.r==='user').length,bots:HIST.slice(n).filter(x=>x.r==='bot').length}),beforeEntry);
+      const historical=await s.page.evaluate(()=>{
+        S.chats.push({id:'qa-historical-turns',title:'تاریخچه',ts:Date.now(),hist:[{r:'user',h:'قدیمی'},{r:'bot',h:'keep-A'},{r:'bot',h:'keep-B'}]});
+        ACT.sessOpen({getAttribute:k=>k==='data-sess'?'qa-historical-turns':null});
+        return HIST.filter(m=>m.h==='keep-A'||m.h==='keep-B').map(m=>m.h);
+      });
+      await s.context.close();return {ok:rows.every(r=>r.users===1&&r.bots===1&&r.body.length>20&&r.rendered===r.stored)&&entry.users===1&&entry.bots===1&&historical.join('|')==='keep-A|keep-B',info:{rows,entry,historical}};
+    });
     await check('A30','Every purchase price-range preset passes normalization without changing its rial endpoints',async()=>{
       const s=await start(browser);
       const v=await s.page.evaluate(()=>({
