@@ -47,3 +47,29 @@ jobs:
           path: V0.31/qa/results/
           retention-days: 45
           if-no-files-found: warn
+
+  audit-regressions:
+    name: Focused V0.31 chat audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: V0.31/qa/package-lock.json
+      - run: npm ci --prefix V0.31/qa
+      - run: V0.31/qa/node_modules/.bin/playwright install --with-deps chromium
+      - name: Build and check discovery logic
+        run: |
+          node V0.31/build_v031.js
+          node --test V0.31/qa/audit-logic.test.cjs
+      - name: Run focused browser regressions
+        run: |
+          python3 -m http.server 8731 --bind 127.0.0.1 --directory V0.31 >/tmp/mahalino-audit-server.log 2>&1 &
+          for attempt in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:8731/Mahalino%2BV0.31.html >/dev/null; then break; fi
+            sleep 1
+          done
+          node V0.31/qa/e2e-audit-v031.cjs
