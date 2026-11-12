@@ -668,13 +668,16 @@ E30.disc=(function(){
 
   /* Guided, optional chat cards. Values enter the SAME evidence-aware collector;
      they are not a second flow engine and never fabricate a budget. */
+  var budgetCardSequence=0;
   function budgetCard(){
+    var cardId=++budgetCardSequence;
     var depMissing=!getF('budget_dep'),rentMissing=!getF('budget_rent');
     if(!depMissing&&!rentMissing)return false;
     var options=function(name,values){
       return values.map(function(v,i){
-        var key=name+'-'+i;
-        return '<label for="'+key+'"><input type="radio" id="'+key+'" name="'+name+'" value="'+qesc(v)+'">تا '+esc(v)+' تومان</label>';
+        var key=name+'-'+cardId+'-'+i;
+        var kind=name==='e30-dep'?'dep':'rent';
+        return '<label for="'+key+'"><input type="radio" id="'+key+'" name="'+name+'-'+cardId+'" data-kind="'+kind+'" value="'+qesc(v)+'">تا '+esc(v)+' تومان</label>';
       }).join('');
     };
     var h='<div class="e30-budget-card" role="group" aria-label="بودجهٔ ودیعه و اجاره">'+
@@ -723,10 +726,10 @@ E30.disc=(function(){
     if(!COL.active||COL.wf!=='rent')return;
     var root=el.closest('.e30-budget-card');
     if(!root)return;
-    var dep=root.querySelector('input[name="e30-dep"]:checked');
-    var rent=root.querySelector('input[name="e30-rent"]:checked');
-    if(root.querySelector('input[name="e30-dep"]')&&!dep){toast('حداکثر ودیعه را انتخاب کن یا مبلغ را در گفتگو بنویس.');return}
-    if(root.querySelector('input[name="e30-rent"]')&&!rent){toast('حداکثر اجارهٔ ماهانه را انتخاب کن یا مبلغ را در گفتگو بنویس.');return}
+    var dep=root.querySelector('input[data-kind="dep"]:checked');
+    var rent=root.querySelector('input[data-kind="rent"]:checked');
+    if(root.querySelector('input[data-kind="dep"]')&&!dep){toast('حداکثر ودیعه را انتخاب کن یا مبلغ را در گفتگو بنویس.');return}
+    if(root.querySelector('input[data-kind="rent"]')&&!rent){toast('حداکثر اجارهٔ ماهانه را انتخاب کن یا مبلغ را در گفتگو بنویس.');return}
     var parts=[];
     if(dep)parts.push('حداکثر ودیعه '+dep.value+' تومان');
     if(rent)parts.push('حداکثر اجاره ماهانه '+rent.value+' تومان');
