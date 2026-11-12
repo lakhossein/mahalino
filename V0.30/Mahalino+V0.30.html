@@ -19022,6 +19022,27 @@ E30.uiTidyInit=function(){
      so decorating ONLY the public shell API would miss the actual user click. */
   var openLibraryAction=ACT.e29panelLib;
   ACT.e29panelLib=function(){var value=openLibraryAction.apply(this,arguments);markFullLibrary();return value};
+  /* Clicking an entry-level rent/buy action should not bypass the conversational
+     discovery and fall into the legacy fixed questionnaire. Internal ceStart()
+     hand-offs remain untouched for contracts, saved progress and tests. */
+  document.addEventListener('click',function(ev){
+    var trigger=ev.target&&ev.target.closest&&ev.target.closest('[data-cf]');
+    if(!trigger||!S.auth)return;
+    var f=trigger.getAttribute('data-cf');
+    if(f!=='rent'&&f!=='buy')return;
+    if(!E30.discAPI||typeof E30.discAPI.start!=='function')return;
+    ev.preventDefault();ev.stopImmediatePropagation();
+    usrC((trigger.textContent||'').replace(/\s+/g,' ').trim()||'شروع '+(f==='rent'?'اجاره':'خرید'));
+    E30.discAPI.start(f,false);
+  },true);
+  if(CBACT.e30StartRent){
+    CBACT.e30StartRent=function(){
+      usrC('آغاز اجاره و قرارداد');
+      E30.discAPI.start('rent',false);
+      return true;
+    };
+  }
+
   var originalPanel=E29.shell.openPanel;
   E29.shell.openPanel=function(kind,opts){
     var value=originalPanel.apply(this,arguments);
