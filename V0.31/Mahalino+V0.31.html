@@ -19237,9 +19237,30 @@ E30.guide=(function(){
     if(r.action==='native'&&r.id==='reminder')return typeof E28!=='undefined';
     return true;
   }
+  function effectiveNode(){
+    var node=state().node;
+    var key=S.ctx30ActiveKey,col=S.ctx30Collectors&&S.ctx30Collectors[key];
+    /* Free text and legacy entry buttons must receive the same guidance as
+       an exact suggested phrase. Never override a deliberate side-task. */
+    if(col&&col.active){
+      if(col.wf==='rent'&&['home','rent','rent-budget','rent-specs'].indexOf(node)>=0){
+        var dep=E30.discAPI.getF('budget_dep'),month=E30.discAPI.getF('budget_rent');
+        if(dep&&month){
+          return E30.discAPI.getF('m2')&&E30.discAPI.getF('rooms')?'rent-specs':'rent-budget';
+        }
+        return 'rent';
+      }
+      if(node==='home'&&BY_ID[col.wf])return col.wf;
+    }
+    if(node==='home'&&CE.f){
+      var flowNode={rent:'rent',buy:'buy',sell:'sell',invp:'invest',lndl:'landlord'};
+      return flowNode[CE.f]||'home';
+    }
+    return node;
+  }
   function suggestions(){
-    var ids=GROUPS[state().node]||GROUPS.home;
-    return ids.map(function(k){return BY_ID[k]}).filter(can).slice(0,state().node==='home'?4:3);
+    var node=effectiveNode(),ids=GROUPS[node]||GROUPS.home;
+    return ids.map(function(k){return BY_ID[k]}).filter(can).slice(0,node==='home'?4:3);
   }
   function card(){
     if(!S.auth||CURRENT!=='landing')return '';
