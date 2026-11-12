@@ -178,11 +178,11 @@ E30.guide=(function(){
     var dep=f('budget_dep'),rent=f('budget_rent'),bud=f('buy_budget'),rules=f('prefRules')||{};
     if(flow==='buy'){
       D.budg=bud&&bud.v?bud.v[1]:0;D.budgOpen=!bud||!!bud.open;
-      D.PR={age:[0,f('prop_age')==null?100:+f('prop_age')],m2:[f('m2')||0,1e6],ppm:[0,Infinity],beds:f('rooms')||0,floorR:[0,100],prefRules:rules};
+      D.PR={age:f('prop_age_range')||[0,f('prop_age')==null?100:+f('prop_age')],m2:[f('m2')||0,1e6],ppm:[0,Infinity],beds:f('rooms')||0,floorR:[0,100],prefRules:rules};
     }else{
       D.B={depB:dep&&dep.v?dep.v[1]:Infinity,rentB:rent&&rent.v?rent.v[1]:Infinity};
       D.depOpen=!dep||!!dep.open;D.rentBOpen=!rent||!!rent.open;
-      D.P.beds=f('rooms')||0;D.P.minM2=f('m2')||0;D.P.maxAge=f('prop_age')==null?100:+f('prop_age');D.P._ageHard=f('prop_age')!=null;D.P.prefRules=rules;
+      D.P.beds=f('rooms')||0;D.P.minM2=f('m2')||0;D.P.maxAge=f('prop_age')==null?100:+f('prop_age');D.P._ageHard=f('prop_age')!=null;D.P.minAge=(f('prop_age_range')||[0])[0];D.P.prefRules=rules;
     }
     D.hood=f('hood')||null;
     var floor=f('floor_preference');if(floor&&floor.level==='required'){if(flow==='buy')D.PR.requiredFloor=floor;else D.P.requiredFloor=floor}

@@ -113,7 +113,7 @@ rep("  var hard=RLIST.filter(function(x){return x.hood===D.hood}).filter(functio
 var rangeStart=H.indexOf('function parseMoneyRangeFA(input){');
 var rangeEnd=H.indexOf('function parseRangeFA(input){',rangeStart);
 if(rangeStart<0||rangeEnd<0){fail.push('money-range parser block missing')}
-else{rep(H.slice(rangeStart,rangeEnd),readSrc('v31-money-range.js')+'\n')}
+else{rep(H.slice(rangeStart,rangeEnd),readSrc('v31-money-range.js')+'\n'+readSrc('v31-age-range.js')+'\n')}
 /* Cards under the 'all listings' heading remain visible for comparison, but
    a failed hard constraint can never become the selected property. */
 rep("CBACT.selL=function(el){var D=wd('rent').data;D.listing=el.getAttribute('data-l');save();if(CURRENT==='rent')renderCurrent();botC('✓ انتخاب شد.',[['بازدید','!skp'],['مقایسه','!cmp']])};",
@@ -199,6 +199,8 @@ if(retiredStart<0||retiredEnd<0)fail.push('retired investment scripts missing');
 else H=H.slice(0,retiredStart)+H.slice(retiredEnd);
 H=H.replace("[' درآمد اجاره','F:invr']", "[' سرمایه‌گذاری ملکی','F:invp']");
 
+rep("var prg=parseRangeFA(v0);", "var prg=st.id==='age'?parseAgeRangeFA(v0):parseRangeFA(v0);");
+
 /* Currency boundary: old persisted financial records remain in canonical rial.
    Human input defaults to toman; explicit rial and machine preset values retain
    their units. This avoids mutating historical transactions or repeated scaling. */
@@ -210,6 +212,18 @@ if(ambiguityStart<0||ambiguityEnd<0)fail.push('money ambiguity block missing');
 else H=H.slice(0,ambiguityStart)+H.slice(ambiguityEnd);
 /* Machine chip values are canonical rial, typed strings are human input. */
 rep("if(st.money){\n    var pm=parseMoneyFA(v0);", "if(st.money){\n    var pm=parseMoneyFA(v0);\n    if(st.chips&&st.chips(D).some(function(c){return String(c[1])===v0&&/^[0-9]+$/.test(v0)}))pm={ok:true,value:+v0};");
+
+/* Contract form controls expose toman; the historical record boundary uses rial. */
+rep("qesc(String(c.terms.deposit||''))", "qesc(c.terms.deposit==null?'':String(c.terms.deposit/10))");
+rep("qesc(String(c.terms.rent===0?0:(c.terms.rent||'')))", "qesc(c.terms.rent==null?'':String(c.terms.rent/10))");
+rep("qesc(String(c.terms.price||''))", "qesc(c.terms.price==null?'':String(c.terms.price/10))");
+rep("var dp=+v('cp-dep'),rn=+v('cp-rent');", "var dp=10*Number(v('cp-dep')),rn=10*Number(v('cp-rent'));");
+rep("var pr=+v('cp-price');", "var pr=10*Number(v('cp-price'));");
+rep("dep=Number(depText),rent=Number(rentText);", "dep=10*Number(depText),rent=10*Number(rentText);");
+rep("var price=+v('cp-price'),delivery=v('cp-delivery');", "var price=10*Number(v('cp-price')),delivery=v('cp-delivery');");
+/* User-visible field labels and instructions. Currency parsing regexes keep
+   explicit rial support; existing stored amounts are never scaled on reload. */
+H=H.replace(/ریال(?=[)؛،: <—])/g,'تومان');
 
 /* ═══ 10) CSS injection ═══ */
 injectBefore('</style>',readSrc('v31.css')+'\n'+readSrc('v31-guided-ui.css'));

@@ -920,7 +920,8 @@ E30.disc=(function(){
         if(/مهم نیست|فرقی/.test(nt)){markUnknown('prop_new');return {ok:true,skip:true}}
         return {ok:false};
       }
-      case 'prop_age': case 'rooms': case 'm2': case 'prop_area': case 'prop_rooms': case 'family_members':{
+      case 'prop_age':{var ar=parseAgeRangeFA(t);if(!ar.ok)return {ok:false};if(ar.skip){markUnknown(id);markUnknown('prop_age_range');return {ok:true,skip:true}}var av=ar.value.split('|').map(Number);setF(id,av[1],{src:'answer',hard:true});setF('prop_age_range',av,{src:'answer',hard:true});return {ok:true}}
+      case 'rooms': case 'm2': case 'prop_area': case 'prop_rooms': case 'family_members':{
         var c=parseCountFA(stripFin(t));
         if(c&&c.ok&&c.value>0&&c.value<2000){setF(id,c.value,{src:'answer',hard:id==='prop_age'});return {ok:true}}
         return {ok:false};
