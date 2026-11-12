@@ -746,6 +746,9 @@ E30.disc=(function(){
       toast('برای جست‌وجوی دقیق، ابتدا ودیعه و اجاره را مشخص کن.');return;
     }
     usrC('با اطلاعات فعلی ادامه بده');
+    /* Explicit opt-out: do not recreate the same optional questionnaire in the
+       deterministic hand-off after the user has asked for recommendations. */
+    COL.skipOptionalToHoods=true;
     missing(COL.wf).forEach(function(item){
       if(!FL[item.id].fin)markUnknown(item.id);
     });
@@ -1179,7 +1182,7 @@ E30.disc=(function(){
         else if(p==='student'){P.metro=5;P.school=1;P.work=4}
         else if(p==='retiree'){P.quiet=5;P.school=1;P.work=1}
         else {P.metro=4;P.work=4;P.school=2}
-        P.persona=({family:'خانواده',couple:'دو نفره',student:'دانشجو/کاری',retiree:'موقت',roommates:'دانشجو/کاری'})[p]||'دانشجو/کاری';
+        P.persona=({family:'خانواده',couple:'دو نفره',student:'دانشجو/کاری',retiree:'موقت',roommates:'دانشجو/کاری'})[p]||''; /* unknown must not become an assumed student */
         var v;
         if((v=getF('rooms'))!=null)P.beds=+v;
         if((v=getF('m2'))!=null)P.minM2=+v;
@@ -1211,6 +1214,11 @@ E30.disc=(function(){
         /* jump to the first missing REQUIRED step — financial never skipped (§2.1) */
         if(!dep||!dep.v)ceJump('dep');
         else if(!rent||!rent.v)ceJump('rentb');
+        else if(d.skipOptionalToHoods){
+          var chosenHood=getF('hood');
+          if(chosenHood){D.hood=chosenHood;ceJump('mk')}
+          else ceJump('hoods');
+        }
         else ceJump('imps');
         try{E30.flowsAPI.syncStage()}catch(e){}
         return true;
