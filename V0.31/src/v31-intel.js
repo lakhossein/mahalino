@@ -257,25 +257,37 @@ E30.disc=(function(){
     return null;
   }
   function finScan(raw){
-    /* split the RAW text — normFa swallows «،» so normalized text has no separators */
-    var out={},segs=String(raw||'').split(/،|,|؛|\sو\s(?=\s?(?:ماهی|ماهانه|اجاره|کرایه))/),i;
-    for(i=0;i<segs.length;i++){
-      var sgN=normFa(segs[i]).replace(/‌/g,' ');
-      var isD=/ودیعه|رهن|پول جلو/.test(sgN),isR=/اجاره|کرایه|ماهی|ماهانه/.test(sgN);
-      if(!isD&&!isR)continue;
-      /* A natural sentence may precede the money clause, e.g. «کارم ... .
-         ودیعه تا ۳ میلیارد تومان» or «اجاره تا ۷۰ میلیون تومان. حداقل
-         دو خواب». Parse from the relevant label rather than the start of
-         the whole sentence; never substitute a chip or guessed budget. */
-      function valueNear(re){
-        var m=sgN.match(re);if(!m)return null;
-        /* Persian speakers place the label on either side of the amount:
-           «ودیعه ۱٫۵ میلیارد» AND «۱٫۵ میلیارد ودیعه». A trailing label
-           must not send the next labeled amount to the generic parser. */
-        return segMoney(sgN.slice(m.index+m[0].length))||segMoney(sgN.slice(0,m.index));
+    var out={},t=normHalf(normFa(String(raw||'').replace(/([0-9۰-۹٠-٩])[,٬](?=[0-9۰-۹٠-٩]{3}(?:[^0-9۰-۹٠-٩]|$))/g,'$1').replace(/[،,؛]/g,' ; ')));
+    var tokens=[],rx=/\d+(?:\.\d+)?|[\u0600-\u06ff]+|[^\s]/g,m;
+    while((m=rx.exec(t)))tokens.push({v:m[0],at:m.index,end:rx.lastIndex});
+    function number(v){return /^\d+(?:\.\d+)?$/.test(v)||v==='صفر'||v==='نیم'||Object.prototype.hasOwnProperty.call(NUM_WORDS,v)}
+    function scale(v){return Object.prototype.hasOwnProperty.call(NUM_MULT,v)}
+    var dep='(?:ودیعه|رهن|پول جلو)',rent='(?:اجاره|کرایه|ماهی|ماهانه)';
+    var filler='(?:من|ام|تا|حداکثر|حداقل|حدود|حدودا|حدوداً|ماهانه|ماهی|بین|از|:)';
+    function bound(label,start,end,side){
+      var before=t.slice(0,start),after=t.slice(end);
+      return side==='before'?new RegExp(label+'(?:\\s*'+filler+')*\\s*$').test(before):
+        new RegExp('^\\s*'+label+'(?=\\s|$|[.;])').test(after);
+    }
+    for(var i=0;i<tokens.length;i++){
+      if(!number(tokens[i].v))continue;
+      var j=i+1;
+      while(j<tokens.length){
+        var token=tokens[j].v;
+        if(/^(تومان|تومن|ریال)$/.test(token)){j++;break}
+        if(number(token)||scale(token)){j++;continue}
+        if(/^(و|تا|الی)$/.test(token)&&tokens[j+1]&&number(tokens[j+1].v)){j+=2;continue}
+        break;
       }
-      if(isD&&!out.dep){var dep=valueNear(/ودیعه|رهن|پول جلو/);if(dep)out.dep=dep}
-      if(isR&&!out.rent){var rent=valueNear(/اجاره|کرایه|ماهی|ماهانه/);if(rent)out.rent=rent}
+      var end=tokens[j-1].end,start=tokens[i].at,span=t.slice(start,end);
+      var isD=bound(dep,start,end,'before'),isR=bound(rent,start,end,'before');
+      if(!isD&&!isR){isD=bound(dep,start,end,'after');isR=bound(rent,start,end,'after')}
+      /* An amount cannot populate two labels. A missing/ambiguous amount is
+         left unknown rather than borrowed from the neighbouring clause. */
+      if(isD===isR){i=j-1;continue}
+      var value=/^(0|صفر)$/.test(span)?[0,0]:segMoney(span);
+      if(value){var key=isD?'dep':'rent';if(!out[key])out[key]=value}
+      i=j-1;
     }
     return out;
   }

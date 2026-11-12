@@ -399,6 +399,24 @@ const start=async b=>{
         v.mixed?.dep?.[0]===1020000000&&v.mixed?.rent?.[0]===15000000&&
         !v.unmapped?.dep&&v.unmapped?.rent?.[0]===25000000,info:v};
     });
+    await check('A31','Post-label decimal budgets and mixed currencies never cross-bind',async()=>{
+      const s=await start(browser);
+      const v=await s.page.evaluate(()=>({
+        post:E30._dbg.finScan('بودجه‌ام ۱.۲ میلیارد ودیعه و ۱۰ میلیون اجاره ماهانه است.'),
+        mixed:E30._dbg.finScan('ودیعه ۱۲ میلیارد ریال، اجاره ماهانه ۳۰ میلیون تومان'),
+        grouped:E30._dbg.finScan('ودیعه 1,200,000,000 تومان اجاره 20,000,000 تومان'),
+        adjacent:E30._dbg.finScan('ودیعه ۸۰۰ میلیون تومان اجاره ۲۵ میلیون تومان'),
+        zero:E30._dbg.finScan('ودیعه ۱ میلیارد تومان و اجاره 0'),
+        ambiguous:E30._dbg.finScan('ودیعه یا اجاره ۱۲ میلیون تومان')
+      }));
+      await s.context.close();
+      return {ok:v.post.dep?.[1]===1200000000&&v.post.rent?.[1]===10000000&&
+        v.mixed.dep?.[1]===12000000000&&v.mixed.rent?.[1]===300000000&&
+        v.grouped.dep?.[1]===12000000000&&v.grouped.rent?.[1]===200000000&&
+        v.adjacent.dep?.[1]===8000000000&&v.adjacent.rent?.[1]===250000000&&
+        v.zero.dep?.[1]===10000000000&&v.zero.rent?.[1]===0&&
+        !v.ambiguous.dep,info:v};
+    });
     await check('A30','Every purchase price-range preset passes normalization without changing its rial endpoints',async()=>{
       const s=await start(browser);
       const v=await s.page.evaluate(()=>({
