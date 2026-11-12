@@ -175,6 +175,10 @@ rep("ppm:4300000000,elev:true,park:true,balc:true,rate:4.6}];",
     "{id:'b11',hood:'h7',seed:'c11',t:'۶۰ م نوساز — ونک',m2:60,age:2,floor:5,beds:2,ppm:5400000000,elev:true,park:true,balc:true,rate:4.6},\n"+
     "{id:'b12',hood:'h8',seed:'c12',t:'۷۰ م ۹ساله — انقلاب',m2:70,age:9,floor:3,beds:2,ppm:2700000000,elev:true,park:false,balc:false,rate:4.1}];");
 
+/* Buying can resume at a preference step without passing the importance loop. */
+rep("  var st=sc[CE.i],D=wd(CE.f).data;\n  if(st.pre", "  var st=sc[CE.i],D=wd(CE.f).data;\n  if(CE.f==='buy'){defP(D);defPR(D)}\n  if(st.pre");
+rep("var p=v.split('|');D.PR.age=[+p[0],+p[1]];", "defPR(D);var p=String(v).split('|');if(p.length!==2||!p.every(function(n){return Number.isFinite(+n)&&+n>=0})||+p[0]>+p[1])return 'ERR';D.PR.age=[+p[0],+p[1]];");
+
 /* Currency boundary: old persisted financial records remain in canonical rial.
    Human input defaults to toman; explicit rial and machine preset values retain
    their units. This avoids mutating historical transactions or repeated scaling. */
