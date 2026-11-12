@@ -1,0 +1,54 @@
+/* V0.30 account-first sidebar and full-width library: light and dark theme compatible */
+body.authed.widemain main{max-width:none;margin:0;padding:0!important}
+body.authed.widemain #appwrap{gap:0;grid-template-columns:272px minmax(0,1fr)}
+body.authed.widemain .side{top:52px;max-height:calc(100dvh - 52px);border-radius:0;border-top:0;border-right:0;margin:0;align-self:stretch;padding:8px 10px}
+body.authed.widemain.sidefold #appwrap{grid-template-columns:64px minmax(0,1fr)}
+body.authed.widemain.sidefold .side{padding:8px 5px}
+body.authed .e27-expand{display:none!important}
+.e30-account-trigger{min-height:48px;border:1px solid transparent!important}
+.e30-account-trigger:hover{border-color:var(--line)!important}
+.e30-account-mark{width:32px;height:32px;border-radius:50%;background:var(--brand);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800;flex:none;font-size:15px}
+.e30-account-chevron{margin-inline-start:auto;color:var(--muted)}
+.e30-account-menu{position:fixed;z-index:160;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh-lg);padding:10px;display:flex;flex-direction:column;gap:2px;max-height:calc(100dvh - 30px);overflow:auto}
+.e30-account-summary{display:flex;flex-direction:column;gap:3px;padding:12px 10px 14px;margin-bottom:5px;border-bottom:1px solid var(--line)}
+.e30-account-summary b{color:var(--ink);font-size:14px}
+.e30-account-summary span{color:var(--muted);font-size:12px}
+.e30-account-menu button{display:block;width:100%;text-align:start;border:0;background:transparent;color:var(--ink);font:inherit;font-size:13px;padding:11px 12px;border-radius:9px;cursor:pointer}
+.e30-account-menu button:hover,.e30-account-menu button:focus-visible{background:var(--surface-2)}
+.e30-chat-icon,.e30-project-icon{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;position:relative;flex:none}
+.e30-chat-icon b,.e30-project-icon b{font-weight:800;font-size:10px;position:absolute;inset-inline-end:-4px;top:-3px;border-radius:99px;background:var(--surface);line-height:1.2;padding:1px}
+.e29-seca[data-act="e29prjNew"]{display:inline-flex;align-items:center;gap:6px}
+.e29-projhead .e30-project-icon{opacity:.7;font-size:16px}
+body.sidefold .e29-seca[data-act="e29prjNew"]{width:44px;justify-content:center;padding:9px 0}
+body.sidefold .e29-seca .lbl{display:none}
+body.sidefold .e29-projhead .pdot{display:none}
+body.sidefold .e29-sbot .e30-account-trigger{width:44px;justify-content:center;padding:8px}
+.e29-panel.e30-library-fullscreen{inset:0!important;top:0;bottom:0;width:100vw!important;max-width:100vw!important;border:0;box-shadow:none;transform:translateX(-101%);z-index:140}
+.e29-panel.e30-library-fullscreen.on{transform:none}
+.e30-library-fullscreen .e29-phead{padding:18px max(24px,calc((100vw - 1160px)/2));min-height:70px}
+.e30-library-fullscreen #e29-ltabs{padding-inline:max(24px,calc((100vw - 1160px)/2));display:flex;flex-wrap:wrap;overflow:visible;gap:6px}
+.e30-library-fullscreen .e29-pbody{padding:24px max(24px,calc((100vw - 1160px)/2));}
+.e30-library-fullscreen .e29-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.e30-library-fullscreen #e29-lsq{max-width:640px}
+.e30-library-fullscreen #e29-lsq:focus{outline:2px solid var(--brand);outline-offset:2px}
+.e30-library-fullscreen .e29-ptab{border-radius:8px;margin-bottom:4px}
+.e30-date-note{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+#e29-rd[aria-invalid=true],#re28-w[aria-invalid=true]{border-color:#c2410c;outline:1px solid #c2410c}
+.e30-budget-card,.e30-persona-card{max-width:620px;border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--surface);margin-top:12px}
+.e30-budget-card fieldset,.e30-persona-card fieldset{border:0;border-bottom:1px solid var(--line);padding:8px 0 14px;margin:0 0 8px;min-width:0}
+.e30-budget-card legend,.e30-persona-card legend{font-size:13px;font-weight:700;color:var(--ink);padding:0 0 8px}
+.e30-budget-card label,.e30-persona-card label{display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer;font-size:13px}
+.e30-budget-card input,.e30-persona-card input{accent-color:var(--brand);width:16px;height:16px}
+.e30-budget-card button,.e30-persona-card button{margin:5px 0 0 6px;padding:9px 12px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;cursor:pointer}
+.e30-budget-card button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.e30-budget-card .e30-footnote{display:block;font-size:11px;color:var(--muted);margin-top:10px}
+@media(max-width:980px){
+  body.authed.widemain #appwrap,body.authed.widemain.sidefold #appwrap{display:block}
+  body.authed.widemain .side{top:0;max-height:100dvh;border-radius:0}
+  .e30-library-fullscreen .e29-phead,.e30-library-fullscreen .e29-pbody{padding-inline:16px}
+  .e30-library-fullscreen #e29-ltabs{padding-inline:12px;flex-wrap:nowrap;overflow-x:auto}
+  .e30-library-fullscreen .e29-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+}
+
+/* Credit and account metadata live in the profile menu, not a permanent header chip. */
+body.authed #tokchip{display:none!important}

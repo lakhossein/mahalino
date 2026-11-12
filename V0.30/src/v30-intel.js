@@ -586,7 +586,7 @@ E30.disc=(function(){
   }
   function active(){return COL.active}
 
-  function start(wf,silent){
+  function start(wf,silent,budgetFirst){
     COL={active:true,wf:wf,fix:null,confirming:null,turns:0,finConfirmed:false};
     _lastPersona=personaOf(wf);
     saveCollector();
@@ -597,6 +597,8 @@ E30.disc=(function(){
       var sum=SUM.start(wf);
       greet+=sum||'تا شناخته‌شدن شرایط‌تان، چند چیز کلیدی را یکی‌یکی می‌پرسم.';
       botC(greet,null);
+      var hasConcreteFacts=!!(getF('work_loc')||getF('uni_loc')||getF('household')||getF('hood')||getF('prop_new')||getF('rooms')||getF('budget_dep')||getF('budget_rent'));
+      if(!budgetFirst&&!hasConcreteFacts&&scenarioCard(wf)){saveCollector();return true}
       askNext();
     }
     return true;
@@ -664,6 +666,120 @@ E30.disc=(function(){
     return String(v);
   }
 
+
+  /* Guided, optional chat cards. Values enter the SAME evidence-aware collector;
+     they are not a second flow engine and never fabricate a budget. */
+  var budgetCardSequence=0;
+  function budgetCard(){
+    var cardId=++budgetCardSequence;
+    var depMissing=!getF('budget_dep'),rentMissing=!getF('budget_rent');
+    if(!depMissing&&!rentMissing)return false;
+    var options=function(name,values){
+      return values.map(function(v,i){
+        var key=name+'-'+cardId+'-'+i;
+        var kind=name==='e30-dep'?'dep':'rent';
+        return '<label for="'+key+'"><input type="radio" id="'+key+'" name="'+name+'-'+cardId+'" data-kind="'+kind+'" value="'+qesc(v)+'">تا '+esc(v)+' تومان</label>';
+      }).join('');
+    };
+    var persona=personaOf('rent');
+    var question=persona==='family'?'برای گزینه‌های مناسب خانواده، سقف ودیعه و اجاره‌ات حدوداً چقدر است؟':
+      (persona==='roommates'?'برای مقایسهٔ گزینه‌های مناسب هم‌خانگی، سقف ودیعه و اجاره حدوداً چقدر است؟':
+      (persona==='student'?'برای زندگی نزدیک دانشگاه، ودیعه و اجاره‌ات حدوداً چقدر است؟':
+      'برای پیدا کردن گزینه‌های متناسب، ودیعه و اجاره‌ات حدوداً چقدر است؟'));
+    var h='<div class="e30-budget-card" role="group" aria-label="بودجهٔ ودیعه و اجاره">'+
+      '<b>'+esc(question)+'</b>'+
+      '<p class="note">می‌توانی یکی از مبلغ‌های پیشنهادی را انتخاب کنی یا بودجهٔ خودت را در گفتگو بنویسی. هیچ مبلغی به‌صورت خودکار انتخاب نشده است.</p>';
+    if(depMissing)h+='<fieldset><legend>حداکثر ودیعه (تومان)</legend>'+
+      options('e30-dep',['۳۰۰ میلیون','۵۰۰ میلیون','۱ میلیارد','۱.۵ میلیارد'])+'</fieldset>';
+    if(rentMissing)h+='<fieldset><legend>حداکثر اجارهٔ ماهانه (تومان)</legend>'+
+      options('e30-rent',['۱۰ میلیون','۲۰ میلیون','۳۰ میلیون','۵۰ میلیون'])+'</fieldset>';
+    h+='<button type="button" class="primary" data-cba="e30BudgetChoice">پیشنهاد گزینه‌های متناسب</button>'+
+      '<span class="e30-footnote">برای مبلغ دقیق یا سقف دیگر، به زبان خودت بنویس؛ مثلاً «۸۰۰ میلیون رهن و ماهی ۲۵ میلیون».</span></div>';
+    botC(h,null);
+    COL.expecting=depMissing?'budget_dep':'budget_rent';
+    saveCollector();
+    return true;
+  }
+  function personaCard(){
+    botC('برای اینکه پیشنهادها با سبک زندگی‌ات جور باشند، کدام حالت به شرایطت نزدیک‌تر است؟ <b>این بخش اختیاری است.</b>'+
+      '<div class="e30-persona-card" role="group" aria-label="هدف سکونت">'+
+      '<button type="button" data-cba="e30PersonaChoice" data-persona="single">زندگی فردی</button>'+
+      '<button type="button" data-cba="e30PersonaChoice" data-persona="couple">زندگی دونفره</button>'+
+      '<button type="button" data-cba="e30PersonaChoice" data-persona="family">زندگی خانوادگی</button>'+
+      '<button type="button" data-cba="e30PersonaChoice" data-persona="roommates">هم‌خانه</button>'+
+      '<button type="button" data-cba="e30PersonaSkip">رد کردن</button>'+
+      '<button type="button" data-cba="e30UseKnown">با اطلاعات فعلی پیشنهاد بده</button></div>',null);
+    COL.expecting='household';saveCollector();
+  }
+  CBACT.e30ChooseScenario=function(el){
+    if(!COL.active)return;
+    var kind=el.getAttribute('data-scenario');
+    var allowed=['budget','family','compare','settle','fast','value','income','growth','safety'];
+    if(allowed.indexOf(kind)<0)return;
+    usrC(el.textContent.trim());
+    COL.goal=kind;
+    if(kind==='family')setF('household','family',{src:'chosen-scenario'});
+    if(kind==='settle')setF('purpose','live',{src:'chosen-scenario'});
+    if(kind==='income')setF('invest_objective','rent_income',{src:'chosen-scenario'});
+    if(kind==='growth')setF('invest_objective','appreciation',{src:'chosen-scenario'});
+    if(kind==='fast')setF('sale_urgency','fast',{src:'chosen-scenario'});
+    if(kind==='value')setF('sale_urgency','maxvalue',{src:'chosen-scenario'});
+    COL.expecting=null;saveCollector();
+    botC('متوجه شدم. اول اطلاعات تعیین‌کننده را می‌گیریم؛ می‌توانی هر زمان مسیر را تغییر دهی.',null);
+    askNext();
+  };
+  CBACT.e30BudgetChoice=function(el){
+    if(!COL.active||COL.wf!=='rent')return;
+    var root=el.closest('.e30-budget-card');
+    if(!root)return;
+    var dep=root.querySelector('input[data-kind="dep"]:checked');
+    var rent=root.querySelector('input[data-kind="rent"]:checked');
+    if(root.querySelector('input[data-kind="dep"]')&&!dep){toast('حداکثر ودیعه را انتخاب کن یا مبلغ را در گفتگو بنویس.');return}
+    if(root.querySelector('input[data-kind="rent"]')&&!rent){toast('حداکثر اجارهٔ ماهانه را انتخاب کن یا مبلغ را در گفتگو بنویس.');return}
+    var parts=[];
+    if(dep)parts.push('حداکثر ودیعه '+dep.value+' تومان');
+    if(rent)parts.push('حداکثر اجاره ماهانه '+rent.value+' تومان');
+    el.disabled=true;ceSend(parts.join(' و '));
+  };
+  CBACT.e30PersonaChoice=function(el){
+    if(!COL.active)return;
+    var value=el.getAttribute('data-persona');
+    var names={single:'تنهایی',couple:'دو نفره',family:'خانواده',roommates:'هم خانه'};
+    if(!names[value])return;
+    ceSend(names[value]);
+  };
+  CBACT.e30PersonaSkip=function(){if(COL.active)ceSend('رد')};
+  CBACT.e30UseKnown=function(){
+    if(!COL.active)return;
+    if(COL.wf==='rent'&&(!getF('budget_dep')||!getF('budget_rent'))){
+      toast('برای جست‌وجوی دقیق، ابتدا ودیعه و اجاره را مشخص کن.');return;
+    }
+    usrC('با اطلاعات فعلی ادامه بده');
+    /* Explicit opt-out: do not recreate the same optional questionnaire in the
+       deterministic hand-off after the user has asked for recommendations. */
+    COL.skipOptionalToHoods=true;
+    missing(COL.wf).forEach(function(item){
+      if(!FL[item.id].fin)markUnknown(item.id);
+    });
+    COL.expecting=null;saveCollector();
+    complete();
+  };
+
+  function scenarioCard(wf){
+    var presets={
+      rent:[['budget','پیدا کردن بهترین گزینه با بودجه‌ام'],['family','محلهٔ مناسب خانواده'],['compare','مقایسهٔ قیمت محله‌ها']],
+      buy:[['budget','بهترین گزینه با بودجه‌ام'],['settle','خرید برای سکونت'],['compare','مقایسهٔ محله‌ها']],
+      sell:[['fast','فروش سریع‌تر'],['value','فروش با بهترین قیمت'],['compare','بررسی قیمت منطقه']],
+      invest:[['income','درآمد از اجاره'],['growth','رشد ارزش ملک'],['safety','حفظ ارزش سرمایه']]
+    };
+    var items=presets[wf];if(!items)return false;
+    botC('می‌تونم چند مسیر متناسب با هدفت پیشنهاد بدم. کدام برایت مهم‌تر است؟'+
+      '<div class="e30-persona-card" role="group" aria-label="انتخاب مسیر گفتگو">'+
+      items.map(function(o){return '<button type="button" data-cba="e30ChooseScenario" data-scenario="'+o[0]+'">'+esc(o[1])+'</button>'}).join('')+
+      '<p class="e30-footnote">می‌توانی به‌جای دکمه‌ها خواسته‌ات را آزادانه بنویسی.</p></div>',null);
+    return true;
+  }
+
   function askNext(){
     if(!COL.active)return;
     if(COL.confirming&&(/financial|contradiction|final/.test(COL.confirming.type)))return;
@@ -682,6 +798,8 @@ E30.disc=(function(){
     }
     if(!m.length){complete();return}
     var top=m[0],a=ASK[top.id];
+    if(wf==='rent'&&(top.id==='budget_dep'||top.id==='budget_rent')){budgetCard();return}
+    if(wf==='rent'&&top.id==='household'){personaCard();return}
     var p=personaOf(wf),tone=P_TONE[p]||P_TONE.general;
     var q=a.q[Math.floor(Math.random()*a.q.length)];
     botC(tone.q+q+(a.why?'<div class="note" style="margin-top:4px">'+esc(a.why)+'</div>':''),null);
@@ -893,13 +1011,14 @@ E30.disc=(function(){
     usrC(t);
     COL.turns++;
     /* mid-flow meta-questions get a brief honest answer, then the flow resumes (§4.6) */
-    if(/بنا چیست|بنا چیه|بنا چطور|چند بنا|موجودی|شارژ/.test(nt)&&
-       (COL.expecting||COL.confirming&&COL.confirming.type==='financial')){
+    if(/کلید چیست|کلید چیه|کلید چطور|چند کلید|بنا چیست|بنا چیه|بنا چطور|چند بنا|موجودی|شارژ/.test(nt)){
       var bal=S.tokens||0;
-      botC('بنا اعتبار سامانه برای سرویس‌های پیشرفته است — هر سرویس قبل از اجرا هزینه‌اش را نشان می‌دهد و فقط با تأیید شما کسر می‌شود. موجودی فعلی شما: '+fa(bal,0)+' بنا. شارژ از دکمهٔ «شارژ بنا» در بالای صفحه.',null);
+      botC('کلید اعتبار سامانه برای سرویس‌های پیشرفته است. هزینهٔ هر خدمت پیش از اجرا نمایش داده می‌شود و فقط با تأیید شما کسر خواهد شد. موجودی: '+fa(bal,0)+' کلید. مدیریت اعتبار از منوی حساب در پایین سایدبار در دسترس است.',null);
       var expq=COL.expecting,aq=ASK[expq];
-      if(aq)botC(aq.q[0],null);
+      if(COL.wf==='rent'&&(expq==='budget_dep'||expq==='budget_rent'))budgetCard();
+      else if(aq)botC(aq.q[0],null);
       else if(COL.confirming&&COL.confirming.type==='financial')promptFinancial();
+      else if(COL.active&&!COL.expecting)scenarioCard(COL.wf);
       return true;
     }
     /* explicit fix mode */
@@ -1073,7 +1192,7 @@ E30.disc=(function(){
         else if(p==='student'){P.metro=5;P.school=1;P.work=4}
         else if(p==='retiree'){P.quiet=5;P.school=1;P.work=1}
         else {P.metro=4;P.work=4;P.school=2}
-        P.persona=({family:'خانواده',couple:'دو نفره',student:'دانشجو/کاری',retiree:'موقت',roommates:'دانشجو/کاری'})[p]||'دانشجو/کاری';
+        P.persona=({family:'خانواده',couple:'دو نفره',student:'دانشجو/کاری',retiree:'موقت',roommates:'دانشجو/کاری'})[p]||''; /* unknown must not become an assumed student */
         var v;
         if((v=getF('rooms'))!=null)P.beds=+v;
         if((v=getF('m2'))!=null)P.minM2=+v;
@@ -1105,6 +1224,11 @@ E30.disc=(function(){
         /* jump to the first missing REQUIRED step — financial never skipped (§2.1) */
         if(!dep||!dep.v)ceJump('dep');
         else if(!rent||!rent.v)ceJump('rentb');
+        else if(d.skipOptionalToHoods){
+          var chosenHood=getF('hood');
+          if(chosenHood){D.hood=chosenHood;ceJump('mk')}
+          else ceJump('hoods');
+        }
         else ceJump('imps');
         try{E30.flowsAPI.syncStage()}catch(e){}
         return true;
@@ -1214,7 +1338,7 @@ E30.disc=(function(){
     var nt=nz(t);
     var wantsRealEstate=/خونه|خانه|ملک|آپارتمان|اجاره|کرایه|رهن|خرید|بخرم|بخریم|می ?خریم|فروش|بفروشم|سرمایه ?گذاری|زمین|مغازه|سویییت|سوئیت|موجر|مستأجر دارم|مستاجر دارم/.test(nt);
     if(!wantsRealEstate)return false;
-    if(!/می ?خوام|می ?خواهم|می ?خوایم|می ?خواهیم|دنبال|اجاره ? نشین|هستم|هستیم|دارم|داریم|سالمه|سالانه|باید|لازم|زوج|خانواده|دانشجو|هم ?خونه/.test(nt)&&!getF('household'))return false;
+    if(!/می ?خوام|می ?خواهم|می ?خوایم|می ?خواهیم|دنبال|اجاره ? نشین|هستم|هستیم|دارم|داریم|سالمه|سالانه|باید|لازم|زوج|خانواده|دانشجو|هم ?خونه|کمک|پیدا|پیشنهاد|مقایسه|بهترین گزینه/.test(nt)&&!getF('household'))return false;
     /* paid-service intents take precedence */
     if(/تحلیل (جامع )?محله/.test(nt)&&CE.f!=='rent'&&CE.f!=='buy'){return false} /* leave to flow/service */
     var intent=null;
@@ -1238,7 +1362,7 @@ E30.disc=(function(){
     usrC(t);
     extract(t,'open'); /* harvest the opening message (§4.2) */
     _lastPersona=null;
-    return start(intent);
+    return start(intent,false,/بودجه|هزینه|قیمت|پول پیش|ودیعه|رهن|ماهی|ماهانه|بهترین گزینه/.test(nt));
   }
 
   E30.discAPI={route:route,active:active,start:start,stop:stop,reset:reset,bindChat:bindChat,useChat:useChat,forgetChat:forgetChat,resume:resume,

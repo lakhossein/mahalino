@@ -44,14 +44,14 @@ async function send(page,text){
   ok('sample dataset extended to 8 hoods (ونک/انقلاب for §4.8)',st.hoods===8,st.hoods);
 
   console.log('— Info chatbot separation —');
-  await page.fill('#spl-q','بنا چیست؟');
+  await page.fill('#spl-q','کلید چیست؟');
   await page.click('#spl-send');
   await page.waitForTimeout(500);
   st=await page.evaluate(()=>{
     const ms=[...document.querySelectorAll('#spl-msgs .spl-msg.bot')];
     return {n:ms.length,last:ms.length?ms[ms.length-1].textContent:'',hist:(typeof HIST!=='undefined')?HIST.length:-1,ce:(typeof CE!=='undefined')?CE.f:'x'};
   });
-  ok('info-bot answers from KB',st.n>=2&&/بنا/.test(st.last),st.last);
+  ok('info-bot answers from KB',st.n>=2&&/کلید/.test(st.last),st.last);
   ok('info-bot does NOT touch app engine',st.hist===0&&st.ce===null,st);
   await page.fill('#spl-q','می‌خوام خونه اجاره کنم برام پیدا کن');
   await page.click('#spl-send');
@@ -70,7 +70,7 @@ async function send(page,text){
   await page.evaluate(()=>{try{doLogin('تستر')}catch(e){}});
   await page.waitForTimeout(700);
   st=await page.evaluate(()=>({auth:!!(window.S&&S.auth),tok:(window.S)?S.tokens:null,cur:(typeof CURRENT!=='undefined')?CURRENT:null}));
-  ok('quick login → 500 welcome بنا',st.auth===true&&st.tok===500&&st.cur==='landing',st);
+  ok('quick login → 500 welcome کلید',st.auth===true&&st.tok===500&&st.cur==='landing',st);
 
   console.log('— Discovery engine (§4.8 reference conversation) —');
   const OPEN='من حدود ۲۶ سالمه. تازه می‌خوام ازدواج کنم و اولین بارمه که می‌خوام خونه اجاره کنم. محل کارم نزدیک ونکه و دانشگاه هم حوالی انقلابه. دوست دارم خونه تا جای ممکن به هر دو نزدیک باشه. نوساز بودنش هم برام مهمه.';
@@ -252,9 +252,9 @@ async function send(page,text){
   });
   ok('sell (17-step) / invest (7) / landlord (6) flows installed',st.sell&&st.inv&&st.lndl,st);
 
-  console.log('— Bana rename —');
-  st=await page.evaluate(()=>({noToken:/توکن/.test(document.body.textContent),hasBana:document.body.textContent.indexOf('بنا')>=0}));
-  ok('«توکن» fully replaced with «بنا» (§17)',st.noToken===false&&st.hasBana===true,st);
+  console.log('— Credit unit renamed to کلید —');
+  st=await page.evaluate(()=>({noToken:/توکن/.test(document.body.textContent),hasKey:document.getElementById('tokchip')?.textContent.includes('کلید'),buildingAgeUnaffected:typeof SCRIPTS!=='undefined'&&SCRIPTS.rent.some(s=>s.id==='age'&&/عمر بنا/.test(String(s.q)))}));
+  ok('credit renamed to «کلید», without altering «عمر بنا»',st.noToken===false&&st.hasKey===true&&st.buildingAgeUnaffected===true,st);
 
   console.log('— Errors —');
   const realErrors=errors.filter(e=>!/picsum|favicon|net::|Failed to load resource/.test(e));

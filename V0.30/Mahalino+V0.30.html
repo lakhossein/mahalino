@@ -2941,6 +2941,61 @@ body.splash-active #v-splash{width:100%}
 .rsld[data-locked="1"]{opacity:.75}
 .rsld[data-locked="1"] input[type=range]{pointer-events:none;opacity:.55}
 
+/* V0.30 account-first sidebar and full-width library: light and dark theme compatible */
+body.authed.widemain main{max-width:none;margin:0;padding:0!important}
+body.authed.widemain #appwrap{gap:0;grid-template-columns:272px minmax(0,1fr)}
+body.authed.widemain .side{top:52px;max-height:calc(100dvh - 52px);border-radius:0;border-top:0;border-right:0;margin:0;align-self:stretch;padding:8px 10px}
+body.authed.widemain.sidefold #appwrap{grid-template-columns:64px minmax(0,1fr)}
+body.authed.widemain.sidefold .side{padding:8px 5px}
+body.authed .e27-expand{display:none!important}
+.e30-account-trigger{min-height:48px;border:1px solid transparent!important}
+.e30-account-trigger:hover{border-color:var(--line)!important}
+.e30-account-mark{width:32px;height:32px;border-radius:50%;background:var(--brand);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800;flex:none;font-size:15px}
+.e30-account-chevron{margin-inline-start:auto;color:var(--muted)}
+.e30-account-menu{position:fixed;z-index:160;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh-lg);padding:10px;display:flex;flex-direction:column;gap:2px;max-height:calc(100dvh - 30px);overflow:auto}
+.e30-account-summary{display:flex;flex-direction:column;gap:3px;padding:12px 10px 14px;margin-bottom:5px;border-bottom:1px solid var(--line)}
+.e30-account-summary b{color:var(--ink);font-size:14px}
+.e30-account-summary span{color:var(--muted);font-size:12px}
+.e30-account-menu button{display:block;width:100%;text-align:start;border:0;background:transparent;color:var(--ink);font:inherit;font-size:13px;padding:11px 12px;border-radius:9px;cursor:pointer}
+.e30-account-menu button:hover,.e30-account-menu button:focus-visible{background:var(--surface-2)}
+.e30-chat-icon,.e30-project-icon{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;position:relative;flex:none}
+.e30-chat-icon b,.e30-project-icon b{font-weight:800;font-size:10px;position:absolute;inset-inline-end:-4px;top:-3px;border-radius:99px;background:var(--surface);line-height:1.2;padding:1px}
+.e29-seca[data-act="e29prjNew"]{display:inline-flex;align-items:center;gap:6px}
+.e29-projhead .e30-project-icon{opacity:.7;font-size:16px}
+body.sidefold .e29-seca[data-act="e29prjNew"]{width:44px;justify-content:center;padding:9px 0}
+body.sidefold .e29-seca .lbl{display:none}
+body.sidefold .e29-projhead .pdot{display:none}
+body.sidefold .e29-sbot .e30-account-trigger{width:44px;justify-content:center;padding:8px}
+.e29-panel.e30-library-fullscreen{inset:0!important;top:0;bottom:0;width:100vw!important;max-width:100vw!important;border:0;box-shadow:none;transform:translateX(-101%);z-index:140}
+.e29-panel.e30-library-fullscreen.on{transform:none}
+.e30-library-fullscreen .e29-phead{padding:18px max(24px,calc((100vw - 1160px)/2));min-height:70px}
+.e30-library-fullscreen #e29-ltabs{padding-inline:max(24px,calc((100vw - 1160px)/2));display:flex;flex-wrap:wrap;overflow:visible;gap:6px}
+.e30-library-fullscreen .e29-pbody{padding:24px max(24px,calc((100vw - 1160px)/2));}
+.e30-library-fullscreen .e29-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.e30-library-fullscreen #e29-lsq{max-width:640px}
+.e30-library-fullscreen #e29-lsq:focus{outline:2px solid var(--brand);outline-offset:2px}
+.e30-library-fullscreen .e29-ptab{border-radius:8px;margin-bottom:4px}
+.e30-date-note{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+#e29-rd[aria-invalid=true],#re28-w[aria-invalid=true]{border-color:#c2410c;outline:1px solid #c2410c}
+.e30-budget-card,.e30-persona-card{max-width:620px;border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--surface);margin-top:12px}
+.e30-budget-card fieldset,.e30-persona-card fieldset{border:0;border-bottom:1px solid var(--line);padding:8px 0 14px;margin:0 0 8px;min-width:0}
+.e30-budget-card legend,.e30-persona-card legend{font-size:13px;font-weight:700;color:var(--ink);padding:0 0 8px}
+.e30-budget-card label,.e30-persona-card label{display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer;font-size:13px}
+.e30-budget-card input,.e30-persona-card input{accent-color:var(--brand);width:16px;height:16px}
+.e30-budget-card button,.e30-persona-card button{margin:5px 0 0 6px;padding:9px 12px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;cursor:pointer}
+.e30-budget-card button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.e30-budget-card .e30-footnote{display:block;font-size:11px;color:var(--muted);margin-top:10px}
+@media(max-width:980px){
+  body.authed.widemain #appwrap,body.authed.widemain.sidefold #appwrap{display:block}
+  body.authed.widemain .side{top:0;max-height:100dvh;border-radius:0}
+  .e30-library-fullscreen .e29-phead,.e30-library-fullscreen .e29-pbody{padding-inline:16px}
+  .e30-library-fullscreen #e29-ltabs{padding-inline:12px;flex-wrap:nowrap;overflow-x:auto}
+  .e30-library-fullscreen .e29-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+}
+
+/* Credit and account metadata live in the profile menu, not a permanent header chip. */
+body.authed #tokchip{display:none!important}
+
 </style>
 </head>
 <body>
@@ -3356,13 +3411,13 @@ function wfDelete(id){
   save();return true;
 }
 
-/* ═══ ۳) بنا و کیف پول ═══ */
+/* ═══ ۳) کلید و کیف پول ═══ */
 var COSTS={detail:10,visit:20,valuation:40,legal:100,contract:0,escrow:150,bid:20,stay:30};
-var COSTL={detail:'جزئیات راستی‌آزمایی‌شدهٔ آگهی',visit:'هماهنگی بازدید',valuation:'تخمین ارزش',legal:'گزارش حقوقی',contract:'تنظیم پیش‌نویس قرارداد (بدون هزینهٔ بنایی)',escrow:'پرداخت امانی',bid:'ارسال پیشنهاد',stay:'رزرو امانی اقامتگاه'};
+var COSTL={detail:'جزئیات راستی‌آزمایی‌شدهٔ آگهی',visit:'هماهنگی بازدید',valuation:'تخمین ارزش',legal:'گزارش حقوقی',contract:'تنظیم پیش‌نویس قرارداد (بدون هزینهٔ کلید)',escrow:'پرداخت امانی',bid:'ارسال پیشنهاد',stay:'رزرو امانی اقامتگاه'};
 function renderTok(){
   var el=$('#tokchip');if(!el)return;
   if(S.auth){
-    el.innerHTML='<button class="tok" data-act="account" data-tab="wallet" title="کیف پول"><span class="ti">'+ico('wallet')+'</span><b>'+rial(S.wallet||0)+'</b></button><button class="tok" data-act="account" data-tab="plan" title="اشتراک و بنا"><span class="ti">'+ico('coin')+'</span><b>'+fa(S.tokens,0)+'</b><span class="tl2">بنا</span><span class="plus">＋</span></button>';
+    el.innerHTML='<button class="tok" data-act="account" data-tab="wallet" title="کیف پول"><span class="ti">'+ico('wallet')+'</span><b>'+rial(S.wallet||0)+'</b></button><button class="tok" data-act="account" data-tab="plan" title="اشتراک و کلید"><span class="ti">'+ico('coin')+'</span><b>'+fa(S.tokens,0)+'</b><span class="tl2">کلید</span><span class="plus">＋</span></button>';
   }else{
     el.innerHTML='<button class="btn btn-primary btn-sm" data-view="auth">ورود / ثبت‌نام</button>';
   }
@@ -3372,15 +3427,15 @@ function renderTok(){
 function spend(key,cat,desc){
   var c=COSTS[key]||0;
   if(S.tokens<c){
-    openModal('<h3>بنا کافی نیست</h3><p class="note">این خدمت '+fa(c,0)+' بنا لازم دارد؛ موجودی شما '+fa(S.tokens,0)+' بنا است.</p><div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-primary" data-view="sub">شارژ بنا</button><button class="btn" data-act="closeModal">بستن</button></div>');
+    openModal('<h3>کلید کافی نیست</h3><p class="note">این خدمت '+fa(c,0)+' کلید لازم دارد؛ موجودی شما '+fa(S.tokens,0)+' کلید است.</p><div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-primary" data-view="sub">شارژ کلید</button><button class="btn" data-act="closeModal">بستن</button></div>');
     return false;
   }
   S.tokens-=c;var _txn='TXN-'+Date.now().toString(36)+Math.floor(Math.random()*999);
 S.log.unshift({t:Date.now(),d:desc,c:-c,cat:cat,id:_txn,svc:key});save();renderTok();
 if(window.E29){try{E29.bus.emit('token.deduct',{txn:_txn,cost:c,svc:key,desc:desc});if((S.tokens||0)<30)E29.bus.emit('wallet.low',{balance:S.tokens})}catch(e){}}
-  toast('−'+fa(c,0)+' بنا — '+desc);return true;
+  toast('−'+fa(c,0)+' کلید — '+desc);return true;
 }
-function earn(n,cat,desc){S.tokens+=n;S.log.unshift({t:Date.now(),d:desc,c:n,cat:cat});save();renderTok();toast('+'+fa(n,0)+' بنا — '+desc)}
+function earn(n,cat,desc){S.tokens+=n;S.log.unshift({t:Date.now(),d:desc,c:n,cat:cat});save();renderTok();toast('+'+fa(n,0)+' کلید — '+desc)}
 function walletIn(a,d){S.wallet=(S.wallet||0)+a;S.wlog.unshift({t:Date.now(),d:d,a:a});save();renderTok();toast(' '+rial(a)+' به کیف پول واریز شد')}
 function addReq(cat,type,title,status,detail){
   var id='R'+Date.now()+Math.floor(Math.random()*999);
@@ -3721,9 +3776,9 @@ var SUPS=[
 {t:'تیم اجرایی — ۱۲ نفر',b:['پروفایل راستی‌آزمایی'],p:'۹٫۵ تا ۱۲ م ریال/روز',d:'این هفته',stock:'—',min:'۲ هفته',s:'۴٫۶'},
 {t:'بتن آمادهٔ C30',b:['گواهی آزمایشگاه'],p:'متری ۴۸٬۰۰۰٬۰۰۰ ریال',d:'فردا',stock:'۲۰۰ متر/روز',min:'۱۰ متر',s:'۴٫۵'}];
 var PACKS=[
-{n:'پایه',tok:1500,pr:2990000,f:['۱۵۰۰ بنا','جزئیات آگهی و بازدید','۲ گزارش حقوقی']},
-{n:'حرفه‌ای',tok:4000,pr:6990000,f:['۴۰۰۰ بنا','حقوقی نامحدود','قرارداد امانی','پشتیبانی اولویت‌دار'],best:true},
-{n:'سازمانی',tok:12000,pr:18990000,f:['۱۲۰۰۰ بنا','کاربر نامحدود','دسترسی سازمانی']}];
+{n:'پایه',tok:1500,pr:2990000,f:['۱۵۰۰ کلید','جزئیات آگهی و بازدید','۲ گزارش حقوقی']},
+{n:'حرفه‌ای',tok:4000,pr:6990000,f:['۴۰۰۰ کلید','حقوقی نامحدود','قرارداد امانی','پشتیبانی اولویت‌دار'],best:true},
+{n:'سازمانی',tok:12000,pr:18990000,f:['۱۲۰۰۰ کلید','کاربر نامحدود','دسترسی سازمانی']}];
 var PPM={v:700000000};
 var SPRIX=765000000;
 /* ═══ ۵.۵) مبنای مالی Rental Income ═══ */
@@ -3743,7 +3798,7 @@ var FIN={
   },
   rent:{
     cashAnnual:(54000*12)/13200000,
-    source:'دادهٔ داخلی سامانه: ۵۴٬۰۰۰ ریال درآمد ماهانه به‌ازای هر بنا با ارزش پایهٔ ۱۳٬۲۰۰٬۰۰۰ ریال'
+    source:'دادهٔ داخلی سامانه: ۵۴٬۰۰۰ ریال درآمد ماهانه به‌ازای هر کلید با ارزش پایهٔ ۱۳٬۲۰۰٬۰۰۰ ریال'
   },
   nav:{default:0.32,source:'فرض افزایش ارزش ملک پیش‌فرض سامانه؛ قابل تغییر و غیرتضمینی'}
 };
@@ -3997,7 +4052,7 @@ var WSTEPS={
 rent:['بودجه','اولویت‌ها','انتخاب محله','بازار محله','انتخاب ملک','بازدید','قرارداد','فسخ و تخلیه'],
 buy:['بودجه و اولویت‌ها','انتخاب محله','بازار محله','دارایی‌های نقدی (اختیاری)','انتخاب ملک','بررسی حقوقی','پرداخت امانی','تحویل'],
 
-invr:['دارایی‌ها و مقایسه','اعتبار صندوق','خرید بنا','درآمد و فروش'],
+invr:['دارایی‌ها و مقایسه','اعتبار صندوق','خرید کلید','درآمد و فروش'],
 mkt:['نقش','پروژه‌ها','پیشنهاد / انتخاب','گردش کار'],
 build:['تأمین','پیشرفت','تحویل'],
 stay:['سفر','اقامتگاه','رزرو','ورود'],
@@ -4089,7 +4144,7 @@ function guardOK(m){
     if(d.step===8&&!D.utils)return 'انتقال انشعابات را کامل کنید.';
   }
   if(false&&m==='invb'&&d.step===3&&!D.bought)return 'ابتدا پرداخت را نهایی کنید.';
-  if(m==='invr'&&d.step===3&&!D.fund)return 'ابتدا خرید بنا را نهایی کنید.';
+  if(m==='invr'&&d.step===3&&!D.fund)return 'ابتدا خرید کلید را نهایی کنید.';
   if(m==='mkt'){
     if(d.step===2&&!D.role)return 'ابتدا نقش خود را انتخاب کنید.';
     if(d.step===3){
@@ -4414,7 +4469,7 @@ function lcard2(x,D,sel,sc,fb){
   '<div class="pcard-extra">'+placeTags(x.hood,3)+(fb?diffBadges(rentDiffTags(x,D)):'')+'</div>'+
   '</div>'+
   '<div class="pcard-foot">'+
-  '<button class="btn btn-xs" data-act="rdet" data-id="'+x.id+'">جزئیات (۱۰ بنا)</button>'+
+  '<button class="btn btn-xs" data-act="rdet" data-id="'+x.id+'">جزئیات (۱۰ کلید)</button>'+
   '<button class="btn btn-xs" data-cba="pcardMore" aria-label="اطلاعات بیشتر">بیشتر</button>'+
   '<button class="btn btn-xs" data-act="lsave" data-id="'+x.id+'" aria-label="نشان‌کردن" title="نشان‌کردن">'+(saved?'★':'☆')+'</button>'+
   '<button class="btn btn-xs'+(sel?'':' btn-primary')+'" data-act="rset" data-id="'+x.id+'">'+(sel?'✓ انتخاب‌شده':'انتخاب')+'</button>'+
@@ -4441,7 +4496,7 @@ function blcard(x,D,sel,sc,fb){
   '<div class="pcard-extra">'+placeTags(x.hood,3)+(fb?diffBadges(buyDiffTags(x,D)):'')+'</div>'+
   '</div>'+
   '<div class="pcard-foot">'+
-  '<button class="btn btn-xs" data-act="bdet" data-id="'+x.id+'">جزئیات (۱۰ بنا)</button>'+
+  '<button class="btn btn-xs" data-act="bdet" data-id="'+x.id+'">جزئیات (۱۰ کلید)</button>'+
   '<button class="btn btn-xs" data-cba="pcardMore" aria-label="اطلاعات بیشتر">بیشتر</button>'+
   '<button class="btn btn-xs" data-act="bsave" data-id="'+x.id+'" aria-label="نشان‌کردن" title="نشان‌کردن">'+(saved?'★':'☆')+'</button>'+
   '<button class="btn btn-xs'+(sel?'':' btn-primary')+'" data-act="bset" data-id="'+x.id+'">'+(sel?'✓ انتخاب‌شده':'انتخاب')+'</button>'+
@@ -4757,7 +4812,7 @@ function renderSidebar(){
   h+='<div class="e27-sbot">'+
     '<button class="e27-srow" data-act="themeToggle" aria-pressed="'+(E22.isDark()?'true':'false')+'" aria-label="تغییر حالت روشن/تاریک"><span class="si">'+(E22.isDark()?E22.ICO.sun:E22.ICO.moon)+'</span><span>'+(E22.isDark()?'حالت روشن':'حالت تاریک')+'</span></button>'+
     '<button class="e27-srow" data-act="wallet"><span class="si">'+E27_IC.wallet+'</span><span>کیف پول</span><small style="margin-inline-start:auto">'+rial(S.wallet)+'</small></button>'+
-    '<button class="e27-srow" data-act="account" data-tab="overview"><span class="si">'+E27_IC.user+'</span><span>'+esc(S.auth.name||'حساب کاربری')+'</span><small style="margin-inline-start:auto">'+fa(S.tokens,0)+' بنا</small></button>'+
+    '<button class="e27-srow" data-act="account" data-tab="overview"><span class="si">'+E27_IC.user+'</span><span>'+esc(S.auth.name||'حساب کاربری')+'</span><small style="margin-inline-start:auto">'+fa(S.tokens,0)+' کلید</small></button>'+
     '<button class="e27-srow" data-view="profile"><span class="si">'+E27_IC.gear+'</span><span>تنظیمات و حساب</span></button>'+
     '</div>';
   el.innerHTML=h;
@@ -4878,7 +4933,7 @@ function flowSummaryText(m){
     if(D.ph){var w=[12,34,22,18,14],tot=0,i;for(i=0;i<5;i++)tot+=w[i]*D.ph[i];add('پیشرفت',fa(tot/100,0)+'٪')}
   }else if(m==='invr'){
     if(D.cap)add('سرمایه',rial(D.cap));
-    if(D.cnt)add('بنا',fa(D.cnt,0));
+    if(D.cnt)add('کلید',fa(D.cnt,0));
     if(D.fund)add('خرید','انجام‌شده');
   }
   return bits.slice(0,5).join(' • ');
@@ -4964,7 +5019,7 @@ function ceSmart(t){t=String(t||'');var has=function(){var a=arguments,i;for(i=0
 function ceVal(v){
   if(v==='!menu'){ceStart('gate');CE.i=3;ceStep();return}
   if(v==='!help'){
-    botC('فرمان‌ها: «ادامه»، «محله‌ها»، «مقایسه»، «امضا»، «فسخ»، «چند بنا دارم»، «کیف پول»، «نقشه»، «منو».',[['منوی اصلی','!menu']]);
+    botC('فرمان‌ها: «ادامه»، «محله‌ها»، «مقایسه»، «امضا»، «فسخ»، «چند کلید دارم»، «کیف پول»، «نقشه»، «منو».',[['منوی اصلی','!menu']]);
     return;
   }
   if(v.indexOf('F:')===0){
@@ -5057,7 +5112,7 @@ function ceSend(t){
   usrC(t);
   var n=pd(t).replace(/[يى]/g,'ی');
   var nn=t.replace(/[يى]/g,'ی');
-  if(/بنا/.test(nn)){CBT.tok();return}
+  if(/کلید/.test(nn)){CBT.tok();return}
   if(/کیف پول/.test(nn)){ACT.wallet();return}
   if(/فسخ/.test(nn)&&CE.f==='rent'&&wd('rent').data.signed){ceJump('termq');return}
   if(/امضا/.test(nn)&&CE.f==='rent'){ceJump('ctr0');return}
@@ -5294,7 +5349,7 @@ SCRIPTS.rent=[
 {id:'time',q:function(D){return ' ساعت (ساعات اعلامی مالک در '+D.vday+'):'},
  chips:function(D){var x=findL(D.listing);return (x.av[D.vday]||[]).map(function(tt){return [tt,tt]})},
  set:function(D,v){if(!v)return 'ERR';D.vtime=v;return null}},
-{id:'visit',q:function(D){return 'ثبت درخواست بازدید برای <b>'+D.vday+' ساعت '+D.vtime+'</b>؟ (۲۰ بنا)'},
+{id:'visit',q:function(D){return 'ثبت درخواست بازدید برای <b>'+D.vday+' ساعت '+D.vtime+'</b>؟ (۲۰ کلید)'},
  chips:function(){return [['ثبت کن','!go'],['تغییر زمان','!back'],[' تور مجازی','!tour']]},
  acts:{
   go:function(D){if(doRentVisit()){ceJump('vform')}},
@@ -5468,7 +5523,7 @@ SCRIPTS.buy=[
   skp:function(){if(!wd('buy').data.blist){botC('اول یک ملک «انتخاب» کنید.');return}ceJump('lgsc')}
  }},
 {id:'lgsc',q:' وضعیت سند ملک برای گزارش حقوقی؟',chips:function(){return [['سند تک‌برگ','ok'],['رهن + مادهٔ ۱۰۰','mort'],['ورثه‌ای','heir']]},set:function(D,v){D.lsel=v;return null}},
-{id:'lg',q:'دریافت گزارش حقوقی (۱۰۰ بنا)؟',chips:function(){return [['دریافت','!lg']]},
+{id:'lg',q:'دریافت گزارش حقوقی (۱۰۰ کلید)؟',chips:function(){return [['دریافت','!lg']]},
  acts:{
   lg:function(D){
     if(!spend('legal','buy','گزارش حقوقی — '+LGD[D.lsel].lbl))return;
@@ -5627,22 +5682,22 @@ SCRIPTS.invr=[
  set:function(D,v){D.cap=+pd(v)||20000000000;return null}},
 {id:'cmp',q:function(D){return finChatHTML(D.cap,S.ui.navg)},
  chips:function(){return [['ادامه','ok']]},set:function(){return null}},
-{id:'fund',money:true,q:function(D){return 'مبلغ خرید بنا؟ (ارزش پایهٔ هر بنا: '+rial(13200000)+') — فروش لحظه‌ای و جزئی است و به کیف پول واریز می‌شود.'},kind:'num',
- chips:function(D){return [['همهٔ سرمایه',String(D.cap)],['۵۰۰ بنا','6600000000'],['۱٬۰۰۰ بنا','13200000000'],['۲ میلیارد','2000000000']]},
+{id:'fund',money:true,q:function(D){return 'مبلغ خرید کلید؟ (ارزش پایهٔ هر کلید: '+rial(13200000)+') — فروش لحظه‌ای و جزئی است و به کیف پول واریز می‌شود.'},kind:'num',
+ chips:function(D){return [['همهٔ سرمایه',String(D.cap)],['۵۰۰ کلید','6600000000'],['۱٬۰۰۰ کلید','13200000000'],['۲ میلیارد','2000000000']]},
  set:function(D,v){
    var amt=+pd(v);
    if(!amt)return 'ERR';
    D.amt=amt;return null}},
-{id:'pay',q:function(D){return ' خرید <b>'+fa(Math.floor(D.amt/13200000),0)+' بنا</b> ('+rial(D.amt)+' + ۰٫۵٪) — درگاه؟'},
+{id:'pay',q:function(D){return ' خرید <b>'+fa(Math.floor(D.amt/13200000),0)+' کلید</b> ('+rial(D.amt)+' + ۰٫۵٪) — درگاه؟'},
  chips:function(){return [['پرداخت','!p'],['تغییر مبلغ','!back']]},
  acts:{
   back:function(){ceJump('fund')},
   p:function(D){
-    openGateway(D.amt,'خرید بنا صندوق',function(){
+    openGateway(D.amt,'خرید کلید صندوق',function(){
       var cnt=Math.floor(D.amt/13200000);
-      if(cnt<1){botC('مبلغ برای ۱ بنا کافی نیست.');return}
+      if(cnt<1){botC('مبلغ برای ۱ کلید کافی نیست.');return}
       D.cnt=cnt;D.fund=true;
-      addReq('invr','پرداخت','خرید '+fa(cnt,0)+' بنا','کامل شد',rial(D.amt)+' + ۰٫۵٪');
+      addReq('invr','پرداخت','خرید '+fa(cnt,0)+' کلید','کامل شد',rial(D.amt)+' + ۰٫۵٪');
       save();if(CURRENT==='invest')renderCurrent();
       ceJump('end');
     });
@@ -5656,14 +5711,14 @@ SCRIPTS.invr=[
  }}
 ];
 function sellTok(D,n){
-  if(!n||n<1){botC('بنایی نیست.');return}
+  if(!n||n<1){botC('کلیدی نیست.');return}
   var net=Math.round(n*13200000*0.995);
-  walletIn(net,'فروش '+fa(n,0)+' بنا');
+  walletIn(net,'فروش '+fa(n,0)+' کلید');
   D.cnt-=n;
-  addReq('invr','فروش','فروش '+fa(n,0)+' بنا — کیف پول','کامل شد',rial(net));
+  addReq('invr','فروش','فروش '+fa(n,0)+' کلید — کیف پول','کامل شد',rial(net));
   if(D.cnt<1){wd('invr').done=true}
   save();if(CURRENT==='invest')renderCurrent();
-  botC(' '+rial(net)+' به کیف پول واریز شد. باقی: '+fa(D.cnt,0)+' بنا.',[['منوی اصلی','!menu']]);
+  botC(' '+rial(net)+' به کیف پول واریز شد. باقی: '+fa(D.cnt,0)+' کلید.',[['منوی اصلی','!menu']]);
   CE.f=null;
 }
 SCRIPTS.mkt=[
@@ -5702,7 +5757,7 @@ SCRIPTS.mkt=[
 {id:'send',pre:function(D){return D.role==='con'},
  q:function(D){
    var a=D.adj==='full'?'نرخ رسمی':(D.adj==='none'?'بدون تعدیل':'سقف ۱۰٪');
-   return 'ارسال پیشنهاد به کارفرما: <b>'+rial(D.bidAmt)+'</b> • تعدیل: '+a+' (۲۰ بنا)؟'},
+   return 'ارسال پیشنهاد به کارفرما: <b>'+rial(D.bidAmt)+'</b> • تعدیل: '+a+' (۲۰ کلید)؟'},
  chips:function(){return [['ارسال','!b']]},
  acts:{b:function(D){
    var i=D.prjI||0;
@@ -5841,7 +5896,7 @@ SCRIPTS.stay=[
  set:function(D,v){D.nights=+pd(v)||5;return null}},
 {id:'book',q:function(D){
   var s=findS(D.stay);
-  return ' رزرو امانی '+fa(D.nights,0)+' شب × '+rial(s.p)+' = <b>'+rial(D.nights*s.p)+'</b> (۳۰ بنا)؟'},
+  return ' رزرو امانی '+fa(D.nights,0)+' شب × '+rial(s.p)+' = <b>'+rial(D.nights*s.p)+'</b> (۳۰ کلید)؟'},
  chips:function(){return [['پرداخت و رزرو','!b']]},
  acts:{b:function(D){
    var s=findS(D.stay);
@@ -5931,7 +5986,7 @@ var CBT={};
 CBT.tok=function(){
   var neg=0;
   S.log.forEach(function(l){if(l.c<0)neg++});
-  botC('موجودی: <b>'+fa(S.tokens,0)+'</b> — '+fa(neg,0)+' مصرف<br> کیف پول: <b>'+rial(S.wallet||0)+'</b>',[['بستهٔ بنا','F:sub'],['کیف پول','F:wallet'],['منو','!menu']]);
+  botC('موجودی: <b>'+fa(S.tokens,0)+'</b> — '+fa(neg,0)+' مصرف<br> کیف پول: <b>'+rial(S.wallet||0)+'</b>',[['بستهٔ کلید','F:sub'],['کیف پول','F:wallet'],['منو','!menu']]);
 };
 
 /* ═══ ۸.۷) لایهٔ هوش گفت‌وگو (V0.20) — نیت، زمینه، سناریو، نمایش ═══
@@ -6174,10 +6229,10 @@ RINT.scExplain=function(q){
     botC('قیمت‌های سامانه «میانگین پیشنهادی آگهی‌ها» در تاریخ داده‌اند — قیمت معاملهٔ قطعی نیستند.'+rcNote('منبع آمار: کیلید؛ برای تصمیم، استعلام و بازدید رسمی لازم است.'),null);
     return true;
   }
-  if(/بنا/.test(q)){
-    botC('بنا واحد استفاده از خدمات سامانه است؛ تعرفهٔ فعلی:'+
-    rcTable(['خدمت','بنا'],Object.keys(COSTS).map(function(k){return [{h:esc(COSTL[k]||k),v:COSTL[k]||k},{h:fa(COSTS[k],0),v:COSTS[k]}]}))+
-    rcNote('خرید بنا از بخش «اشتراک و بنا» حساب کاربری.'+rcActs([{l:'اشتراک و بنا',a:'data-act="account" data-tab="plan"'}])),null);
+  if(/کلید/.test(q)){
+    botC('کلید واحد استفاده از خدمات سامانه است؛ تعرفهٔ فعلی:'+
+    rcTable(['خدمت','کلید'],Object.keys(COSTS).map(function(k){return [{h:esc(COSTL[k]||k),v:COSTL[k]||k},{h:fa(COSTS[k],0),v:COSTS[k]}]}))+
+    rcNote('خرید کلید از بخش «اشتراک و کلید» حساب کاربری.'+rcActs([{l:'اشتراک و کلید',a:'data-act="account" data-tab="plan"'}])),null);
     return true;
   }
   return false;
@@ -6408,7 +6463,7 @@ function doLogin(name){
   if(!S.welcomed){S.tokens=500;S.welcomed=true;S.log.unshift({t:Date.now(),d:'هدیهٔ خوش‌آمدگویی',c:500,cat:'sub'})}
   var p=S.pending||'landing';
   S.pending=null;save();
-  toast('خوش آمدید '+name+'! ۵۰۰ بنا هدیه بنا');
+  toast('خوش آمدید '+name+'! ۵۰۰ کلید هدیه');
   go(p);
 }
 
@@ -6822,7 +6877,7 @@ VIEWS.rent=function(){
       var vr=openReqOf('rent','بازدید',S.active.rent);
       h+='<div class="alert al-ok" style="margin-top:12px"><b>درخواست بازدید ثبت شد</b> — '+D.vday+' ساعت '+D.vtime+(vr?' • '+vr.status:'')+'<div style="margin-top:6px"><button class="btn btn-xs" data-act="dt" data-t="req" data-cat="rent">پیگیری در درخواست‌ها</button></div></div>';
     }else{
-      h+='<button class="btn btn-primary" style="margin-top:14px" data-act="rvisit"'+(D.vday&&D.vtime?'':' disabled')+'>'+(D.vday&&D.vtime?('ثبت درخواست بازدید (۲۰ بنا)'):'روز و ساعت را انتخاب کنید')+'</button>';
+      h+='<button class="btn btn-primary" style="margin-top:14px" data-act="rvisit"'+(D.vday&&D.vtime?'':' disabled')+'>'+(D.vday&&D.vtime?('ثبت درخواست بازدید (۲۰ کلید)'):'روز و ساعت را انتخاب کنید')+'</button>';
     }
     h+='<div style="margin-top:10px"><button class="btn" data-act="vtour" data-id="'+D.listing+'">تور مجازی ۳۶۰°</button></div></div>';
     h+='<div class="card"><div class="ct"> فرم هوشمند بازدید</div>';
@@ -7054,7 +7109,7 @@ VIEWS.buy=function(){
       h+='<div class="alert al-ok"><b>گزارش حقوقی آماده است.</b>'+(lr?' وضعیت درخواست: '+lr.status:'')+'<div style="margin-top:6px"><button class="btn btn-xs" data-act="dt" data-t="req" data-cat="buy">پیگیری در درخواست‌ها</button></div></div>';
     }else{
       h+='<p class="note">سند، رهن، مادهٔ ۱۰۰، وقف و وراثت — پیش از هر پرداخت بررسی می‌شود.</p>'+
-      '<button class="btn btn-primary" style="margin-top:10px" data-act="blegal">دریافت گزارش (۱۰۰ بنا)</button>';
+      '<button class="btn btn-primary" style="margin-top:10px" data-act="blegal">دریافت گزارش (۱۰۰ کلید)</button>';
     }
     h+='</div>'+wnav('buy',!!D.legal,D.legal?'✓ دریافت شد':'ابتدا گزارش را دریافت کنید');
   }else if(st===7){
@@ -7248,7 +7303,7 @@ VIEWS.invest=function(){
       '<div id="irbars"></div><p class="note" style="text-align:center;margin-top:2px">مقادیر نمودار: میلیون ریال در ماه</p><div id="fintable" style="margin-top:10px"></div><div id="finnote"></div><div class="alert al-warn" id="irnote"></div></div>'+wnav('invr',true,'');
     }else if(st===2){
       h+='<div class="grid g2"><div class="card"><div class="ct"> سابقهٔ واریز — ۱۲ از ۱۲</div>'+
-      '<p class="note">به‌ازای هر ۱۰۰ بنا: واریز یکم هر ماه.</p><div class="chips">'+
+      '<p class="note">به‌ازای هر ۱۰۰ کلید: واریز یکم هر ماه.</p><div class="chips">'+
       MFULL.map(function(mm){return '<span class="chip on">'+mm+' ✓</span>'}).join('')+
       '</div><div class="alert al-ok">✓ هر ۱۲ ماه، بدون تأخیر — پیگیری با تیم سامانه.</div></div>'+
       '<div class="card"><div class="ct"> شناسنامهٔ دارایی پایه</div>'+
@@ -7259,9 +7314,9 @@ VIEWS.invest=function(){
     }else if(st===3){
       if(D.cnt===undefined){D.cnt=500}
       var trq=openReqOf('invr','پرداخت',S.active.invr);
-      h+='<div class="card"><div class="ct">خرید بنا</div>'+
-      (D.fund?'<div class="kv"><span>تعداد بنا</span><b>'+fa(D.cnt,0)+'</b></div>':rng('cnt','تعداد بنا',50,2000,50,D.cnt,function(v){return fa(v,0)+' بنا'}))+
-      '<div class="kv"><span>ارزش پایهٔ هر بنا</span><b>'+rial(13200000)+'</b></div>';
+      h+='<div class="card"><div class="ct">خرید کلید</div>'+
+      (D.fund?'<div class="kv"><span>تعداد کلید</span><b>'+fa(D.cnt,0)+'</b></div>':rng('cnt','تعداد کلید',50,2000,50,D.cnt,function(v){return fa(v,0)+' کلید'}))+
+      '<div class="kv"><span>ارزش پایهٔ هر کلید</span><b>'+rial(13200000)+'</b></div>';
       if(D.fund){
         h+='<div class="alert al-ok"><b>خرید انجام شد</b>'+(trq?' • وضعیت: '+trq.status:'')+'<div style="margin-top:6px"><button class="btn btn-xs" data-act="dt" data-t="req" data-cat="invr">پیگیری در درخواست‌ها</button></div></div>';
       }else{
@@ -7273,11 +7328,11 @@ VIEWS.invest=function(){
       h+='<div class="grid g2"><div class="card"><div class="ct"> درآمد ماهانه</div>'+
       '<div class="kv"><span>درآمد شما</span><b>'+rial(D.cnt*54000)+'</b></div>'+
       '<div class="kv"><span>افزایش ارزش ملک (فرضی)</span><b style="color:var(--ok)">'+fa((S.ui.navg||FIN.nav.default)*100,0)+'٪</b></div>'+
-      '<div class="kv"><span>دارایی</span><b>'+fa(D.cnt,0)+' بنا</b></div>'+
+      '<div class="kv"><span>دارایی</span><b>'+fa(D.cnt,0)+' کلید</b></div>'+
       '<div class="chips" style="margin-top:10px">'+[[6,'۶ ماه'],[12,'۱۲ ماه']].map(function(x){return '<span class="chip'+(NR===x[0]?' on':'')+'" data-act="nrng" data-v="'+x[0]+'">'+x[1]+'</span>'}).join('')+'</div>'+
       '<div id="navchart"></div></div>'+
       '<div class="card"><div class="ct"> فروش لحظه‌ای و جزئی</div>'+
-      '<div class="kv"><span>قیمت هر بنا</span><b>'+rial(13200000)+'</b></div>'+
+      '<div class="kv"><span>قیمت هر کلید</span><b>'+rial(13200000)+'</b></div>'+
       '<div class="kv"><span> کیف پول</span><b>'+rial(S.wallet||0)+' <button class="btn btn-xs" data-act="wallet">برداشت</button></b></div>'+
       '<div class="srow" style="margin-top:10px"><div class="slab"><span>تعداد فروش (تایپ)</span></div><input class="inp" type="number" id="selln" min="1" max="'+(D.cnt||1)+'" value="'+Math.min(100,D.cnt||1)+'"></div><div id="slout"></div>'+
       '<div class="fs-actions" style="margin-top:12px"><button class="btn btn-primary" data-act="irsell">فروش فوری</button><button class="btn" data-act="irdone">نگه می‌دارم</button>'+(d.done?'<button class="btn" data-act="flowNew" data-m="invr">درخواست جدید</button>':'')+'</div></div></div>'+wnav('invr',false,'');
@@ -7335,7 +7390,7 @@ VIEWS.invest=function(){
     var sn=document.getElementById('selln');
     var updSl=function(){
       var v=Math.min(D.cnt||0,Math.max(1,+((sn&&sn.value)||1)));
-      document.getElementById('slout').innerHTML='<div class="kv"><span>مبلغ '+fa(v,0)+' بنا</span><b>'+rial(v*13200000)+'</b></div>'+
+      document.getElementById('slout').innerHTML='<div class="kv"><span>مبلغ '+fa(v,0)+' کلید</span><b>'+rial(v*13200000)+'</b></div>'+
       '<div class="kv"><span>کارمزد → کیف پول</span><b>'+rial(Math.round(v*13200000*0.995))+'</b></div>'+
       '<div class="kv"><span>باقی</span><b>'+fa((D.cnt||0)-v,0)+'</b></div>';
     };
@@ -7375,7 +7430,7 @@ VIEWS.mkt=function(){
       '<div class="kv"><span>پیشنهادها</span><b>'+fa(p.bids,0)+'</b></div>'+
       (p.warn?'<div class="alert al-warn"> '+p.warn+'</div>':'')+
       '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">'+
-      (con?('<button class="btn btn-xs btn-primary" data-act="pbid" data-i="'+i+'"'+(myBid?' disabled':'')+'>'+(myBid?'✓ ثبت شد':'پیشنهاد (۲۰ بنا)')+'</button>')
+      (con?('<button class="btn btn-xs btn-primary" data-act="pbid" data-i="'+i+'"'+(myBid?' disabled':'')+'>'+(myBid?'✓ ثبت شد':'پیشنهاد (۲۰ کلید)')+'</button>')
         :('<button class="btn btn-xs btn-primary" data-act="mBids" data-i="'+i+'">پیشنهادات ('+fa(BIDS.length,0)+')</button>'))+
       '<button class="btn btn-xs" data-act="pinfo" data-i="'+i+'">موضوعات</button>'+
       '<button class="btn btn-xs" data-act="pdet" data-i="'+i+'">جزئیات</button></div></div>';
@@ -7519,7 +7574,7 @@ VIEWS.stay=function(){
     if(D.code){
       h+='<div class="alert al-ok"><b>رزرو ثبت شد — کد '+D.code+'#</b>'+(br?' • وضعیت: '+br.status:'')+'<div style="margin-top:6px"><button class="btn btn-xs" data-act="dt" data-t="req" data-cat="stay">پیگیری در درخواست‌ها</button> <button class="btn btn-xs" data-act="flowNew" data-m="stay">رزرو جدید</button></div></div>';
     }else{
-      h+='<button class="btn btn-primary" style="margin-top:12px" data-act="sbook">پرداخت امانی (۳۰ بنا)</button>';
+      h+='<button class="btn btn-primary" style="margin-top:12px" data-act="sbook">پرداخت امانی (۳۰ کلید)</button>';
     }
     h+='</div><div class="card"><div class="ct">قفل اعتماد</div><div class="tl">'+
     '<div class="tli done"><span class="dot">✓</span>امانی</div><div class="tli done"><span class="dot">✓</span>احراز دوطرفه</div><div class="tli act"><span class="dot">•</span>۷۲ ساعت مغایرت</div></div></div></div>'+wnav('stay',!!D.code,'');
@@ -7879,7 +7934,7 @@ function openPickMap(title,cb){
 }
 
 /* ═══ ۱۸) حساب کاربری ═══ */
-var ACC_TABS=[['overview','نمای کلی'],['wallet','کیف پول'],['plan','اشتراک و بنا'],['contracts','قراردادها'],['settings','تنظیمات']];
+var ACC_TABS=[['overview','نمای کلی'],['wallet','کیف پول'],['plan','اشتراک و کلید'],['contracts','قراردادها'],['settings','تنظیمات']];
 function accTab(){var t=S.ui.atab||'overview',i;for(i=0;i<ACC_TABS.length;i++){if(ACC_TABS[i][0]===t)return t}S.ui.atab='overview';return 'overview'}
 function accBar(){
   var cur=accTab();
@@ -7890,7 +7945,7 @@ function accBar(){
 function tokenSpent(){var n=0;S.log.forEach(function(l){if(l.c<0)n+=-l.c});return n}
 function activityRows(n){
   var rows=[];
-  S.log.forEach(function(l){rows.push({t:l.t,d:l.d,amt:(l.c<0?'−':'+')+fa(Math.abs(l.c),0)+' بنا',cls:l.c<0?'out':'in'})});
+  S.log.forEach(function(l){rows.push({t:l.t,d:l.d,amt:(l.c<0?'−':'+')+fa(Math.abs(l.c),0)+' کلید',cls:l.c<0?'out':'in'})});
   S.wlog.forEach(function(w){rows.push({t:w.t,d:w.d,amt:rial(Math.abs(w.a)),cls:w.a<0?'out':'in'})});
   rows.sort(function(a,b){return b.t-a.t});
   return rows.slice(0,n);
@@ -7941,15 +7996,15 @@ function accountOverviewHTML(){
   var places=placesCount();
   return '<div class="acc-stats">'+
   '<div class="stat"><b>'+rial(S.wallet||0)+'</b><span>کیف پول قابل برداشت</span></div>'+
-  '<div class="stat"><b>'+fa(S.tokens,0)+'</b><span>موجودی بنا</span></div>'+
-  '<div class="stat"><b>'+esc(plan)+'</b><span>بستهٔ بنا</span></div>'+
+  '<div class="stat"><b>'+fa(S.tokens,0)+'</b><span>موجودی کلید</span></div>'+
+  '<div class="stat"><b>'+esc(plan)+'</b><span>بستهٔ کلید</span></div>'+
   '<div class="stat"><b>'+fa(open,0)+'</b><span>درخواست جاری</span></div></div>'+
   '<div class="acc-hero" style="margin-top:16px">'+
   '<div class="card"><div class="ct">فعالیت اخیر</div>'+activityHTML(6)+
-  '<div class="fs-actions" style="margin-top:10px"><button class="btn btn-xs" data-act="account" data-tab="wallet">کیف پول</button><button class="btn btn-xs" data-act="account" data-tab="plan">بناها</button></div></div>'+
+  '<div class="fs-actions" style="margin-top:10px"><button class="btn btn-xs" data-act="account" data-tab="wallet">کیف پول</button><button class="btn btn-xs" data-act="account" data-tab="plan">کلیدها</button></div></div>'+
   '<div class="card"><div class="ct">وضعیت حساب</div>'+
   '<div class="acc-id"><div class="acc-avatar">'+esc((S.auth.name||'؟').trim().charAt(0))+'</div><div class="acc-name"><b>'+esc(S.auth.name)+'</b><span style="direction:ltr;display:block">'+esc(S.auth.phone)+'</span></div></div>'+
-  '<div class="kv"><span>بستهٔ بنا</span><b>'+(S.sub?esc(S.sub.name)+' — '+fa(S.sub.tokens,0)+' بنا':'ثبت نشده')+'</b></div>'+
+  '<div class="kv"><span>بستهٔ کلید</span><b>'+(S.sub?esc(S.sub.name)+' — '+fa(S.sub.tokens,0)+' کلید':'ثبت نشده')+'</b></div>'+
   '<div class="kv"><span>مکان‌های مهم</span><b>'+fa(places,0)+' مورد</b></div>'+
   '<div class="kv"><span>قراردادها</span><b>'+fa(S.contracts.length,0)+' مورد</b></div>'+
   '<div class="acc-actions"><button class="btn btn-sm" data-act="account" data-tab="wallet">کیف پول</button><button class="btn btn-sm" data-act="account" data-tab="settings">ویرایش حساب</button></div></div></div>';
@@ -7960,7 +8015,7 @@ function accountWalletHTML(){
     return '<tr><td>'+esc(w.d)+'</td><td><b style="color:'+(w.a<0?'var(--danger)':'var(--ok)')+'">'+rial(Math.abs(w.a))+'</b></td><td>'+dt(w.t)+'</td></tr>';
   }).join('')+'</tbody></table></div>':'<div class="empty">واریزی ثبت نشده است.</div>';
   return '<div class="acc-hero"><div class="card"><div class="ct">کیف پول ریالی</div><div class="acc-balance">'+rial(S.wallet||0)+'<small>موجودی قابل برداشت</small></div>'+
-  '<div class="acc-actions"><button class="btn btn-sm btn-primary" data-act="wchat">شارژ کیف پول</button><button class="btn btn-sm" data-act="wdraw">برداشت وجه</button><button class="btn btn-sm" data-act="account" data-tab="plan">خرید بنا</button></div>'+
+  '<div class="acc-actions"><button class="btn btn-sm btn-primary" data-act="wchat">شارژ کیف پول</button><button class="btn btn-sm" data-act="wdraw">برداشت وجه</button><button class="btn btn-sm" data-act="account" data-tab="plan">خرید کلید</button></div>'+
   '<p class="note" style="margin-top:10px">شارژ با درگاه نمایشی.</p></div>'+
   '<div class="card"><div class="ct">خلاصه</div><div class="kv"><span>تعداد واریز</span><b>'+fa(wl.filter(function(w){return w.a>0}).length,0)+' مورد</b></div>'+
   '<div class="kv"><span>تعداد برداشت</span><b>'+fa(wl.filter(function(w){return w.a<0}).length,0)+' مورد</b></div>'+
@@ -7970,31 +8025,31 @@ function accountWalletHTML(){
 function accountPlanHTML(){
   var neg=tokenSpent();
   var sub=S.sub?('<div class="kv"><span>بسته</span><b>'+esc(S.sub.name)+'</b></div>'+
-    '<div class="kv"><span>بنا واریزشده</span><b>'+fa(S.sub.tokens,0)+' بنا</b></div>'+
+    '<div class="kv"><span>کلید واریزشده</span><b>'+fa(S.sub.tokens,0)+' کلید</b></div>'+
     '<div class="kv"><span>تاریخ خرید</span><b>'+dt(S.sub.at)+'</b></div>'+
     '<div class="kv"><span>تمدید خودکار</span><b>ندارد</b></div>'+
     '<p class="note">بسته‌ها یک‌باره واریز می‌شوند؛ تمدید خودکار یا کسر ماهانه در این نسخه وجود ندارد.</p>')
-    :('<div class="empty"><b>بستهٔ بنایی خریداری نشده</b><div class="note">برای استفاده از خدمات پولی، یکی از بسته‌های زیر را انتخاب کنید.</div></div>');
-  return '<div class="acc-stats g3"><div class="stat"><b>'+fa(S.tokens,0)+'</b><span>موجودی بنا</span></div>'+
-  '<div class="stat"><b>'+fa(neg,0)+'</b><span>مجموع مصرف بنا</span></div>'+
+    :('<div class="empty"><b>بستهٔ کلیدی خریداری نشده</b><div class="note">برای استفاده از خدمات پولی، یکی از بسته‌های زیر را انتخاب کنید.</div></div>');
+  return '<div class="acc-stats g3"><div class="stat"><b>'+fa(S.tokens,0)+'</b><span>موجودی کلید</span></div>'+
+  '<div class="stat"><b>'+fa(neg,0)+'</b><span>مجموع مصرف کلید</span></div>'+
   '<div class="stat"><b>'+(S.sub?esc(S.sub.name):'—')+'</b><span>آخرین بستهٔ خریداری‌شده</span></div></div>'+
-  '<div class="card" style="margin-top:16px"><div class="ct">اشتراک و بستهٔ بنا</div>'+sub+'</div>'+
-  '<h4 class="mini">بسته‌های بنا</h4><div class="packs-row">'+PACKS.map(function(p,i){
+  '<div class="card" style="margin-top:16px"><div class="ct">اشتراک و بستهٔ کلید</div>'+sub+'</div>'+
+  '<h4 class="mini">بسته‌های کلید</h4><div class="packs-row">'+PACKS.map(function(p,i){
     return '<div class="pack'+(p.best?' best':'')+'">'+(p.best?'<span class="badge-best">پیشنهاد</span>':'')+
-    '<div class="pk">'+p.n+'</div><div class="pt">'+fa(p.tok,0)+' بنا</div><div style="font-size:13px;color:var(--ink2);margin-bottom:8px">'+rial(p.pr)+'</div><ul>'+p.f.map(function(f){return '<li>✓ '+f+'</li>'}).join('')+'</ul>'+
+    '<div class="pk">'+p.n+'</div><div class="pt">'+fa(p.tok,0)+' کلید</div><div style="font-size:13px;color:var(--ink2);margin-bottom:8px">'+rial(p.pr)+'</div><ul>'+p.f.map(function(f){return '<li>✓ '+f+'</li>'}).join('')+'</ul>'+
     '<button class="btn btn-primary" style="margin-top:12px" data-act="buypack" data-i="'+i+'">خرید</button></div>';
   }).join('')+'</div>'+
   '<details class="costs-box"><summary>تعرفهٔ شفاف خدمات و هزینه‌های بیرونی</summary><div class="costs-body">'+
-  '<div class="ct">هزینهٔ ثابت بنایی</div><div class="tblwrap"><table class="tbl"><thead><tr><th>خدمت</th><th>هزینه</th></tr></thead><tbody>'+
-  Object.keys(COSTS).filter(function(k){return COSTS[k]>0}).map(function(k){return '<tr><td>'+COSTL[k]+'</td><td>'+fa(COSTS[k],0)+' بنا</td></tr>'}).join('')+'</tbody></table></div>'+
-  '<div class="kv"><span>تنظیم پیش‌نویس و PDF در محلینو</span><b>بدون هزینهٔ بنا</b></div>'+
-  '<div class="kv"><span>ثبت رسمی در سامانه‌های دولتی</span><b>هزینهٔ بیرونی؛ جدا از بنا</b></div>'+
-  '<div class="kv"><span>دفتر اسناد رسمی / مشاور املاک</span><b>متغیر و جدا از بنا</b></div>'+
+  '<div class="ct">هزینهٔ ثابت کلیدی</div><div class="tblwrap"><table class="tbl"><thead><tr><th>خدمت</th><th>هزینه</th></tr></thead><tbody>'+
+  Object.keys(COSTS).filter(function(k){return COSTS[k]>0}).map(function(k){return '<tr><td>'+COSTL[k]+'</td><td>'+fa(COSTS[k],0)+' کلید</td></tr>'}).join('')+'</tbody></table></div>'+
+  '<div class="kv"><span>تنظیم پیش‌نویس و PDF در محلینو</span><b>بدون هزینهٔ کلید</b></div>'+
+  '<div class="kv"><span>ثبت رسمی در سامانه‌های دولتی</span><b>هزینهٔ بیرونی؛ جدا از کلید</b></div>'+
+  '<div class="kv"><span>دفتر اسناد رسمی / مشاور املاک</span><b>متغیر و جدا از کلید</b></div>'+
   '<div class="kv"><span>خدمات ملک</span><b>در محلینو؛ مبلغ نهایی پیش از پرداخت</b></div>'+
-  '<div class="kv"><span>مصرف واقعی شما</span><b>'+fa(neg,0)+' بنا</b></div>'+
+  '<div class="kv"><span>مصرف واقعی شما</span><b>'+fa(neg,0)+' کلید</b></div>'+
   '<p class="note">هزینه‌های ثابت پیش از هر اقدام در همان فلو نمایش داده می‌شوند و از موجودی کسر می‌شوند. هزینه‌های بیرونی توسط ارائه‌دهنده تعیین می‌شوند و محلینو آن‌ها را دریافت نمی‌کند.</p></div></details>'+
-  '<h4 class="mini">مصرف بنا</h4>'+(S.log.length?'<div class="tblwrap"><table class="tbl"><thead><tr><th>شرح</th><th>تغییر</th><th>تاریخ</th></tr></thead><tbody>'+S.log.slice(0,12).map(function(l){
-    return '<tr><td>'+esc(l.d)+'</td><td><b style="color:'+(l.c<0?'var(--danger)':'var(--ok)')+'">'+(l.c<0?'−':'+')+fa(Math.abs(l.c),0)+' بنا</b></td><td>'+dt(l.t)+'</td></tr>';
+  '<h4 class="mini">مصرف کلید</h4>'+(S.log.length?'<div class="tblwrap"><table class="tbl"><thead><tr><th>شرح</th><th>تغییر</th><th>تاریخ</th></tr></thead><tbody>'+S.log.slice(0,12).map(function(l){
+    return '<tr><td>'+esc(l.d)+'</td><td><b style="color:'+(l.c<0?'var(--danger)':'var(--ok)')+'">'+(l.c<0?'−':'+')+fa(Math.abs(l.c),0)+' کلید</b></td><td>'+dt(l.t)+'</td></tr>';
   }).join('')+'</tbody></table></div>':'<div class="empty">مصرفی ثبت نشده است.</div>');
 }
 function accountSettingsHTML(){
@@ -8055,7 +8110,7 @@ VIEWS.profile=function(){
   else if(t==='plan')body=accountPlanHTML();
   else if(t==='contracts')body=accountContractsHTML();
   else body=accountSettingsHTML();
-  el.innerHTML='<div class="wtop"><div><h2>حساب کاربری</h2><p>کیف پول، بستهٔ بنا، قراردادها و تنظیمات در یک‌جا</p></div><div class="head-actions"><button class="btn btn-sm btn-primary" data-act="newRequest">درخواست جدید</button><button class="btn btn-sm" data-act="fcb">دستیار</button></div></div>'+accBar()+body;
+  el.innerHTML='<div class="wtop"><div><h2>حساب کاربری</h2><p>کیف پول، بستهٔ کلید، قراردادها و تنظیمات در یک‌جا</p></div><div class="head-actions"><button class="btn btn-sm btn-primary" data-act="newRequest">درخواست جدید</button><button class="btn btn-sm" data-act="fcb">دستیار</button></div></div>'+accBar()+body;
   var p=document.getElementById('pf-name');
   if(p){p.addEventListener('keydown',function(e){if(e.key==='Enter'){ACT.pname()}})}
 };
@@ -8965,11 +9020,11 @@ ACT.paySubmit=function(el){
     if(mode==='invr'){
       cb=function(){
         var cnt=Math.floor(amt/13200000);
-        if(cnt<1){toast('برای ۱ بنا کافی نیست');return}
+        if(cnt<1){toast('برای ۱ کلید کافی نیست');return}
         var D2=wd('invr').data;
         D2.cnt=cnt;D2.fund=true;
-        addReq('invr','پرداخت','خرید '+fa(cnt,0)+' بنا','کامل شد',rial(amt)+' + ۰٫۵٪');
-        save();renderCurrent();toast(' '+fa(cnt,0)+' بنا');
+        addReq('invr','پرداخت','خرید '+fa(cnt,0)+' کلید','کامل شد',rial(amt)+' + ۰٫۵٪');
+        save();renderCurrent();toast(' '+fa(cnt,0)+' کلید');
       };
     }else{
       cb=function(){
@@ -9026,7 +9081,7 @@ ACT.isell=function(){
 ACT.ibdone=function(){var d=wd('invb');d.done=true;addReq('invb','پیگیری','پایان','کامل شد');save();renderCurrent()};
 ACT.irbuy=function(){
   var D=wd('invr').data;
-  openPayModal({mode:'invr',unit:'بنا',rate:13200000,def:D.cnt*13200000,sugg:[{l:'۵۰۰ بنا',v:6600000000},{l:'۱٬۰۰۰ بنا',v:13200000000},{l:'۲ میلیارد',v:2000000000},{l:'۵ میلیارد',v:5000000000}],title:'خرید بنا صندوق'});
+  openPayModal({mode:'invr',unit:'کلید',rate:13200000,def:D.cnt*13200000,sugg:[{l:'۵۰۰ کلید',v:6600000000},{l:'۱٬۰۰۰ کلید',v:13200000000},{l:'۲ میلیارد',v:2000000000},{l:'۵ میلیارد',v:5000000000}],title:'خرید کلید صندوق'});
 };
 ACT.irsell=function(){
   var D=wd('invr').data;
@@ -9035,9 +9090,9 @@ ACT.irsell=function(){
   if(!n||n<1){toast('تعداد را وارد کنید');return}
   if(n>(D.cnt||0)){toast('بیشتر از دارایی');return}
   var net=Math.round(n*13200000*0.995);
-  walletIn(net,'فروش '+fa(n,0)+' بنا');
+  walletIn(net,'فروش '+fa(n,0)+' کلید');
   D.cnt-=n;
-  addReq('invr','فروش','فروش '+fa(n,0)+' بنا','کامل شد',rial(net));
+  addReq('invr','فروش','فروش '+fa(n,0)+' کلید','کامل شد',rial(net));
   if(D.cnt<1){wd('invr').done=true}
   save();renderCurrent();toast('واریز شد ');
 };
@@ -9107,7 +9162,7 @@ ACT.pdet=function(el){
   '<div class="kv"><span>تاریخچه</span><b>★ '+p.score+' — '+p.hist+'</b></div>'+
   (p.warn?('<div class="alert al-warn"> '+p.warn+'</div>'):'')+
   '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">'+
-  '<button class="btn btn-primary" data-act="pbid" data-i="'+el.getAttribute('data-i')+'">پیشنهاد (۲۰ بنا)</button>'+
+  '<button class="btn btn-primary" data-act="pbid" data-i="'+el.getAttribute('data-i')+'">پیشنهاد (۲۰ کلید)</button>'+
   '<button class="btn" data-act="pinfo" data-i="'+el.getAttribute('data-i')+'">موضوعات</button>'+
   '<button class="btn" data-act="closeModal">بستن</button></div>');
 };
@@ -9120,7 +9175,7 @@ ACT.pbid=function(el){
   '<div class="srow"><div class="slab"><span>مدت (ماه)</span></div><input class="inp" id="bid-dur" type="number" value="18" style="direction:ltr;text-align:left"></div>'+
   '<div class="srow"><div class="slab"><span>شرط تعدیل</span></div><select class="inp" id="bid-adj"><option value="none"'+(adjSel==='none'?' selected':'')+'>بدون تعدیل</option><option value="full"'+(adjSel==='full'?' selected':'')+'>نرخ رسمی مصالح (توصیه)</option><option value="cap10"'+(adjSel==='cap10'?' selected':'')+'>سقف ۱۰٪</option></select></div>'+
   '<div class="srow"><div class="slab"><span>توضیح</span></div><textarea class="inp" id="bid-note" rows="2"></textarea></div>'+
-  '<button class="btn btn-primary" data-act="pbidok" data-i="'+i+'">ارسال (۲۰ بنا)</button> <button class="btn" data-act="closeModal">انصراف</button>');
+  '<button class="btn btn-primary" data-act="pbidok" data-i="'+i+'">ارسال (۲۰ کلید)</button> <button class="btn" data-act="closeModal">انصراف</button>');
 };
 ACT.pbidok=function(el){
   var i=+el.getAttribute('data-i'),D=wd('mkt').data;
@@ -9222,7 +9277,7 @@ ACT.sreview=function(){
 };
 ACT.buypack=function(el){
   var p=PACKS[+el.getAttribute('data-i')];
-  openPayModal({mode:'sub',unit:'بنا',kind:'pack',packName:p.n,packTok:p.tok,packPrice:p.pr,rate:p.pr/p.tok,def:p.pr,sugg:[{l:'کامل',v:p.pr},{l:'دو برابر',v:p.pr*2}],title:'بستهٔ '+p.n});
+  openPayModal({mode:'sub',unit:'کلید',kind:'pack',packName:p.n,packTok:p.tok,packPrice:p.pr,rate:p.pr/p.tok,def:p.pr,sugg:[{l:'کامل',v:p.pr},{l:'دو برابر',v:p.pr*2}],title:'بستهٔ '+p.n});
 };
 
 ACT.pname=function(){
@@ -9242,7 +9297,7 @@ ACT.reset=function(){
   '<p class="note">همهٔ داده‌های محلینو در این مرورگر حذف می‌شود:</p>'+
   '<ul style="font-size:12.5px;line-height:2;color:var(--ink2);margin:6px 0 10px;padding-inline-start:18px">'+
   '<li>گفت‌وگوها و تاریخچهٔ چت</li><li>درخواست‌ها، فلوها و قراردادها</li><li>آگهی‌های نشان‌شده و یادآورها</li>'+
-  '<li>موجودی شبیه‌سازی‌شدهٔ کیف پول و بناها</li><li>تنظیمات، حساب کاربری و حالت نمایش</li></ul>'+
+  '<li>موجودی شبیه‌سازی‌شدهٔ کیف پول و کلیدها</li><li>تنظیمات، حساب کاربری و حالت نمایش</li></ul>'+
   '<p class="note">داده‌های سایت‌های دیگر دست‌نخورده می‌ماند. این کار بازگردانی ندارد.</p>'+
   '<div class="fs-actions" style="margin-top:12px"><button class="btn btn-danger" data-act="resetOk">حذف کامل و شروع از نو</button><button class="btn" data-act="closeModal">انصراف</button></div>');
 };
@@ -10347,7 +10402,7 @@ var GRT_INCLUDED=[
 var GRT_EXCLUDED=[
 'هزینهٔ مصرفی آب، برق، گاز و شارژ',
 'خسارت ناشی از بلایای طبیعی و حوادث تحت پوشش بیمهٔ ساختمان',
-'تغییرات بنایی به درخواست صاحب‌ملک',
+'تغییرات کلیدی به درخواست صاحب‌ملک',
 'خسارت فراتر از سقف پوشش توافق‌شده در قرارداد',
 'هزینه‌های دادرسی و مطالبات قانونی شخصی'];
 var GRT_OWNER_KEEP=[
@@ -11438,9 +11493,9 @@ E21.visitConfirmHTML=function(){
     {l:'ملک',v:lx?esc(lx.t):'',j:'list'},
     {l:'محله',v:lx?esc(findH(lx.hood).n):''},
     {l:'زمان بازدید',v:(D.vday&&D.vtime)?(esc(D.vday)+' — '+esc(D.vtime)):'',j:'day'},
-    {l:'هزینهٔ بنایی',v:fa(COSTS.visit,0)+' بنا — '+esc(COSTL.visit)}
+    {l:'هزینهٔ کلید',v:fa(COSTS.visit,0)+' کلید — '+esc(COSTL.visit)}
   ];
-  var acts=ok?[{l:'تأیید و ثبت درخواست بازدید ('+fa(COSTS.visit,0)+' بنا)',a:'data-cba="attVisitGo"',p:1}]:null;
+  var acts=ok?[{l:'تأیید و ثبت درخواست بازدید ('+fa(COSTS.visit,0)+' کلید)',a:'data-cba="attVisitGo"',p:1}]:null;
   var tail=ok?'':rcNote('برای فعال‌شدن تأیید، ملک و زمان بازدید را کامل کنید؛ مقدارهای «—» با کلیک به مرحلهٔ مربوط می‌روند.');
   return rcConfirm(rows,acts)+tail;
 };
@@ -11454,7 +11509,7 @@ E21.escConfirmHTML=function(){
     {l:'مرحله',v:fa(i0+1,0)+' از '+fa(stg.length,0)+' — '+esc(s.t)},
     {l:'درصد آزادسازی',v:'٪'+fa(s.p,0)},
     {l:'مبلغ این مرحله',v:rial(Math.round(((D.price||D.budg)||0)*s.p/100))},
-    {l:'هزینهٔ بنایی',v:fa(COSTS.escrow,0)+' بنا — یک‌بار، در مرحلهٔ اول ('+esc(COSTL.escrow)+')'}
+    {l:'هزینهٔ کلید',v:fa(COSTS.escrow,0)+' کلید — یک‌بار، در مرحلهٔ اول ('+esc(COSTL.escrow)+')'}
   ];
   return rcConfirm(rows,[{l:'تأیید و آزادسازی همین مرحله',a:'data-cba="attEscGo"',p:1}]);
 };
@@ -11465,7 +11520,7 @@ E21.tpayConfirmHTML=function(){
     {l:'ودیعهٔ قابل واریز',v:rial(D.B?D.B.depB:0)},
     {l:'کسورات',v:'صفر — شبیه‌سازی؛ نتیجهٔ واقعی از عکس شما استخراج نمی‌شود'},
     {l:'نحوهٔ واریز',v:'۱۰۰٪ از حساب امانی'},
-    {l:'هزینهٔ بنایی',v:'۰ بنا'}
+    {l:'هزینهٔ کلید',v:'۰ کلید'}
   ];
   return rcConfirm(rows,[{l:'تأیید واریز ودیعه',a:'data-cba="attTpayGo"',p:1}]);
 };
@@ -11508,7 +11563,7 @@ E21.SUMFIELD={
   build:[['سفارش تأمین','sup',function(D){return (D.orders&&D.orders.length)?fa(D.orders.length,0)+' مورد':''}],
          ['پیشرفت','ph',function(D){return D.ph?'ثبت‌شده':''}]],
   invr:[['سرمایه','cap',function(D){return D.cap?rial(D.cap):''}],
-        ['خرید بنا','fund',function(D){return D.amt?rial(D.amt):((D.cnt!==undefined)?fa(D.cnt,0)+' بنا':'')}]]
+        ['خرید کلید','fund',function(D){return D.amt?rial(D.amt):((D.cnt!==undefined)?fa(D.cnt,0)+' کلید':'')}]]
 };
 E21.scSummary=function(){
   var mod=CE.f;
@@ -11574,7 +11629,7 @@ ceStep=function(){
      budget → بودجه                  room/bedroom/beds → خواب
      meter/meters → متر              neighborhood/hood → محله
      north/south/east/west → شمال/جنوب/شرق/غرب
-     family → خانواده                map → نقشه              token/tokens → بنا
+     family → خانواده                map → نقشه              token/tokens → کلید
      price → قیمت                    compare → مقایسه        stay/booking → اقامت/رزرو
      project(s) → پروژه              service(s) → خدمات      cleaning → نظافت
      repair → تعمیر                  help/guide → راهنما     summary → جمع‌بندی
@@ -11591,7 +11646,7 @@ E21.ENMAP=[['apartment','آپارتمان'],['neighborhood','محله'],['dashbo
   ['saadatabad','سعادت‌آباد'],['shahran','شهران'],['jordan','جردن'],['narmak','نارمک'],['ponak','پونک'],
   ['villa','ویلایی'],['flat','آپارتمان'],['meters','متر'],['meter','متر'],['hood','محله'],
   ['north','شمال'],['south','جنوب'],['east','شرق'],['west','غرب'],['house','خانه'],['home','خانه'],
-  ['token','بنا'],['tokens','بنا'],['price','قیمت'],['wallet','کیف پول'],['invest','سرمایه'],['visit','بازدید'],
+  ['token','کلید'],['tokens','کلید'],['price','قیمت'],['wallet','کیف پول'],['invest','سرمایه'],['visit','بازدید'],
   ['repair','تعمیر'],['guide','راهنما'],['help','راهنما'],['rent','اجاره'],['buy','خرید'],['sell','فروش'],
   ['loan','وام'],['beds','خواب'],['room','خواب'],['map','نقشه'],['menu','منو'],['stay','اقامت']];
 E21.enNorm=function(t){
@@ -11605,7 +11660,7 @@ E21.enNorm=function(t){
 };
 
 /* ─── پیش‌پردازش پیام کاربر — همه‌چیز پیش از ceSend اصلی ─── */
-E21.STRONG=/بازار|مقایسه|بنا|نقشه|کیف پول|تضمینی|کدوم|کدام بهتر|جمع بندی|توزیع آگهی/;
+E21.STRONG=/بازار|مقایسه|کلید|نقشه|کیف پول|تضمینی|کدوم|کدام بهتر|جمع بندی|توزیع آگهی/;
 /* آینهٔ بی‌اثر رگکس‌های RINT.route — فقط برای «ترتیب درست نمایش» (پاسخ پس از پیام کاربر) */
 E21.routeLooksLikely=function(q){
   if(/^سلام/.test(q)||/^(درود|هی|hello|hi)/.test(q))return true;
@@ -13512,7 +13567,7 @@ try{
   });
 }catch(e){}
 
-/* ── کیف پول: شارژ در گفت‌وگو با درگاه نمایشی + استقلال از بنا ── */
+/* ── کیف پول: شارژ در گفت‌وگو با درگاه نمایشی + استقلال از کلید ── */
 E27.wf=null;
 E27.doneTx={};
 E27._lastAmt=0;
@@ -13524,15 +13579,15 @@ E27.wtxRow=function(w){
 };
 CBACT.wMenu=function(){
   E27.wf=null;
-  botC('<b>کیف پول و بناها</b> — دو موجودی مستقل:'+
+  botC('<b>کیف پول و کلیدها</b> — دو موجودی مستقل:'+
   rcards([
     rcard('کیف پول ریالی','<span style="font-size:15px;font-weight:800">'+rial(S.wallet||0)+'</span>','برای خدمات سامانه'),
-    rcard('بناهای مصرفی',fa(S.tokens,0)+' بنا','برای قابلیت‌های بنایی')
+    rcard('بناهای مصرفی',fa(S.tokens,0)+' کلید','برای قابلیت‌های کلیدی')
   ])+
   '<div class="racts">'+
   '<button class="qbtn primary" data-cba="wTopup">شارژ کیف پول</button>'+
   '<button class="qbtn" data-cba="wTx">تاریخچهٔ تراکنش‌ها</button>'+
-  '<button class="qbtn" data-cba="wTok">خرید بنا</button>'+
+  '<button class="qbtn" data-cba="wTok">خرید کلید</button>'+
   '</div>',null);
 };
 CBACT.wTopup=function(){
@@ -13600,7 +13655,7 @@ CBACT.wPay=function(){
     save();renderTok();
     E27.wf=null;
     botC('✓ پرداخت موفق (درگاه نمایشی). کیف پول ریالی: <b>'+rial(S.wallet)+'</b><br><small>کد پیگیری: '+esc(myTx)+' — موجودی پس از نوسازی صفحه هم حفظ می‌شود.</small>'+
-    '<div class="racts"><button class="qbtn" data-cba="wTx">تاریخچهٔ تراکنش‌ها</button><button class="qbtn" data-cba="wMenu">کیف پول و بناها</button></div>',null);
+    '<div class="racts"><button class="qbtn" data-cba="wTx">تاریخچهٔ تراکنش‌ها</button><button class="qbtn" data-cba="wMenu">کیف پول و کلیدها</button></div>',null);
   },1200);
 };
 CBACT.wRetry=function(){
@@ -13612,12 +13667,12 @@ CBACT.wTx=function(){
   var wl=S.wlog||[];
   botC('<b>تاریخچهٔ کیف پول ریالی</b>'+(wl.length?'':'<div class="empty" style="margin-top:8px">تراکنشی ثبت نشده است.</div>')+
   wl.slice(0,10).map(E27.wtxRow).join('')+
-  '<div class="racts"><button class="qbtn" data-cba="wMenu">کیف پول و بناها</button></div>',null);
+  '<div class="racts"><button class="qbtn" data-cba="wMenu">کیف پول و کلیدها</button></div>',null);
 };
 CBACT.wTok=function(){
-  botC('<b>خرید بنا</b> — بسته‌ها کاملاً جدا از کیف پول ریالی‌اند:'+
+  botC('<b>خرید کلید</b> — بسته‌ها کاملاً جدا از کیف پول ریالی‌اند:'+
   '<div class="racts">'+PACKS.map(function(p,i){
-    return '<button class="qbtn'+(p.best?' primary':'')+'" data-cba="wBuyPack" data-i="'+i+'">'+p.n+' — '+fa(p.tok,0)+' بنا ('+rial(p.pr)+')</button>';
+    return '<button class="qbtn'+(p.best?' primary':'')+'" data-cba="wBuyPack" data-i="'+i+'">'+p.n+' — '+fa(p.tok,0)+' کلید ('+rial(p.pr)+')</button>';
   }).join('')+'</div>'+
   '<div class="racts"><button class="qbtn" data-cba="wMenu">بازگشت</button></div>',null);
 };
@@ -13625,7 +13680,7 @@ CBACT.wBuyPack=function(el){
   var p=PACKS[+el.getAttribute('data-i')];
   if(!p){toast('بسته پیدا نشد');return}
   E27.wf=null;
-  openPayModal({mode:'sub',unit:'بنا',kind:'pack',packName:p.n,packTok:p.tok,packPrice:p.pr,rate:p.pr/p.tok,def:p.pr,sugg:[{l:'کامل',v:p.pr},{l:'دو برابر',v:p.pr*2}],title:'بستهٔ '+p.n});
+  openPayModal({mode:'sub',unit:'کلید',kind:'pack',packName:p.n,packTok:p.tok,packPrice:p.pr,rate:p.pr/p.tok,def:p.pr,sugg:[{l:'کامل',v:p.pr},{l:'دو برابر',v:p.pr*2}],title:'بستهٔ '+p.n});
 };
 ACT.wchat=function(){
   if(CURRENT!=='landing'){go('landing')}
@@ -14206,11 +14261,11 @@ E29.pay={
     var p=E29.PRICING[key],cost=(COSTS[key]!==undefined?COSTS[key]:p.cost),bal=S.tokens||0;
     if(E29._inflight[key]){toast('این خدمت در حال انجام است');return}
     if(bal<cost){
-      botC('<div class="e29-paycard"><div class="pt">موجودی بنا کافی نیست</div>'+
+      botC('<div class="e29-paycard"><div class="pt">موجودی کلید کافی نیست</div>'+
       '<div class="pr"><span>سرویس</span><b>'+esc(p?p.label:desc)+'</b></div>'+
-      '<div class="pr"><span>هزینهٔ لازم</span><b>'+fa(cost,0)+' بنا</b></div>'+
-      '<div class="pr"><span>موجودی شما</span><b>'+fa(bal,0)+' بنا</b></div>'+
-      '<div class="qr"><button data-view="sub">شارژ بنا</button></div></div>',null);
+      '<div class="pr"><span>هزینهٔ لازم</span><b>'+fa(cost,0)+' کلید</b></div>'+
+      '<div class="pr"><span>موجودی شما</span><b>'+fa(bal,0)+' کلید</b></div>'+
+      '<div class="qr"><button data-view="sub">شارژ کلید</button></div></div>',null);
       a11yify($('#v-landing')||document.body);
       return;
     }
@@ -14218,11 +14273,11 @@ E29.pay={
     var html='<div class="e29-paycard">'+
       '<div class="pt">'+e29ico('coin',16)+' تأیید هزینهٔ سرویس</div>'+
       '<div class="pr"><span>سرویس</span><b>'+esc(p?p.label:desc)+'</b></div>'+
-      '<div class="pr"><span>هزینه</span><b>'+fa(cost,0)+' بنا</b></div>'+
-      '<div class="pr"><span>موجودی شما</span><b>'+fa(bal,0)+' بنا</b></div>'+
+      '<div class="pr"><span>هزینه</span><b>'+fa(cost,0)+' کلید</b></div>'+
+      '<div class="pr"><span>موجودی شما</span><b>'+fa(bal,0)+' کلید</b></div>'+
       (ctx?'<div class="pr"><span>موضوع</span><b>'+esc(ctx)+'</b></div>':'')+
       '<div class="qr">'+
-      '<button data-cba="e29payGo" data-key="'+qesc(key)+'" data-desc="'+qesc(desc||'')+'">'+fa(cost,0)+' بنا پرداخت و اجرا</button>'+
+      '<button data-cba="e29payGo" data-key="'+qesc(key)+'" data-desc="'+qesc(desc||'')+'">'+fa(cost,0)+' کلید پرداخت و اجرا</button>'+
       '<button data-cba="e29payCancel" data-key="'+qesc(key)+'">انصراف</button>'+
       '</div></div>';
     var chatEl=document.getElementById('chatB');
@@ -14241,7 +14296,7 @@ E29.pay={
     save();renderTok();
     E29.bus.emit('token.deduct',{txn:txn,cost:cost,svc:key,desc:pend.desc});
     if(balLow())E29.bus.emit('wallet.low',{balance:S.tokens});
-    usrC('تأیید پرداخت '+fa(cost,0)+' بنا');
+    usrC('تأیید پرداخت '+fa(cost,0)+' کلید');
     try{pend.cb(txn)}catch(e){E29.pay.refund(txn,key,cost,'خطا در اجرا');console.error(e)}
   },
   cancel:function(key){
@@ -14254,10 +14309,10 @@ E29.pay={
   refund:function(txn,key,cost,reason){
     if(!cost)return;
     S.tokens+=cost;
-    S.log.unshift({t:Date.now(),d:'بازگشت بنا — '+(reason||''),c:cost,cat:'v29',id:txn,svc:key,refund:true});
+    S.log.unshift({t:Date.now(),d:'بازگشت کلید — '+(reason||''),c:cost,cat:'v29',id:txn,svc:key,refund:true});
     save();renderTok();
     E29.bus.emit('token.refund',{txn:txn,cost:cost,reason:reason});
-    toast('+'+fa(cost,0)+' بنا بازگشت داده شد');
+    toast('+'+fa(cost,0)+' کلید بازگشت داده شد');
   }
 };
 function balLow(){return (S.tokens||0)<30}
@@ -14365,9 +14420,9 @@ E29.notifs=(function(){
   }
 
   /* event subscriptions */
-  E29.bus.on('token.deduct',function(d){push({cat:'financial',etype:'token.deduct',title:'کسر بنا',msg:fa(d.cost,0)+' بنا — '+(d.desc||E29.PRICING[d.svc]&&E29.PRICING[d.svc].label||''),action:{kind:'wallet'},dedupKey:d.txn})});
-  E29.bus.on('token.refund',function(d){push({cat:'financial',etype:'token.refund',title:'بازگشت بنا',msg:'+'+fa(d.cost,0)+' بنا'+(d.reason?' — '+d.reason:''),action:{kind:'wallet'},dedupKey:d.txn+'-r'})});
-  E29.bus.on('wallet.low',function(d){push({cat:'financial',etype:'wallet.low',title:'موجودی بنا کم است',msg:'تنها '+fa(d.balance,0)+' بنا باقی مانده — برای سرویس‌های تحلیلی شارژ کنید.',action:{kind:'wallet'},dedupKey:'low-'+new Date().toDateString()})});
+  E29.bus.on('token.deduct',function(d){push({cat:'financial',etype:'token.deduct',title:'کسر کلید',msg:fa(d.cost,0)+' کلید — '+(d.desc||E29.PRICING[d.svc]&&E29.PRICING[d.svc].label||''),action:{kind:'wallet'},dedupKey:d.txn})});
+  E29.bus.on('token.refund',function(d){push({cat:'financial',etype:'token.refund',title:'بازگشت کلید',msg:'+'+fa(d.cost,0)+' کلید'+(d.reason?' — '+d.reason:''),action:{kind:'wallet'},dedupKey:d.txn+'-r'})});
+  E29.bus.on('wallet.low',function(d){push({cat:'financial',etype:'wallet.low',title:'موجودی کلید کم است',msg:'تنها '+fa(d.balance,0)+' کلید باقی مانده — برای سرویس‌های تحلیلی شارژ کنید.',action:{kind:'wallet'},dedupKey:'low-'+new Date().toDateString()})});
   E29.bus.on('library.saved',function(d){push({cat:d.cat||'workflow',etype:'library.saved',title:'خروجی ذخیره شد',msg:'«'+d.title+'» در کتابخانه ذخیره شد.',action:{kind:'library',target:d.id},dedupKey:'lib-'+d.id})});
   E29.bus.on('reminder.due',function(d){push({cat:'reminder',etype:'reminder.due',title:'یادآور: '+d.title,msg:d.msg||'زمان انجام رسیده است.',action:{kind:'reminders'},dedupKey:'rem-'+d.id+'-'+new Date().toDateString()})});
   E29.bus.on('contract.status',function(d){push({cat:'contract',etype:'contract.status',title:d.title,msg:d.msg,action:{kind:'library',target:d.libId},entityId:d.code,dedupKey:'con-'+d.code+'-'+d.status})});
@@ -14520,7 +14575,7 @@ E29.lib=(function(){
       workflowId:wf.id,status:'progress'});
   }
   function wfTitle(wf){
-    var names={rent:'اجاره',buy:'خرید',invb:'سرمایه‌گذاری ملکی',invr:'سرمایه‌گذاری بنایی',mkt:'پروژه‌ها',build:'ساخت',stay:'اقامتگاه',grt:'اجاره تضمینی',svc:'خدمات ملک'};
+    var names={rent:'اجاره',buy:'خرید',invb:'سرمایه‌گذاری ملکی',invr:'سرمایه‌گذاری کلیدی',mkt:'پروژه‌ها',build:'ساخت',stay:'اقامتگاه',grt:'اجاره تضمینی',svc:'خدمات ملک'};
     return 'گردش کار '+ (names[wf.m]||wf.m) +' — مرحلهٔ '+fa(wf.step,0);
   }
   function projOfChat(chatId){
@@ -14571,7 +14626,7 @@ E29.lib=(function(){
       '<span class="summ">'+esc(it.summary||'')+'</span>'+
       '<span class="meta">'+
       '<span>'+fd(it.createdAt)+'</span>'+
-      (it.tokenCost?'<span class="cost">'+fa(it.tokenCost,0)+' بنا</span>':'')+
+      (it.tokenCost?'<span class="cost">'+fa(it.tokenCost,0)+' کلید</span>':'')+
       (it.versions&&it.versions.length>1?'<span>'+fa(it.versions.length,0)+' نسخه</span>':'')+
       (it.status==='progress'?'<span>در جریان</span>':'')+
       '</span>'+
@@ -14634,8 +14689,8 @@ E29.lib=(function(){
     /* related transaction */
     if(it.txnId){
       var lg=(S.log||[]).filter(function(x){return x.id===it.txnId});
-      h+='<h4>تراکنش بنا مرتبط</h4><div class="sect">';
-      lg.forEach(function(x){h+=kv(fd(x.t),fa(-x.c,0)+' بنا')});
+      h+='<h4>تراکنش کلید مرتبط</h4><div class="sect">';
+      lg.forEach(function(x){h+=kv(fd(x.t),fa(-x.c,0)+' کلید')});
       h+=kv('شناسه تراکنش','<span style="direction:ltr">'+esc(it.txnId)+'</span>')+'</div>';
     }
     /* versions */
@@ -14664,7 +14719,7 @@ E29.lib=(function(){
       });
       h+='</div>';
     }
-    if(it.txnId)h+='<div class="sect"><div class="kv"><span>شناسه تراکنش</span><b style="direction:ltr">'+esc(it.txnId)+'</b></div><div class="kv"><span>هزینه</span><b>'+fa(it.tokenCost,0)+' بنا</b></div></div>';
+    if(it.txnId)h+='<div class="sect"><div class="kv"><span>شناسه تراکنش</span><b style="direction:ltr">'+esc(it.txnId)+'</b></div><div class="kv"><span>هزینه</span><b>'+fa(it.tokenCost,0)+' کلید</b></div></div>';
     if(it.versions&&it.versions.length>1){
       h+='<h4>تاریخچهٔ نسخه‌ها</h4><div class="e29-vers">';
       it.versions.forEach(function(v,ix){h+='<div class="vi">نسخهٔ '+fa(ix+1,0)+' — '+fd(v.ts)+(v.note?' — '+esc(v.note):'')+'</div>'});
@@ -14678,7 +14733,7 @@ E29.lib=(function(){
   }
   function wfDetail(it){
     var a=it.artifact||{};
-    var names={rent:'اجاره',buy:'خرید',invb:'سرمایه‌گذاری ملکی',invr:'سرمایه‌گذاری بنایی',mkt:'پروژه‌ها',build:'ساخت',stay:'اقامتگاه',grt:'اجاره تضمینی',svc:'خدمات ملک'};
+    var names={rent:'اجاره',buy:'خرید',invb:'سرمایه‌گذاری ملکی',invr:'سرمایه‌گذاری کلیدی',mkt:'پروژه‌ها',build:'ساخت',stay:'اقامتگاه',grt:'اجاره تضمینی',svc:'خدمات ملک'};
     var total=(a.m&&MODBY[a.m])?10:0;
     var pct=total?Math.min(100,Math.round((a.step||1)/total*100)):40;
     var h='<div class="e29-detail"><h4>گردش کار در جریان</h4><div class="sect">';
@@ -14735,7 +14790,7 @@ E29.lib=(function(){
       '<button data-act="e29libRename" data-lib="'+qesc(it.id)+'">تغییر نام</button>'+
       '<button data-act="e29libDoc" data-lib="'+qesc(it.id)+'" data-print="1">دریافت PDF</button>'+
       (it.sourceChat?'<button data-act="e29libChat" data-sess="'+qesc(it.sourceChat)+'">گفت‌وگوی اصلی</button>':'')+
-      '<button data-act="e29libTxn" data-lib="'+qesc(it.id)+'">تراکنش بنا</button>'+
+      '<button data-act="e29libTxn" data-lib="'+qesc(it.id)+'">تراکنش کلید</button>'+
       '<button data-act="e29libDel" data-lib="'+qesc(it.id)+'" style="color:var(--danger)">حذف</button>'+
       '</div>');
   };
@@ -14769,9 +14824,9 @@ E29.lib=(function(){
   ACT.e29libTxn=function(el){
     var it=byId(el.getAttribute('data-lib'));if(!it||!it.txnId)return;
     var lg=(S.log||[]).filter(function(x){return x.id===it.txnId});
-    var h='<h3>تراکنش بنا</h3>';
+    var h='<h3>تراکنش کلید</h3>';
     if(!lg.length)h+='<p class="note">تراکنشی با این شناسه یافت نشد.</p>';
-    lg.forEach(function(x){h+='<div class="kv" style="display:flex;justify-content:space-between;padding:6px 0"><span>'+fd(x.t)+'</span><b>'+(x.c>0?'+':'−')+fa(Math.abs(x.c),0)+' بنا — '+esc(x.d)+'</b></div>'});
+    lg.forEach(function(x){h+='<div class="kv" style="display:flex;justify-content:space-between;padding:6px 0"><span>'+fd(x.t)+'</span><b>'+(x.c>0?'+':'−')+fa(Math.abs(x.c),0)+' کلید — '+esc(x.d)+'</b></div>'});
     openModal(h);
   };
   ACT.e29libResume=function(el){resumeWf(el.getAttribute('data-lib'))};
@@ -15795,7 +15850,7 @@ E29.shell=(function(){
       '<button class="e29-srow" data-act="themeToggle" aria-pressed="'+(E22.isDark()?'true':'false')+'" data-tip="'+(E22.isDark()?'حالت روشن':'حالت تاریک')+'"><span class="si">'+(E22.isDark()?E22.ICO.sun:E22.ICO.moon)+'</span><span class="lbl">'+(E22.isDark()?'حالت روشن':'حالت تاریک')+'</span></button>'+
       '<button class="e29-srow" data-act="wallet" data-tip="کیف پول"><span class="si">'+e29ico('wallet',17)+'</span><span class="lbl">کیف پول</span></button>'+
       '<button class="e29-srow" data-act="e29shManage" data-tip="لینک‌های اشتراک‌گذاری"><span class="si">'+e29ico('share',17)+'</span><span class="lbl">لینک‌های اشتراک‌گذاری</span></button>'+
-      '<button class="e29-srow" data-act="account" data-tab="overview" data-tip="حساب کاربری"><span class="si">'+e29ico('user',17)+'</span><span class="lbl">'+esc(S.auth.name||'حساب کاربری')+'</span><small style="margin-inline-start:auto">'+fa(S.tokens,0)+' بنا</small></button>'+
+      '<button class="e29-srow" data-act="account" data-tab="overview" data-tip="حساب کاربری"><span class="si">'+e29ico('user',17)+'</span><span class="lbl">'+esc(S.auth.name||'حساب کاربری')+'</span><small style="margin-inline-start:auto">'+fa(S.tokens,0)+' کلید</small></button>'+
       '<button class="e29-srow" data-view="profile" data-tip="تنظیمات"><span class="si">'+e29ico('gear',17)+'</span><span class="lbl">تنظیمات و حساب</span></button>'+
       '</div>';
     el.innerHTML=h;
@@ -16015,13 +16070,13 @@ E30.pay=(function(){
       '<div class="pr"><span>سرویس</span><b>'+esc(s.title||p.label||s.key)+'</b></div>'+
       (s.desc?'<div class="pr"><span>شرح</span><b>'+esc(s.desc)+'</b></div>':'')+
       (s.ctx?'<div class="pr"><span>موضوع</span><b>'+esc(s.ctx)+'</b></div>':'')+
-      '<div class="pr"><span>هزینه</span><b>'+fa(cost,0)+' بنا</b></div>'+
-      '<div class="pr"><span>موجودی فعلی</span><b>'+fa(bal,0)+' بنا</b></div>'+
-      '<div class="pr"><span>موجودی پس از پرداخت</span><b>'+fa(Math.max(0,bal-cost),0)+' بنا</b></div>'+
-      '<div class="pr"><span>گیرندهٔ پرداخت</span><b>سامانهٔ محلینو (اعتبار بنا)</b></div>'+
+      '<div class="pr"><span>هزینه</span><b>'+fa(cost,0)+' کلید</b></div>'+
+      '<div class="pr"><span>موجودی فعلی</span><b>'+fa(bal,0)+' کلید</b></div>'+
+      '<div class="pr"><span>موجودی پس از پرداخت</span><b>'+fa(Math.max(0,bal-cost),0)+' کلید</b></div>'+
+      '<div class="pr"><span>گیرندهٔ پرداخت</span><b>سامانهٔ محلینو (اعتبار کلید)</b></div>'+
       (extra&&extra.note?'<div class="e30-note">'+extra.note+'</div>':'')+
       '<div class="qr">'+
-      '<button data-paygo="'+qesc(s.payId)+'">'+fa(cost,0)+' بنا پرداخت و اجرا</button>'+
+      '<button data-paygo="'+qesc(s.payId)+'">'+fa(cost,0)+' کلید پرداخت و اجرا</button>'+
       '<button data-paycancel="'+qesc(s.payId)+'">انصراف</button>'+
       '</div></div>';
   }
@@ -16038,7 +16093,7 @@ E30.pay=(function(){
     /* A paid service must have a real execution path. Displaying a confirmation
        with no executable service is misleading, even if the balance is ample. */
     if(typeof spec.onConfirm!=='function'){
-      toast('اجرای این خدمت فعلاً آماده نیست؛ هیچ بنایی کسر نمی‌شود');
+      toast('اجرای این خدمت فعلاً آماده نیست؛ هیچ کلیدی کسر نمی‌شود');
       return false;
     }
     var prev=sess();
@@ -16053,11 +16108,11 @@ E30.pay=(function(){
       set('insufficient');
       var bal=S.tokens||0;
       var h='<div class="e30-paycard e30-paybad" data-pay="'+qesc(s.payId)+'">'+
-        '<div class="pt">موجودی بنا کافی نیست</div>'+
+        '<div class="pt">موجودی کلید کافی نیست</div>'+
         '<div class="pr"><span>سرویس</span><b>'+esc(s.title)+'</b></div>'+
-        '<div class="pr"><span>هزینهٔ لازم</span><b>'+fa(cost,0)+' بنا</b></div>'+
-        '<div class="pr"><span>موجودی شما</span><b>'+fa(bal,0)+' بنا</b></div>'+
-        '<div class="qr"><button data-view="sub">شارژ بنا</button><button data-paycancel="'+qesc(s.payId)+'">بستن</button></div></div>';
+        '<div class="pr"><span>هزینهٔ لازم</span><b>'+fa(cost,0)+' کلید</b></div>'+
+        '<div class="pr"><span>موجودی شما</span><b>'+fa(bal,0)+' کلید</b></div>'+
+        '<div class="qr"><button data-view="sub">شارژ کلید</button><button data-paycancel="'+qesc(s.payId)+'">بستن</button></div></div>';
       show(s,h,'insufficient');
       return false;
     }
@@ -16108,7 +16163,7 @@ E30.pay=(function(){
     try{E29.bus.emit('token.deduct',{txn:txn,cost:s.cost,svc:s.key,desc:s.title,payId:s.payId})}catch(e){}
     if((S.tokens||0)<30){try{E29.bus.emit('wallet.low',{balance:S.tokens})}catch(e){}}
     set('paid');
-    usrC('پرداخت '+fa(s.cost,0)+' بنا برای «'+s.title+'»');
+    usrC('پرداخت '+fa(s.cost,0)+' کلید برای «'+s.title+'»');
     set('executing');
     function finish(ok,err){
       /* The only definitive post-payment states are completed with an actual
@@ -16119,7 +16174,7 @@ E30.pay=(function(){
         refund(txn,s.key,s.cost,'خطا در اجرای سرویس',s.payId);
         s.refunded=true;
         set('refunded');
-        botC('پرداخت انجام شد اما اجرای سرویس با خطا مواجه شد — <b>'+fa(s.cost,0)+' بنا بازگشت داده شد</b>. می‌توانید دوباره تلاش کنید.',null);
+        botC('پرداخت انجام شد اما اجرای سرویس با خطا مواجه شد — <b>'+fa(s.cost,0)+' کلید بازگشت داده شد</b>. می‌توانید دوباره تلاش کنید.',null);
       }
       return !!ok;
     }
@@ -16141,18 +16196,18 @@ E30.pay=(function(){
     set('declined');
     clear();
     invalidateOthers(payId);
-    if(!silent){usrC('انصراف از پرداخت');botC('انجام نشد — هیچ بنایی کسر نشد. هر وقت خواستید دوباره درخواست کنید.',null)}
+    if(!silent){usrC('انصراف از پرداخت');botC('انجام نشد — هیچ کلیدی کسر نشد. هر وقت خواستید دوباره درخواست کنید.',null)}
   }
 
   /* refund path (failure after payment) */
   function refund(txn,key,cost,reason,payId){
     if(payId&&(S.log||[]).some(function(x){return x.payId===payId&&x.refund}))return false;
     S.tokens+=cost;
-    S.log.unshift({t:Date.now(),d:'بازگشت بنا — '+(reason||''),c:cost,cat:'bana',id:txn,svc:key,payId:payId||null,refund:true});
+    S.log.unshift({t:Date.now(),d:'بازگشت کلید — '+(reason||''),c:cost,cat:'bana',id:txn,svc:key,payId:payId||null,refund:true});
     var current=sess();if(current&&payId===current.payId)current.refunded=true;
     save();renderTok();
     try{E29.bus.emit('token.refund',{txn:txn,cost:cost,reason:reason})}catch(e){}
-    toast('+'+fa(cost,0)+' بنا بازگشت داده شد');
+    toast('+'+fa(cost,0)+' کلید بازگشت داده شد');
   }
 
   /* boot recovery: an interrupted 'paid/executing/processing' session means the user
@@ -16168,7 +16223,7 @@ E30.pay=(function(){
         var txn=E30.uid('TXN-R');
         refund(txn,s.key,s.cost,'بازیابی پس از وقفه',s.payId);
         s.refunded=true;save();
-        try{E29.notifsAPI.push({cat:'financial',etype:'pay.recovered',title:'پرداخت ناتمام بازگشت داده شد',msg:fa(s.cost,0)+' بنا بابت «'+s.title+'» بازگشت داده شد — سرویس اجرا نشده بود.',action:{kind:'wallet'},dedupKey:'rec-'+s.payId})}catch(e){}
+        try{E29.notifsAPI.push({cat:'financial',etype:'pay.recovered',title:'پرداخت ناتمام بازگشت داده شد',msg:fa(s.cost,0)+' کلید بابت «'+s.title+'» بازگشت داده شد — سرویس اجرا نشده بود.',action:{kind:'wallet'},dedupKey:'rec-'+s.payId})}catch(e){}
       }
     }
     clear();
@@ -16797,7 +16852,7 @@ E30.disc=(function(){
   }
   function active(){return COL.active}
 
-  function start(wf,silent){
+  function start(wf,silent,budgetFirst){
     COL={active:true,wf:wf,fix:null,confirming:null,turns:0,finConfirmed:false};
     _lastPersona=personaOf(wf);
     saveCollector();
@@ -16808,6 +16863,8 @@ E30.disc=(function(){
       var sum=SUM.start(wf);
       greet+=sum||'تا شناخته‌شدن شرایط‌تان، چند چیز کلیدی را یکی‌یکی می‌پرسم.';
       botC(greet,null);
+      var hasConcreteFacts=!!(getF('work_loc')||getF('uni_loc')||getF('household')||getF('hood')||getF('prop_new')||getF('rooms')||getF('budget_dep')||getF('budget_rent'));
+      if(!budgetFirst&&!hasConcreteFacts&&scenarioCard(wf)){saveCollector();return true}
       askNext();
     }
     return true;
@@ -16875,6 +16932,120 @@ E30.disc=(function(){
     return String(v);
   }
 
+
+  /* Guided, optional chat cards. Values enter the SAME evidence-aware collector;
+     they are not a second flow engine and never fabricate a budget. */
+  var budgetCardSequence=0;
+  function budgetCard(){
+    var cardId=++budgetCardSequence;
+    var depMissing=!getF('budget_dep'),rentMissing=!getF('budget_rent');
+    if(!depMissing&&!rentMissing)return false;
+    var options=function(name,values){
+      return values.map(function(v,i){
+        var key=name+'-'+cardId+'-'+i;
+        var kind=name==='e30-dep'?'dep':'rent';
+        return '<label for="'+key+'"><input type="radio" id="'+key+'" name="'+name+'-'+cardId+'" data-kind="'+kind+'" value="'+qesc(v)+'">تا '+esc(v)+' تومان</label>';
+      }).join('');
+    };
+    var persona=personaOf('rent');
+    var question=persona==='family'?'برای گزینه‌های مناسب خانواده، سقف ودیعه و اجاره‌ات حدوداً چقدر است؟':
+      (persona==='roommates'?'برای مقایسهٔ گزینه‌های مناسب هم‌خانگی، سقف ودیعه و اجاره حدوداً چقدر است؟':
+      (persona==='student'?'برای زندگی نزدیک دانشگاه، ودیعه و اجاره‌ات حدوداً چقدر است؟':
+      'برای پیدا کردن گزینه‌های متناسب، ودیعه و اجاره‌ات حدوداً چقدر است؟'));
+    var h='<div class="e30-budget-card" role="group" aria-label="بودجهٔ ودیعه و اجاره">'+
+      '<b>'+esc(question)+'</b>'+
+      '<p class="note">می‌توانی یکی از مبلغ‌های پیشنهادی را انتخاب کنی یا بودجهٔ خودت را در گفتگو بنویسی. هیچ مبلغی به‌صورت خودکار انتخاب نشده است.</p>';
+    if(depMissing)h+='<fieldset><legend>حداکثر ودیعه (تومان)</legend>'+
+      options('e30-dep',['۳۰۰ میلیون','۵۰۰ میلیون','۱ میلیارد','۱.۵ میلیارد'])+'</fieldset>';
+    if(rentMissing)h+='<fieldset><legend>حداکثر اجارهٔ ماهانه (تومان)</legend>'+
+      options('e30-rent',['۱۰ میلیون','۲۰ میلیون','۳۰ میلیون','۵۰ میلیون'])+'</fieldset>';
+    h+='<button type="button" class="primary" data-cba="e30BudgetChoice">پیشنهاد گزینه‌های متناسب</button>'+
+      '<span class="e30-footnote">برای مبلغ دقیق یا سقف دیگر، به زبان خودت بنویس؛ مثلاً «۸۰۰ میلیون رهن و ماهی ۲۵ میلیون».</span></div>';
+    botC(h,null);
+    COL.expecting=depMissing?'budget_dep':'budget_rent';
+    saveCollector();
+    return true;
+  }
+  function personaCard(){
+    botC('برای اینکه پیشنهادها با سبک زندگی‌ات جور باشند، کدام حالت به شرایطت نزدیک‌تر است؟ <b>این بخش اختیاری است.</b>'+
+      '<div class="e30-persona-card" role="group" aria-label="هدف سکونت">'+
+      '<button type="button" data-cba="e30PersonaChoice" data-persona="single">زندگی فردی</button>'+
+      '<button type="button" data-cba="e30PersonaChoice" data-persona="couple">زندگی دونفره</button>'+
+      '<button type="button" data-cba="e30PersonaChoice" data-persona="family">زندگی خانوادگی</button>'+
+      '<button type="button" data-cba="e30PersonaChoice" data-persona="roommates">هم‌خانه</button>'+
+      '<button type="button" data-cba="e30PersonaSkip">رد کردن</button>'+
+      '<button type="button" data-cba="e30UseKnown">با اطلاعات فعلی پیشنهاد بده</button></div>',null);
+    COL.expecting='household';saveCollector();
+  }
+  CBACT.e30ChooseScenario=function(el){
+    if(!COL.active)return;
+    var kind=el.getAttribute('data-scenario');
+    var allowed=['budget','family','compare','settle','fast','value','income','growth','safety'];
+    if(allowed.indexOf(kind)<0)return;
+    usrC(el.textContent.trim());
+    COL.goal=kind;
+    if(kind==='family')setF('household','family',{src:'chosen-scenario'});
+    if(kind==='settle')setF('purpose','live',{src:'chosen-scenario'});
+    if(kind==='income')setF('invest_objective','rent_income',{src:'chosen-scenario'});
+    if(kind==='growth')setF('invest_objective','appreciation',{src:'chosen-scenario'});
+    if(kind==='fast')setF('sale_urgency','fast',{src:'chosen-scenario'});
+    if(kind==='value')setF('sale_urgency','maxvalue',{src:'chosen-scenario'});
+    COL.expecting=null;saveCollector();
+    botC('متوجه شدم. اول اطلاعات تعیین‌کننده را می‌گیریم؛ می‌توانی هر زمان مسیر را تغییر دهی.',null);
+    askNext();
+  };
+  CBACT.e30BudgetChoice=function(el){
+    if(!COL.active||COL.wf!=='rent')return;
+    var root=el.closest('.e30-budget-card');
+    if(!root)return;
+    var dep=root.querySelector('input[data-kind="dep"]:checked');
+    var rent=root.querySelector('input[data-kind="rent"]:checked');
+    if(root.querySelector('input[data-kind="dep"]')&&!dep){toast('حداکثر ودیعه را انتخاب کن یا مبلغ را در گفتگو بنویس.');return}
+    if(root.querySelector('input[data-kind="rent"]')&&!rent){toast('حداکثر اجارهٔ ماهانه را انتخاب کن یا مبلغ را در گفتگو بنویس.');return}
+    var parts=[];
+    if(dep)parts.push('حداکثر ودیعه '+dep.value+' تومان');
+    if(rent)parts.push('حداکثر اجاره ماهانه '+rent.value+' تومان');
+    el.disabled=true;ceSend(parts.join(' و '));
+  };
+  CBACT.e30PersonaChoice=function(el){
+    if(!COL.active)return;
+    var value=el.getAttribute('data-persona');
+    var names={single:'تنهایی',couple:'دو نفره',family:'خانواده',roommates:'هم خانه'};
+    if(!names[value])return;
+    ceSend(names[value]);
+  };
+  CBACT.e30PersonaSkip=function(){if(COL.active)ceSend('رد')};
+  CBACT.e30UseKnown=function(){
+    if(!COL.active)return;
+    if(COL.wf==='rent'&&(!getF('budget_dep')||!getF('budget_rent'))){
+      toast('برای جست‌وجوی دقیق، ابتدا ودیعه و اجاره را مشخص کن.');return;
+    }
+    usrC('با اطلاعات فعلی ادامه بده');
+    /* Explicit opt-out: do not recreate the same optional questionnaire in the
+       deterministic hand-off after the user has asked for recommendations. */
+    COL.skipOptionalToHoods=true;
+    missing(COL.wf).forEach(function(item){
+      if(!FL[item.id].fin)markUnknown(item.id);
+    });
+    COL.expecting=null;saveCollector();
+    complete();
+  };
+
+  function scenarioCard(wf){
+    var presets={
+      rent:[['budget','پیدا کردن بهترین گزینه با بودجه‌ام'],['family','محلهٔ مناسب خانواده'],['compare','مقایسهٔ قیمت محله‌ها']],
+      buy:[['budget','بهترین گزینه با بودجه‌ام'],['settle','خرید برای سکونت'],['compare','مقایسهٔ محله‌ها']],
+      sell:[['fast','فروش سریع‌تر'],['value','فروش با بهترین قیمت'],['compare','بررسی قیمت منطقه']],
+      invest:[['income','درآمد از اجاره'],['growth','رشد ارزش ملک'],['safety','حفظ ارزش سرمایه']]
+    };
+    var items=presets[wf];if(!items)return false;
+    botC('می‌تونم چند مسیر متناسب با هدفت پیشنهاد بدم. کدام برایت مهم‌تر است؟'+
+      '<div class="e30-persona-card" role="group" aria-label="انتخاب مسیر گفتگو">'+
+      items.map(function(o){return '<button type="button" data-cba="e30ChooseScenario" data-scenario="'+o[0]+'">'+esc(o[1])+'</button>'}).join('')+
+      '<p class="e30-footnote">می‌توانی به‌جای دکمه‌ها خواسته‌ات را آزادانه بنویسی.</p></div>',null);
+    return true;
+  }
+
   function askNext(){
     if(!COL.active)return;
     if(COL.confirming&&(/financial|contradiction|final/.test(COL.confirming.type)))return;
@@ -16893,6 +17064,8 @@ E30.disc=(function(){
     }
     if(!m.length){complete();return}
     var top=m[0],a=ASK[top.id];
+    if(wf==='rent'&&(top.id==='budget_dep'||top.id==='budget_rent')){budgetCard();return}
+    if(wf==='rent'&&top.id==='household'){personaCard();return}
     var p=personaOf(wf),tone=P_TONE[p]||P_TONE.general;
     var q=a.q[Math.floor(Math.random()*a.q.length)];
     botC(tone.q+q+(a.why?'<div class="note" style="margin-top:4px">'+esc(a.why)+'</div>':''),null);
@@ -17104,13 +17277,14 @@ E30.disc=(function(){
     usrC(t);
     COL.turns++;
     /* mid-flow meta-questions get a brief honest answer, then the flow resumes (§4.6) */
-    if(/بنا چیست|بنا چیه|بنا چطور|چند بنا|موجودی|شارژ/.test(nt)&&
-       (COL.expecting||COL.confirming&&COL.confirming.type==='financial')){
+    if(/کلید چیست|کلید چیه|کلید چطور|چند کلید|کلید چیست|کلید چیه|کلید چطور|چند کلید|موجودی|شارژ/.test(nt)){
       var bal=S.tokens||0;
-      botC('بنا اعتبار سامانه برای سرویس‌های پیشرفته است — هر سرویس قبل از اجرا هزینه‌اش را نشان می‌دهد و فقط با تأیید شما کسر می‌شود. موجودی فعلی شما: '+fa(bal,0)+' بنا. شارژ از دکمهٔ «شارژ بنا» در بالای صفحه.',null);
+      botC('کلید اعتبار سامانه برای سرویس‌های پیشرفته است. هزینهٔ هر خدمت پیش از اجرا نمایش داده می‌شود و فقط با تأیید شما کسر خواهد شد. موجودی: '+fa(bal,0)+' کلید. مدیریت اعتبار از منوی حساب در پایین سایدبار در دسترس است.',null);
       var expq=COL.expecting,aq=ASK[expq];
-      if(aq)botC(aq.q[0],null);
+      if(COL.wf==='rent'&&(expq==='budget_dep'||expq==='budget_rent'))budgetCard();
+      else if(aq)botC(aq.q[0],null);
       else if(COL.confirming&&COL.confirming.type==='financial')promptFinancial();
+      else if(COL.active&&!COL.expecting)scenarioCard(COL.wf);
       return true;
     }
     /* explicit fix mode */
@@ -17284,7 +17458,7 @@ E30.disc=(function(){
         else if(p==='student'){P.metro=5;P.school=1;P.work=4}
         else if(p==='retiree'){P.quiet=5;P.school=1;P.work=1}
         else {P.metro=4;P.work=4;P.school=2}
-        P.persona=({family:'خانواده',couple:'دو نفره',student:'دانشجو/کاری',retiree:'موقت',roommates:'دانشجو/کاری'})[p]||'دانشجو/کاری';
+        P.persona=({family:'خانواده',couple:'دو نفره',student:'دانشجو/کاری',retiree:'موقت',roommates:'دانشجو/کاری'})[p]||''; /* unknown must not become an assumed student */
         var v;
         if((v=getF('rooms'))!=null)P.beds=+v;
         if((v=getF('m2'))!=null)P.minM2=+v;
@@ -17316,6 +17490,11 @@ E30.disc=(function(){
         /* jump to the first missing REQUIRED step — financial never skipped (§2.1) */
         if(!dep||!dep.v)ceJump('dep');
         else if(!rent||!rent.v)ceJump('rentb');
+        else if(d.skipOptionalToHoods){
+          var chosenHood=getF('hood');
+          if(chosenHood){D.hood=chosenHood;ceJump('mk')}
+          else ceJump('hoods');
+        }
         else ceJump('imps');
         try{E30.flowsAPI.syncStage()}catch(e){}
         return true;
@@ -17425,7 +17604,7 @@ E30.disc=(function(){
     var nt=nz(t);
     var wantsRealEstate=/خونه|خانه|ملک|آپارتمان|اجاره|کرایه|رهن|خرید|بخرم|بخریم|می ?خریم|فروش|بفروشم|سرمایه ?گذاری|زمین|مغازه|سویییت|سوئیت|موجر|مستأجر دارم|مستاجر دارم/.test(nt);
     if(!wantsRealEstate)return false;
-    if(!/می ?خوام|می ?خواهم|می ?خوایم|می ?خواهیم|دنبال|اجاره ? نشین|هستم|هستیم|دارم|داریم|سالمه|سالانه|باید|لازم|زوج|خانواده|دانشجو|هم ?خونه/.test(nt)&&!getF('household'))return false;
+    if(!/می ?خوام|می ?خواهم|می ?خوایم|می ?خواهیم|دنبال|اجاره ? نشین|هستم|هستیم|دارم|داریم|سالمه|سالانه|باید|لازم|زوج|خانواده|دانشجو|هم ?خونه|کمک|پیدا|پیشنهاد|مقایسه|بهترین گزینه/.test(nt)&&!getF('household'))return false;
     /* paid-service intents take precedence */
     if(/تحلیل (جامع )?محله/.test(nt)&&CE.f!=='rent'&&CE.f!=='buy'){return false} /* leave to flow/service */
     var intent=null;
@@ -17449,7 +17628,7 @@ E30.disc=(function(){
     usrC(t);
     extract(t,'open'); /* harvest the opening message (§4.2) */
     _lastPersona=null;
-    return start(intent);
+    return start(intent,false,/بودجه|هزینه|قیمت|پول پیش|ودیعه|رهن|ماهی|ماهانه|بهترین گزینه/.test(nt));
   }
 
   E30.discAPI={route:route,active:active,start:start,stop:stop,reset:reset,bindChat:bindChat,useChat:useChat,forgetChat:forgetChat,resume:resume,
@@ -18432,7 +18611,7 @@ E30.ux=(function(){
             txnId:txn,tokenCost:E30.price('valuation')});
           if(!it)return false;
           botC('<b>گزارش تخمین نمونه در کتابخانه ذخیره شد.</b>'+html+
-            '<div class="note">رسید: '+esc(txn)+' · هزینه: ۴۰ بنا</div>',null);
+            '<div class="note">رسید: '+esc(txn)+' · هزینه: ۴۰ کلید</div>',null);
           return true;
         }});
     };
@@ -18508,7 +18687,7 @@ E30.landing=(function(){
   var FAQ=[
     ['محلینو چه کمکی می‌کند؟','محلینو یک دستیار گفت‌وگویی املاک است: شرایط‌تان را به زبان خودتان تعریف می‌کنید و دستیار، محله‌های مناسب، آگهی‌های منطبق، تحلیل بازار، قرارداد و پرداخت امانی را در همان گفت‌وگو پیش می‌برد.'],
     ['شروع چطور است؟','حساب این نمونه نمایشی است: ورود و کد تأیید واقعی نیست و داده‌ها میان حساب‌های مختلف همین مرورگر جدا نمی‌شوند. پس از ورود نمایشی در اولین پیام، شرایط‌تان را آزاد بنویسید — مثلاً «تازه ازدواج کردم و دنبال خونهٔ نوساز نزدیک محل کارم هستم». اطلاعات حساس واقعی وارد نکنید.'],
-    ['بنا چیست؟','بنا اعتبار داخلی سامانه برای سرویس‌های پیشرفته (تحلیل محله، ارزش‌گذاری، گزارش حقوقی، قرارداد و…) است. هر سرویس قبل از اجرا، هزینه را نشان می‌دهد و فقط با تأیید شما اجرا می‌شود.'],
+    ['کلید چیست؟','کلید اعتبار داخلی سامانه برای سرویس‌های پیشرفته (تحلیل محله، ارزش‌گذاری، گزارش حقوقی، قرارداد و…) است. هر سرویس قبل از اجرا، هزینه را نشان می‌دهد و فقط با تأیید شما اجرا می‌شود.'],
     ['داده‌های من کجا ذخیره می‌شود؟','وضعیت و تاریخچهٔ نمایشی در حافظهٔ محلی همین مرورگر ذخیره می‌شود. هنگام استفاده از جست‌وجوی نشانی، کد پستی ممکن است به سرویس موقعیت‌یابی بیرونی ارسال شود؛ اگر endpoint احراز هویت پیکربندی شده باشد، دادهٔ هویتی به آن endpoint ارسال خواهد شد. پیش از واردکردن دادهٔ حساس این موضوع را در نظر بگیرید.'],
     ['قیمت‌ها و آمار از کجاست؟','از دادهٔ نمونهٔ داخلی سامانه و صرفاً برای تصمیم‌گیری بهتر؛ آمار رسمی یا مشاورهٔ حقوقی نیست.'],
     ['وام یا تسهیلات پردازش می‌کنید؟','خیر — پردازش وام انجام نمی‌شود؛ اما می‌توانید بودجه، هزینه‌های جانبی و برنامهٔ پرداخت امانی را در گفت‌وگو بچینید.'],
@@ -18521,14 +18700,14 @@ E30.landing=(function(){
     {k:['اجاره'],a:function(){return 'سرویس اجاره: شرایط‌تان (بودجه، محله/محل کار، تعداد خواب…) را می‌گویید؛ دستیار محله‌های همخوان و آگهی‌های منطبق با الزام‌های الزامی‌تان نشان می‌دهد و بازدید و قرارداد را هم داخل گفت‌وگو می‌برد. شروع آن فقط داخل برنامه است.'}},
     {k:['خرید','مبایعه'],a:function(){return 'سرویس خرید: بودجه و هدف‌تان را می‌پرسد، فقط ملک‌هایی را نشان می‌دهد که قیمت کلشان (متراژ × قیمت هر متر) زیر سقف بودجه باشد، و گزارش حقوقی و پرداخت امانی را هم دارد. شروع در برنامه.'}},
     {k:['فروش','بفروش'],a:function(){return 'سرویس فروش: از وضعیت سند و انگیزهٔ فروش می‌پرسد، بر پایهٔ دادهٔ نمونه ارزیابی می‌کند، استراتژی قیمت (سریع یا حداکثر) می‌چیند و تا قرارداد همراهتان است. شروع در برنامه.'}},
-    {k:['بنا','هزینه','قیمت','تعرفه','پول'],a:function(){return 'هزینه‌های بنا طبق جدول تعرفه است: تحلیل محله ۴۰، مقایسهٔ محله‌ها ۴۰، ارزش‌گذاری ۴۰، قرارداد ۶۰، گزارش حقوقی ۱۰۰، تسویهٔ امانی نمایشی ۱۵۰ و بازدید ۲۰. راهنمای عمومی فسخ رایگان است و هیچ سندی را تحلیل نمی‌کند. هر کسر بنا باید با کارت تأیید جداگانه همراه باشد.'}},
+    {k:['کلید','هزینه','قیمت','تعرفه','پول'],a:function(){return 'هزینه‌های کلید طبق جدول تعرفه است: تحلیل محله ۴۰، مقایسهٔ محله‌ها ۴۰، ارزش‌گذاری ۴۰، قرارداد ۶۰، گزارش حقوقی ۱۰۰، تسویهٔ امانی نمایشی ۱۵۰ و بازدید ۲۰. راهنمای عمومی فسخ رایگان است و هیچ سندی را تحلیل نمی‌کند. هر کسر کلید باید با کارت تأیید جداگانه همراه باشد.'}},
     {k:['ثبت نام','ثبت‌نام','ورود','حساب','عضویت'],a:function(){return 'ورود این نسخه فقط نمایشی است: کد یک‌بارمصرف واقعی و جداسازی امن اطلاعات حساب‌ها وجود ندارد. برای آزمایش از «ورود نمایشی به برنامه» استفاده کنید و دادهٔ حساس واقعی وارد نکنید.'}},
     {k:['حریم','امنیت','داده','ذخیره','privacy'],a:function(){return 'وضعیت نمایشی در حافظهٔ محلی مرورگر ذخیره می‌شود. هنگام فعال‌کردن جست‌وجوی نشانی، کد پستی ممکن است به سرویس‌های بیرونی Photon/Nominatim فرستاده شود؛ احراز هویت هم فقط در صورت تنظیم endpoint بیرونی درخواست شبکه دارد. لینک اسنپ‌شات در دستگاه دیگر قابل بازیابی نیست؛ برای ارسال واقعی، فایل مستقل دانلود کنید.'}},
     {k:['یادآور','یاد اور'],a:function(){return 'یادآورها هم از داخل گفت‌وگو ساخته می‌شوند («یادآور بساز برای…») هم از پنل یادآورها؛ اعلان و تکرار دارند و ثبت تکراری مسدود می‌شود.'}},
     {k:['وام','تسهیل','بانک'],a:function(){return 'پردازش وام/تسهیلات در محلینو انجام نمی‌شود و صادقانه می‌گوییم؛ ولی برنامه‌ریزی بودجه و هزینه‌های جانبی معامله را داخل گفت‌وگو می‌توانید بچینید.'}},
     {k:['قیمت خانه','قیمت ملک','بازار','روند','تورم'],a:function(){return 'تحلیل بازار و روند قیمت بر پایهٔ «دادهٔ نمونهٔ سامانه» ارائه می‌شود و صریحاً همین‌طور برچسب می‌خورد — آمار رسمی یا پیش‌بینی قطعی نیست.'}},
     {k:['امنیت پرداخت','امانی','تسویه'],a:function(){return 'فرایند امانی در این نسخه نمونه و آموزشی است؛ توافق و مراحل آزادسازی داخل گفت‌وگو ثبت می‌شود اما انتقال وجه واقعی، سپرده‌گذاری نزد شخص ثالث یا ضمانت بانکی انجام نمی‌شود.'}},
-    {k:['سلام','درود','هی'],a:function(){return 'سلام! دربارهٔ خدمات، بنا، ثبت‌نام یا حریم خصوصی هر سؤالی دارید بپرسید — یا با «ورود به برنامه» همین حالا شروع کنید.'}}
+    {k:['سلام','درود','هی'],a:function(){return 'سلام! دربارهٔ خدمات، کلید، ثبت‌نام یا حریم خصوصی هر سؤالی دارید بپرسید — یا با «ورود به برنامه» همین حالا شروع کنید.'}}
   ];
 
   /* pure KB reply — intentionally no access to the app engine */
@@ -18545,7 +18724,7 @@ E30.landing=(function(){
       if(s>score){score=s;best=KB[i]}
     }
     if(best)return {text:best.a()};
-    return {text:'دقیق متوجه سؤالتان نشدم. می‌توانید بپرسید: «خدمات محلینو چیست؟»، «بنا چیست؟»، «داده‌هایم کجا ذخیره می‌شود؟» یا «چطور شروع کنم؟».'};
+    return {text:'دقیق متوجه سؤالتان نشدم. می‌توانید بپرسید: «خدمات محلینو چیست؟»، «کلید چیست؟»، «داده‌هایم کجا ذخیره می‌شود؟» یا «چطور شروع کنم؟».'};
   }
 
   function section(name){return document.getElementById('spl-'+name)}
@@ -18556,7 +18735,7 @@ E30.landing=(function(){
       '<span class="spl-ic">'+splIco(s.ic,20)+'</span>'+
       '<b>'+esc(s.t)+'</b>'+
       '<span class="spl-desc">'+esc(s.b)+'</span>'+
-      (s.price?'<span class="spl-price">'+fa(s.price,0)+' بنا</span>':'<span class="spl-price spl-free">'+esc(s.freeLabel||'در جریان گفت‌وگو')+'</span>')+
+      (s.price?'<span class="spl-price">'+fa(s.price,0)+' کلید</span>':'<span class="spl-price spl-free">'+esc(s.freeLabel||'در جریان گفت‌وگو')+'</span>')+
       '</button>';
   }
   function cardDetail(s){
@@ -18564,7 +18743,7 @@ E30.landing=(function(){
       '<div class="kv" style="display:flex;justify-content:space-between;padding:6px 0"><span>فایدهٔ اصلی</span><b>'+esc(s.b)+'</b></div>'+
       '<div class="kv" style="display:flex;justify-content:space-between;padding:6px 0"><span>چه چیزی می‌گیرید</span><b style="max-width:60%;text-align:left">'+esc(s.get)+'</b></div>'+
       '<div class="kv" style="display:flex;justify-content:space-between;padding:6px 0"><span>چه چیزی لازم است</span><b style="max-width:60%;text-align:left">'+esc(s.req)+'</b></div>'+
-      '<div class="kv" style="display:flex;justify-content:space-between;padding:6px 0"><span>هزینه</span><b>'+(s.price?fa(s.price,0)+' بنا (قبل از اجرا تأیید می‌شود)':esc(s.freeLabel||'بخشی از گفت‌وگوی اصلی — بدون هزینهٔ جدا'))+'</b></div>'+
+      '<div class="kv" style="display:flex;justify-content:space-between;padding:6px 0"><span>هزینه</span><b>'+(s.price?fa(s.price,0)+' کلید (قبل از اجرا تأیید می‌شود)':esc(s.freeLabel||'بخشی از گفت‌وگوی اصلی — بدون هزینهٔ جدا'))+'</b></div>'+
       '<div class="note" style="margin-top:10px">این کارت فقط توضیح است؛ اجرای واقعی سرویس داخل برنامه و پس از ورود انجام می‌شود.</div>';
   }
   function bindCards(root){
@@ -18603,7 +18782,7 @@ E30.landing=(function(){
       '<div class="spl-chat" id="spl-chatbox">'+
       '<div class="spl-msgs" id="spl-msgs" aria-live="polite"></div>'+
       '<div class="spl-chips" id="spl-chips">'+
-      ['خدمات چیست؟','بنا چیست؟','داده‌ها کجا ذخیره می‌شود؟','چطور شروع کنم؟'].map(function(q){return '<button data-splq="'+esc(q)+'">'+esc(q)+'</button>'}).join('')+
+      ['خدمات چیست؟','کلید چیست؟','داده‌ها کجا ذخیره می‌شود؟','چطور شروع کنم؟'].map(function(q){return '<button data-splq="'+esc(q)+'">'+esc(q)+'</button>'}).join('')+
       '</div>'+
       '<div class="spl-inputrow"><input id="spl-q" type="text" placeholder="سؤال‌تان را بنویسید…" aria-label="پرسش از دستیار معرفی"><button id="spl-send" aria-label="ارسال">فرستادن</button></div>'+
       '</div></div></section>';
@@ -18631,8 +18810,8 @@ E30.landing=(function(){
       return '<tr><td>'+esc(p.label)+'</td><td>'+(p.cost?fa(p.cost,0):'رایگان')+'</td><td>'+(p.cost?'پیش از اجرا، داخل گفت‌وگو':'بدون کسر اعتبار')+'</td><td>'+(p.cost?'فقط در صورت خطای اجرا':'بدون هزینه')+'</td><td>سامانهٔ محلینو</td></tr>';
     }).join('');
     h+='<section class="spl-sec alt" id="spl-pricing"><div class="spl-wrap">'+
-      '<h2>تعرفهٔ شفاف</h2><p class="spl-sub2">واحد پرداخت خدمات پیشرفته، اعتبار «بنا» است. هیچ کسر بدون تأیید صریح انجام نمی‌شود و هزینهٔ خارجیِ نامعلومی دریافت نمی‌گردد.</p>'+
-      '<div class="spl-table"><table><thead><tr><th>سرویس</th><th>بنا</th><th>زمان پرداخت</th><th>شرط بازگشت</th><th>گیرنده</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+      '<h2>تعرفهٔ شفاف</h2><p class="spl-sub2">واحد پرداخت خدمات پیشرفته، اعتبار «کلید» است. هیچ کسر بدون تأیید صریح انجام نمی‌شود و هزینهٔ خارجیِ نامعلومی دریافت نمی‌گردد.</p>'+
+      '<div class="spl-table"><table><thead><tr><th>سرویس</th><th>کلید</th><th>زمان پرداخت</th><th>شرط بازگشت</th><th>گیرنده</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
       '</div></section>';
 
     h+='<section class="spl-sec" id="spl-faq"><div class="spl-wrap"><h2>پرسش‌های پرتکرار</h2>'+
@@ -18745,6 +18924,227 @@ E30.landing=(function(){
 })();
 
 
+/* V0.30 usability repair: compact sidebar, account menu, full-width library and valid reminders.
+   No storage keys or monetary balances are changed here. */
+E30.uiTidyInit=function(){
+  if(E30._uiTidyReady)return;
+  E30._uiTidyReady=true;
+  var menu=null;
+
+  function closeAccountMenu(){
+    if(menu){menu.remove();menu=null}
+    var owner=document.querySelector('[data-act="e30AccountMenu"]');
+    if(owner)owner.setAttribute('aria-expanded','false');
+  }
+  function decorateSidebar(){
+    var side=document.getElementById('side');
+    if(!side||!S.auth){closeAccountMenu();return}
+    closeAccountMenu();
+    var footer=side.querySelector('.e29-sbot');
+    if(footer){
+      footer.innerHTML='<button class="e29-srow e30-account-trigger" type="button" data-act="e30AccountMenu" data-tip="حساب و تنظیمات" aria-label="باز کردن منوی حساب و تنظیمات" aria-expanded="false" aria-haspopup="dialog">'+
+        '<span class="e30-account-mark" aria-hidden="true">م</span><span class="lbl">حساب و تنظیمات</span><span class="e30-account-chevron lbl" aria-hidden="true">⌄</span></button>';
+    }
+    var chat=side.querySelector('.e29-newbtn');
+    if(chat){
+      chat.innerHTML='<span class="e30-chat-icon" aria-hidden="true">'+e29ico('chat',17)+'<b>+</b></span><span class="lbl">گفت‌وگوی جدید</span>';
+      chat.setAttribute('aria-label','ایجاد گفت‌وگوی جدید');
+      chat.title='گفت‌وگوی جدید';
+    }
+    var project=side.querySelector('.e29-seca[data-act="e29prjNew"]');
+    if(project){
+      project.innerHTML='<span class="e30-project-icon" aria-hidden="true">▣<b>+</b></span><span class="lbl">پروژهٔ جدید</span>';
+      project.setAttribute('aria-label','ایجاد پروژهٔ جدید');
+      project.setAttribute('data-tip','ایجاد پروژهٔ جدید');
+      project.title='ایجاد پروژهٔ جدید';
+    }
+    Array.prototype.forEach.call(side.querySelectorAll('.e29-projhead'),function(btn){
+      btn.setAttribute('data-tip','باز کردن پروژه');
+      if(!btn.querySelector('.e30-project-icon')){
+        btn.insertAdjacentHTML('afterbegin','<span class="e30-project-icon" aria-hidden="true">▣</span>');
+      }
+    });
+    var fold=side.querySelector('[data-act="sideFold"]');
+    if(fold)fold.title=fold.getAttribute('aria-label');
+  }
+
+  var originalRender=E29.shell.renderSidebar;
+  E29.shell.renderSidebar=function(){
+    var value=originalRender.apply(this,arguments);
+    decorateSidebar();
+    return value;
+  };
+  var originalOnly=E29.shell.renderSidebarOnly;
+  E29.shell.renderSidebarOnly=function(){
+    var value=originalOnly.apply(this,arguments);
+    decorateSidebar();
+    return value;
+  };
+
+  ACT.e30AccountMenu=function(){
+    if(menu){closeAccountMenu();return}
+    var trigger=document.querySelector('[data-act="e30AccountMenu"]');
+    if(!trigger)return;
+    menu=document.createElement('div');
+    menu.className='e30-account-menu';
+    menu.setAttribute('role','dialog');
+    menu.setAttribute('aria-label','حساب و تنظیمات');
+    var who=esc(S.auth&&S.auth.name||'حساب کاربری'),balance=fa(Number(S.tokens)||0,0);
+    menu.innerHTML='<div class="e30-account-summary"><b>'+who+'</b><span>اعتبار باقی‌مانده: '+balance+' کلید</span></div>'+
+      '<button type="button" data-act="account" data-tab="overview">پروفایل و حساب کاربری</button>'+
+      '<button type="button" data-act="wallet">کیف پول و تراکنش‌ها</button>'+
+      '<button type="button" data-act="e29shManage">لینک‌های اشتراک‌گذاری</button>'+
+      '<button type="button" data-act="themeToggle">تغییر حالت روشن و تاریک</button>'+
+      '<button type="button" data-view="profile">تنظیمات</button>';
+    document.body.appendChild(menu);
+    var r=trigger.getBoundingClientRect();
+    var w=Math.min(316,window.innerWidth-24);
+    menu.style.width=w+'px';
+    menu.style.right=Math.max(12,window.innerWidth-r.right)+'px';
+    menu.style.bottom=Math.max(12,window.innerHeight-r.top+8)+'px';
+    trigger.setAttribute('aria-expanded','true');
+    menu.querySelector('button').focus();
+  };
+  document.addEventListener('click',function(event){
+    if(!menu)return;
+    var target=event.target;
+    if(target.closest&&target.closest('.e30-account-menu')){
+      if(target.closest('button'))window.setTimeout(closeAccountMenu,0);
+      return;
+    }
+    if(target.closest&&target.closest('[data-act="e30AccountMenu"]'))return;
+    closeAccountMenu();
+  });
+  document.addEventListener('keydown',function(event){
+    if(event.key==='Escape'&&menu)closeAccountMenu();
+  });
+
+  function markFullLibrary(){
+    var panel=document.getElementById('e29-panel');
+    if(panel){panel.classList.add('e30-library-fullscreen');panel.setAttribute('aria-label','کتابخانهٔ تمام‌صفحه')}
+  }
+  /* The sidebar library action captures its private openPanel closure in V0.29,
+     so decorating ONLY the public shell API would miss the actual user click. */
+  var openLibraryAction=ACT.e29panelLib;
+  ACT.e29panelLib=function(){var value=openLibraryAction.apply(this,arguments);markFullLibrary();return value};
+  /* Clicking an entry-level rent/buy action should not bypass the conversational
+     discovery and fall into the legacy fixed questionnaire. Internal ceStart()
+     hand-offs remain untouched for contracts, saved progress and tests. */
+  document.addEventListener('click',function(ev){
+    var trigger=ev.target&&ev.target.closest&&ev.target.closest('[data-cf]');
+    if(!trigger||!S.auth)return;
+    var f=trigger.getAttribute('data-cf');
+    if(f!=='rent'&&f!=='buy')return;
+    if(!E30.discAPI||typeof E30.discAPI.start!=='function')return;
+    ev.preventDefault();ev.stopImmediatePropagation();
+    usrC((trigger.textContent||'').replace(/\s+/g,' ').trim()||'شروع '+(f==='rent'?'اجاره':'خرید'));
+    E30.discAPI.start(f,false);
+  },true);
+  if(CBACT.e30StartRent){
+    CBACT.e30StartRent=function(){
+      usrC('آغاز اجاره و قرارداد');
+      E30.discAPI.start('rent',false);
+      return true;
+    };
+  }
+
+  var originalPanel=E29.shell.openPanel;
+  E29.shell.openPanel=function(kind,opts){
+    var value=originalPanel.apply(this,arguments);
+    if(kind==='library')markFullLibrary();
+    return value;
+  };
+
+  function localStamp(ts){
+    var d=new Date(ts),p=function(n){return String(n).padStart(2,'0')};
+    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes());
+  }
+  function decorateDate(id,edit){
+    var input=document.getElementById(id);
+    if(!input)return;
+    var previousValue=input.value;
+    input.type='datetime-local';
+    input.setAttribute('aria-label','تاریخ و ساعت یادآور، از اکنون به بعد');
+    input.setAttribute('step','60');
+    input.min=localStamp(Date.now()+60000);
+    if(edit){
+      var current=previousValue.replace(' ','T');
+      var parsed=Date.parse(current);
+      input.value=Number.isFinite(parsed)?localStamp(parsed):localStamp(Date.now()+3600000);
+    }else if(!input.value){
+      input.value=localStamp(Date.now()+3600000);
+    }
+    var label=document.createElement('label');
+    label.setAttribute('for',id);
+    label.className='e30-date-note';
+    label.textContent='تاریخ و ساعت یادآور (از اکنون به بعد)';
+    input.parentNode.insertBefore(label,input);
+  }
+  function validDate(id){
+    var input=document.getElementById(id),ts=input&&Date.parse(input.value.replace(' ','T'));
+    if(!input||!Number.isFinite(ts)||ts<=Date.now()){
+      toast('تاریخ و ساعت یادآور باید در آینده باشد.');
+      if(input){input.setAttribute('aria-invalid','true');input.focus()}
+      return false;
+    }
+    input.removeAttribute('aria-invalid');
+    return true;
+  }
+
+  var newForm=ACT.e29remNew;
+  ACT.e29remNew=function(){
+    var value=newForm.apply(this,arguments);
+    decorateDate('e29-rd',false);
+    return value;
+  };
+  var newSave=ACT.e29remNewGo;
+  ACT.e29remNewGo=function(){
+    if(!validDate('e29-rd'))return;
+    return newSave.apply(this,arguments);
+  };
+  var editForm=ACT.e30remEdit;
+  ACT.e30remEdit=function(){
+    var value=editForm.apply(this,arguments);
+    decorateDate('re28-w',true);
+    return value;
+  };
+  var editSave=ACT.remEditOk28;
+  ACT.remEditOk28=function(){
+    if(!validDate('re28-w'))return;
+    var input=document.getElementById('re28-w');
+    if(input)input.value=input.value.replace('T',' ');
+    return editSave.apply(this,arguments);
+  };
+  if(E25&&typeof E25.remDoSave==='function'){
+    var legacySave=E25.remDoSave;
+    E25.remDoSave=function(){
+      if(E25.rem&&!(Number(E25.rem.due)>Date.now())){
+        botC('برای یادآور باید زمان آینده انتخاب شود؛ لطفاً تاریخ جدید بگویید.',null);
+        return false;
+      }
+      return legacySave.apply(this,arguments);
+    };
+  }
+  if(E28&&typeof E28.remAuto==='function'){
+    var auto=E28.remAuto;
+    E28.remAuto=function(nn,raw){
+      var nt=normFa(raw||nn||'');
+      var reminder=/یادم بنداز|یادم بینداز|یادآور|یادآوری/.test(nt)||!!E28.remPend;
+      if(reminder&&typeof E28.remParseWhen==='function'){
+        var when=E28.remParseWhen(nt);
+        if(when&&Number(when.ts)<=Date.now()){
+          usrC(raw||nn);E28.remPend=null;
+          botC('این زمان گذشته است. تاریخ و ساعت آینده را بنویسید یا از تقویم یادآورها انتخاب کنید.',null);
+          return true;
+        }
+      }
+      return auto.apply(this,arguments);
+    };
+  }
+  E29.shell.renderSidebar();
+};
+
+
 /* ═══════════════ V0.30 — E30 SHELL: init glue — wraps engine entry points ═══════════════ */
 E30._slidPending=null;
 
@@ -18761,7 +19161,7 @@ E30.autoAnswer=function(f){
   var id=st.id,map={
     rent:{
       beds:function(){var v=G('rooms');return v!=null?String(v):null},
-      who:function(){var h=G('household');return h==='family'?'خانواده':(h==='couple'?'دو نفره':(h==='single'||h==='roommates'?'دانشجو/کاری':null))},
+      who:function(){var c=E30.discAPI.ctx(),state=c&&c.fields&&c.fields.household;if(state&&state.status==='unknown')return 'رد کردن';var h=G('household');return h==='family'?'خانواده':(h==='couple'?'دو نفره':(h==='single'||h==='roommates'?'دانشجو/کاری':null))},
       age:function(){var v=G('prop_age');return v!=null?String(v):null},
       m2:function(){var v=G('m2');return v!=null?String(v):null},
       elev:function(){return P('elevator')?'yes':null},
@@ -19388,6 +19788,7 @@ E30.init=function(){
 
   /* 9) UX patches: saved listings, share independence, projects, reminders */
   try{E30.uxInit()}catch(e){console.error('E30 ux',e)}
+  try{E30.uiTidyInit()}catch(e){console.error('E30 guided UI',e)}
 
   /* 9b) A burst of toasts used to cover the fixed chat composer. Deduplicate
          near-identical events and bound the simultaneous visible stack. */
