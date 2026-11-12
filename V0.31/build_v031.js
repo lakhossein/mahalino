@@ -200,7 +200,7 @@ H=H.replace("[' درآمد اجاره','F:invr']", "[' سرمایه‌گذاری
 
 rep("var prg=parseRangeFA(v0);", "var prg=st.id==='age'?parseAgeRangeFA(v0):parseRangeFA(v0);");
 
-rep("    '<button class=\"e22-sact e22-sact-del\"", "    '<button class=\"e22-sact\" type=\"button\" data-act=\"e31MoveChat\" data-sess=\"'+qesc(s.id)+'\" title=\"انتقال به پروژه\" aria-label=\"انتقال به پروژه\">'+E27_IC.pin+'</button>'+\n    '<button class=\"e22-sact e22-sact-del\"");
+rep("    '<button class=\"e22-sact e22-sact-del\"", "    '<button class=\"e22-sact\" type=\"button\" data-act=\"e31MoveChat\" data-sess=\"'+qesc(s.id)+'\" title=\"انتقال به پروژه\" aria-label=\"انتقال به پروژه\">'+E27_IC.pin+'</button>'+\n    '<button class=\"e22-sact e22-sact-del\"",2);
 
 /* Currency boundary: old persisted financial records remain in canonical rial.
    Human input defaults to toman; explicit rial and machine preset values retain
