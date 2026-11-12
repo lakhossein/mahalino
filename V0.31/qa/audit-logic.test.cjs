@@ -80,7 +80,11 @@ for(const flow of ['buy','sell','invest','landlord'])check(flow+' optional promp
  one(w,w.E30.guide.actions[flow].prompt);let count=0;
  while(count++<60){const r=w.E30.guide.suggestions().find(x=>x.action.startsWith('preference:'));if(!r)break;one(w,r.prompt);one(w,w.E30.guide.actions['skip-preference'].prompt)}
  assert(count<60,'cycle');const action=w.E30.guide.suggestions().find(x=>['results','start-service'].includes(x.id));assert(action,'service exit missing');
- const h=one(w,action.prompt);assert(!/خطای غیرمنتظره/.test(h));assert(w.HIST.at(-1).c?.length||h.includes('آگهی‌های منطبق'));if(flow==='buy')assert(h.includes('آگهی‌های منطبق'));else assert.equal(w.CE.f,{sell:'sell',invest:'invp',landlord:'lndl'}[flow]);
+ const h=one(w,action.prompt);assert(!/خطای غیرمنتظره/.test(h));
+ if(flow==='buy')assert(h.includes('آگهی‌های منطبق'));
+ else if(flow==='sell'){assert.equal(w.SCRIPTS.sell[w.CE.i].id,'s_area');w.ceVal('۸۵');assert.equal(w.SCRIPTS.sell[w.CE.i].id,'s_hood');w.ceVal('نارمک');assert.equal(w.SCRIPTS.sell[w.CE.i].id,'s_val');assert(w.HIST.at(-1).h.includes('ارزیابی بازار'))}
+ else if(flow==='invest'){assert(h.includes('تحلیل مقدماتی سرمایه‌گذاری'));const before=(w.S.library||[]).length;w.ceVal('!save');assert.equal(w.S.library.length,before+1);assert.equal(w.SCRIPTS.invp[w.CE.i].id,'i_done')}
+ else{w.ceVal('price');w.ceVal('نارمک');assert.equal(w.SCRIPTS.lndl[w.CE.i].id,'l_advice');assert(w.HIST.at(-1).h.includes('مشاورهٔ مقدماتی'));w.ceVal('!end');assert.equal(w.CE.f,null)}
 });
 
 check('canonical money is parsed once across legacy setters',w=>{

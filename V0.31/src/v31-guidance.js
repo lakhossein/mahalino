@@ -148,7 +148,7 @@ E30.guide=(function(){
         fields.forEach(function(f){var id=f.id==='budget_dep'||f.id==='budget_rent'?'rent-budget':'need-'+f.id.replace(/_/g,'-').replace('m2','size');if(!seen[id]&&BY_ID[id]){ids.push(id);seen[id]=1}});
         ids=ids.slice(0,4).concat(col.wf==='rent'||col.wf==='buy'?['hood-results','results']:['start-service']);
       }
-    }else if(CE.f&&CE.f!=='gate'){return []}
+    }else if(CE.f&&CE.f!=='gate'){return st.suspended?[BY_ID.resume]:[]}
     else ids=GROUPS[effectiveNode()]||GROUPS.home;
     if(st.suspended)ids=ids.concat(['resume']);
     return ids.map(function(k){return BY_ID[k]}).filter(can);
@@ -210,7 +210,22 @@ E30.guide=(function(){
     var a=r.action;
     if(a.indexOf('preference:')===0){usrC(t);if(!E30.discAPI.active())E30.discAPI.start(CE.f==='buy'?'buy':'rent',true);E30.discAPI.preference(a.split(':')[1]);return true}
     if(a.indexOf('persona:')===0){usrC(t);E30.discAPI.setF('persona',a.split(':')[1],{src:'answer'});E30.discAPI.collector().expecting=null;save();botC('پرسونای انتخابی ثبت شد؛ ترکیب خانوار جداگانه و اختیاری است.',null);return true}
-    if(a==='start-service'){var flow=E30.discAPI.collector().wf,m={sell:'sell',invest:'invp',landlord:'lndl'}[flow];usrC(t);if(!m){sample();return true}suspend();ceStart(m);return true}
+    if(a==='start-service'){
+      var flow=E30.discAPI.collector().wf,m={sell:'sell',invest:'invp',landlord:'lndl'}[flow],f=E30.discAPI.getF;
+      usrC(t);if(!m){sample();return true}
+      var D=wd(m).data;
+      if(m==='invp'){
+        var fields={invest_objective:'objective',invest_horizon:'horizon',invest_risk:'risk',invest_liquidity:'liquidity',hood:'hood'};
+        Object.keys(fields).forEach(function(k){D[fields[k]]=f(k)||null});
+        var cap=f('invest_capital');D.cap=cap&&cap.v?cap.v[1]:null;
+      }else if(m==='sell'){
+        ['prop_area','prop_rooms','prop_age','hood','ownership','sale_urgency'].forEach(function(k){D[k]=f(k)||null});
+        D._optionalNeeds=true;
+      }else{D.hood=f('hood')||null;D.ltype=f('listing_intent')||null}
+      suspend();CE.f=m;CE.li=0;CE.hist=[];
+      CE.i=m==='invp'?SCRIPTS.invp.findIndex(function(x){return x.id==='i_an'}):m==='sell'?SCRIPTS.sell.findIndex(function(x){return x.id==='s_area'}):0;
+      ceStep();return true;
+    }
     if(a==='skip')return E30.discAPI.route('رد');
     if(a==='results'||a==='sample'){usrC(t);sample();return true}
     if(a==='hood-results'){usrC(t);compare(t);return true}
@@ -284,6 +299,12 @@ E30.guide=(function(){
       input.dispatchEvent(new Event('input',{bubbles:true}));
       input.focus();
     };
+    (SCRIPTS.sell||[]).forEach(function(st){
+      var optional=['s_role','s_own','s_docs','s_note','s_rooms','s_age','s_floor','s_motiv','s_urg','s_min'].indexOf(st.id)>=0,previous=st.pre;
+      if(optional)st.pre=function(D){if(D._optionalNeeds)return false;return previous?previous(D):true};
+      if(st.id==='s_area')st.pre=function(D){return !D.prop_area};
+      if(st.id==='s_hood')st.pre=function(D){return !D.hood};
+    });
     ['selL','selB'].forEach(function(key){
       var original=CBACT[key];
       CBACT[key]=function(el){
