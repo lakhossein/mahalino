@@ -41,8 +41,8 @@ E30.guide=(function(){
     prefs:['امکانات','می‌خواهم امکانات دلخواه را مشخص کنم.']
   };
   function add(r){REGISTRY.push(Object.assign({group:'search',aliases:[],slots:[],next:[],test:'journey-'+r.id,result:'خروجی داخلی با پایان مشخص'},r))}
-  Object.keys(PREFS).filter(function(slot){return slot!=='budget_pair'}).forEach(function(slot){var x=PREFS[slot];add({id:'need-'+slot.replace(/_/g,'-'),title:x[0],prompt:x[1],action:'preference:'+slot,slots:[slot]})});
-  add({id:'skip-preference',title:'رد ترجیح',prompt:'رد',action:'skip'});
+  Object.keys(PREFS).filter(function(slot){return slot!=='budget_pair'}).forEach(function(slot){var x=PREFS[slot];add({id:'need-'+slot.replace(/_/g,'-').replace('m2','size'),title:x[0],prompt:x[1],action:'preference:'+slot,slots:[slot]})});
+  add({id:'skip-preference',title:'رد ترجیح',prompt:'این ترجیح را فعلاً رد کن.',action:'skip'});
   add({id:'results',title:'آگهی‌های منطبق',prompt:'با اطلاعات فعلی آگهی‌ها را نشان بده.',action:'results'});
   add({id:'hood-results',title:'محله‌های مناسب',prompt:'با اطلاعات فعلی محله‌های مناسب را نشان بده.',action:'hood-results'});
   add({id:'resume',title:'بازگشت به خدمت',prompt:'به خدمت قبلی برگرد.',action:'resume'});
@@ -53,6 +53,12 @@ E30.guide=(function(){
     if(r.id==='rent-area'){r.prompt='محله‌های دارای داده را برای اجاره ارزیابی کن.'}
     if(r.id==='compare'){r.prompt='محله‌های دارای داده را از نظر قیمت مقایسه کن.'}
   });
+  Object.keys(E30.discAPI?E30.discAPI.SLOT_LABEL:{}).forEach(function(slot){
+    if(PREFS[slot]||slot==='budget_dep'||slot==='budget_rent')return;
+    var id='need-'+slot.replace(/_/g,'-').replace('m2','size');
+    add({id:id,title:E30.discAPI.SLOT_LABEL[slot],prompt:'می‌خواهم «'+E30.discAPI.SLOT_LABEL[slot]+'» را مشخص کنم.',action:'preference:'+slot,slots:[slot]});
+  });
+  add({id:'start-service',title:'شروع خدمت',prompt:'خدمت این مسیر را با اطلاعات فعلی شروع کن.',action:'start-service'});
   var BY_ID={},BY_PROMPT={};
   function norm(s){return String(s||'').replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/[\u200c\u200f]/g,' ').replace(/\s+/g,' ').replace(/[.!؟?]+$/g,'').trim().toLowerCase()}
   REGISTRY.forEach(function(r){
@@ -99,7 +105,7 @@ E30.guide=(function(){
     if(r.id==='projects')return !!(S.projects||[]).length;
     if(r.id==='resume')return !!state().suspended;
     if(r.id==='skip-preference')return !!E30.discAPI.collector().expecting;
-    if(r.id==='build')return !!wd('mkt').data.active;
+    if(r.id==='build')return !!(wd('mkt').data.bid||wd('mkt').data.chosen);
     if(r.id==='termination')return (S.contracts||[]).some(function(c){return c&&c.code});
     if(r.action.indexOf('flow:')===0)return !!(typeof SCRIPTS!=='undefined'&&SCRIPTS[r.action.split(':')[1]]);
     if(r.action==='valuation')return typeof CBACT.e30ValOpen==='function';
@@ -136,11 +142,11 @@ E30.guide=(function(){
     var col=E30.discAPI.collector(),st=state(),ids=[];
     if(col.active){
       if(col.expecting==='persona')ids=['persona-student','persona-couple','persona-young','persona-family','skip-preference','results'];
-      else if(col.expecting||col.fix)ids=['skip-preference','results'];
+      else if(col.expecting||col.fix)ids=['skip-preference'].concat(col.wf==='rent'||col.wf==='buy'?['results']:['start-service']);
       else{
         var fields=E30.discAPI.missing(col.wf),seen={};
-        fields.forEach(function(f){var id=f.id==='budget_dep'||f.id==='budget_rent'?'rent-budget':'need-'+f.id.replace(/_/g,'-');if(!seen[id]&&BY_ID[id]){ids.push(id);seen[id]=1}});
-        ids=ids.slice(0,4).concat(['hood-results','results']);
+        fields.forEach(function(f){var id=f.id==='budget_dep'||f.id==='budget_rent'?'rent-budget':'need-'+f.id.replace(/_/g,'-').replace('m2','size');if(!seen[id]&&BY_ID[id]){ids.push(id);seen[id]=1}});
+        ids=ids.slice(0,4).concat(col.wf==='rent'||col.wf==='buy'?['hood-results','results']:['start-service']);
       }
     }else if(CE.f&&CE.f!=='gate'){return []}
     else ids=GROUPS[effectiveNode()]||GROUPS.home;
@@ -204,6 +210,7 @@ E30.guide=(function(){
     var a=r.action;
     if(a.indexOf('preference:')===0){usrC(t);if(!E30.discAPI.active())E30.discAPI.start(CE.f==='buy'?'buy':'rent',true);E30.discAPI.preference(a.split(':')[1]);return true}
     if(a.indexOf('persona:')===0){usrC(t);E30.discAPI.setF('persona',a.split(':')[1],{src:'answer'});E30.discAPI.collector().expecting=null;save();botC('پرسونای انتخابی ثبت شد؛ ترکیب خانوار جداگانه و اختیاری است.',null);return true}
+    if(a==='start-service'){var flow=E30.discAPI.collector().wf,m={sell:'sell',invest:'invp',landlord:'lndl'}[flow];usrC(t);if(!m){sample();return true}suspend();ceStart(m);return true}
     if(a==='skip')return E30.discAPI.route('رد');
     if(a==='results'||a==='sample'){usrC(t);sample();return true}
     if(a==='hood-results'){usrC(t);compare(t);return true}
@@ -242,6 +249,7 @@ E30.guide=(function(){
     if(a==='projects'){showList(S.projects,'پروژه‌های فعلی','هنوز پروژه‌ای در این مرورگر ثبت نشده است.',function(x){return '<div class="kv"><span>'+esc(x.name||x.title||'پروژه')+'</span><b>ذخیره‌شده</b></div>'});return true}
     if(a.indexOf('flow:')===0){
       var f=a.split(':')[1];
+      if(f==='build'&&!can(r)){botC('برای سفارش تأمین، ابتدا پروژهٔ فعال را در مسیر پروژه‌ها انتخاب کنید.',null);return true}
       if(SCRIPTS[f]){botC('این فلو در همین محیط گفت‌وگو اجرا می‌شود. وضعیت و اطلاعات نهایی فقط در مراحل صریح ثبت خواهد شد.',null);ceStart(f);return true}
     }
     return false;
@@ -271,6 +279,16 @@ E30.guide=(function(){
       input.dispatchEvent(new Event('input',{bubbles:true}));
       input.focus();
     };
+    ['selL','selB'].forEach(function(key){
+      var original=CBACT[key];
+      CBACT[key]=function(el){
+        var q=queryData(),id=el.getAttribute('data-l'),x=key==='selL'?findL(id):findB(id);
+        if(x&&(key==='selL'?E30.flowsAPI.rentPass(x,q.D):E30.flowsAPI.buyPass(x,q.D))){
+          suspend();CE.f=key==='selL'?'rent':'buy';CE.i=SCRIPTS[CE.f].findIndex(function(st){return st.id==='list'});CE.li=0;
+        }
+        return original(el);
+      };
+    });
     var previousBot=botC,depth=0,pending=[];
     function deliver(h,chips){
       var html=String(h||'');
