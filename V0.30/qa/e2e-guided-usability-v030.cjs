@@ -100,8 +100,8 @@ const results=[];
       assert(await card.count()===1,'combined rent budget card not shown');
       const choices=await card.locator('input[type="radio"]:checked').count();
       assert(choices===0,'the budget UI silently selected user money');
-      await card.locator('input[name="e30-dep"][value="۵۰۰ میلیون"]').check();
-      await card.locator('input[name="e30-rent"][value="۲۰ میلیون"]').check();
+      await card.locator('input[data-kind="dep"][value="۵۰۰ میلیون"]').check();
+      await card.locator('input[data-kind="rent"][value="۲۰ میلیون"]').check();
       await card.locator('[data-cba="e30BudgetChoice"]').click();
       await page.waitForTimeout(450);
       const facts=await page.evaluate(()=>({dep:E30.discAPI.getF('budget_dep'),rent:E30.discAPI.getF('budget_rent'),
