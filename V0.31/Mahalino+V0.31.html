@@ -19342,7 +19342,7 @@ E30.guide=(function(){
     var nt=norm(t),r=BY_PROMPT[nt];
     if(!r&&/^(یه|یک) (خونه|خانه) (برام|برای من )? ?پیدا کن$/.test(nt)){
       setNode('home');usrC(String(t));
-      botC('برای شروع، منظورتان خرید خانه است یا رهن و اجاره؟ یک پرامپت از پیشنهادهای همین گفت‌وگو انتخاب کنید.',null);
+      botC('برای شروع، منظورتان خرید خانه است یا رهن و اجاره؟ یک پرامپت از پیشنهادهای همین گفت‌وگو انتخاب کنید.'+card(),null);
       return true;
     }
     if(!r||!can(r))return false;
@@ -19377,7 +19377,7 @@ E30.guide=(function(){
       var value=previousCr.apply(this,arguments);
       if(S.auth&&CURRENT==='landing'&&HIST.length===0){
         var box=document.getElementById('chatB');
-        if(box&&box.offsetParent&&!box.querySelector('.e31-guide')){
+        if(box&&!box.querySelector('.e31-guide')){
           box.innerHTML='<div class="msg bot"><span class="who">دستیار</span><div class="bub">برای مشاهدهٔ مسیرهای نمایشی محلینو یکی از این درخواست‌ها را وارد کنید.'+
             card()+'</div></div>';
         }
