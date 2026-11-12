@@ -147,6 +147,9 @@ E30.guide=(function(){
     var a=r.action;
     if(a.indexOf('discover:')===0){
       var flow=a.split(':')[1];
+      /* Guided prompts may start directly from the legacy onboarding gate.
+         Do not leave a competing active gate flow behind the discovery collector. */
+      if(CE.f==='gate'){CE.f=null;CE.i=0;CE.li=0;CE.hist=[];}
       if(E30.discAPI.active())E30.discAPI.stop();
       usrC(t);
       E30.discAPI.extract(t,'guided-prompt');
@@ -209,7 +212,8 @@ E30.guide=(function(){
     var previousBot=botC;
     botC=function(h,chips){
       var html=String(h||''),skip=/(تأیید مالی ضروری|تعارضی در شرایط|e30-paycard|e30-budget-card|e30-persona-card|e31-guide|data-e28ctr|e30-val-hood)/.test(html);
-      if(!skip&&S.auth&&CURRENT==='landing'&&!(CE.f&&!E30.discAPI.active())){
+      var startup=CE.f==='gate'&&state().node==='home'&&CE.i===0;
+      if(!skip&&S.auth&&CURRENT==='landing'&&(startup||!(CE.f&&!E30.discAPI.active()))){
         html+=card();
       }
       return previousBot(html,chips);
