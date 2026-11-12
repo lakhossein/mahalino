@@ -5877,7 +5877,7 @@ function ctxFromStep(f,st,D){
   }catch(e){}
 }
 /* ── نمایش‌سازها ── */
-function rShort(v){v=+v||0;if(v>=1e9)return fa(v/1e9,1)+' میلیارد';if(v>=1e6)return fa(v/1e6,0)+' میلیون';return fa(v,0)}
+function rShort(v){v=(+v||0)/10;if(v>=1e9)return fa(v/1e9,1)+' میلیارد';if(v>=1e6)return fa(v/1e6,0)+' میلیون';return fa(v,0)}
 function rcard(t,v,sub,cls,full){return '<div class="rcard'+(full?' full':'')+'"><small>'+esc(t)+'</small><span class="rv '+(cls||'')+'">'+v+'</span>'+(sub?'<span class="sub">'+sub+'</span>':'')+'</div>'}
 function rcards(a){return '<div class="rcards">'+a.join('')+'</div>'}
 function rcNote(t){return '<div class="rnote">'+t+'</div>'}

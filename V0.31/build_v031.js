@@ -223,6 +223,8 @@ var retiredPicker=H.indexOf('CBACT.ipset=function(el){'),retiredPickerEnd=H.inde
 if(retiredPicker<0||retiredPickerEnd<0)fail.push('retired picker missing');
 else H=H.slice(0,retiredPicker)+H.slice(retiredPickerEnd);
 
+rep("function rShort(v){v=+v||0;", "function rShort(v){v=(+v||0)/10;");
+
 /* Contract form controls expose toman; the historical record boundary uses rial. */
 rep("qesc(String(c.terms.deposit||''))", "qesc(c.terms.deposit==null?'':String(c.terms.deposit/10))");
 rep("qesc(String(c.terms.rent===0?0:(c.terms.rent||'')))", "qesc(c.terms.rent==null?'':String(c.terms.rent/10))");
