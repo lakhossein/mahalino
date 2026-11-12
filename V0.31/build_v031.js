@@ -33,12 +33,12 @@ function rep(oldStr,newStr,expect){
 }
 function injectBefore(marker,str){
   if(H.indexOf(marker)===-1){fail.push('marker missing: '+marker.slice(0,60));return}
-  H=H.replace(marker,str+'\n'+marker);
+  H=H.replace(marker,function(){return str+'\n'+marker});
   count++;
 }
 function injectAfter(marker,str){
   if(H.indexOf(marker)===-1){fail.push('marker missing: '+marker.slice(0,60));return}
-  H=H.replace(marker,marker+'\n'+str);
+  H=H.replace(marker,function(){return marker+'\n'+str});
   count++;
 }
 function readSrc(f){return fs.readFileSync(path.join(SRC_DIR,f),'utf8')}
