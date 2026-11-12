@@ -41,15 +41,15 @@ E30.guide=(function(){
     prefs:['امکانات','می‌خواهم امکانات دلخواه را مشخص کنم.']
   };
   function add(r){REGISTRY.push(Object.assign({group:'search',aliases:[],slots:[],next:[],test:'journey-'+r.id,result:'خروجی داخلی با پایان مشخص'},r))}
-  Object.keys(PREFS).forEach(function(slot){var x=PREFS[slot];add({id:'need-'+slot.replace(/_/g,'-'),title:x[0],prompt:x[1],action:'preference:'+slot,slots:[slot]})});
+  Object.keys(PREFS).filter(function(slot){return slot!=='budget_pair'}).forEach(function(slot){var x=PREFS[slot];add({id:'need-'+slot.replace(/_/g,'-'),title:x[0],prompt:x[1],action:'preference:'+slot,slots:[slot]})});
   add({id:'skip-preference',title:'رد ترجیح',prompt:'رد',action:'skip'});
   add({id:'results',title:'آگهی‌های منطبق',prompt:'با اطلاعات فعلی آگهی‌ها را نشان بده.',action:'results'});
   add({id:'hood-results',title:'محله‌های مناسب',prompt:'با اطلاعات فعلی محله‌های مناسب را نشان بده.',action:'hood-results'});
   add({id:'resume',title:'بازگشت به خدمت',prompt:'به خدمت قبلی برگرد.',action:'resume'});
   ['student','couple','young','family'].forEach(function(v,i){add({id:'persona-'+v,title:['دانشجو','زوج','جوان','خانواده'][i],prompt:['دانشجو هستم.','برای یک زوج جست‌وجو می‌کنم.','برای یک جوان جست‌وجو می‌کنم.','برای خانواده جست‌وجو می‌کنم.'][i],action:'persona:'+v})});
   REGISTRY.forEach(function(r){
-    if(r.id==='rent-budget'){r.prompt=PREFS.budget_pair[1];r.action='preference:budget_pair'}
-    if(r.id==='rent-specs'){r.prompt='می‌خواهم متراژ و تعداد خواب را مشخص کنم.';r.action='preference:m2'}
+    if(r.id==='rent-budget'){r.prompt=PREFS.budget_pair[1];r.action='preference:budget_pair';r.aliases=[]}
+    if(r.id==='rent-specs'){r.aliases=[];r.prompt='می‌خواهم متراژ و تعداد خواب را مشخص کنم.';r.action='preference:m2'}
     if(r.id==='rent-area'){r.prompt='محله‌های دارای داده را برای اجاره ارزیابی کن.'}
     if(r.id==='compare'){r.prompt='محله‌های دارای داده را از نظر قیمت مقایسه کن.'}
   });

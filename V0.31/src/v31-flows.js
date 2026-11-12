@@ -432,7 +432,7 @@ E30.flows=(function(){
     if(!MODBY.sell)MODBY.sell={v:'landing',t:'فروش ملک'};
     if(!MODBY.invp)MODBY.invp={v:'landing',t:'سرمایه‌گذاری ملکی'};
     if(!MODBY.lndl)MODBY.lndl={v:'landing',t:'اجاره‌دهی'};
-    FRC.sell=['sell'];FRC.invest=['invp','invb','invr'];FRC.rent=['rent','lndl'];
+    FRC.sell=['sell'];FRC.invest=['invp'];FRC.rent=['rent','lndl'];
     WSTEPS.sell=SELL.map(function(s){return s.id});
     WSTEPS.invp=INVP.map(function(s){return s.id});
     WSTEPS.lndl=LNDL.map(function(s){return s.id});

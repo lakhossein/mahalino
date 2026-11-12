@@ -185,6 +185,20 @@ rep("var free=(S.chats||[]).filter(function(c){return c&&!c.projectId&&!c.pinned
 rep("ACT.e29prjNew=function(){E29.shell.openPanel('projects')};", "ACT.e29prjNew=function(){sessArchive();E29.shell.openPanel('projects')};");
 rep("ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));toast('گفت‌وگو به پروژه اضافه شد')};", "ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));E29.shell.renderSidebarOnly();toast('گفت‌وگو به پروژه منتقل شد')};");
 
+/* The entry gate routes requests and never collects personal locations. */
+var gateWork=H.indexOf("{id:'work',q:'محل کارتان را انتخاب کنید",H.indexOf('SCRIPTS.gate='));
+var gateMenu=H.indexOf("{id:'menu'",gateWork);
+if(gateWork<0||gateMenu<0)fail.push('gate personal steps missing');
+else H=H.slice(0,gateWork)+H.slice(gateMenu);
+rep("acts:{pnow:function(){CE.i=1;ceStep()},pskip:function(){CE.i=3;ceStep()}}}", "acts:{pnow:function(){CE.i=1;ceStep()},pskip:function(){CE.i=1;ceStep()}}}");
+rep("if(v==='!menu'){ceStart('gate');CE.i=3;ceStep();return}", "if(v==='!menu'){ceStart('gate');CE.i=1;ceStep();return}");
+/* Retired investment simulations are absent from the V0.31 executable bundle.
+   Historical versions and user records remain intact. */
+var retiredStart=H.indexOf('SCRIPTS.invb=['),retiredEnd=H.indexOf('SCRIPTS.mkt=[',retiredStart);
+if(retiredStart<0||retiredEnd<0)fail.push('retired investment scripts missing');
+else H=H.slice(0,retiredStart)+H.slice(retiredEnd);
+H=H.replace("[' درآمد اجاره','F:invr']", "[' سرمایه‌گذاری ملکی','F:invp']");
+
 /* Currency boundary: old persisted financial records remain in canonical rial.
    Human input defaults to toman; explicit rial and machine preset values retain
    their units. This avoids mutating historical transactions or repeated scaling. */
