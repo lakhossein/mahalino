@@ -66,7 +66,7 @@ if test "$ready" -ne 1; then
 fi
 
 failed_suites=0
-for suite in smoke-v030.js e2e-functional.js e2e-conversational.js v030-browser-regressions.cjs e2e-acceptance-v030.cjs e2e-scenarios-v030.cjs e2e-full-journeys-v030.cjs; do
+for suite in smoke-v030.js e2e-functional.js e2e-conversational.js v030-browser-regressions.cjs e2e-acceptance-v030.cjs e2e-scenarios-v030.cjs e2e-full-journeys-v030.cjs e2e-guided-usability-v030.cjs; do
   echo "========= $suite ========="
   if node "V0.30/qa/$suite" >"$result_dir/$suite.log" 2>&1; then
     echo "PASS $suite"
