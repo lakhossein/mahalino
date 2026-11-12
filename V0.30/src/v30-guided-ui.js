@@ -93,14 +93,18 @@ E30.uiTidyInit=function(){
     if(event.key==='Escape'&&menu)closeAccountMenu();
   });
 
+  function markFullLibrary(){
+    var panel=document.getElementById('e29-panel');
+    if(panel){panel.classList.add('e30-library-fullscreen');panel.setAttribute('aria-label','کتابخانهٔ تمام‌صفحه')}
+  }
+  /* The sidebar library action captures its private openPanel closure in V0.29,
+     so decorating ONLY the public shell API would miss the actual user click. */
+  var openLibraryAction=ACT.e29panelLib;
+  ACT.e29panelLib=function(){var value=openLibraryAction.apply(this,arguments);markFullLibrary();return value};
   var originalPanel=E29.shell.openPanel;
   E29.shell.openPanel=function(kind,opts){
     var value=originalPanel.apply(this,arguments);
-    var panel=document.getElementById('e29-panel');
-    if(panel&&kind==='library'){
-      panel.classList.add('e30-library-fullscreen');
-      panel.setAttribute('aria-label','کتابخانهٔ تمام‌صفحه');
-    }
+    if(kind==='library')markFullLibrary();
     return value;
   };
 
