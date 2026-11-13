@@ -203,6 +203,51 @@ retireBetween('CBACT.ipset=function(el){','var CBT={};');
 retireBetween('VIEWS.invest=function(){','/* ═══ ۱۴) مارکت',
   "VIEWS.invest=function(){go('landing');if(window.E30&&E30.discAPI)E30.discAPI.start('invest','مشاوره سرمایه‌گذاری')};\n\n");
 
+/* Toman is the public currency; preserve historical canonical storage. */
+retireBetween('function parseMoneyFA(input){','function parseCountFA(input){',readSrc('v31-money.js')+'\n');
+rep("function rial(v){return fa(v,0)+' ریال'}","function rial(v){return fa(Number(v)/10,Number(v)%10?1:0)+' تومان'}");
+rep("function rShort(v){v=+v||0;","function rShort(v){v=(+v||0)/10;");
+rep("if(st.set){done=st.set(D,v)}","if(st.set){done=(st.money||st.moneyRange)?moneyCanonical(function(){return st.set(D,v)}):st.set(D,v)}");
+rep("try{ceVal(el.getAttribute('data-cv'))}","try{ceVal(moneyChip(el))}");
+rep("qesc(String(c.terms.deposit||''))","qesc(String(c.terms.deposit?c.terms.deposit/10:''))");
+rep("qesc(String(c.terms.rent===0?0:(c.terms.rent||'')))","qesc(String(c.terms.rent==null?'':c.terms.rent/10))");
+rep("qesc(String(c.terms.price||''))","qesc(String(c.terms.price?c.terms.price/10:''))");
+rep("dep=Number(depText),rent=Number(rentText)","dep=10*Number(depText),rent=10*Number(rentText)");
+rep("var dp=+v('cp-dep'),rn=+v('cp-rent');if(dp)c.terms.deposit=dp;if(rn)c.terms.rent=rn;","var dp=10*Number(v('cp-dep')),rn=10*Number(v('cp-rent'));if(v('cp-dep'))c.terms.deposit=dp;if(v('cp-rent'))c.terms.rent=rn;");
+rep("var pr=+v('cp-price');","var pr=10*Number(v('cp-price'));");
+rep("var price=+v('cp-price'),delivery=","var price=10*Number(v('cp-price')),delivery=");
+rep('value="8000000000" step="500000000"','value="800000000" step="50000000"',2);
+rep("var amt=+(document.getElementById('np-amt').value||0);","var amt=10*Number(document.getElementById('np-amt').value||0);");
+rep("var amt=(document.getElementById('bid-amt')||{}).value||'8000000000';","var amt=10*Number((document.getElementById('bid-amt')||{}).value||'800000000');");
+rep('id="wd-amt" type="number" min="100000" step="100000"','id="wd-amt" type="number" min="10000" step="10000"');
+rep('Math.max(100000,Math.floor(S.wallet||0))','Math.max(10000,Math.floor((S.wallet||0)/10))');
+rep("var a=+((document.getElementById('wd-amt')||{}).value||0);","var a=10*Number((document.getElementById('wd-amt')||{}).value||0);");
+rep("toast('حداقل ۱۰۰٬۰۰۰')","toast('حداقل ۱۰٬۰۰۰ تومان')");
+rep("D.assets.push({n:n.value,a:+a.value||0,d:+dd.value||0});","D.assets.push({n:n.value,a:10*Number(a.value)||0,d:+dd.value||0});");
+rep("data-paytxt value=\"'+(amtStr||'')+'\"","data-paytxt value=\"'+(amtStr?Number(amtStr)/10:'')+'\"");
+rep("var amt=+dg||0;","var amt=10*Number(dg)||0;");
+rep("wd('invb').data.payAmt=dg;","wd('invb').data.payAmt=String(amt);");
+rep("PAYM.amt=dg}","PAYM.amt=String(amt)}");
+rep("PAYM.amt=(PAYM.amt||'')+dg;","PAYM.amt=String(10*Number((PAYM.amt?String(Number(PAYM.amt)/10):'')+dg));");
+rep("PAYM.amt=(PAYM.amt||'').slice(0,-1);","PAYM.amt=String(10*Number((PAYM.amt?String(Number(PAYM.amt)/10):'').slice(0,-1)));");
+rep("function grtField(k,label,val,ph,type){", "function grtField(k,label,val,ph,type){if((k==='dep'||k==='rent'||k==='la-income')&&typeof val==='number')val=val/10;");
+rep("fa(tgt[0],0)+' تا '+fa(tgt[1],0)","fa(tgt[0]/(k==='ppm'?10:1),0)+' تا '+fa(tgt[1]/(k==='ppm'?10:1),0)");
+rep("id=\"dvr-'+k+'\">'+fa(v[0],0)+' تا '+fa(v[1],0)","id=\"dvr-'+k+'\">'+fa(v[0]/(k==='ppm'?10:1),0)+' تا '+fa(v[1]/(k==='ppm'?10:1),0)");
+rep("var n=Math.max(mn,Math.min(mx,+v2));","var n=Math.max(mn,Math.min(mx,Number(v2)*(k==='ppm'?10:1)));");
+rep("data-max=\"'+max+'\" value=\"'+v[0]+'\"><span", "data-max=\"'+max+'\" value=\"'+v[0]/(k==='ppm'?10:1)+'\"><span");
+rep("data-max=\"'+max+'\" value=\"'+v[1]+'\"></div>", "data-max=\"'+max+'\" value=\"'+v[1]/(k==='ppm'?10:1)+'\"></div>");
+rep("['۲–۲٫۵ میلیارد','2000000000|2500000000']","['۲۰۰–۲۵۰ میلیون تومان','2000000000|2500000000']");
+rep("['۲٫۵–۳٫۵ میلیارد','2500000000|3500000000']","['۲۵۰–۳۵۰ میلیون تومان','2500000000|3500000000']");
+/* Static prices are converted numerically before changing display labels. */
+[
+ ['۱۲٬۰۰۰٬۰۰۰٬۰۰۰ ریال','۱٬۲۰۰٬۰۰۰٬۰۰۰ تومان'],['۸۰۰٬۰۰۰٬۰۰۰ ریال','۸۰٬۰۰۰٬۰۰۰ تومان'],
+ ['۲۷۴٬۰۰۰ ریال/کیلو','۲۷٬۴۰۰ تومان/کیلو'],['۸٬۵۰۰٬۰۰۰ ریال','۸۵۰٬۰۰۰ تومان'],
+ ['۹٫۵ تا ۱۲ م ریال/روز','۹۵۰ هزار تا ۱٫۲ میلیون تومان/روز'],['۴۸٬۰۰۰٬۰۰۰ ریال','۴٬۸۰۰٬۰۰۰ تومان'],
+ ['۵۴٬۰۰۰ ریال','۵٬۴۰۰ تومان'],['۱۳٬۲۰۰٬۰۰۰ ریال','۱٬۳۲۰٬۰۰۰ تومان']
+].forEach(function(pair){rep(pair[0],pair[1])});
+/* Labels only: do not rewrite explicit-rial parser expressions. */
+H=H.replace(/ریالی/g,'تومانی').replace(/ریال(?=[)؛،: <—·])/g,'تومان').split('ریال/متر').join('تومان/متر');
+
 /* ═══ 10) CSS injection ═══ */
 injectBefore('</style>',readSrc('v31.css')+'\n'+readSrc('v31-guided-ui.css'));
 

@@ -3048,7 +3048,7 @@ window.onerror=function(m,s,l){var e=document.getElementById('errbar');if(e){e.s
 function $(s){return document.querySelector(s)}
 function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
 function fa(n,d){if(d===undefined)d=0;n=Number(n);if(isNaN(n))n=0;return n.toLocaleString('fa-IR',{maximumFractionDigits:d})}
-function rial(v){return fa(v,0)+' ریال'}
+function rial(v){return fa(Number(v)/10,Number(v)%10?1:0)+' تومان'}
 function dt(t){try{return new Date(t).toLocaleDateString('fa-IR',{month:'long',day:'numeric'})}catch(e){return ''}}
 function fd(t){try{return new Date(t).toLocaleDateString('fa-IR',{year:'numeric',month:'long',day:'numeric'})}catch(e){return ''}}
 function dateFa(v){if(!v)return '—';var n=(typeof v==='number')?v:Date.parse(v);return isNaN(n)?String(v):fd(n)}
@@ -3095,25 +3095,28 @@ function parseImportance(input){
   if(/زیاد|مهم|4|۴/.test(t))return 4;
   var c=parseCountFA(t);return c.ok?Math.max(1,Math.min(5,c.value)):3;
 }
+/* Storage schema 1 retains historical rial minor units. All public input and
+   formatting uses toman. No load-time scaling: repeated restore is idempotent. */
+var MONEY_INPUT_CANONICAL=false;
+function moneyCanonical(fn){var prior=MONEY_INPUT_CANONICAL;MONEY_INPUT_CANONICAL=true;try{return fn()}finally{MONEY_INPUT_CANONICAL=prior}}
 function parseMoneyFA(input){
-  var t=normFa(input);
+  var t=normFa(String(input==null?'':input));
   if(!t)return {ok:false,msg:'مبلغ را وارد کنید.'};
   var toman=/تومان|تومن/.test(t),hasRial=/ریال/.test(t);
-  if(toman&&hasRial)return {ok:false,msg:'واحد را مشخص کنید: تومان یا ریال.'};
-  var cleaned=t.replace(/تومان|تومن|ریال/g,' ').replace(/حدود|تقریبا|تقریباً|حداقل|حداکثر|مبلغ/g,' ').trim();
-  if(/بین\s|\sتا\s|\sالی\s|[0-9]\s*[-–—]\s*[0-9]/.test(cleaned))return {ok:false,msg:'برای این فیلد یک مبلغ مشخص بدهید، نه بازه (مثلاً «۳ میلیارد»).'};
-  var pr=parseNumberWords(cleaned);
-  if(!pr.ok)return {ok:false,msg:'مبلغ را با عدد یا عبارتی مثل «۳ میلیارد» یا «۳ میلیون تومان» بنویسید.'};
-  var value=pr.value*(toman?10:1);
-  if(!isFinite(value)||value<=0)return {ok:false,msg:'مبلغ معتبر نیست؛ یک عدد مثبت وارد کنید.'};
-  if(!toman&&!hasRial&&!pr.multi&&value<1000000){
-    return {ok:false,msg:'مبلغ «'+t+'» مبهم است. اگر منظورتان ۳ میلیارد ریال است «۳ میلیارد» و اگر ۳ میلیون است «۳ میلیون» بنویسید.'};
-  }
-  var note=null;
-  if(toman)note='✓ '+t+' = '+rial(Math.round(value))+' ثبت شد.';
-  else if(pr.multi||/[آ-ی]/.test(cleaned))note='✓ مبلغ تفسیرشده: '+rial(Math.round(value));
-  return {ok:true,value:Math.round(value),note:note,unit:toman?'toman':'rial'};
+  if(toman&&hasRial)return {ok:false,msg:'در یک مبلغ فقط یک واحد پول بنویسید.'};
+  var clean=t.replace(/تومان|تومن|ریال/g,' ').replace(/حدود|تقریبا|تقریباً|حداقل|حداکثر|مبلغ/g,' ').trim();
+  if(/بین\s|\sتا\s|\sالی\s|[0-9]\s*[-–—]\s*[0-9]/.test(clean))return {ok:false,msg:'یک مبلغ مشخص بنویسید؛ برای بازه از فیلد بازه استفاده کنید.'};
+  var p=parseNumberWords(clean),unit=hasRial||(!toman&&MONEY_INPUT_CANONICAL)?'rial':'toman';
+  var value=p.value*(unit==='rial'?1:10);
+  if(!p.ok||!Number.isFinite(value)||value<=0||!Number.isSafeInteger(Math.round(value)))return {ok:false,msg:'مبلغ مثبت و معتبر وارد کنید؛ واحد پیش‌فرض تومان است.'};
+  return {ok:true,value:Math.round(value),unit:unit,note:'✓ مبلغ: '+rial(Math.round(value))};
 }
+function moneyChip(el){
+  var value=el.getAttribute('data-cv'),sc=SCRIPTS[CE.f],st=sc&&sc[CE.i];
+  if(st&&st.money&&/^\d+$/.test(value))return value+' ریال';
+  return value;
+}
+
 function parseCountFA(input){
   var t=normFa(input).replace(/تومان|تومن|ریال/g,' ');
   var cleaned=t.replace(/(^|\s)(خواب|خوابه|اتاق|متر|متری|متراژ|سال|ساله|طبقه|مسافر|نفر|شب|عدد|تا|الی|حدود|تقریبا|تقریباً)(?=\s|$)/g,' ');
@@ -3130,7 +3133,7 @@ function parseMoneyRangeFA(input){
   if(toman&&rialUnit)return {ok:false,msg:'در یک بازه از یک واحد پول استفاده کنید: تومان یا ریال.'};
   var between=/^\s*بین\b/.test(t)||/^\s*بین\s/.test(t);
   var body=t.replace(/^\s*(?:بین|از)\s+/,'').replace(/\b(?:حدود|تقریبا|تقریباً)\b/g,' ').trim();
-  var parts;
+  var parts,canonical=/^\d+\s*\|\s*\d+$/.test(body);
   // Preset UI chips already carry two explicit rial endpoints separated by |.
   // Normalize them through the same validation as typed ranges.
   if(/^\d+\s*\|\s*\d+$/.test(body))parts=body.split(/\s*\|\s*/);
@@ -3152,7 +3155,7 @@ function parseMoneyRangeFA(input){
     var v=Number(p.value);
     if(!explicit&&inherited&&v<1e6)v*=inherited;
     /* parseNumberWords already evaluates explicit million/billion words. */
-    if(toman)v*=10;
+    if(!rialUnit&&!canonical&&!MONEY_INPUT_CANONICAL)v*=10;
     return v;
   }
   var lo=endpoint(parts[0],m0),hi=endpoint(parts[1],m1);
@@ -3160,12 +3163,9 @@ function parseMoneyRangeFA(input){
       !Number.isSafeInteger(Math.round(lo))||!Number.isSafeInteger(Math.round(hi))){
     return {ok:false,msg:'بازه یا واحد پول معتبر نیست؛ دو مبلغ مثبت با مرتبهٔ روشن وارد کنید.'};
   }
-  if(!toman&&!rialUnit&&!inherited&&lo<1e6&&hi<1e6){
-    return {ok:false,msg:'واحد مبلغ مبهم است؛ تومان، ریال یا میلیون/میلیارد را بنویسید.'};
-  }
   lo=Math.round(lo);hi=Math.round(hi);
   return {ok:true,value:Math.min(lo,hi)+'|'+Math.max(lo,hi),
-    note:'✓ بازهٔ ریالی: '+rial(Math.min(lo,hi))+' تا '+rial(Math.max(lo,hi)),unit:toman?'toman':'rial'};
+    note:'✓ بازهٔ مبلغ: '+rial(Math.min(lo,hi))+' تا '+rial(Math.max(lo,hi)),unit:rialUnit||canonical?'rial':'toman'};
 }
 
 /* Age preferences accept a new building, upper bound, range, or explicit skip. */
@@ -3762,7 +3762,7 @@ function ser12(base){var m=[.86,.875,.89,.885,.905,.925,.935,.95,.945,.965,.985,
 var REP=[['پکیج / آبگرمکن','o'],['نشت لولهٔ اصلی','o'],['ایزوگام و نم‌گیری','o'],['پمپ آب مشاعات','o'],['شارژ گاز کولر','t'],['شیرآلات و واشر','t'],['قفل و درب واحد','t'],['لامپ و کلید واحد','t']];
 var LGD={
 ok:{lbl:'سند تک‌برگ',est:'۷ روز کاری',rows:[['سند','تک‌برگ رسمی','ok'],['رهن / بازداشت','ندارد','ok'],['تفکیک رسمی','صورت شده','ok'],['مادهٔ ۱۰۰','ندارد','ok'],['وقف / ملی','ندارد','ok']],risk:''},
-mort:{lbl:'رهن بانکی + مادهٔ ۱۰۰',est:'۲۵ تا ۴۰ روز',rows:[['سند','تک‌برگ رسمی','ok'],['رهن بانکی','۱۲٬۰۰۰٬۰۰۰٬۰۰۰ ریال — فک رهن ~۱۵ روز','warn'],['مادهٔ ۱۰۰','جریمه: ۸۰۰٬۰۰۰٬۰۰۰ ریال','bad'],['وقف','ندارد','ok']],risk:'تا رفع موانع، وجه فقط در حساب امانی آزاد می‌شود.'},
+mort:{lbl:'رهن بانکی + مادهٔ ۱۰۰',est:'۲۵ تا ۴۰ روز',rows:[['سند','تک‌برگ رسمی','ok'],['رهن بانکی','۱٬۲۰۰٬۰۰۰٬۰۰۰ تومان — فک رهن ~۱۵ روز','warn'],['مادهٔ ۱۰۰','جریمه: ۸۰٬۰۰۰٬۰۰۰ تومان','bad'],['وقف','ندارد','ok']],risk:'تا رفع موانع، وجه فقط در حساب امانی آزاد می‌شود.'},
 heir:{lbl:'ورثه‌ای و وقفی',est:'بیش از ۴۵ روز',rows:[['سند','منگوله‌دار','warn'],['وقف','استعلام اوقاف لازم','warn'],['وراثت','گواهی انحصار وراثت نیست','bad'],['وکالت','اعتبار نامشخص','bad'],['مالیات ارث','مفاصاحساب نیست','bad']],risk:'فروش ملک ورثه‌ای بدون رضایت همهٔ ورثه باطل است — مگر با پرداخت مرحله‌ای امانی.'}};
 var SCN={bad:{p:.06,g:.08,u:.05,d:.225},mid:{p:.24,g:.26,u:.31,d:.225},good:{p:.42,g:.48,u:.6,d:.225}};
 var SLIST=[
@@ -3792,10 +3792,10 @@ var PRJ=[
 (function(){var i;for(i=0;i<S.nprj.length;i++){PRJ.push(S.nprj[i])}})();
 var BIDS=[{n:'بنیان‌گستر — ★۴٫۶',amt:8200000000,dur:18},{n:'آریا سازه — ★۴٫۳',amt:7800000000,dur:20},{n:'مهر ساخت — ★۴٫۱',amt:8600000000,dur:16}];
 var SUPS=[
-{t:'آرماتور A3 — بورس کالا',b:['استاندارد ملی','آنالیز کارخانه'],p:'۲۷۴٬۰۰۰ ریال/کیلو',d:'۳ روز',stock:'۵۰۰ تن',min:'۲ تن',s:'۴٫۷'},
-{t:'خدمات جرثقیل — تهران',b:['صلاحیت فنی','بیمهٔ اپراتور'],p:'ساعتی ۸٬۵۰۰٬۰۰۰ ریال',d:'همان روز',stock:'۳ دستگاه',min:'۴ ساعت',s:'۴٫۴'},
-{t:'تیم اجرایی — ۱۲ نفر',b:['پروفایل راستی‌آزمایی'],p:'۹٫۵ تا ۱۲ م ریال/روز',d:'این هفته',stock:'—',min:'۲ هفته',s:'۴٫۶'},
-{t:'بتن آمادهٔ C30',b:['گواهی آزمایشگاه'],p:'متری ۴۸٬۰۰۰٬۰۰۰ ریال',d:'فردا',stock:'۲۰۰ متر/روز',min:'۱۰ متر',s:'۴٫۵'}];
+{t:'آرماتور A3 — بورس کالا',b:['استاندارد ملی','آنالیز کارخانه'],p:'۲۷٬۴۰۰ تومان/کیلو',d:'۳ روز',stock:'۵۰۰ تن',min:'۲ تن',s:'۴٫۷'},
+{t:'خدمات جرثقیل — تهران',b:['صلاحیت فنی','بیمهٔ اپراتور'],p:'ساعتی ۸۵۰٬۰۰۰ تومان',d:'همان روز',stock:'۳ دستگاه',min:'۴ ساعت',s:'۴٫۴'},
+{t:'تیم اجرایی — ۱۲ نفر',b:['پروفایل راستی‌آزمایی'],p:'۹۵۰ هزار تا ۱٫۲ میلیون تومان/روز',d:'این هفته',stock:'—',min:'۲ هفته',s:'۴٫۶'},
+{t:'بتن آمادهٔ C30',b:['گواهی آزمایشگاه'],p:'متری ۴٬۸۰۰٬۰۰۰ تومان',d:'فردا',stock:'۲۰۰ متر/روز',min:'۱۰ متر',s:'۴٫۵'}];
 var PACKS=[
 {n:'پایه',tok:1500,pr:2990000,f:['۱۵۰۰ کلید','جزئیات آگهی و بازدید','۲ گزارش حقوقی']},
 {n:'حرفه‌ای',tok:4000,pr:6990000,f:['۴۰۰۰ کلید','حقوقی نامحدود','قرارداد امانی','پشتیبانی اولویت‌دار'],best:true},
@@ -3819,7 +3819,7 @@ var FIN={
   },
   rent:{
     cashAnnual:(54000*12)/13200000,
-    source:'دادهٔ داخلی سامانه: ۵۴٬۰۰۰ ریال درآمد ماهانه به‌ازای هر کلید با ارزش پایهٔ ۱۳٬۲۰۰٬۰۰۰ ریال'
+    source:'دادهٔ داخلی سامانه: ۵٬۴۰۰ تومان درآمد ماهانه به‌ازای هر کلید با ارزش پایهٔ ۱٬۳۲۰٬۰۰۰ تومان'
   },
   nav:{default:0.32,source:'فرض افزایش ارزش ملک پیش‌فرض سامانه؛ قابل تغییر و غیرتضمینی'}
 };
@@ -4275,7 +4275,7 @@ function bindImp(m){
   });
   updImp(m);
 }
-function drLabel(k,tgt){var e=document.getElementById('dvr-'+k);if(e){e.textContent=fa(tgt[0],0)+' تا '+fa(tgt[1],0)}}
+function drLabel(k,tgt){var e=document.getElementById('dvr-'+k);if(e){e.textContent=fa(tgt[0]/(k==='ppm'?10:1),0)+' تا '+fa(tgt[1]/(k==='ppm'?10:1),0)}}
 function bindDr(m){
   var D=wd(m).data;
   $$('[data-dr]').forEach(function(r){
@@ -4290,16 +4290,16 @@ function bindDr(m){
   });
 }
 function drrow(k,l,min,max,step,v){
-  return '<div class="srow"><div class="slab"><span>'+l+'</span><b id="dvr-'+k+'">'+fa(v[0],0)+' تا '+fa(v[1],0)+'</b></div>'+
+  return '<div class="srow"><div class="slab"><span>'+l+'</span><b id="dvr-'+k+'">'+fa(v[0]/(k==='ppm'?10:1),0)+' تا '+fa(v[1]/(k==='ppm'?10:1),0)+'</b></div>'+
   '<input type="range" data-dr="'+k+'" data-side="0" data-min="'+min+'" data-max="'+max+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+v[0]+'">'+
   '<input type="range" data-dr="'+k+'" data-side="1" data-min="'+min+'" data-max="'+max+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+v[1]+'">'+
-  '<div style="display:flex;gap:8px;margin-top:4px;align-items:center"><input class="tinp" data-dt="'+k+'" data-side="0" data-min="'+min+'" data-max="'+max+'" value="'+v[0]+'"><span class="note">تا</span><input class="tinp" data-dt="'+k+'" data-side="1" data-min="'+min+'" data-max="'+max+'" value="'+v[1]+'"></div></div>';
+  '<div style="display:flex;gap:8px;margin-top:4px;align-items:center"><input class="tinp" data-dt="'+k+'" data-side="0" data-min="'+min+'" data-max="'+max+'" value="'+v[0]/(k==='ppm'?10:1)+'"><span class="note">تا</span><input class="tinp" data-dt="'+k+'" data-side="1" data-min="'+min+'" data-max="'+max+'" value="'+v[1]/(k==='ppm'?10:1)+'"></div></div>';
 }
 function prRangeBlock(D,m){
   var P=D.PR,h='<div class="card"><div class="ct"> بازهٔ اولویت‌های ملک</div>';
   h+=drrow('age','عمر بنا (سال)',0,30,1,P.age);
   h+=drrow('m2','متراژ (متر)',40,140,5,P.m2);
-  h+=drrow('ppm','قیمت هر متر (ریال)',1800000000,5500000000,50000000,P.ppm);
+  h+=drrow('ppm','قیمت هر متر (تومان)',1800000000,5500000000,50000000,P.ppm);
   h+=drrow('floorR','طبقه',1,10,1,P.floorR);
   h+='<div class="srow"><div class="slab"><span>حداقل خواب</span></div><div class="chips">'+[[0,'۰'],[1,'۱'],[2,'۲'],[3,'۳+']].map(function(b){return '<span class="chip'+(P.beds===b[0]?' on':'')+'" data-act="prset" data-m="'+m+'" data-k="beds" data-v="'+b[0]+'">'+b[1]+'</span>'}).join('')+'</div></div>';
   h+='<div class="srow"><div class="slab"><span>ویژگی‌های الزامی</span></div><div class="chips">'+[['elev','آسانسور'],['park','پارکینگ'],['balc','بالکن']].map(function(f){return '<span class="chip'+(P[f[0]]==='yes'?' on':'')+'" data-act="prtog" data-m="'+m+'" data-k="'+f[0]+'">'+f[1]+'</span>'}).join('')+'</div></div>';
@@ -4479,7 +4479,7 @@ function lcard2(x,D,sel,sc,fb){
   '<div class="pcard-art">'+ph(x.seed,480,360,'')+'<span class="pcard-type">اجارهٔ ماهانه</span>'+
   '<div class="pcard-badges"><span class="match" style="position:static">'+(fb?'نزدیک‌ترین پیشنهاد':'تطبیق ٪'+fa(sc,0))+'</span>'+srcBadge(x)+'</div></div>'+
   '<div class="pcard-body">'+
-  '<div class="pcard-price">'+rial(x.rent)+'<small>ریال در ماه</small></div>'+
+  '<div class="pcard-price">'+rial(x.rent)+'<small>تومان در ماه</small></div>'+
   '<div style="font-size:12px;color:var(--ink2)">ودیعه (رهن): <b style="color:var(--ink)">'+rial(x.dep)+'</b></div>'+
   '<div class="pcard-title">'+esc(x.t)+'</div>'+
   '<div class="pcard-adr">'+ico('map',12)+' '+esc(findH(x.hood).n)+'</div>'+
@@ -4593,7 +4593,7 @@ function payPanel(mode,unit,rate,amtStr,sugg,title){
   var amt=+(amtStr||'0'),units=Math.floor(amt/rate),fee=Math.round(amt*0.005);
   var h='<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><b style="font-size:14px">'+title+'</b><span class="note">فاکتور ۰٫۵٪</span></div>';
   h+='<div class="payamt">مبلغ<b id="pay-amt">'+rial(amt)+'</b></div>';
-  h+='<div class="srow"><input class="inp" data-paytxt value="'+(amtStr||'')+'" placeholder="مبلغ را تایپ کنید (ریال) — ارقام فارسی هم پذیرفته" style="direction:ltr;text-align:left"></div>';
+  h+='<div class="srow"><input class="inp" data-paytxt value="'+(amtStr?Number(amtStr)/10:'')+'" placeholder="مبلغ را تایپ کنید (تومان) — ارقام فارسی هم پذیرفته" style="direction:ltr;text-align:left"></div>';
   h+='<div class="kv"><span>دریافت شما</span><b id="pay-units">'+fa(units,0)+' '+unit+'</b></div>';
   h+='<div class="kv"><span>کارمزد (۰٫۵٪)</span><b id="pay-fee">'+rial(fee)+'</b></div>';
   h+='<div class="kv"><span>مبلغ نهایی</span><b id="pay-total">'+rial(amt+fee)+'</b></div>';
@@ -5094,7 +5094,7 @@ function ceVal(v){
     v=pmr.value;note=pmr.note;
   }
   var done=null;
-  if(st.set){done=st.set(D,v)}
+  if(st.set){done=(st.money||st.moneyRange)?moneyCanonical(function(){return st.set(D,v)}):st.set(D,v)}
   else if(st.key){D[st.key]=v}
   if(done==='ERR'){botC(st.err||('این مقدار در بازهٔ مجاز نیست. '+(st.hint||'یک مقدار معتبر وارد کنید.')));return}
   try{ctxFromStep(CE.f,st,D)}catch(e){}
@@ -5179,7 +5179,7 @@ function chatListCard(x,sel){
   return '<div class="pcard'+(sel?' sel':'')+'">'+
   '<div class="pcard-art">'+ph(x.seed,480,360,'')+'<span class="pcard-type">اجارهٔ ماهانه</span></div>'+
   '<div class="pcard-body">'+
-  '<div class="pcard-price">'+rial(x.rent)+'<small>ریال در ماه</small></div>'+
+  '<div class="pcard-price">'+rial(x.rent)+'<small>تومان در ماه</small></div>'+
   '<div style="font-size:12px;color:var(--ink2)">ودیعه (رهن): <b style="color:var(--ink)">'+rial(x.dep)+'</b></div>'+
   '<div class="pcard-title">'+esc(x.t)+'</div>'+
   '<div class="pcard-adr">'+ico('map',12)+' '+esc(findH(x.hood).n)+'</div>'+
@@ -5241,7 +5241,7 @@ SCRIPTS.gate=[
  chips:function(){return [[' اجاره','F:rent'],[' خرید','F:buy'],[' سرمایه‌گذاری','F:invp'],[' پروژه‌ها','F:mkt'],[' اقامتگاه','F:stay'],['نقشه','F:dashx'],[' راهنما','!help']]}}
 ];
 SCRIPTS.rent=[
-{id:'dep',money:true,q:' <b>مبلغ ودیعهٔ شما</b> چقدر است؟ (ریال — عدد دقیق وارد کنید)',kind:'num',
+{id:'dep',money:true,q:' <b>مبلغ ودیعهٔ شما</b> چقدر است؟ (تومان — عدد دقیق وارد کنید)',kind:'num',
  pre:function(D){if(CTX.dep&&!D._depSet){if(!D.B){D.B={inc:1500000000,depB:CTX.dep,rentB:0,chg:50000000,incr:100000000}}D.B.depB=CTX.dep;D._depSet=1;botC('✓ ودیعه از گفت‌وگوی قبلی به‌کار رفت: <b>'+rial(CTX.dep)+'</b> — برای تغییر، «بازگشت» را بزنید.');return false}return true},
  chips:function(){return [['۵۰۰ میلیون تومان','5000000000'],['۱ میلیارد تومان','10000000000'],['۳ میلیارد تومان','30000000000'],['بدون سقف','بدون سقف']]},
  set:function(D,v){
@@ -5252,8 +5252,8 @@ SCRIPTS.rent=[
    if(p.mode==='open'){D.depOpen=true;D.B.depB=D.B.depB||15000000000;return null}
    if(p.n<=0)return 'ERR';
    D.depOpen=false;D.B.depB=p.n;return null},
- err:'ودیعه را به ریال بنویسید (مثلاً «۱۵ میلیارد» یا «۱٫۵ میلیارد تومان») — بدون سقف؛ یا «بدون سقف» بفرستید.'},
-{id:'rentb',money:true,q:' <b>اجارهٔ ماهانهٔ شما</b> چقدر است؟ (ریال)',kind:'num',
+ err:'ودیعه را به تومان بنویسید (مثلاً «۱۵ میلیارد» یا «۱٫۵ میلیارد تومان») — بدون سقف؛ یا «بدون سقف» بفرستید.'},
+{id:'rentb',money:true,q:' <b>اجارهٔ ماهانهٔ شما</b> چقدر است؟ (تومان)',kind:'num',
  pre:function(D){if(CTX.rent&&!D._rentbSet){D.B=D.B||{inc:1500000000,depB:CTX.dep||15000000000,rentB:CTX.rent,chg:50000000,incr:100000000};D.B.rentB=CTX.rent;D._rentbSet=1;botC('✓ سقف اجاره از گفت‌وگوی قبلی: <b>'+rial(CTX.rent)+'</b>');return false}return true},
  chips:function(){return [['۳۰ میلیون تومان','300000000'],['۵۰ میلیون تومان','500000000'],['۸۰ میلیون تومان','800000000'],['بدون سقف','بدون سقف']]},
  set:function(D,v){
@@ -5262,7 +5262,7 @@ SCRIPTS.rent=[
    if(p.mode==='open'){D.rentBOpen=true;D._rentbSet=1;return null}
    if(p.n<=0)return 'ERR';
    D.rentBOpen=false;D._rentbSet=1;D.B.rentB=p.n;return null},
- err:'اجارهٔ ماهانه را به ریال بنویسید (مثلاً «۸۰ میلیون تومان») — بدون سقف؛ یا «بدون سقف» بفرستید.'},
+ err:'اجارهٔ ماهانه را به تومان بنویسید (مثلاً «۸۰ میلیون تومان») — بدون سقف؛ یا «بدون سقف» بفرستید.'},
 {id:'imps',loop:[{k:'metro',t:' اهمیت دسترسی به مترو (۱–۵)؟'},{k:'school',t:' اهمیت نزدیکی به مدرسه؟'},{k:'work',t:' اهمیت کوتاه‌بودن رفت‌وآمد به کار'+wLabel()+'؟'}],pre:function(D){defP(D);return true}},
 {id:'beds',count:true,q:' حداقل چند خواب؟',chips:function(){return [['۰','0'],['۱','1'],['۲','2'],['۳ یا بیشتر','3']]},pre:function(D){if(CTX.beds&&D._bedsSet===undefined){defP(D);D.P.beds=CTX.beds;D._bedsSet=1;botC('✓ حداقل خواب از گفت‌وگوی قبلی: <b>'+fa(CTX.beds,0)+'</b>');return false}return true},set:function(D,v){defP(D);D.P.beds=+v;D._bedsSet=1;return null}},
 {id:'who',kind:'text',q:'و برای تنظیم بهتر پیشنهادها — این خانه بیشتر برای چه موقعیتی مناسب است؟ (اختیاری؛ می‌توانید رد کنید)',
@@ -5442,7 +5442,7 @@ SCRIPTS.rent=[
  acts:{pay:function(){ACT.tpay();ceEnd()}}}
 ];
 SCRIPTS.buy=[
-{id:'budg',money:true,q:' بودجهٔ کل خرید شما چقدر است؟ (ریال — تایپ کنید)',kind:'num',
+{id:'budg',money:true,q:' بودجهٔ کل خرید شما چقدر است؟ (تومان — تایپ کنید)',kind:'num',
  pre:function(D){if(CTX.budg&&!D._budgSet&&CTX.budg>=50000000000){D.budg=CTX.budg;D._budgSet=1;botC('✓ بودجه از گفت‌وگوی قبلی: <b>'+rial(CTX.budg)+'</b> — برای تغییر، «بازگشت» را بزنید.');return false}return true},
  chips:function(){return [['۱۵ میلیارد تومان','150000000000'],['۳۰ میلیارد تومان','300000000000'],['۵۰ میلیارد تومان','500000000000'],['بدون بودجهٔ مشخص','بدون بودجهٔ مشخص'],['۵ میلیارد به بالا','۵ میلیارد به بالا']]},
  set:function(D,v){
@@ -5454,11 +5454,11 @@ SCRIPTS.buy=[
    if(p.mode==='max'){D.budgOpen=false;D.budg=p.n;botC('✓ سقف بودجه '+rial(p.n)+' ثبت شد — بدون کف.');return null}
    if(p.n<=0)return 'ERR';
    D.budgOpen=false;D.budg=p.n;return null},
- err:'بودجه را به ریال بنویسید (مثلاً «۳۰ میلیارد» یا «۵ میلیارد به بالا» یا «بدون بودجهٔ مشخص»).'},
+ err:'بودجه را به تومان بنویسید (مثلاً «۳۰ میلیارد» یا «۵ میلیارد به بالا» یا «بدون بودجهٔ مشخص»).'},
 {id:'imps',loop:[{k:'metro',t:' اهمیت مترو؟'},{k:'school',t:' اهمیت مدرسه؟'},{k:'work',t:' اهمیت رفت‌وآمد'+wLabel()+'؟'}],pre:function(D){defP(D);defPR(D);return true}},
 {id:'age',range:true,q:' بازهٔ عمر بنا؟',chips:function(){return [['نوساز','0|3'],['۰–۵','0|5'],['۳–۱۰','3|10'],['تا ۲۰','0|20'],['هرچه','0|30']]},set:function(D,v){defPR(D);var p=String(v).split('|');if(p.length!==2||!p.every(function(n){return Number.isFinite(+n)&&+n>=0})||+p[0]>+p[1])return 'ERR';D.PR.age=[+p[0],+p[1]];return null}},
 {id:'m2',range:true,q:' بازهٔ متراژ؟ (بنویسید 45-60)',kind:'text',chips:function(){return [['۴۵–۶۰','45|60'],['۵۰–۷۰','50|70'],['۶۰–۹۰','60|90'],['۷۰+','70|130']]},set:function(D,v){var p=pd(v).split(/[-|]/);if(p.length<2||!+p[1])return 'ERR';D.PR.m2=[+p[0],+p[1]];return null}},
-{id:'ppm',moneyRange:true,q:' بازهٔ قیمت هر متر (ریال)؟ (بنویسید 2000000000-3000000000)',kind:'text',chips:function(){return [['۲–۲٫۵ میلیارد','2000000000|2500000000'],['۲٫۵–۳٫۵ میلیارد','2500000000|3500000000'],['مهم نیست','1800000000|5500000000']]},set:function(D,v){var p=pd(v).split(/[-|]/);if(p.length<2||!+p[1])return 'ERR';D.PR.ppm=[+p[0],+p[1]];return null}},
+{id:'ppm',moneyRange:true,q:' بازهٔ قیمت هر متر (تومان)؟ (بنویسید 2000000000-3000000000)',kind:'text',chips:function(){return [['۲۰۰–۲۵۰ میلیون تومان','2000000000|2500000000'],['۲۵۰–۳۵۰ میلیون تومان','2500000000|3500000000'],['مهم نیست','1800000000|5500000000']]},set:function(D,v){var p=pd(v).split(/[-|]/);if(p.length<2||!+p[1])return 'ERR';D.PR.ppm=[+p[0],+p[1]];return null}},
 {id:'floor',range:true,q:' بازهٔ طبقه؟ (بنویسید 1-3 یا «همه»)',kind:'text',chips:function(){return [['۱–۳','1|3'],['۴–۱۰','4|10'],['همه','1|10']]},set:function(D,v){if(/همه/.test(v)){D.PR.floorR=[1,10];return null}var p=pd(v).split(/[-|]/);if(p.length<2||!+p[1])return 'ERR';D.PR.floorR=[Math.max(1,+p[0]),Math.min(10,+p[1])];return null}},
 {id:'beds',count:true,q:' حداقل خواب؟',chips:function(){return [['۰','0'],['۱','1'],['۲','2'],['۳+','3']]},set:function(D,v){D.PR.beds=+v;return null}},
 {id:'feat',q:' ویژگی الزامی؟ (آسانسور/پارکینگ/بالکن/هیچ)',kind:'text',
@@ -5621,7 +5621,7 @@ SCRIPTS.mkt=[
   }
  }},
 {id:'bid',money:true,pre:function(D){return D.role==='con'},
- q:' قیمت پایهٔ پیشنهاد (ریال — تایپ کنید)؟',kind:'num',
+ q:' قیمت پایهٔ پیشنهاد (تومان — تایپ کنید)؟',kind:'num',
  chips:function(){return [['۸ میلیارد','8000000000'],['۱۰ میلیارد','10000000000'],['۱۲ میلیارد','12000000000']]},
  set:function(D,v){D.bidAmt=+pd(v)||8000000000;return null}},
 {id:'adj',pre:function(D){return D.role==='con'},
@@ -5873,7 +5873,7 @@ function ctxFromStep(f,st,D){
   }catch(e){}
 }
 /* ── نمایش‌سازها ── */
-function rShort(v){v=+v||0;if(v>=1e9)return fa(v/1e9,1)+' میلیارد';if(v>=1e6)return fa(v/1e6,0)+' میلیون';return fa(v,0)}
+function rShort(v){v=(+v||0)/10;if(v>=1e9)return fa(v/1e9,1)+' میلیارد';if(v>=1e6)return fa(v/1e6,0)+' میلیون';return fa(v,0)}
 function rcard(t,v,sub,cls,full){return '<div class="rcard'+(full?' full':'')+'"><small>'+esc(t)+'</small><span class="rv '+(cls||'')+'">'+v+'</span>'+(sub?'<span class="sub">'+sub+'</span>':'')+'</div>'}
 function rcards(a){return '<div class="rcards">'+a.join('')+'</div>'}
 function rcNote(t){return '<div class="rnote">'+t+'</div>'}
@@ -6542,11 +6542,11 @@ function conPropHTML(D,kind){
   if(isRent){
     h+='<div class="srow"><div class="slab"><span>تاریخ شروع</span></div><input class="inp" id="cp-start" type="date" value="'+qesc(c.terms.start||'')+'" style="direction:ltr;text-align:left"></div>'+
     '<div class="srow"><div class="slab"><span>مدت</span></div><select class="inp" id="cp-dur"><option'+(c.terms.duration==='یک‌ساله'?' selected':'')+'>یک‌ساله</option><option'+(c.terms.duration==='دوساله'?' selected':'')+'>دوساله</option></select></div>'+
-    '<div class="srow"><div class="slab"><span>ودیعه (ریال)</span></div><input class="inp" id="cp-dep" type="number" value="'+qesc(String(c.terms.deposit||''))+'" style="direction:ltr;text-align:left"></div>'+
-    '<div class="srow"><div class="slab"><span>اجارهٔ ماهانه (ریال)</span></div><input class="inp" id="cp-rent" type="number" value="'+qesc(String(c.terms.rent===0?0:(c.terms.rent||'')))+'" style="direction:ltr;text-align:left"></div>'+
+    '<div class="srow"><div class="slab"><span>ودیعه (تومان)</span></div><input class="inp" id="cp-dep" type="number" value="'+qesc(String(c.terms.deposit?c.terms.deposit/10:''))+'" style="direction:ltr;text-align:left"></div>'+
+    '<div class="srow"><div class="slab"><span>اجارهٔ ماهانه (تومان)</span></div><input class="inp" id="cp-rent" type="number" value="'+qesc(String(c.terms.rent==null?'':c.terms.rent/10))+'" style="direction:ltr;text-align:left"></div>'+
     '<div class="srow"><div class="slab"><span>روز پرداخت</span></div><select class="inp" id="cp-pay"><option'+(c.terms.paymentDay==='پنجم هر ماه'?' selected':'')+'>پنجم هر ماه</option><option'+(c.terms.paymentDay==='اول هر ماه'?' selected':'')+'>اول هر ماه</option><option'+(c.terms.paymentDay==='توافقی'?' selected':'')+'>توافقی</option></select></div>';
   }else{
-    h+='<div class="srow"><div class="slab"><span>قیمت توافق‌شده (ریال)</span></div><input class="inp" id="cp-price" type="number" value="'+qesc(String(c.terms.price||''))+'" style="direction:ltr;text-align:left"></div>'+
+    h+='<div class="srow"><div class="slab"><span>قیمت توافق‌شده (تومان)</span></div><input class="inp" id="cp-price" type="number" value="'+qesc(String(c.terms.price?c.terms.price/10:''))+'" style="direction:ltr;text-align:left"></div>'+
     '<div class="srow"><div class="slab"><span>تاریخ تحویل</span></div><input class="inp" id="cp-delivery" type="date" value="'+qesc(c.terms.delivery||'')+'" style="direction:ltr;text-align:left"></div>'+
     '<div class="srow"><div class="slab"><span>نحوهٔ پرداخت</span></div><select class="inp" id="cp-payment"><option'+(c.terms.payment==='مرحله‌ای'?' selected':'')+'>مرحله‌ای</option><option'+(c.terms.payment==='یکجا'?' selected':'')+'>یکجا</option></select></div>';
   }
@@ -6948,7 +6948,7 @@ VIEWS.buy=function(){
     '<div class="grid g2" style="margin-top:12px">'+
     '<div>'+drrow('age','عمر بنا (سال)',0,30,1,D.PR.age)+'</div>'+
     '<div>'+drrow('m2','متراژ',40,140,5,D.PR.m2)+'</div>'+
-    '<div>'+drrow('ppm','هر متر (ریال)',1800000000,5500000000,50000000,D.PR.ppm)+'</div>'+
+    '<div>'+drrow('ppm','هر متر (تومان)',1800000000,5500000000,50000000,D.PR.ppm)+'</div>'+
     '<div>'+drrow('floorR','طبقه',1,10,1,D.PR.floorR)+'</div></div>'+
     '<div class="chips" style="margin-top:8px">'+
     [[0,'۰ خواب+'],[1,'۱+'],[2,'۲+'],[3,'۳+']].map(function(b){return '<span class="chip'+(D.PR.beds===b[0]?' on':'')+'" data-act="prset" data-m="buy" data-k="beds" data-v="'+b[0]+'">'+b[1]+'</span>'}).join('')+
@@ -7714,7 +7714,7 @@ function accountWalletHTML(){
   var hist=wl.length?'<div class="tblwrap"><table class="tbl"><thead><tr><th>شرح</th><th>مبلغ</th><th>تاریخ</th></tr></thead><tbody>'+wl.slice(0,12).map(function(w){
     return '<tr><td>'+esc(w.d)+'</td><td><b style="color:'+(w.a<0?'var(--danger)':'var(--ok)')+'">'+rial(Math.abs(w.a))+'</b></td><td>'+dt(w.t)+'</td></tr>';
   }).join('')+'</tbody></table></div>':'<div class="empty">واریزی ثبت نشده است.</div>';
-  return '<div class="acc-hero"><div class="card"><div class="ct">کیف پول ریالی</div><div class="acc-balance">'+rial(S.wallet||0)+'<small>موجودی قابل برداشت</small></div>'+
+  return '<div class="acc-hero"><div class="card"><div class="ct">کیف پول تومانی</div><div class="acc-balance">'+rial(S.wallet||0)+'<small>موجودی قابل برداشت</small></div>'+
   '<div class="acc-actions"><button class="btn btn-sm btn-primary" data-act="wchat">شارژ کیف پول</button><button class="btn btn-sm" data-act="wdraw">برداشت وجه</button><button class="btn btn-sm" data-act="account" data-tab="plan">خرید کلید</button></div>'+
   '<p class="note" style="margin-top:10px">شارژ با درگاه نمایشی.</p></div>'+
   '<div class="card"><div class="ct">خلاصه</div><div class="kv"><span>تعداد واریز</span><b>'+fa(wl.filter(function(w){return w.a>0}).length,0)+' مورد</b></div>'+
@@ -8209,7 +8209,7 @@ ACT.nprj=function(){
   '<div class="srow"><div class="slab"><span>موقعیت</span></div><input class="inp" id="np-loc" placeholder="تهران، ..."></div>'+
   '<div class="grid g2"><div class="srow"><div class="slab"><span>زیربنا (متر)</span></div><input class="inp" id="np-area" type="number" value="3000" style="direction:ltr;text-align:left"></div>'+
   '<div class="srow"><div class="slab"><span>مدت (ماه)</span></div><input class="inp" id="np-dur" type="number" value="18" style="direction:ltr;text-align:left"></div></div>'+
-  '<div class="srow"><div class="slab"><span>بودجه (ریال)</span></div><input class="inp" id="np-amt" type="number" value="8000000000" step="500000000" style="direction:ltr;text-align:left"></div>'+
+  '<div class="srow"><div class="slab"><span>بودجه (تومان)</span></div><input class="inp" id="np-amt" type="number" value="800000000" step="50000000" style="direction:ltr;text-align:left"></div>'+
   '<div class="srow"><div class="slab"><span>محدودهٔ کار</span></div><select class="inp" id="np-scope"><option>از صفر (گودبرداری)</option><option>ادامهٔ کار</option><option>بهسازی</option></select></div>'+
   '<button class="btn btn-primary" data-act="npOk">ثبت در مارکت‌پلیس</button> <button class="btn" data-act="closeModal">انصراف</button>');
 };
@@ -8219,7 +8219,7 @@ ACT.npOk=function(){
   if(!t||!loc){toast('عنوان و موقعیت را وارد کنید');return}
   var area=+(document.getElementById('np-area').value||3000);
   var dur=+(document.getElementById('np-dur').value||18);
-  var amt=+(document.getElementById('np-amt').value||0);
+  var amt=10*Number(document.getElementById('np-amt').value||0);
   var scope=document.getElementById('np-scope').value;
   var p={t:t,loc:loc,emp:'کارفرما/ثبت: '+S.auth.name,fl:'طبقات طبق طرح',area:fa(area,0)+' متر',pre:'توافقی',score:'جدید',bids:0,dur:fa(dur,0)+' ماه',start:'پس از تأیید اسناد',scope:scope,lic:'بررسی اسناد',pay:'مرحله‌ای',hist:'ثبت شما',mine:true};
   PRJ.push(p);S.nprj.push(p);
@@ -8430,10 +8430,10 @@ function conCapture(D,kind){
     if(po)c.prop.postal=po;if(ar)c.prop.area=ar;if(v('cp-addr')!==null)c.prop.addr=v('cp-addr');
     if(kind==='rent'){
       if(v('cp-start'))c.terms.start=v('cp-start');if(v('cp-dur'))c.terms.duration=v('cp-dur');
-      var dp=+v('cp-dep'),rn=+v('cp-rent');if(dp)c.terms.deposit=dp;if(rn)c.terms.rent=rn;
+      var dp=10*Number(v('cp-dep')),rn=10*Number(v('cp-rent'));if(v('cp-dep'))c.terms.deposit=dp;if(v('cp-rent'))c.terms.rent=rn;
       if(v('cp-pay'))c.terms.paymentDay=v('cp-pay');
     }else{
-      var pr=+v('cp-price');if(pr)c.terms.price=pr;if(v('cp-delivery'))c.terms.delivery=v('cp-delivery');if(v('cp-payment'))c.terms.payment=v('cp-payment');
+      var pr=10*Number(v('cp-price'));if(pr)c.terms.price=pr;if(v('cp-delivery'))c.terms.delivery=v('cp-delivery');if(v('cp-payment'))c.terms.payment=v('cp-payment');
     }
     if(v('cp-notes')!==null)c.terms.notes=v('cp-notes');
   }
@@ -8475,13 +8475,13 @@ ACT.cpropSave=function(){
   if(!area||area<10){toast('متراژ را درست وارد کنید');return}
   c.prop.postal=postal;c.prop.addr=addr;c.prop.area=area;
   if(ctx.kind==='rent'){
-    var depText=v('cp-dep'),rentText=v('cp-rent'),dep=Number(depText),rent=Number(rentText);
+    var depText=v('cp-dep'),rentText=v('cp-rent'),dep=10*Number(depText),rent=10*Number(rentText);
     if(!depText||!rentText||!Number.isFinite(dep)||!Number.isFinite(rent)||dep<0||rent<0||(dep===0&&rent===0)){toast('مبلغ‌های ودیعه و اجاره را درست وارد کنید؛ رهن کامل با اجارهٔ صفر پذیرفته است');return}
     c.terms.start=v('cp-start');if(!c.terms.start){toast('تاریخ شروع را انتخاب کنید');return}
     c.terms.duration=v('cp-dur')||'یک‌ساله';c.terms.deposit=dep;c.terms.rent=rent;c.terms.paymentDay=v('cp-pay')||'پنجم هر ماه';
     ctx.D.B.depB=dep;ctx.D.dur=c.terms.duration;
   }else{
-    var price=+v('cp-price'),delivery=v('cp-delivery');
+    var price=10*Number(v('cp-price')),delivery=v('cp-delivery');
     if(!price){toast('قیمت را وارد کنید');return}
     if(!delivery){toast('تاریخ تحویل را انتخاب کنید');return}
     c.terms.price=price;c.terms.delivery=delivery;c.terms.payment=v('cp-payment')||'مرحله‌ای';
@@ -8652,7 +8652,7 @@ ACT.asadd=function(){
   var n=document.getElementById('asn'),a=document.getElementById('asa'),dd=document.getElementById('asd');
   if(!n||!a||!dd)return;
   if(!n.value.replace(/^\s+|\s+$/g,'')){toast('نام دارایی');return}
-  D.assets.push({n:n.value,a:+a.value||0,d:+dd.value||0});
+  D.assets.push({n:n.value,a:10*Number(a.value)||0,d:+dd.value||0});
   save();if(CURRENT==='profile')renderCurrent();else renderTok();toast('ذخیره شد');
 };
 ACT.iscn=function(el){wd('invb').data.scn=el.getAttribute('data-v');save();renderCurrent()};
@@ -8673,7 +8673,7 @@ ACT.pk=function(el){
     if(D.payAmt.length>14){D.payAmt=D.payAmt.slice(0,14)}
     save();renderCurrent();
   }else{
-    PAYM.amt=(PAYM.amt||'')+dg;
+    PAYM.amt=String(10*Number((PAYM.amt?String(Number(PAYM.amt)/10):'')+dg));
     if(PAYM.amt.length>14){PAYM.amt=PAYM.amt.slice(0,14)}
     reopenPay();
   }
@@ -8684,7 +8684,7 @@ ACT.pkdel=function(){
     D.payAmt=(D.payAmt||'').slice(0,-1);
     save();renderCurrent();
   }else{
-    PAYM.amt=(PAYM.amt||'').slice(0,-1);
+    PAYM.amt=String(10*Number((PAYM.amt?String(Number(PAYM.amt)/10):'').slice(0,-1)));
     reopenPay();
   }
 };
@@ -8800,14 +8800,14 @@ ACT.irdone=function(){var d=wd('invr');d.done=true;addReq('invr','درآمد','�
 ACT.wallet=function(){S.ui.atab='wallet';save();if(CURRENT==='profile'){renderCurrent()}else{go('profile')}};
 ACT.wdraw=function(){
   openModal('<h3> برداشت</h3><div class="payamt">موجودی<b>'+rial(S.wallet||0)+'</b></div>'+
-  '<div class="srow"><div class="slab"><span>مبلغ (ریال)</span></div><input class="inp" id="wd-amt" type="number" min="100000" step="100000" value="'+Math.max(100000,Math.floor(S.wallet||0))+'"></div>'+
+  '<div class="srow"><div class="slab"><span>مبلغ (تومان)</span></div><input class="inp" id="wd-amt" type="number" min="10000" step="10000" value="'+Math.max(10000,Math.floor((S.wallet||0)/10))+'"></div>'+
   '<div class="srow"><div class="slab"><span>شبا</span></div><input class="inp" id="wd-iba" placeholder="IR..." style="direction:ltr;text-align:left" value="IR"></div>'+
   '<button class="btn btn-primary" data-act="wdOk">ثبت درخواست</button> <button class="btn" data-act="closeModal">انصراف</button>');
 };
 ACT.wdOk=function(){
-  var a=+((document.getElementById('wd-amt')||{}).value||0);
+  var a=10*Number((document.getElementById('wd-amt')||{}).value||0);
   var ib=((document.getElementById('wd-iba')||{}).value||'').replace(/\s/g,'');
-  if(!a||a<100000){toast('حداقل ۱۰۰٬۰۰۰');return}
+  if(!a||a<100000){toast('حداقل ۱۰٬۰۰۰ تومان');return}
   if(a>(S.wallet||0)){toast('بیشتر از موجودی');return}
   if(ib.length<22){toast('شبا کامل نیست');return}
   openModal('<div style="text-align:center;padding:26px 10px"><span class="dots"><i></i><i></i><i></i></span><b style="display:block;margin-top:12px">ثبت درخواست...</b></div>');
@@ -8871,7 +8871,7 @@ ACT.pbid=function(el){
   D.prjI=i;
   var adjSel=(D.adj||'full');
   openModal('<h3>ارسال پیشنهاد — '+PRJ[i].t+'</h3>'+
-  '<div class="srow"><div class="slab"><span>قیمت (ریال — تایپ کنید)</span></div><input class="inp" id="bid-amt" type="number" value="8000000000" step="500000000" style="direction:ltr;text-align:left"></div>'+
+  '<div class="srow"><div class="slab"><span>قیمت (تومان — تایپ کنید)</span></div><input class="inp" id="bid-amt" type="number" value="800000000" step="50000000" style="direction:ltr;text-align:left"></div>'+
   '<div class="srow"><div class="slab"><span>مدت (ماه)</span></div><input class="inp" id="bid-dur" type="number" value="18" style="direction:ltr;text-align:left"></div>'+
   '<div class="srow"><div class="slab"><span>شرط تعدیل</span></div><select class="inp" id="bid-adj"><option value="none"'+(adjSel==='none'?' selected':'')+'>بدون تعدیل</option><option value="full"'+(adjSel==='full'?' selected':'')+'>نرخ رسمی مصالح (توصیه)</option><option value="cap10"'+(adjSel==='cap10'?' selected':'')+'>سقف ۱۰٪</option></select></div>'+
   '<div class="srow"><div class="slab"><span>توضیح</span></div><textarea class="inp" id="bid-note" rows="2"></textarea></div>'+
@@ -8879,7 +8879,7 @@ ACT.pbid=function(el){
 };
 ACT.pbidok=function(el){
   var i=+el.getAttribute('data-i'),D=wd('mkt').data;
-  var amt=(document.getElementById('bid-amt')||{}).value||'8000000000';
+  var amt=10*Number((document.getElementById('bid-amt')||{}).value||'800000000');
   var dur=(document.getElementById('bid-dur')||{}).value||'18';
   var adj=(document.getElementById('bid-adj')||{}).value||(D.adj||'full');
   var note=(document.getElementById('bid-note')||{}).value||'';
@@ -9077,7 +9077,7 @@ function grtMoneyCard(e){
   }
   return h;
 }
-function grtField(k,label,val,ph,type){
+function grtField(k,label,val,ph,type){if((k==='dep'||k==='rent'||k==='la-income')&&typeof val==='number')val=val/10;
   return '<div class="fld"><span class="fl">'+label+'</span><input class="inp" id="gp-'+k+'" type="'+(type||'text')+'" placeholder="'+qesc(ph||'')+'" value="'+qesc(val===undefined||val===null?'':String(val))+'"></div>';
 }
 function grtStepProp(e){
@@ -9936,7 +9936,7 @@ document.addEventListener('click',function(e){
   if(el){
     var lab=(el.textContent||'').replace(/^\s+|\s+$/g,'');
     usrC(lab);
-    try{ceVal(el.getAttribute('data-cv'))}catch(err){console.error('ceVal',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
+    try{ceVal(moneyChip(el))}catch(err){console.error('ceVal',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
     return;
   }
   el=t.closest('[data-cq]');
@@ -9983,7 +9983,7 @@ document.addEventListener('input',function(e){
   if(t.hasAttribute('data-paytxt')){
     var dg=pd(t.value).replace(/[^0-9]/g,'').slice(0,14);
     t.value=dg;
-    var amt=+dg||0;
+    var amt=10*Number(dg)||0;
     var rate=PAYM.ctx?PAYM.ctx.rate:1;
     var unit=PAYM.ctx?PAYM.ctx.unit:'';
     var fee=Math.round(amt*0.005);
@@ -9991,8 +9991,8 @@ document.addEventListener('input',function(e){
     var eU=document.getElementById('pay-units');if(eU){eU.textContent=fa(Math.floor(amt/rate),0)+' '+unit}
     var eF=document.getElementById('pay-fee');if(eF){eF.textContent=rial(fee)}
     var eT=document.getElementById('pay-total');if(eT){eT.textContent=rial(amt+fee)}
-    if(PAYM.mode==='invb'){wd('invb').data.payAmt=dg;save()}
-    else if(PAYM.ctx){PAYM.amt=dg}
+    if(PAYM.mode==='invb'){wd('invb').data.payAmt=String(amt);save()}
+    else if(PAYM.ctx){PAYM.amt=String(amt)}
     return;
   }
   if(t.hasAttribute('data-ep')){
@@ -10018,7 +10018,7 @@ document.addEventListener('input',function(e){
     var v2=pd(t.value).replace(/[^0-9]/g,'');
     t.value=v2;
     if(v2!==''){
-      var n=Math.max(mn,Math.min(mx,+v2));
+      var n=Math.max(mn,Math.min(mx,Number(v2)*(k==='ppm'?10:1)));
       tgt[side]=n;save();drLabel(k,tgt);
       var row=t.parentNode;
       if(row){
@@ -13125,7 +13125,7 @@ E27.marketHTML=function(o){
   var kpis;
   if(isBuy){
     kpis=kpi('میانگین آگهی هر متر',rial(h.buyBase),null)+kpi('تغییر یک‌ساله','',yoy)+kpi('تغییر ماهانه','',mom)+
-      '<div class="mkti-kpi"><small>بازهٔ آگهی‌ها</small><b>'+rShort(m.low)+' – '+rShort(m.high)+'</b><span class="delta" style="color:var(--ink2)">ریال بر متر</span></div>';
+      '<div class="mkti-kpi"><small>بازهٔ آگهی‌ها</small><b>'+rShort(m.low)+' – '+rShort(m.high)+'</b><span class="delta" style="color:var(--ink2)">تومان بر متر</span></div>';
   }else{
     kpis=kpi('اجارهٔ نمونهٔ ماهانه',rial(h.avgRent),null)+kpi('ودیعهٔ نمونه',rial(h.avgDep),null)+kpi('تغییر یک‌ساله بازار','',yoy)+kpi('تغییر ماهانه بازار','',mom);
   }
@@ -13134,7 +13134,7 @@ E27.marketHTML=function(o){
     var lo=m.low,hi=m.high,span=(hi-lo)||1,pos=Math.max(0,Math.min(100,Math.round((h.buyBase-lo)/span*100)));
     rangeBox='<div class="mkti-box mkti-range"><h5>جایگاه میانگین آگهی در بازهٔ محله</h5>'+
     '<div class="mkti-rangebar"><i class="pin" style="right:'+pos+'%"></i></div>'+
-    '<div class="mkti-rl"><span title="'+rial(lo)+'">'+rShort(lo)+'</span><span title="'+rial(hi)+'">'+rShort(hi)+' (ریال/متر)</span></div></div>';
+    '<div class="mkti-rl"><span title="'+rial(lo)+'">'+rShort(lo)+'</span><span title="'+rial(hi)+'">'+rShort(hi)+' (تومان/متر)</span></div></div>';
   }else{
     var mx=Math.max(h.avgRent,h.avgDep)||1;
     rangeBox='<div class="mkti-box"><h5>اجاره در برابر ودیعه (نسبت نمایشی)</h5>'+
@@ -13147,7 +13147,7 @@ E27.marketHTML=function(o){
     var v=isBuy?x.buyBase:x.avgRent;
     return {l:x.n,v:v,fmt:rShort(v),cur:x.id===h.id};
   }).sort(function(a,b){return b.v-a.v});
-  var cmp='<div class="mkti-box"><h5>'+(isBuy?'هر متر (آگهی) در محله‌ها':'اجارهٔ نمونه در محله‌ها')+' — ریال</h5><div class="mkti-cmp">'+
+  var cmp='<div class="mkti-box"><h5>'+(isBuy?'هر متر (آگهی) در محله‌ها':'اجارهٔ نمونه در محله‌ها')+' — تومان</h5><div class="mkti-cmp">'+
   bars.map(function(b){
     return '<div class="mkti-cmp-row'+(b.cur?' cur':'')+'"><span>'+esc(b.l)+'</span><span class="mkti-cmp-bar" style="width:'+Math.max(3,Math.round(b.v/bars[0].v*100))+'%"></span><b title="'+rial(b.v)+'">'+b.fmt+'</b></div>';
   }).join('')+'</div></div>';
@@ -13159,9 +13159,9 @@ E27.marketHTML=function(o){
   }
   var chart='';
   if(isBuy){
-    chart='<div>'+rcLine('روند برآوردی هر متر — '+fa(period,0)+' ماه','ریال · برآورد از تغییر یک‌سالهٔ اعلامی (دادهٔ نمونه)',series,labels,null)+'</div>';
+    chart='<div>'+rcLine('روند برآوردی هر متر — '+fa(period,0)+' ماه','تومان · برآورد از تغییر یک‌سالهٔ اعلامی (دادهٔ نمونه)',series,labels,null)+'</div>';
   }else{
-    chart='<div>'+rcLine('روند برآوردی اجاره — '+fa(period,0)+' ماه','ریال · برآورد از تغییر یک‌سالهٔ اعلامی (دادهٔ نمونه)',series,labels,null)+'</div>';
+    chart='<div>'+rcLine('روند برآوردی اجاره — '+fa(period,0)+' ماه','تومان · برآورد از تغییر یک‌سالهٔ اعلامی (دادهٔ نمونه)',series,labels,null)+'</div>';
   }
   return '<div class="mkti" data-h="'+h.id+'" data-mode="'+mode+'" data-period="'+period+'">'+
   '<div class="mkti-h"><b>'+ico('map',14)+' بازار '+esc(h.n)+' <small style="color:var(--ink2);font-weight:400">· '+esc(MARKET.asOf)+'</small></b>'+
@@ -13176,7 +13176,7 @@ E27.marketHTML=function(o){
   '<div style="margin-top:12px">'+cmp+'</div>'+
   '<button class="mkti-more-btn" data-cba="mktMore">توضیح بیشتر و اعداد دقیق ▾</button>'+
   '<div class="mkti-more">'+
-  '<b>اعداد دقیق (ریال):</b><br>'+
+  '<b>اعداد دقیق (تومان):</b><br>'+
   'میانگین هر متر (آگهی): '+rial(h.buyBase)+' · بازه: '+rial(m.low)+' تا '+rial(m.high)+'<br>'+
   'اجارهٔ نمونه: '+rial(h.avgRent)+' · ودیعهٔ نمونه: '+rial(h.avgDep)+'<br>'+
   '<b>روش و منبع:</b> قیمت‌ها «آگهی»اند، نه معاملهٔ قطعی. منبع اعلامی: '+esc(m.src||'کیلید')+' · تاریخ داده: '+esc(MARKET.asOf)+' · محدوده: محلهٔ '+esc(h.n)+'.<br>'+
@@ -13282,7 +13282,7 @@ CBACT.wMenu=function(){
   E27.wf=null;
   botC('<b>کیف پول و کلیدها</b> — دو موجودی مستقل:'+
   rcards([
-    rcard('کیف پول ریالی','<span style="font-size:15px;font-weight:800">'+rial(S.wallet||0)+'</span>','برای خدمات سامانه'),
+    rcard('کیف پول تومانی','<span style="font-size:15px;font-weight:800">'+rial(S.wallet||0)+'</span>','برای خدمات سامانه'),
     rcard('بناهای مصرفی',fa(S.tokens,0)+' کلید','برای قابلیت‌های کلیدی')
   ])+
   '<div class="racts">'+
@@ -13293,7 +13293,7 @@ CBACT.wMenu=function(){
 };
 CBACT.wTopup=function(){
   E27.wf={mode:'amount'};
-  botC('<b>شارژ کیف پول ریالی</b> — مبلغ را بنویسید (مثلاً «۲ میلیون تومان» یا «۵۰۰ هزار تومان»):'+
+  botC('<b>شارژ کیف پول تومانی</b> — مبلغ را بنویسید (مثلاً «۲ میلیون تومان» یا «۵۰۰ هزار تومان»):'+
   '<div class="racts"><button class="qbtn" data-cba="wCancel">انصراف</button></div>',null);
 };
 CBACT.wCancel=function(){E27.wf=null;botC('شارژ لغو شد. موجودی تغییری نکرد.',null)};
@@ -13316,7 +13316,7 @@ E27.wConfirm=function(){
   var f=E27.wf;if(!f)return;
   botC('<b>خلاصهٔ تراکنش (ConfirmationPanel)</b>'+
   '<div class="pay27-sim">'+
-  '<div class="pay27-row"><span>نوع</span><b>شارژ کیف پول ریالی</b></div>'+
+  '<div class="pay27-row"><span>نوع</span><b>شارژ کیف پول تومانی</b></div>'+
   '<div class="pay27-row"><span>مبلغ</span><b>'+rial(f.amt)+'</b></div>'+
   '<div class="pay27-row"><span>درگاه</span><b>'+(f.method==='sim-ok'?'درگاه نمایشی — سناریوی موفق':'درگاه نمایشی — سناریوی ناموفق (تست)')+'</b></div>'+
   '<div class="pay27-row"><span>کد پیگیری</span><b dir="ltr">'+esc(f.txid)+'</b></div>'+
@@ -13355,7 +13355,7 @@ CBACT.wPay=function(){
     S.wlog.unshift({t:Date.now(),d:'شارژ کیف پول — درگاه نمایشی',a:myAmt,tx:myTx});
     save();renderTok();
     E27.wf=null;
-    botC('✓ پرداخت موفق (درگاه نمایشی). کیف پول ریالی: <b>'+rial(S.wallet)+'</b><br><small>کد پیگیری: '+esc(myTx)+' — موجودی پس از نوسازی صفحه هم حفظ می‌شود.</small>'+
+    botC('✓ پرداخت موفق (درگاه نمایشی). کیف پول تومانی: <b>'+rial(S.wallet)+'</b><br><small>کد پیگیری: '+esc(myTx)+' — موجودی پس از نوسازی صفحه هم حفظ می‌شود.</small>'+
     '<div class="racts"><button class="qbtn" data-cba="wTx">تاریخچهٔ تراکنش‌ها</button><button class="qbtn" data-cba="wMenu">کیف پول و کلیدها</button></div>',null);
   },1200);
 };
@@ -13366,12 +13366,12 @@ CBACT.wRetry=function(){
 };
 CBACT.wTx=function(){
   var wl=S.wlog||[];
-  botC('<b>تاریخچهٔ کیف پول ریالی</b>'+(wl.length?'':'<div class="empty" style="margin-top:8px">تراکنشی ثبت نشده است.</div>')+
+  botC('<b>تاریخچهٔ کیف پول تومانی</b>'+(wl.length?'':'<div class="empty" style="margin-top:8px">تراکنشی ثبت نشده است.</div>')+
   wl.slice(0,10).map(E27.wtxRow).join('')+
   '<div class="racts"><button class="qbtn" data-cba="wMenu">کیف پول و کلیدها</button></div>',null);
 };
 CBACT.wTok=function(){
-  botC('<b>خرید کلید</b> — بسته‌ها کاملاً جدا از کیف پول ریالی‌اند:'+
+  botC('<b>خرید کلید</b> — بسته‌ها کاملاً جدا از کیف پول تومانی‌اند:'+
   '<div class="racts">'+PACKS.map(function(p,i){
     return '<button class="qbtn'+(p.best?' primary':'')+'" data-cba="wBuyPack" data-i="'+i+'">'+p.n+' — '+fa(p.tok,0)+' کلید ('+rial(p.pr)+')</button>';
   }).join('')+'</div>'+
@@ -17582,10 +17582,10 @@ E30.flows=(function(){
        if(!m||!m.ok){var p2=E27.budgParse(v);if(p2&&p2.ok&&p2.n&&p2.n>0){D.ask=p2.n}else return 'ERR'}
        else D.ask=m.value;
        return null},
-     err:'قیمت را به ریال بنویسید (مثلاً «۱۲ میلیارد»).'},
+     err:'قیمت را به تومان بنویسید (مثلاً «۱۲ میلیارد»).'},
     {id:'s_min',q:'کف قیمت — پایین‌تر از چه مبلغی نمی‌فروشید؟ (برای فیلتر پیشنهادها)',kind:'num',
      set:function(D,v){var m=parseMoneyFA(v);if(!m||!m.ok||m.value<=0||m.value>Number(D.ask||0))return 'ERR';D.minprice=m.value;return null},
-     err:'کف قیمت را به ریال بنویسید؛ کف نمی‌تواند از قیمت اعلامی بیشتر باشد.'},
+     err:'کف قیمت را به تومان بنویسید؛ کف نمی‌تواند از قیمت اعلامی بیشتر باشد.'},
     {id:'s_prep',q:function(D){
        var h=findH(D.hood);
        return '<b>آماده‌سازی آگهی</b><div class="sect">'+
@@ -17689,9 +17689,9 @@ E30.flows=(function(){
     {id:'i_obj',q:'هدف اصلی سرمایه‌گذاری چیست؟',
      chips:function(){return [['درآمد اجاره','rent_income'],['رشد قیمت','appreciation'],['حفظ ارزش (تورم)','inflation_hedge'],['زمین','land_bank'],['فروش کوتاه‌مدت','resale'],['تجاری','commercial']]},
      set:function(D,v){D.objective=v;return null}},
-    {id:'i_cap',money:true,q:'سرمایه‌ای که می‌خواهید وارد کنید حدوداً چقدر است؟ (ریال)',kind:'num',
+    {id:'i_cap',money:true,q:'سرمایه‌ای که می‌خواهید وارد کنید حدوداً چقدر است؟ (تومان)',kind:'num',
      set:function(D,v){var m=parseMoneyFA(v);if(!m||!m.ok)return 'ERR';D.cap=m.value;return null},
-     err:'سرمایه را به ریال بنویسید (مثلاً «۱۰ میلیارد»).'},
+     err:'سرمایه را به تومان بنویسید (مثلاً «۱۰ میلیارد»).'},
     {id:'i_liq',pre:function(D){return !!D.cap},
      q:'چقدر از این مبلغ باید در دسترس بماند؟ (ملک به‌سرعت نقد نمی‌شود)',
      chips:function(){return [['همه‌اش آزاد باشد','all'],['بخشی کافی است','some'],['قفل بلندمدت اوکی است','long']]},
@@ -17709,7 +17709,7 @@ E30.flows=(function(){
      set:function(D,v){D.financing=v;return null}},
     {id:'i_income',q:'برای درآمد اجاره، ماهانه چه مبلغی مدنظرتان است؟ (اگر فقط رشد قیمت مهم است «مهم نیست»)',kind:'num',
      chips:function(){return [['مهم نیست','none']]},
-     set:function(D,v){if(v==='none'){D.expectedCash=null;return null}var p=parseMoneyFA(v);if(!p||!p.ok||p.value<0)return 'ERR';D.expectedCash=p.value;return null},err:'عدد درآمد ماهانه را به ریال وارد کنید یا «مهم نیست» را بزنید.'},
+     set:function(D,v){if(v==='none'){D.expectedCash=null;return null}var p=parseMoneyFA(v);if(!p||!p.ok||p.value<0)return 'ERR';D.expectedCash=p.value;return null},err:'عدد درآمد ماهانه را به تومان وارد کنید یا «مهم نیست» را بزنید.'},
     {id:'i_mgmt',q:'برای نگهداری و مدیریت ملک چقدر وقت می‌گذارید؟',
      chips:function(){return [['خودم مدیریت می‌کنم','self'],['مدیر/مشاور می‌گیرم','delegate'],['زمان ندارم','none']]},
      set:function(D,v){D.management=v;return null}},
@@ -17763,13 +17763,13 @@ E30.flows=(function(){
        return 'بازهٔ رایج '+esc(h.n)+' (نمونهٔ سامانه): ودیعه '+rial(h.avgDep)+' با اجارهٔ '+rial(h.avgRent)+'. چه ترکیبی مدنظرتان است؟'},
      kind:'num',
      set:function(D,v){var m=parseMoneyFA(v);if(!m||!m.ok)return 'ERR';D.ask_dep=m.value;return null},
-     err:'ودیعهٔ درخواستی را به ریال بنویسید.'},
-    {id:'l_rent',pre:function(D){return D.ltype==='res'},kind:'num',q:'اجارهٔ ماهانهٔ درخواستی؟ (ریال — یا «صفر» برای رهن کامل)',
+     err:'ودیعهٔ درخواستی را به تومان بنویسید.'},
+    {id:'l_rent',pre:function(D){return D.ltype==='res'},kind:'num',q:'اجارهٔ ماهانهٔ درخواستی؟ (تومان — یا «صفر» برای رهن کامل)',
      set:function(D,v){if(/^(?:صفر|0|۰)$|بدون اجاره/.test(String(v).trim())){D.ask_rent=0;D.zeroRent=true;return null}var m=parseMoneyFA(v);if(!m||!m.ok)return 'ERR';D.ask_rent=m.value;D.zeroRent=false;return null},
-     err:'اجاره را به ریال بنویسید.'},
+     err:'اجاره را به تومان بنویسید.'},
     {id:'l_rules',pre:function(D){return D.ltype==='res'},q:'شرط‌های اجاره؟ (چند مورد را با ویرگول بنویسید — یا «ندارد»)',kind:'text',
      set:function(D,v){if(/ندارد|نه/.test(v)){D.rules=[];return null}D.rules=v.split(/[،,]/).map(function(x){return x.replace(/^\s+|\s+$/g,'')}).filter(Boolean);return null}},
-    {id:'l_stay_rate',pre:function(D){return D.ltype==='stay'},q:'نرخ پیشنهادی هر شب اقامت چقدر است؟ (ریال)',kind:'num',
+    {id:'l_stay_rate',pre:function(D){return D.ltype==='stay'},q:'نرخ پیشنهادی هر شب اقامت چقدر است؟ (تومان)',kind:'num',
      set:function(D,v){var m=parseMoneyFA(v);if(!m||!m.ok)return 'ERR';D.nightlyRate=m.value;return null},err:'قیمت هر شب را با مبلغ مشخص و واحد وارد کنید.'},
     {id:'l_stay_capacity',pre:function(D){return D.ltype==='stay'},q:'حداکثر ظرفیت اقامتگاه چند نفر است؟',count:true,
      set:function(D,v){var n=Number(pd(String(v)));if(!Number.isInteger(n)||n<1||n>50)return 'ERR';D.stayCapacity=n;return null},err:'ظرفیت را بین ۱ تا ۵۰ نفر وارد کنید.'},
@@ -19524,7 +19524,7 @@ E30.init=function(){
       if(!v){toast('مقدار لغزنده نامعتبر است');return}
       E30._slidPending=slot;
       usrC('تأیید مقدار لغزنده: '+rial(v));
-      ceVal(String(v));
+      ceVal(String(v)+((SCRIPTS[CE.f]||[])[CE.i]&&SCRIPTS[CE.f][CE.i].money?' ریال':''));
     };
   }catch(e){console.error('E30 slSet',e)}
 

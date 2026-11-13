@@ -371,7 +371,7 @@ E30.init=function(){
       if(!v){toast('مقدار لغزنده نامعتبر است');return}
       E30._slidPending=slot;
       usrC('تأیید مقدار لغزنده: '+rial(v));
-      ceVal(String(v));
+      ceVal(String(v)+((SCRIPTS[CE.f]||[])[CE.i]&&SCRIPTS[CE.f][CE.i].money?' ریال':''));
     };
   }catch(e){console.error('E30 slSet',e)}
 

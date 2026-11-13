@@ -270,7 +270,7 @@ async function drainDisc(page,final){
       await page.locator('#cp-area').fill('70');
       const tomorrow=new Date(Date.now()+864e5).toISOString().slice(0,10);
       await page.locator('#cp-start').fill(tomorrow);
-      await page.locator('#cp-dep').fill('10000000000');
+      await page.locator('#cp-dep').fill('1000000000');
       await page.locator('#cp-rent').fill('0');
       await page.locator('#chatB [data-act="cpropSave"]').last().click();await sleep(page,210);
       const property=await page.evaluate(()=>wd('rent').data.ctr?.step);
@@ -553,7 +553,7 @@ async function drainDisc(page,final){
       await page.locator('#co-mobile').fill('09123334455');
       await page.locator('#chatB [data-act="cpartySave"]').last().click();await sleep(page,100);
       await page.locator('#cp-postal').fill('1234567890');await page.locator('#cp-addr').fill('نشانی آزمون خرید');
-      await page.locator('#cp-area').fill('70');await page.locator('#cp-price').fill(String(price));
+      await page.locator('#cp-area').fill('70');await page.locator('#cp-price').fill(String(price/10));
       await page.locator('#cp-delivery').fill(new Date(Date.now()+864e5).toISOString().slice(0,10));
       await page.locator('#chatB [data-act="cpropSave"]').last().click();await sleep(page,100);
       await page.locator('label.switch:has(#ca-me)').click();await page.locator('label.switch:has(#ca-owner)').click();
