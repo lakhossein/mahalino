@@ -611,7 +611,11 @@ async function drainDisc(page,final){
     });
     await run('H16','Personalized investment goal and risk reach a saved report and tracked completed request',async page=>{
       await send(page,'حدود ۳۰ میلیارد تومان سرمایه دارم. می‌خوام یه ملک بخرم که اجاره ماهانه بده.');await drainDisc(page);
-      const answers={i_obj:'rent_income',i_cap:'300000000000',i_liq:'some',i_hor:'میان‌مدت',i_risk:'medium',i_asset:'residential',i_fin:'cash',i_income:'100000000',i_mgmt:'self',i_exit:'hold',i_hood:'نارمک'};
+      const initialCapital=await page.evaluate(()=>wd('invp').data.cap);
+      if(initialCapital!==300000000000)throw Error('The stated 30B toman capital changed during handoff: '+initialCapital);
+      // User-facing inputs are toman; saved historical financial values remain
+      // rial. Replay the same 30B toman capital and request 10M toman income.
+      const answers={i_obj:'rent_income',i_cap:'۳۰ میلیارد تومان',i_liq:'some',i_hor:'میان‌مدت',i_risk:'medium',i_asset:'residential',i_fin:'cash',i_income:'۱۰ میلیون تومان',i_mgmt:'self',i_exit:'hold',i_hood:'نارمک'};
       for(let i=0;i<20;i++){
         const st=await page.evaluate(()=>({flow:CE.f,id:SCRIPTS[CE.f]?.[CE.i]?.id}));
         if(st.flow!=='invp')throw Error('Wrong investor flow '+JSON.stringify(st));
