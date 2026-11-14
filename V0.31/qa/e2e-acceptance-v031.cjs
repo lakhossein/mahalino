@@ -251,10 +251,10 @@ const start=async b=>{
       const v=await s.page.evaluate(()=>{
         const st=SCRIPTS.sell.find(x=>x.id==='s_inq');
         const D={ask:100000000000,minprice:90000000000};
-        return {prompt:st&&st.q(D),expected:96000000000};
+        return {prompt:st&&st.q(D),expected:'۹٬۶۰۰٬۰۰۰٬۰۰۰ تومان'};
       });
       await s.context.close();
-      return {ok:v.prompt&&/۴٪|4٪/.test(v.prompt)&&v.prompt.includes('۹۶'),info:v};
+      return {ok:v.prompt&&/۴٪|4٪/.test(v.prompt)&&v.prompt.includes(v.expected),info:v};
     });
     await check('A21','Investment card changes with asset class and reported capital',async()=>{
       const s=await start(browser);
@@ -392,12 +392,111 @@ const start=async b=>{
         };
       });
       await s.context.close();
-      return {ok:v.postLabel?.dep?.[0]===1500000000&&v.postLabel?.dep?.[1]===1500000000&&
-        v.postLabel?.rent?.[0]===20000000&&v.postLabel?.rent?.[1]===25000000&&
+      return {ok:v.postLabel?.dep?.[0]===15000000000&&v.postLabel?.dep?.[1]===15000000000&&
+        v.postLabel?.rent?.[0]===200000000&&v.postLabel?.rent?.[1]===250000000&&
         v.postLabelToman?.rent?.[0]===200000000&&v.postLabelToman?.rent?.[1]===250000000&&
         v.preLabel?.dep?.[0]===1500000000&&v.preLabel?.rent?.[0]===20000000&&v.preLabel?.rent?.[1]===25000000&&
-        v.mixed?.dep?.[0]===1020000000&&v.mixed?.rent?.[0]===15000000&&
+        v.mixed?.dep?.[0]===10200000000&&v.mixed?.rent?.[0]===150000000&&
         !v.unmapped?.dep&&v.unmapped?.rent?.[0]===25000000,info:v};
+    });
+    await check('A31','Post-label decimal budgets and mixed currencies never cross-bind',async()=>{
+      const s=await start(browser);
+      const v=await s.page.evaluate(()=>({
+        post:E30._dbg.finScan('بودجه‌ام ۱.۲ میلیارد ودیعه و ۱۰ میلیون اجاره ماهانه است.'),
+        mixed:E30._dbg.finScan('ودیعه ۱۲ میلیارد ریال، اجاره ماهانه ۳۰ میلیون تومان'),
+        grouped:E30._dbg.finScan('ودیعه 1,200,000,000 تومان اجاره 20,000,000 تومان'),
+        adjacent:E30._dbg.finScan('ودیعه ۸۰۰ میلیون تومان اجاره ۲۵ میلیون تومان'),
+        zero:E30._dbg.finScan('ودیعه ۱ میلیارد تومان و اجاره 0'),
+        ambiguous:E30._dbg.finScan('ودیعه یا اجاره ۱۲ میلیون تومان')
+      }));
+      await s.context.close();
+      return {ok:v.post.dep?.[1]===12000000000&&v.post.rent?.[1]===100000000&&
+        v.mixed.dep?.[1]===12000000000&&v.mixed.rent?.[1]===300000000&&
+        v.grouped.dep?.[1]===12000000000&&v.grouped.rent?.[1]===200000000&&
+        v.adjacent.dep?.[1]===8000000000&&v.adjacent.rent?.[1]===250000000&&
+        v.zero.dep?.[1]===10000000000&&v.zero.rent?.[1]===0&&
+        !v.ambiguous.dep,info:v};
+    });
+    await check('A32','Purchase resumes at age with valid, skipped and corrected inputs',async()=>{
+      const s=await start(browser);
+      const v=await s.page.evaluate(()=>{
+        doLogin('QA');const rows=[];
+        for(const input of ['نوساز','تا ۵ سال','۵ تا ۱۰ سال','مهم نیست']){
+          delete wd('buy').data.PR;ceStart('buy');ceJump('age');ceVal(input);
+          rows.push({input,step:SCRIPTS.buy[CE.i].id,age:wd('buy').data.PR.age});
+        }
+        ceJump('age');ceVal('نامعتبر');const invalid=SCRIPTS.buy[CE.i].id;ceVal('تا ۵ سال');
+        return {rows,invalid,corrected:SCRIPTS.buy[CE.i].id};
+      });
+      await s.context.close();
+      return {ok:v.rows.every(x=>x.step==='m2')&&v.rows[0].age[1]===3&&v.rows[1].age[1]===5&&v.rows[2].age[0]===5&&v.rows[2].age[1]===10&&v.invalid==='age'&&v.corrected==='m2',info:v};
+    });
+    await check('A33','Project transfers preserve chat history, context and unrelated artifacts',async()=>{
+      const s=await start(browser);
+      const v=await s.page.evaluate(()=>{
+        doLogin('QA');const a=E29.projAPI.create('A'),b=E29.projAPI.create('B');
+        S.chats=[{id:'move-chat',title:'عنوان یکسان',pinned:true,hist:[{r:'user',h:'keep'}]}];
+        S.ctx30ByChat['chat:move-chat']={fields:{marker:{v:'keep'}},log:[]};
+        S.library=[{id:'related',sourceChat:'move-chat'},{id:'unrelated',sourceChat:null,sourceTitle:'عنوان یکسان',projectId:a.id}];
+        E29.projAPI.addChat(a.id,'move-chat');E29.projAPI.addChat(b.id,'move-chat');E29.projAPI.addChat(b.id,'move-chat');E29.projAPI.addChat(b.id,'missing');
+        return {old:a.chatIds,now:b.chatIds,chat:S.chats[0],context:S.ctx30ByChat['chat:move-chat'],artifacts:S.library,target:b.id,original:a.id,button:E27.sessRow(S.chats[0]).includes('e31MoveChat')};
+      });
+      await s.page.reload({waitUntil:'domcontentloaded'});
+      const restored=await s.page.evaluate(()=>({chat:S.chats.find(c=>c.id==='move-chat'),context:S.ctx30ByChat['chat:move-chat']}));
+      await s.context.close();
+      return {ok:v.old.length===0&&v.now.length===1&&v.now[0]==='move-chat'&&v.chat.projectId===v.target&&v.chat.hist[0].h==='keep'&&v.artifacts[0].projectId===v.target&&v.artifacts[1].projectId===v.original&&v.button&&restored.chat.projectId===v.target&&restored.context.fields.marker.v==='keep',info:{v,restored}};
+    });
+    await check('A34','Live project membership survives archival without stale references',async()=>{
+      const s=await start(browser);
+      const v=await s.page.evaluate(()=>{
+        doLogin('QA');usrC('گفتگوی پروژه');botC('حفظ تاریخچه');const p=E29.projAPI.create('پروژه');E30.ux.addLive(p.id);const live=p.chatIds[0];E22.collect();const chat=S.chats[0];
+        return {live,id:chat.id,project:chat.projectId,target:p.id,links:p.chatIds,refs:p._liveRefs||[],hist:chat.hist.length};
+      });
+      await s.context.close();return {ok:v.project===v.target&&v.links.length===1&&v.links[0]===v.id&&v.refs.length===0&&v.hist>=2,info:v};
+    });
+    await check('A35','One user submission produces one persisted and rendered assistant message',async()=>{
+      const s=await start(browser);await s.page.evaluate(()=>doLogin('QA'));
+      const rows=[];
+      for(const text of ['می‌خوام در تهران یه خونه رهن و اجاره پیدا کنم.','ودیعه ۱ میلیارد تومان اجاره ۲۰ میلیون تومان']){
+        rows.push(await s.page.evaluate(text=>{const before=HIST.length;ceSend(text);const added=HIST.slice(before);return {users:added.filter(x=>x.r==='user').length,bots:added.filter(x=>x.r==='bot').length,body:added.filter(x=>x.r==='bot').map(x=>x.h).join(''),rendered:document.querySelectorAll('#chatB .msg.bot').length,stored:JSON.parse(localStorage.getItem('mahalino_v31')).liveHistory.filter(x=>x.r==='bot').length}},text));
+      }
+      const beforeEntry=await s.page.evaluate(()=>HIST.length);
+      await s.page.locator('#chatB [data-cf="buy"]').first().click();
+      const entry=await s.page.evaluate(n=>({users:HIST.slice(n).filter(x=>x.r==='user').length,bots:HIST.slice(n).filter(x=>x.r==='bot').length}),beforeEntry);
+      const historical=await s.page.evaluate(()=>{
+        S.chats.push({id:'qa-historical-turns',title:'تاریخچه',ts:Date.now(),hist:[{r:'user',h:'قدیمی'},{r:'bot',h:'keep-A'},{r:'bot',h:'keep-B'}]});
+        ACT.sessOpen({getAttribute:k=>k==='data-sess'?'qa-historical-turns':null});
+        return HIST.filter(m=>m.h==='keep-A'||m.h==='keep-B').map(m=>m.h);
+      });
+      await s.context.close();return {ok:rows.every(r=>r.users===1&&r.bots===1&&r.body.length>20&&r.rendered===r.stored)&&entry.users===1&&entry.bots===1&&historical.join('|')==='keep-A|keep-B',info:{rows,entry,historical}};
+    });
+    await check('A36','Entry skips personal gates and retired investment engines cannot execute',async()=>{
+      const s=await start(browser);
+      const v=await s.page.evaluate(()=>{
+        doLogin('QA');ceStart('gate');ceVal('!pskip');
+        return {steps:SCRIPTS.gate.map(x=>x.id),step:SCRIPTS.gate[CE.i].id,
+          legacy:!!(SCRIPTS.invb||SCRIPTS.invr||CBACT.ipset),active:!!SCRIPTS.invp,
+          source:[...document.scripts].map(x=>x.textContent).join('')};
+      });
+      await s.context.close();return {ok:v.steps.join('|')==='hello|menu'&&v.step==='menu'&&!v.legacy&&v.active&&!v.source.includes('function sellTok('),info:{steps:v.steps,step:v.step,legacy:v.legacy,active:v.active}};
+    });
+    await check('A37','Toman defaults, explicit rial and canonical presets stay distinct',async()=>{
+      const s=await start(browser);const v=await s.page.evaluate(()=>{
+        const typed=parseMoneyFA('5000000000'),small=parseMoneyFA('۱۰۰'),arabic=parseMoneyFA('١٠٠'),rialInput=parseMoneyFA('۱۰۰ میلیون ریال');
+        doLogin('QA');ceStart('rent');ceJump('dep');ceVal(moneyChip({getAttribute:()=> '5000000000'}));const preset=wd('rent').data.B.depB;
+        ceJump('dep');ceVal('5000000000');const entered=wd('rent').data.B.depB;
+        const wallet=S.wallet;save();return {typed,small,arabic,rialInput,preset,entered,wallet,display:rial(100000000),range:parseMoneyRangeFA('100 تا 200')};
+      });await s.page.reload({waitUntil:'domcontentloaded'});const again=await s.page.evaluate(()=>({budget:wd('rent').data.B.depB,wallet:S.wallet}));
+      await s.context.close();return {ok:v.typed.value===50000000000&&v.small.value===1000&&v.arabic.value===1000&&v.rialInput.value===100000000&&v.preset===5000000000&&v.entered===50000000000&&v.display==='۱۰٬۰۰۰٬۰۰۰ تومان'&&v.range.value==='1000|2000'&&again.budget===v.entered&&again.wallet===v.wallet,info:{v,again}};
+    });
+    await check('A38','Contract and payment forms display toman and retain exact canonical totals',async()=>{
+      const s=await start(browser);const v=await s.page.evaluate(()=>{
+        doLogin('QA');const D=wd('rent').data,c=conInit(D,'rent');c.terms={deposit:10000000000,rent:200000000};
+        const html=conPropHTML(D,'rent');const host=document.createElement('div');host.innerHTML=html;
+        const values=['cp-dep','cp-rent'].map(id=>host.querySelector('#'+id)?.value);
+        const panel=payPanel('test','واحد',10000000,'100000000',[],'پرداخت');host.innerHTML=panel;
+        return {values,payment:host.querySelector('[data-paytxt]')?.value,short:rShort(10000000000),deposit:c.terms.deposit};
+      });await s.context.close();return {ok:v.values[0]==='1000000000'&&v.values[1]==='20000000'&&v.payment==='10000000'&&v.short==='۱ میلیارد'&&v.deposit===10000000000,info:v};
     });
     await check('A30','Every purchase price-range preset passes normalization without changing its rial endpoints',async()=>{
       const s=await start(browser);

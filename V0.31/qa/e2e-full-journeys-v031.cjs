@@ -270,7 +270,7 @@ async function drainDisc(page,final){
       await page.locator('#cp-area').fill('70');
       const tomorrow=new Date(Date.now()+864e5).toISOString().slice(0,10);
       await page.locator('#cp-start').fill(tomorrow);
-      await page.locator('#cp-dep').fill('10000000000');
+      await page.locator('#cp-dep').fill('1000000000');
       await page.locator('#cp-rent').fill('0');
       await page.locator('#chatB [data-act="cpropSave"]').last().click();await sleep(page,210);
       const property=await page.evaluate(()=>wd('rent').data.ctr?.step);
@@ -553,7 +553,7 @@ async function drainDisc(page,final){
       await page.locator('#co-mobile').fill('09123334455');
       await page.locator('#chatB [data-act="cpartySave"]').last().click();await sleep(page,100);
       await page.locator('#cp-postal').fill('1234567890');await page.locator('#cp-addr').fill('نشانی آزمون خرید');
-      await page.locator('#cp-area').fill('70');await page.locator('#cp-price').fill(String(price));
+      await page.locator('#cp-area').fill('70');await page.locator('#cp-price').fill(String(price/10));
       await page.locator('#cp-delivery').fill(new Date(Date.now()+864e5).toISOString().slice(0,10));
       await page.locator('#chatB [data-act="cpropSave"]').last().click();await sleep(page,100);
       await page.locator('label.switch:has(#ca-me)').click();await page.locator('label.switch:has(#ca-owner)').click();
@@ -611,7 +611,11 @@ async function drainDisc(page,final){
     });
     await run('H16','Personalized investment goal and risk reach a saved report and tracked completed request',async page=>{
       await send(page,'حدود ۳۰ میلیارد تومان سرمایه دارم. می‌خوام یه ملک بخرم که اجاره ماهانه بده.');await drainDisc(page);
-      const answers={i_obj:'rent_income',i_cap:'300000000000',i_liq:'some',i_hor:'میان‌مدت',i_risk:'medium',i_asset:'residential',i_fin:'cash',i_income:'100000000',i_mgmt:'self',i_exit:'hold',i_hood:'نارمک'};
+      const initialCapital=await page.evaluate(()=>wd('invp').data.cap);
+      if(initialCapital!==300000000000)throw Error('The stated 30B toman capital changed during handoff: '+initialCapital);
+      // User-facing inputs are toman; saved historical financial values remain
+      // rial. Replay the same 30B toman capital and request 10M toman income.
+      const answers={i_obj:'rent_income',i_cap:'۳۰ میلیارد تومان',i_liq:'some',i_hor:'میان‌مدت',i_risk:'medium',i_asset:'residential',i_fin:'cash',i_income:'۱۰ میلیون تومان',i_mgmt:'self',i_exit:'hold',i_hood:'نارمک'};
       for(let i=0;i<20;i++){
         const st=await page.evaluate(()=>({flow:CE.f,id:SCRIPTS[CE.f]?.[CE.i]?.id}));
         if(st.flow!=='invp')throw Error('Wrong investor flow '+JSON.stringify(st));

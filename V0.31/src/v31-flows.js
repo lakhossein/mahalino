@@ -195,10 +195,10 @@ E30.flows=(function(){
        if(!m||!m.ok){var p2=E27.budgParse(v);if(p2&&p2.ok&&p2.n&&p2.n>0){D.ask=p2.n}else return 'ERR'}
        else D.ask=m.value;
        return null},
-     err:'قیمت را به ریال بنویسید (مثلاً «۱۲ میلیارد»).'},
+     err:'قیمت را به تومان بنویسید (مثلاً «۱۲ میلیارد»).'},
     {id:'s_min',q:'کف قیمت — پایین‌تر از چه مبلغی نمی‌فروشید؟ (برای فیلتر پیشنهادها)',kind:'num',
      set:function(D,v){var m=parseMoneyFA(v);if(!m||!m.ok||m.value<=0||m.value>Number(D.ask||0))return 'ERR';D.minprice=m.value;return null},
-     err:'کف قیمت را به ریال بنویسید؛ کف نمی‌تواند از قیمت اعلامی بیشتر باشد.'},
+     err:'کف قیمت را به تومان بنویسید؛ کف نمی‌تواند از قیمت اعلامی بیشتر باشد.'},
     {id:'s_prep',q:function(D){
        var h=findH(D.hood);
        return '<b>آماده‌سازی آگهی</b><div class="sect">'+
@@ -302,9 +302,9 @@ E30.flows=(function(){
     {id:'i_obj',q:'هدف اصلی سرمایه‌گذاری چیست؟',
      chips:function(){return [['درآمد اجاره','rent_income'],['رشد قیمت','appreciation'],['حفظ ارزش (تورم)','inflation_hedge'],['زمین','land_bank'],['فروش کوتاه‌مدت','resale'],['تجاری','commercial']]},
      set:function(D,v){D.objective=v;return null}},
-    {id:'i_cap',money:true,q:'سرمایه‌ای که می‌خواهید وارد کنید حدوداً چقدر است؟ (ریال)',kind:'num',
+    {id:'i_cap',money:true,q:'سرمایه‌ای که می‌خواهید وارد کنید حدوداً چقدر است؟ (تومان)',kind:'num',
      set:function(D,v){var m=parseMoneyFA(v);if(!m||!m.ok)return 'ERR';D.cap=m.value;return null},
-     err:'سرمایه را به ریال بنویسید (مثلاً «۱۰ میلیارد»).'},
+     err:'سرمایه را به تومان بنویسید (مثلاً «۱۰ میلیارد»).'},
     {id:'i_liq',pre:function(D){return !!D.cap},
      q:'چقدر از این مبلغ باید در دسترس بماند؟ (ملک به‌سرعت نقد نمی‌شود)',
      chips:function(){return [['همه‌اش آزاد باشد','all'],['بخشی کافی است','some'],['قفل بلندمدت اوکی است','long']]},
@@ -322,7 +322,7 @@ E30.flows=(function(){
      set:function(D,v){D.financing=v;return null}},
     {id:'i_income',q:'برای درآمد اجاره، ماهانه چه مبلغی مدنظرتان است؟ (اگر فقط رشد قیمت مهم است «مهم نیست»)',kind:'num',
      chips:function(){return [['مهم نیست','none']]},
-     set:function(D,v){if(v==='none'){D.expectedCash=null;return null}var p=parseMoneyFA(v);if(!p||!p.ok||p.value<0)return 'ERR';D.expectedCash=p.value;return null},err:'عدد درآمد ماهانه را به ریال وارد کنید یا «مهم نیست» را بزنید.'},
+     set:function(D,v){if(v==='none'){D.expectedCash=null;return null}var p=parseMoneyFA(v);if(!p||!p.ok||p.value<0)return 'ERR';D.expectedCash=p.value;return null},err:'عدد درآمد ماهانه را به تومان وارد کنید یا «مهم نیست» را بزنید.'},
     {id:'i_mgmt',q:'برای نگهداری و مدیریت ملک چقدر وقت می‌گذارید؟',
      chips:function(){return [['خودم مدیریت می‌کنم','self'],['مدیر/مشاور می‌گیرم','delegate'],['زمان ندارم','none']]},
      set:function(D,v){D.management=v;return null}},
@@ -376,13 +376,13 @@ E30.flows=(function(){
        return 'بازهٔ رایج '+esc(h.n)+' (نمونهٔ سامانه): ودیعه '+rial(h.avgDep)+' با اجارهٔ '+rial(h.avgRent)+'. چه ترکیبی مدنظرتان است؟'},
      kind:'num',
      set:function(D,v){var m=parseMoneyFA(v);if(!m||!m.ok)return 'ERR';D.ask_dep=m.value;return null},
-     err:'ودیعهٔ درخواستی را به ریال بنویسید.'},
-    {id:'l_rent',pre:function(D){return D.ltype==='res'},kind:'num',q:'اجارهٔ ماهانهٔ درخواستی؟ (ریال — یا «صفر» برای رهن کامل)',
+     err:'ودیعهٔ درخواستی را به تومان بنویسید.'},
+    {id:'l_rent',pre:function(D){return D.ltype==='res'},kind:'num',q:'اجارهٔ ماهانهٔ درخواستی؟ (تومان — یا «صفر» برای رهن کامل)',
      set:function(D,v){if(/^(?:صفر|0|۰)$|بدون اجاره/.test(String(v).trim())){D.ask_rent=0;D.zeroRent=true;return null}var m=parseMoneyFA(v);if(!m||!m.ok)return 'ERR';D.ask_rent=m.value;D.zeroRent=false;return null},
-     err:'اجاره را به ریال بنویسید.'},
+     err:'اجاره را به تومان بنویسید.'},
     {id:'l_rules',pre:function(D){return D.ltype==='res'},q:'شرط‌های اجاره؟ (چند مورد را با ویرگول بنویسید — یا «ندارد»)',kind:'text',
      set:function(D,v){if(/ندارد|نه/.test(v)){D.rules=[];return null}D.rules=v.split(/[،,]/).map(function(x){return x.replace(/^\s+|\s+$/g,'')}).filter(Boolean);return null}},
-    {id:'l_stay_rate',pre:function(D){return D.ltype==='stay'},q:'نرخ پیشنهادی هر شب اقامت چقدر است؟ (ریال)',kind:'num',
+    {id:'l_stay_rate',pre:function(D){return D.ltype==='stay'},q:'نرخ پیشنهادی هر شب اقامت چقدر است؟ (تومان)',kind:'num',
      set:function(D,v){var m=parseMoneyFA(v);if(!m||!m.ok)return 'ERR';D.nightlyRate=m.value;return null},err:'قیمت هر شب را با مبلغ مشخص و واحد وارد کنید.'},
     {id:'l_stay_capacity',pre:function(D){return D.ltype==='stay'},q:'حداکثر ظرفیت اقامتگاه چند نفر است؟',count:true,
      set:function(D,v){var n=Number(pd(String(v)));if(!Number.isInteger(n)||n<1||n>50)return 'ERR';D.stayCapacity=n;return null},err:'ظرفیت را بین ۱ تا ۵۰ نفر وارد کنید.'},
@@ -432,7 +432,7 @@ E30.flows=(function(){
     if(!MODBY.sell)MODBY.sell={v:'landing',t:'فروش ملک'};
     if(!MODBY.invp)MODBY.invp={v:'landing',t:'سرمایه‌گذاری ملکی'};
     if(!MODBY.lndl)MODBY.lndl={v:'landing',t:'اجاره‌دهی'};
-    FRC.sell=['sell'];FRC.invest=['invp','invb','invr'];FRC.rent=['rent','lndl'];
+    FRC.sell=['sell'];FRC.invest=['invp'];FRC.rent=['rent','lndl'];
     WSTEPS.sell=SELL.map(function(s){return s.id});
     WSTEPS.invp=INVP.map(function(s){return s.id});
     WSTEPS.lndl=LNDL.map(function(s){return s.id});

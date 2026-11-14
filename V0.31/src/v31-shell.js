@@ -78,7 +78,9 @@ E30.autoRun=function(){
     val=E30.autoAnswer(CE.f);
     if(val===null)break;
     var done=null;
-    try{done=st.set?st.set(wd(CE.f).data,val):null}catch(e){break}
+    /* autoAnswer returns already normalized stored values, including prices
+       whose steps do not use the generic st.money parser. */
+    try{done=st.set?moneyCanonical(function(){return st.set(wd(CE.f).data,val)}):null}catch(e){break}
     if(done==='ERR')break;
     botC('✓ همین را از حرف‌های قبلی‌تان داشتم — دوباره نمی‌پرسم.');
     CE.i++;CE.li=0;save();
@@ -371,7 +373,7 @@ E30.init=function(){
       if(!v){toast('مقدار لغزنده نامعتبر است');return}
       E30._slidPending=slot;
       usrC('تأیید مقدار لغزنده: '+rial(v));
-      ceVal(String(v));
+      ceVal(String(v)+((SCRIPTS[CE.f]||[])[CE.i]&&SCRIPTS[CE.f][CE.i].money?' ریال':''));
     };
   }catch(e){console.error('E30 slSet',e)}
 
@@ -643,6 +645,7 @@ E30.init=function(){
   try{E30.uxInit()}catch(e){console.error('E30 ux',e)}
   try{E30.uiTidyInit()}catch(e){console.error('E30 guided UI',e)}
   try{E30.guide.install()}catch(e){console.error('E31 deterministic guide',e)}
+  try{E30.turns.install()}catch(e){console.error('E31 chat turns',e)}
 
   /* 9b) A burst of toasts used to cover the fixed chat composer. Deduplicate
          near-identical events and bound the simultaneous visible stack. */

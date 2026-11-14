@@ -1,0 +1,50 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
+const root=path.resolve(__dirname,'..');
+const html=fs.readFileSync(path.join(root,'Mahalino+V0.31.html'),'utf8');
+const utilities=html.slice(html.indexOf('function fa(n,d)'),html.indexOf('function hoodFromText('));
+function runtime(){
+  let seq=0;
+  const c=vm.createContext({S:{auth:{name:'QA'}},E30:{uid:()=>String(++seq)},CBACT:{},CE:{f:null},HOODS:[],
+    save(){},botC(){},usrC(){}});
+  vm.runInContext(utilities,c);
+  vm.runInContext(fs.readFileSync(path.join(root,'src/v31-intel.js'),'utf8'),c);
+  return c;
+}
+const opening='حدود ۳۰ میلیارد تومان سرمایه دارم. می‌خوام یه ملک بخرم که اجاره ماهانه بده.';
+const investor=runtime();
+assert.equal(investor.E30.discAPI.route(opening),true);
+assert.equal(investor.S.ctx30Collectors[investor.S.ctx30ActiveKey].wf,'invest');
+assert.equal(investor.E30.discAPI.getF('invest_capital')?.v[1],300000000000,'investment routing lost the opening capital');
+assert.equal(investor.E30.discAPI.getF('buy_budget'),null,'investment capital leaked into a purchase budget');
+const buyer=runtime();
+assert.equal(buyer.E30.discAPI.route('می‌خوام برای خودم آپارتمان بخرم؛ بودجه ۳۰ میلیارد تومان، نه سرمایه‌گذاری.'),true);
+assert.equal(buyer.E30.discAPI.getF('buy_budget')?.v[1],300000000000);
+assert.equal(buyer.E30.discAPI.getF('invest_capital'),null);
+const guided=runtime();
+guided.E30.discAPI.extract(opening,'guided-prompt','invest');
+assert.equal(guided.E30.discAPI.getF('invest_capital')?.v[1],300000000000);
+assert.equal(guided.E30.discAPI.getF('buy_budget'),null);
+const automatic=runtime(),data={};
+Object.assign(automatic,{SCRIPTS:{buy:[{id:'buy_ctr'}]},MODBY:{},FRC:{},WSTEPS:{},
+  wd:flow=>({data:data[flow]||(data[flow]={})})});
+automatic.window=automatic;
+vm.runInContext(fs.readFileSync(path.join(root,'src/v31-flows.js'),'utf8'),automatic);
+automatic.E30.flowsAPI.install();
+vm.runInContext(fs.readFileSync(path.join(root,'src/v31-shell.js'),'utf8'),automatic);
+automatic.E30.discAPI.setF('invest_capital',{v:[300000000000,300000000000]},{src:'open'});
+automatic.CE.f='invp';automatic.CE.i=automatic.SCRIPTS.invp.findIndex(x=>x.id==='i_cap');
+automatic.CE.li=0;
+automatic.E30.autoRun();
+assert.equal(data.invp.cap,300000000000,'automatic reuse scaled investment capital again');
+automatic.CE.i=automatic.SCRIPTS.invp.findIndex(x=>x.id==='i_cap');
+automatic.E30.autoRun();
+assert.equal(data.invp.cap,300000000000,'repeated automatic reuse changed investment capital');
+automatic.E30.discAPI.setF('expected_price',{v:[120000000000,120000000000]},{src:'open'});
+automatic.E30.discAPI.setF('min_price',{v:[110000000000,110000000000]},{src:'open'});
+automatic.CE.f='sell';automatic.CE.i=automatic.SCRIPTS.sell.findIndex(x=>x.id==='s_price');
+automatic.E30.autoRun();
+assert.equal(data.sell.ask,120000000000,'automatic reuse scaled seller price again');
+assert.equal(data.sell.minprice,110000000000,'automatic reuse scaled seller minimum again');
+assert.equal(automatic.parseMoneyFA('۱۰۰').value,1000,'automatic replay leaked its currency context into public input');
+console.log('PASS investment and residence openings retain amounts in their routed financial context');

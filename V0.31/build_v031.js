@@ -33,12 +33,12 @@ function rep(oldStr,newStr,expect){
 }
 function injectBefore(marker,str){
   if(H.indexOf(marker)===-1){fail.push('marker missing: '+marker.slice(0,60));return}
-  H=H.replace(marker,str+'\n'+marker);
+  H=H.replace(marker,function(){return str+'\n'+marker});
   count++;
 }
 function injectAfter(marker,str){
   if(H.indexOf(marker)===-1){fail.push('marker missing: '+marker.slice(0,60));return}
-  H=H.replace(marker,marker+'\n'+str);
+  H=H.replace(marker,function(){return marker+'\n'+str});
   count++;
 }
 function readSrc(f){return fs.readFileSync(path.join(SRC_DIR,f),'utf8')}
@@ -113,7 +113,7 @@ rep("  var hard=RLIST.filter(function(x){return x.hood===D.hood}).filter(functio
 var rangeStart=H.indexOf('function parseMoneyRangeFA(input){');
 var rangeEnd=H.indexOf('function parseRangeFA(input){',rangeStart);
 if(rangeStart<0||rangeEnd<0){fail.push('money-range parser block missing')}
-else{rep(H.slice(rangeStart,rangeEnd),readSrc('v31-money-range.js')+'\n')}
+else{rep(H.slice(rangeStart,rangeEnd),readSrc('v31-money-range.js')+'\n'+readSrc('v31-age-range.js')+'\n')}
 /* Cards under the 'all listings' heading remain visible for comparison, but
    a failed hard constraint can never become the selected property. */
 rep("CBACT.selL=function(el){var D=wd('rent').data;D.listing=el.getAttribute('data-l');save();if(CURRENT==='rent')renderCurrent();botC('✓ انتخاب شد.',[['بازدید','!skp'],['مقایسه','!cmp']])};",
@@ -175,11 +175,84 @@ rep("ppm:4300000000,elev:true,park:true,balc:true,rate:4.6}];",
     "{id:'b11',hood:'h7',seed:'c11',t:'۶۰ م نوساز — ونک',m2:60,age:2,floor:5,beds:2,ppm:5400000000,elev:true,park:true,balc:true,rate:4.6},\n"+
     "{id:'b12',hood:'h8',seed:'c12',t:'۷۰ م ۹ساله — انقلاب',m2:70,age:9,floor:3,beds:2,ppm:2700000000,elev:true,park:false,balc:false,rate:4.1}];");
 
+/* Purchase preferences can be entered directly or resumed after reload. */
+rep("  var st=sc[CE.i],D=wd(CE.f).data;\n  if(st.pre", "  var st=sc[CE.i],D=wd(CE.f).data;\n  if(CE.f==='buy'){defP(D);defPR(D)}\n  if(st.pre");
+rep("var prg=parseRangeFA(v0);", "var prg=st.id==='age'?parseAgeRangeFA(v0):parseRangeFA(v0);");
+rep("var p=v.split('|');D.PR.age=[+p[0],+p[1]];", "defPR(D);var p=String(v).split('|');if(p.length!==2||!p.every(function(n){return Number.isFinite(+n)&&+n>=0})||+p[0]>+p[1])return 'ERR';D.PR.age=[+p[0],+p[1]];");
+
+/* A transfer keeps a single project owner and a stable archived conversation. */
+rep("    if(!p||!S.chats)return;\n    var title=null;", "    if(!p||!S.chats||!S.chats.some(function(c){return c.id===chatId}))return false;\n    store().forEach(function(other){other.chatIds=(other.chatIds||[]).filter(function(id){return id!==chatId});if(other._liveRefs)other._liveRefs=other._liveRefs.filter(function(r){return r.id!==chatId})});\n    if(!p.chatIds)p.chatIds=[];\n    var title=null;");
+rep("if(it.sourceChat===chatId||(it.sourceChat==null&&title&&it.sourceTitle===title))it.projectId=pid;", "if(it.sourceChat===chatId)it.projectId=pid;");
+rep("var free=(S.chats||[]).filter(function(c){return c&&!c.projectId&&!c.pinned});", "var free=(S.chats||[]).filter(function(c){return c&&c.projectId!==p.id});");
+rep("ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));toast('گفت‌وگو به پروژه اضافه شد')};", "ACT.e29prjAddChat=function(el){addChat(el.getAttribute('data-prj'),el.getAttribute('data-sess'));mountPanel(el.getAttribute('data-prj'));E29.shell.renderSidebarOnly();toast('گفت‌وگو به پروژه منتقل شد')};");
+rep("    '<button class=\"e22-sact e22-sact-del\"", "    '<button class=\"e22-sact\" type=\"button\" data-act=\"e31MoveChat\" data-sess=\"'+qesc(s.id)+'\" title=\"انتقال به پروژه\" aria-label=\"انتقال به پروژه\">'+E27_IC.pin+'</button>'+\n    '<button class=\"e22-sact e22-sact-del\"",2);
+
+/* Remove retired runtime branches rather than leaving disabled copies.
+   Historical workflow data remains untouched for archive restoration. */
+function retireBetween(start,end,replacement){
+  var a=H.indexOf(start),b=H.indexOf(end,a);
+  if(a<0||b<0){fail.push('retired block missing: '+start);return}
+  rep(H.slice(a,b),replacement||'');
+}
+retireBetween("{id:'work',q:'محل کارتان", "{id:'menu',q:");
+rep("if(v==='!menu'){ceStart('gate');CE.i=3;ceStep();return}","if(v==='!menu'){ceStart('gate');CE.i=1;ceStep();return}");
+rep("pskip:function(){CE.i=3;ceStep()}","pskip:function(){CE.i=1;ceStep()}");
+rep("[' درآمد اجاره','F:invr']","[' سرمایه‌گذاری','F:invp']");
+retireBetween('SCRIPTS.invb=[','SCRIPTS.mkt=[');
+retireBetween('CBACT.ipset=function(el){','var CBT={};');
+retireBetween('VIEWS.invest=function(){','/* ═══ ۱۴) مارکت',
+  "VIEWS.invest=function(){go('landing');if(window.E30&&E30.discAPI)E30.discAPI.start('invest','مشاوره سرمایه‌گذاری')};\n\n");
+
+/* Toman is the public currency; preserve historical canonical storage. */
+retireBetween('function parseMoneyFA(input){','function parseCountFA(input){',readSrc('v31-money.js')+'\n');
+rep("function rial(v){return fa(v,0)+' ریال'}","function rial(v){return fa(Number(v)/10,Number(v)%10?1:0)+' تومان'}");
+rep("function rShort(v){v=+v||0;","function rShort(v){v=(+v||0)/10;");
+rep("if(st.set){done=st.set(D,v)}","if(st.set){done=(st.money||st.moneyRange)?moneyCanonical(function(){return st.set(D,v)}):st.set(D,v)}");
+rep("try{ceVal(el.getAttribute('data-cv'))}","try{ceVal(moneyChip(el))}");
+rep("qesc(String(c.terms.deposit||''))","qesc(String(c.terms.deposit?c.terms.deposit/10:''))");
+rep("qesc(String(c.terms.rent===0?0:(c.terms.rent||'')))","qesc(String(c.terms.rent==null?'':c.terms.rent/10))");
+rep("qesc(String(c.terms.price||''))","qesc(String(c.terms.price?c.terms.price/10:''))");
+rep("dep=Number(depText),rent=Number(rentText)","dep=10*Number(depText),rent=10*Number(rentText)");
+rep("var dp=+v('cp-dep'),rn=+v('cp-rent');if(dp)c.terms.deposit=dp;if(rn)c.terms.rent=rn;","var dp=10*Number(v('cp-dep')),rn=10*Number(v('cp-rent'));if(v('cp-dep'))c.terms.deposit=dp;if(v('cp-rent'))c.terms.rent=rn;");
+rep("var pr=+v('cp-price');","var pr=10*Number(v('cp-price'));");
+rep("var price=+v('cp-price'),delivery=","var price=10*Number(v('cp-price')),delivery=");
+rep('value="8000000000" step="500000000"','value="800000000" step="50000000"',2);
+rep("var amt=+(document.getElementById('np-amt').value||0);","var amt=10*Number(document.getElementById('np-amt').value||0);");
+rep("var amt=(document.getElementById('bid-amt')||{}).value||'8000000000';","var amt=10*Number((document.getElementById('bid-amt')||{}).value||'800000000');");
+rep('id="wd-amt" type="number" min="100000" step="100000"','id="wd-amt" type="number" min="10000" step="10000"');
+rep('Math.max(100000,Math.floor(S.wallet||0))','Math.max(10000,Math.floor((S.wallet||0)/10))');
+rep("var a=+((document.getElementById('wd-amt')||{}).value||0);","var a=10*Number((document.getElementById('wd-amt')||{}).value||0);");
+rep("toast('حداقل ۱۰۰٬۰۰۰')","toast('حداقل ۱۰٬۰۰۰ تومان')");
+rep("D.assets.push({n:n.value,a:+a.value||0,d:+dd.value||0});","D.assets.push({n:n.value,a:10*Number(a.value)||0,d:+dd.value||0});");
+rep("data-paytxt value=\"'+(amtStr||'')+'\"","data-paytxt value=\"'+(amtStr?Number(amtStr)/10:'')+'\"");
+rep("var amt=+dg||0;","var amt=10*Number(dg)||0;");
+rep("wd('invb').data.payAmt=dg;","wd('invb').data.payAmt=String(amt);");
+rep("PAYM.amt=dg}","PAYM.amt=String(amt)}");
+rep("PAYM.amt=(PAYM.amt||'')+dg;","PAYM.amt=String(10*Number((PAYM.amt?String(Number(PAYM.amt)/10):'')+dg));");
+rep("PAYM.amt=(PAYM.amt||'').slice(0,-1);","PAYM.amt=String(10*Number((PAYM.amt?String(Number(PAYM.amt)/10):'').slice(0,-1)));");
+rep("function grtField(k,label,val,ph,type){", "function grtField(k,label,val,ph,type){if((k==='dep'||k==='rent'||k==='la-income')&&typeof val==='number')val=val/10;");
+rep("fa(tgt[0],0)+' تا '+fa(tgt[1],0)","fa(tgt[0]/(k==='ppm'?10:1),0)+' تا '+fa(tgt[1]/(k==='ppm'?10:1),0)");
+rep("id=\"dvr-'+k+'\">'+fa(v[0],0)+' تا '+fa(v[1],0)","id=\"dvr-'+k+'\">'+fa(v[0]/(k==='ppm'?10:1),0)+' تا '+fa(v[1]/(k==='ppm'?10:1),0)");
+rep("var n=Math.max(mn,Math.min(mx,+v2));","var n=Math.max(mn,Math.min(mx,Number(v2)*(k==='ppm'?10:1)));");
+rep("data-max=\"'+max+'\" value=\"'+v[0]+'\"><span", "data-max=\"'+max+'\" value=\"'+v[0]/(k==='ppm'?10:1)+'\"><span");
+rep("data-max=\"'+max+'\" value=\"'+v[1]+'\"></div>", "data-max=\"'+max+'\" value=\"'+v[1]/(k==='ppm'?10:1)+'\"></div>");
+rep("['۲–۲٫۵ میلیارد','2000000000|2500000000']","['۲۰۰–۲۵۰ میلیون تومان','2000000000|2500000000']");
+rep("['۲٫۵–۳٫۵ میلیارد','2500000000|3500000000']","['۲۵۰–۳۵۰ میلیون تومان','2500000000|3500000000']");
+/* Static prices are converted numerically before changing display labels. */
+[
+ ['۱۲٬۰۰۰٬۰۰۰٬۰۰۰ ریال','۱٬۲۰۰٬۰۰۰٬۰۰۰ تومان'],['۸۰۰٬۰۰۰٬۰۰۰ ریال','۸۰٬۰۰۰٬۰۰۰ تومان'],
+ ['۲۷۴٬۰۰۰ ریال/کیلو','۲۷٬۴۰۰ تومان/کیلو'],['۸٬۵۰۰٬۰۰۰ ریال','۸۵۰٬۰۰۰ تومان'],
+ ['۹٫۵ تا ۱۲ م ریال/روز','۹۵۰ هزار تا ۱٫۲ میلیون تومان/روز'],['۴۸٬۰۰۰٬۰۰۰ ریال','۴٬۸۰۰٬۰۰۰ تومان'],
+ ['۵۴٬۰۰۰ ریال','۵٬۴۰۰ تومان'],['۱۳٬۲۰۰٬۰۰۰ ریال','۱٬۳۲۰٬۰۰۰ تومان']
+].forEach(function(pair){rep(pair[0],pair[1])});
+/* Labels only: do not rewrite explicit-rial parser expressions. */
+H=H.replace(/ریالی/g,'تومانی').replace(/ریال(?=[)؛،: <—·])/g,'تومان').split('ریال/متر').join('تومان/متر');
+
 /* ═══ 10) CSS injection ═══ */
 injectBefore('</style>',readSrc('v31.css')+'\n'+readSrc('v31-guided-ui.css'));
 
 /* ═══ 11) JS injection before boot ═══ */
-var jsOrder=['v31-core.js','v31-intel.js','v31-flows.js','v31-ux.js','v31-landing.js','v31-guided-ui.js','v31-guidance.js','v31-shell.js'];
+var jsOrder=['v31-core.js','v31-intel.js','v31-flows.js','v31-ux.js','v31-landing.js','v31-guided-ui.js','v31-guidance.js','v31-turns.js','v31-shell.js'];
 var js=jsOrder.map(readSrc).join('\n\n');
 injectBefore('/* ═══ ۲۲) راه‌اندازی ═══ */',js);
 

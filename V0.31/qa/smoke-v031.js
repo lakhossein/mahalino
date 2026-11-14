@@ -83,7 +83,7 @@ async function send(page,text){
       fields:Object.keys(f),
       persona:E30.discAPI.personaOf('rent'),
       newness:f.prop_new&&{value:f.prop_new.v,kind:f.prop_new.kind,needsConfirmation:f.prop_new.requiresConfirmation},
-      bubbles:bubbles.map(b=>b.slice(0,150))
+      bubbles:bubbles
     };
   });
   ok('opening message starts discovery collector',st.disc===true,st);
@@ -115,8 +115,8 @@ async function send(page,text){
   });
   ok('BOTH deposit and rent captured from the two-amount sentence',!!st.dep&&!!st.rent,st);
   ok('two-amount sentence keeps the trailing «ودیعه» label on 1.5b, separate from 20–25m rent',
-    st.dep?.v?.[0]===1500000000&&st.dep?.v?.[1]===1500000000&&
-    st.rent?.v?.[0]===20000000&&st.rent?.v?.[1]===25000000,st);
+    st.dep?.v?.[0]===15000000000&&st.dep?.v?.[1]===15000000000&&
+    st.rent?.v?.[0]===200000000&&st.rent?.v?.[1]===250000000,st);
   ok('both financial values read back and explicit confirmation awaited (no silent defaults)',st.finConf===true&&st.pending==='financial',st);
   // The financial confirmation is a mandatory *separate user turn*. Text about
   // parking/rooms must not be silently treated as confirmation or discarded.
