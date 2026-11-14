@@ -16344,7 +16344,7 @@ E30.disc=(function(){
     if(ag){var na=pd(ag[1]);if(na>0&&na<=40&&getF('prop_age')!=+na){setF('prop_age',+na,{src:src,hard:true});found++}}
     /* work / university locations — matched CLAUSE-WISE so «محل کارم نزدیک ونک و دانشگاه حوالی انقلاب» binds each hood to its own context */
     var hl=(typeof HOODS!=='undefined')?HOODS:[];
-    function locIn(txt){for(var j=0;j<hl.length;j++){if(txt.indexOf(hl[j].n)>=0)return hl[j].id}return null}
+    function locIn(txt){txt=nz(txt);for(var j=0;j<hl.length;j++){if(txt.indexOf(nz(hl[j].n))>=0)return hl[j].id}return null}
     var clauses=nt.split(/\sو\s|،|؛|\.| ولی /).filter(function(c){return c&&c.replace(/\s/g,'')});
     var i2,wl2,ul2,gl2;
     for(i2=0;i2<clauses.length;i2++){
@@ -16871,7 +16871,7 @@ E30.disc=(function(){
       case 'work_loc': case 'uni_loc': case 'hood':{
         var hl=(typeof HOODS!=='undefined')?HOODS:[],i;
         if(/فرقی نداره|فرق ندارد|هر جا|هرجا/.test(nt)){markUnknown(id);return {ok:true,skip:true}}
-        for(i=0;i<hl.length;i++){if(t.indexOf(hl[i].n)>=0){setF(id,hl[i].id,{src:'answer',hard:id!=='hood'});return {ok:true}}}
+        for(i=0;i<hl.length;i++){if(nt.indexOf(nz(hl[i].n))>=0){setF(id,hl[i].id,{src:'answer',hard:id!=='hood'});return {ok:true}}}
         return {ok:false};
       }
       case 'work_weight':{

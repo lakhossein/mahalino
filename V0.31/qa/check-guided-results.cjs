@@ -24,6 +24,10 @@ function runtime(flow){
   }};
 }
 const impossible=runtime('rent');
+const named=runtime('rent');
+named.c.E30.discAPI.extract('ودیعه تا ۳ میلیارد تومان و اجاره ماهانه تا ۷۰ میلیون تومان، سعادت‌آباد، حداقل ۶۰ متر و ۲ خواب و پارکینگ الزامی است.','turn');
+assert.equal(named.c.E30.discAPI.getF('hood'),'h1','normalized neighborhood name was silently dropped');
+named.run();assert(named.shown.length>0&&named.shown.every(x=>x.hood==='h1'));
 impossible.set('hood','h8');impossible.set('budget_dep',{v:[12e9,12e9]});impossible.set('budget_rent',{v:[1e8,1e8]});
 impossible.set('m2',60);impossible.set('rooms',1);impossible.run();
 assert.equal(impossible.shown.length,0,'Enghelab example returned violating listings');
