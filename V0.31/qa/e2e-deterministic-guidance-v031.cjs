@@ -272,6 +272,51 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
         if(width>=1440)assert(state.width>=1120&&state.width<=1281,'desktop chat canvas did not use the requested width: '+state.width);
       }
     });
+    await test('Investment risk and liquidity preferences retain their meaning in the saved report',async page=>{
+      await send(page,await page.evaluate(()=>E30.guide.actions.invest.prompt));
+      await send(page,await page.evaluate(()=>E30.guide.actions['need-invest-risk'].prompt));await send(page,'ریسک متوسط');
+      await send(page,await page.evaluate(()=>E30.guide.actions['need-invest-liquidity'].prompt));await send(page,'نقدشوندگی بالا');
+      await send(page,await page.evaluate(()=>E30.guide.actions['start-service'].prompt));await send(page,'درسته');
+      const selected=await page.evaluate(()=>({risk:wd('invp').data.risk,liquidity:wd('invp').data.liquidity,text:document.querySelector('#chatB .msg.bot:last-child')?.textContent}));
+      assert(selected.risk==='medium'&&selected.liquidity==='all'&&/متوسط/.test(selected.text)&&/نقدشوندگی زیاد/.test(selected.text),'handoff discarded the stated risk or liquidity preference: '+JSON.stringify(selected));
+      await page.locator('#chatB [data-cv="!save"]').last().click();
+      assert(await page.evaluate(()=>S.library.some(x=>x.type==='invest'&&x.artifact.data.risk==='medium'&&x.artifact.data.liquidity==='all')),'saved analysis lost normalized preference meanings');
+    });
+    const catalogContext=await browser.newContext(),catalogPage=await catalogContext.newPage();
+    await catalogPage.goto(base,{waitUntil:'domcontentloaded'});await catalogPage.evaluate(()=>doLogin('QA'));
+    const preferenceCases=await catalogPage.evaluate(()=>E30.guide.registry.filter(r=>r.action.startsWith('preference:')).map(r=>({id:r.id,prompt:r.prompt,slot:r.action.split(':')[1]})));
+    await catalogContext.close();
+    assert(preferenceCases.length>=30,'actual runtime preference registry was not loaded');
+    for(const entry of preferenceCases){
+      await test('Registered preference '+entry.id+' can be skipped and reach its selected service output',async page=>{
+        const slot=entry.slot,flow=slot.startsWith('invest_')?'invest':['buy_budget','budget_scope','purpose'].includes(slot)?'buy':['prop_area','prop_rooms','ownership','docs','sale_motivation','sale_urgency','expected_price','min_price'].includes(slot)?'sell':slot==='listing_intent'?'landlord':'rent';
+        await send(page,await page.evaluate(f=>E30.guide.actions[f].prompt,flow));
+        const credits=await page.evaluate(()=>S.tokens);
+        await send(page,entry.prompt);
+        assert(await page.evaluate(()=>!!E30.discAPI.collector().expecting),'registered preference had no executable question: '+entry.id);
+        await page.locator('#chatB [data-e31-id="skip-preference"]').last().click();await page.locator('#chatSend').click();
+        assert(await page.evaluate(()=>!E30.discAPI.collector().expecting),'skip left the preference active: '+entry.id);
+        if(flow==='rent'||flow==='buy'){
+          await send(page,await page.evaluate(()=>E30.guide.actions.sample.prompt));
+          assert(await page.locator('#chatB .e31-results .pcard').count()>0,'skipped preference blocked a successful search: '+entry.id);
+        }else{
+          await send(page,await page.evaluate(()=>E30.guide.actions['start-service'].prompt));await send(page,'درسته');
+          if(flow==='invest'){
+            await page.locator('#chatB [data-cv="!save"]').last().click();
+            assert(await page.evaluate(()=>wd('invp').done&&S.library.some(x=>x.type==='invest')),'skipped investor preference blocked report completion');
+          }else if(flow==='sell'){
+            await page.evaluate(()=>ceVal('single'));await send(page,'۸۵');await send(page,'نارمک');
+            assert(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='s_val'&&wd('sell').data.prop_area===85&&wd('sell').data.hood==='h6'),'skipped seller preference blocked the selected real quote');
+          }else{
+            await page.evaluate(()=>ceVal('price'));await send(page,'نارمک');
+            assert(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='l_advice'),'skipped landlord preference blocked actual price advice');
+            await page.locator('#chatB [data-cv="!end"]').last().click();
+            assert(await page.evaluate(()=>CE.f===null&&!wd('lndl').data.registered),'price advice forced the user to publish a draft');
+          }
+        }
+        assert(await page.evaluate(()=>S.tokens)===credits,'optional preference or its sample output charged credit');
+      });
+    }
     await test('Stored item and contract summaries do not fabricate entries',async page=>{
       await send(page,'قراردادهای ذخیره‌شده رو داخل چت نشون بده.');
       assert((await page.locator('#chatB').textContent()).includes('هنوز قراردادی ثبت نشده'),'empty contract list not honest');

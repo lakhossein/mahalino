@@ -13,6 +13,7 @@ function runtime(flow){
     const declaration=html.match(new RegExp('var '+name+'=\\[[\\s\\S]*?\\];'));
     assert(declaration,'missing actual sample dataset '+name);vm.runInContext(declaration[0],c);
   }
+  const find=html.match(/^function findH\(id\).*$/m);assert(find,'missing actual neighborhood lookup');vm.runInContext(find[0],c);
   for(const name of ['v31-intel.js','v31-flows.js','v31-guidance.js'])vm.runInContext(fs.readFileSync(path.join(root,'src',name),'utf8'),c);
   c.E30.discAPI.start(flow,true);
   return {c,shown,messages,set:(k,v)=>c.E30.discAPI.setF(k,v,{src:'answer',hard:true}),run:()=>{

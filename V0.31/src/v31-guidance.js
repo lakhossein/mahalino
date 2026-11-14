@@ -43,7 +43,7 @@ E30.guide=(function(){
   function preferenceId(slot){return 'need-'+slot.replace(/_/g,'-').replace('m2','size')}
   Object.keys(PREFS).forEach(function(slot){var x=PREFS[slot];add({id:preferenceId(slot),title:x[0],prompt:x[1],action:'preference:'+slot,slots:[slot]})});
   Object.keys(E30.discAPI?E30.discAPI.SLOT_LABEL:{}).forEach(function(slot){
-    if(PREFS[slot]||slot==='budget_dep'||slot==='budget_rent')return;
+    if(PREFS[slot]||slot==='budget_dep'||slot==='budget_rent'||!E30.discAPI.canPreference(slot))return;
     var label=E30.discAPI.SLOT_LABEL[slot];
     add({id:preferenceId(slot),title:label,prompt:'می‌خواهم «'+label+'» را مشخص کنم.',action:'preference:'+slot,slots:[slot]});
   });
@@ -116,6 +116,12 @@ E30.guide=(function(){
   }
   function can(r,explicit){
     if(!r)return false;
+    if(r.action.indexOf('preference:')===0){
+      var slot=r.action.split(':')[1];
+      if(!E30.discAPI||!E30.discAPI.canPreference(slot))return false;
+      if(!explicit&&slot==='work_loc'&&E30.discAPI.getF('work_commute')!==true)return false;
+      if(!explicit&&slot==='uni_loc'&&E30.discAPI.getF('persona')!=='student')return false;
+    }
     if((r.id==='compare'||r.id==='neighborhood')&&!explicit)return typeof HOODS!=='undefined'&&HOODS.filter(function(h){return Number(h.buyBase)>0}).length>=2;
     if(r.id==='rent-area'&&!explicit)return false; /* No verified adjacency dataset. */
     if(r.id==='saved'&&!explicit)return !!(S.savedListings||[]).length;

@@ -617,8 +617,9 @@ E30.disc=(function(){
     botC((SUM.start(COL.wf)||'چه خدمتی می‌خواهید دریافت کنید؟')+
       '<p class="note">شناخت نیاز اختیاری است؛ پیشنهادهای شرایط را می‌توانید انتخاب، ویرایش یا رد کنید. با اطلاعات فعلی هم می‌توانید نتیجه بگیرید.</p>',null);
   }
+  function canPreference(id){return id==='persona'||id==='floor_preference'||id==='budget_pair'||!!ASK[id]}
   function preference(id){
-    if(!COL.active)return false;
+    if(!COL.active||!canPreference(id))return false;
     COL.confirming=null;COL.expecting=id;saveCollector();
     if(id==='budget_pair'){COL.budgetPair=true;budgetCard(true);return true}
     var q=id==='persona'?'پرسونای جست‌وجو را توصیف کنید: دانشجو، زوج، جوان، خانواده یا توصیف خودتان.':
@@ -1369,8 +1370,8 @@ E30.disc=(function(){
         var ob=getF('invest_objective');if(ob)D4.objective=ob;
         var cap=getF('invest_capital');if(cap&&cap.v)D4.cap=cap.v[1];
         var hz=getF('invest_horizon');if(hz)D4.horizon=hz;
-        var lq=getF('invest_liquidity');if(lq)D4.liquidity=lq;
-        var rk=getF('invest_risk');if(rk)D4.risk=rk;
+        var lq=getF('invest_liquidity');if(lq)D4.liquidity=({'بالا':'all','مهم نیست':'long'})[lq]||lq;
+        var rk=getF('invest_risk');if(rk)D4.risk=({'کم':'low','متوسط':'medium','بالا':'high'})[rk]||rk;
         var hp2=getF('hood');if(hp2)D4.hood=hp2;
         D4._e30=1;D4.optionalNeedsSkipped=!!d.skipOptionalToHoods;save();
         ceJump(d.skipOptionalToHoods?'i_an':'i_obj');
@@ -1447,7 +1448,7 @@ E30.disc=(function(){
 
   E30.discAPI={route:route,active:active,start:start,stop:stop,reset:reset,bindChat:bindChat,useChat:useChat,forgetChat:forgetChat,resume:resume,
     getF:getF,setF:setF,ctx:ctx,personaOf:personaOf,
-    preference:preference,collector:function(){return COL},
+    preference:preference,canPreference:canPreference,collector:function(){return COL},
     resumePrompt:resumePrompt,
     profileCard:profileCard,missing:missing,show:show,markUnknown:markUnknown,SLOT_LABEL:SLOT_LABEL,
     extract:extract,answer:answer};
