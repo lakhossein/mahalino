@@ -81,6 +81,8 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
       const body=await page.locator('#chatB').textContent();
       assert(body.includes('مقایسهٔ نمایشی محله‌ها'),'comparison action failed to render a real artifact');
       assert(body.includes('ساختگی'),'sample data were not labeled');
+      assert(await page.locator('#chatB .e31-geo-unavailable').count()===1,'unsupported adjacency was not disclosed');
+      assert(await page.locator('#chatB .e31-price-row').count()===0,'unrelated neighborhoods substituted for Enghelab');
       const after=await page.evaluate(()=>JSON.stringify(E30.discAPI.getF('budget_dep')));
       assert(before===after,'switching tasks corrupted confirmed budget information');
       assert(await page.locator('#chatB [data-e31-id="map"]').count()>0,'no valid next map prompt');
@@ -220,6 +222,22 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
       assert(await page.evaluate(()=>E30.discAPI.active()&&E30.discAPI.collector().wf==='rent'),'switching transactions lost the original collector');
       await send(page,await page.evaluate(()=>E30.guide.actions.sample.prompt));
       assert(await page.locator('#chatB .e31-results .pcard').count()>0,'resumed legacy entry failed to complete a search');
+    });
+    await test('Sample price charts use actual values and remain inside a wide responsive chat',async page=>{
+      for(const width of [1600,1440,980,600,360]){
+        await page.setViewportSize({width,height:900});
+        await send(page,await page.evaluate(()=>E30.guide.actions.compare.prompt));
+        const chart=page.locator('#chatB .e31-price-chart').last();
+        assert(await chart.locator('.e31-price-row').count()===3,'comparison did not render actual sample rows');
+        const state=await page.evaluate(()=>{
+          const chat=document.querySelector('.ch-main'),box=document.getElementById('chatB'),charts=box.querySelectorAll('.e31-price-chart'),chart=charts[charts.length-1];
+          return {width:chat.getBoundingClientRect().width,overflow:document.documentElement.scrollWidth>innerWidth+1,
+            clipped:chart.scrollWidth>chart.clientWidth+1,inside:box.contains(chart),
+            rows:Array.from(chart.querySelectorAll('.e31-price-row')).map(row=>{const h=HOODS.find(h=>h.n===row.dataset.hood);return {text:row.querySelector('b').textContent,expected:rial(h.buyBase)}})};
+        });
+        assert(state.inside&&!state.overflow&&!state.clipped&&state.rows.every(r=>r.text===r.expected),'chart escaped chat, overflowed, or altered its values: '+JSON.stringify(state));
+        if(width>=1440)assert(state.width>=1120&&state.width<=1281,'desktop chat canvas did not use the requested width: '+state.width);
+      }
     });
     await test('Stored item and contract summaries do not fabricate entries',async page=>{
       await send(page,'قراردادهای ذخیره‌شده رو داخل چت نشون بده.');

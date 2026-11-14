@@ -14,7 +14,7 @@ E30.guide=(function(){
     {id:'invest',group:'investment',title:'بررسی سرمایه‌گذاری',prompt:'می‌خوام برای سرمایه‌گذاری در ملک گزینه‌ها رو بررسی کنم.',aliases:['میخوام توی ملک سرمایه گذاری کنم'],action:'discover:invest',slots:['invest_capital','invest_horizon','invest_risk'],result:'شروع فرایند سرمایه‌گذاری',next:['neighborhood','map','valuation'],test:'guide-invest'},
     {id:'landlord',group:'seller',title:'ثبت درخواست موجر',prompt:'ملک خودم رو می‌خوام اجاره بدم.',aliases:['من موجرم و میخوام ملکم را اجاره بدهم'],action:'discover:landlord',slots:['listing_intent','prop_area','ownership'],result:'شروع فرایند موجر',next:['contracts','services','map'],test:'guide-landlord'},
     {id:'neighborhood',group:'neighborhood',title:'تحلیل محله',prompt:'می‌خوام محله‌های تهران رو از نظر قیمت و دسترسی مقایسه کنم.',aliases:['محله های تهران رو مقایسه کن'],action:'compare',slots:['hood','area_reference'],result:'مقایسه با برچسب دادهٔ داخلی',next:['rent-area','map','sample'],test:'guide-neighborhood'},
-    {id:'compare',group:'neighborhood',title:'مقایسهٔ قیمت محله‌ها',prompt:'محله‌های اطراف انقلاب رو از نظر قیمت و دسترسی مقایسه کن.',aliases:['قیمت محله‌های نزدیک انقلاب رو مقایسه کن'],action:'compare',slots:['area_reference'],result:'مقایسهٔ قابل ردیابی با دادهٔ نمونه',next:['sample','map','rent'],test:'guide-compare'},
+    {id:'compare',group:'neighborhood',title:'مقایسهٔ قیمت محله‌ها',prompt:'قیمت نمونهٔ محله‌های موجود رو مقایسه کن.',aliases:['قیمت محله‌های نزدیک انقلاب رو مقایسه کن','محله‌های اطراف انقلاب رو از نظر قیمت و دسترسی مقایسه کن.'],action:'compare',slots:['area_reference'],result:'مقایسهٔ قابل ردیابی با دادهٔ نمونه',next:['sample','map','rent'],test:'guide-compare'},
     {id:'map',group:'neighborhood',title:'نقشه داخل گفت‌وگو',prompt:'نقشه محله‌ها رو همین‌جا نشون بده.',aliases:['نقشه رو نشون بده'],action:'map',slots:['hood'],result:'نقشهٔ موجود داخل چت',next:['compare','sample','rent'],test:'guide-map'},
     {id:'valuation',group:'services',title:'تخمین نمونهٔ ارزش ملک',prompt:'می‌خوام ارزش ملک رو با داده‌های نمونه تخمین بزنم.',aliases:['تخمین ارزش ملک','ارزش‌گذاری ملک'],action:'valuation',slots:['hood','prop_area','prop_age'],result:'فرم داخلی و تأیید هزینه پیش از اجرا',next:['sell','neighborhood','contracts'],test:'guide-valuation'},
     {id:'contracts',group:'contract',title:'مدیریت قرارداد',prompt:'قراردادهای ذخیره‌شده رو داخل چت نشون بده.',aliases:['قراردادهای من رو نشون بده'],action:'contracts',slots:['contract_id'],result:'فهرست قراردادهای واقعاً ذخیره‌شده',next:['contract-start','termination','library'],test:'guide-contracts'},
@@ -116,6 +116,7 @@ E30.guide=(function(){
   }
   function can(r,explicit){
     if(!r)return false;
+    if(r.id==='rent-area'&&!explicit)return false; /* No verified adjacency dataset. */
     if(r.id==='saved'&&!explicit)return !!(S.savedListings||[]).length;
     if(r.id==='library'&&!explicit)return !!(S.library||[]).length;
     if(r.id==='projects'&&!explicit)return !!(S.projects||[]).length;
@@ -199,16 +200,23 @@ E30.guide=(function(){
       '</div><p class="note">اطلاعات از همین مرورگر خوانده شده است؛ هیچ داده‌ای ساخته نشده.</p>',null);
   }
   function compare(text){
-    var list=(typeof HOODS!=='undefined'&&Array.isArray(HOODS))?HOODS:[];
-    var near=/انقلاب/.test(norm(text));
-    var focus=list.filter(function(h){return near&&/انقلاب/.test(norm(h.n||''))});
-    var picks=(focus.length?focus:list.slice(0,3));
+    var list=(typeof HOODS!=='undefined'&&Array.isArray(HOODS))?HOODS:[],t=norm(text);
+    var header='<b>مقایسهٔ نمایشی محله‌ها</b><p class="note">فقط دادهٔ داخلی و ساختگی Mahalino، نه تحلیل زندهٔ بازار. قیمت خرید نمونه به‌ازای هر متر مربع، با واحد تومان؛ دادهٔ دسترسی و زمان سفر تأیید نشده است.</p>';
+    /* Coordinates alone do not establish adjacency, commuting or transit access.
+       Never substitute arbitrary neighborhoods for an unsupported area query. */
+    if(/اطراف|نزدیک|سمت|انقلاب/.test(t)){
+      botC(header+'<p class="e31-geo-unavailable">دادهٔ تأییدشده‌ای برای تعیین محله‌های نزدیک محدودهٔ درخواستی ندارم. محله‌ای را به‌عنوان همجوار پیشنهاد نمی‌کنم. برای مقایسهٔ عمومی قیمت، نام محله‌های موجود را مشخص کنید یا «قیمت نمونهٔ محله‌های موجود رو مقایسه کن» را بفرستید.</p>',null);return;
+    }
+    var named=list.filter(function(h){return t.indexOf(norm(h.n||''))>=0}),picks=named.length?named:list.slice(0,3);
+    var prices=picks.map(function(h){return Number(h.buyBase)||0}),max=Math.max.apply(null,[0].concat(prices));
     var rows=picks.map(function(h){
-      var price=(typeof h.buyBase==='number'&&typeof rial==='function')?rial(h.buyBase):'دادهٔ قابل نمایش موجود نیست';
-      return '<div class="kv"><span>'+esc(h.n||'محلهٔ نمونه')+'</span><b>'+esc(price)+'</b></div>';
+      var value=Number(h.buyBase),valid=isFinite(value)&&value>0;
+      var price=valid&&typeof rial==='function'?rial(value):'دادهٔ قابل نمایش موجود نیست';
+      return '<div class="e31-price-row" data-hood="'+qesc(h.n||'')+'"><span class="e31-price-label">'+esc(h.n||'محلهٔ نمونه')+'</span>'+
+        '<span class="e31-price-track" aria-hidden="true"><span style="width:'+(valid&&max?Math.round(value/max*100):0)+'%"></span></span>'+
+        '<b class="e31-price-value">'+esc(price)+'</b></div>';
     }).join('');
-    botC('<b>مقایسهٔ نمایشی محله‌ها</b><p class="note">فقط دادهٔ داخلی و ساختگی Mahalino، نه تحلیل زندهٔ بازار. ارقام در صورت وجود، مبنای نمونهٔ قیمت خرید به‌ازای هر متر هستند؛ دادهٔ دسترسی و زمان سفر تأیید نشده است.</p>'+
-      (rows?'<div class="sect">'+rows+'</div>':'<p>دادهٔ نمونهٔ محله در دسترس نیست.</p>'),null);
+    botC(header+(rows?'<div class="e31-price-chart" role="group" aria-label="مقایسهٔ قیمت نمونهٔ خرید هر متر مربع">'+rows+'</div>':'<p>دادهٔ نمونهٔ محله در دسترس نیست.</p>'),null);
   }
   function sample(){
     var col=S.ctx30Collectors&&S.ctx30Collectors[S.ctx30ActiveKey];
