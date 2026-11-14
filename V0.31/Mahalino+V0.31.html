@@ -19011,10 +19011,33 @@ E30.guide=(function(){
       (rows?'<div class="sect">'+rows+'</div>':'<p>دادهٔ نمونهٔ محله در دسترس نیست.</p>'),null);
   }
   function sample(){
-    var a=(typeof RLIST!=='undefined'&&Array.isArray(RLIST))?RLIST:[];
-    var opts=a.slice(0,3);
-    botC('<b>آگهی‌های ساختگی برای پیش‌نمایش کارت ملک</b><p class="note">این موارد آگهی زنده نیستند و به معنی انطباق تأییدشده با بودجه یا شرایط شما نیستند.</p>'+
-      (opts.length?'<div class="sect">'+opts.map(function(x){return '<div class="kv"><span>'+esc(x.t||'ملک آزمایشی')+'</span><b>'+esc(String(x.m2||'—'))+' متر · '+esc(String(x.beds||'—'))+' خواب</b></div>'}).join('')+'</div>':'<p>دادهٔ آزمایشی برای نمایش در دسترس نیست.</p>'),null);
+    var col=S.ctx30Collectors&&S.ctx30Collectors[S.ctx30ActiveKey];
+    var flow=(col&&col.wf==='buy')||CE.f==='buy'?'buy':'rent',f=E30.discAPI.getF;
+    var dep=f('budget_dep'),rent=f('budget_rent'),budget=f('buy_budget'),age=f('prop_age');
+    var rules=f('prefRules')||{},floor=f('floor_preference');
+    var fields=E30.discAPI.ctx().fields;
+    if(age==null&&f('prop_new')==='new'&&fields.prop_new&&fields.prop_new.kind==='hard')age=3;
+    /* Build an independent query from explicit facts. Never import the legacy
+       workflow's illustrative defaults or mutate its operational state. */
+    var D={hood:f('hood'),budg:budget&&budget.v?budget.v[1]:0,budgOpen:!budget||!!budget.open,
+      depOpen:!dep||!!dep.open,rentBOpen:!rent||!!rent.open,
+      B:{depB:dep&&dep.v?dep.v[1]:null,rentB:rent&&rent.v?rent.v[1]:null},
+      P:{beds:f('rooms')||0,minM2:f('m2')||0,maxAge:age,_ageHard:age!=null,prefRules:rules},
+      PR:{beds:f('rooms')||0,m2:[f('m2')||0,Infinity],age:f('prop_age_range')||[0,age==null?Infinity:age],
+        floorR:[-Infinity,Infinity],prefRules:rules}};
+    if(floor&&floor.level==='required'){D.P.requiredFloor=floor;D.PR.requiredFloor=floor}
+    var all=flow==='buy'?BLIST:RLIST;
+    var matches=all.filter(function(x){return flow==='buy'?E30.flowsAPI.buyPass(x,D):E30.flowsAPI.rentPass(x,D)});
+    var cards=matches.slice(0,3).map(function(x){
+      var h=flow==='buy'?chatBCard(x,false):chatListCard(x,false);
+      /* Preview keeps details and save controls. Choosing a service is separate
+         from these result cards; legacy selection expects an active flow. */
+      return h.replace(/<button\b[^>]*data-cba="sel[LB]"[^>]*>[\s\S]*?<\/button>/g,'');
+    }).join('');
+    botC('<b>آگهی‌های منطبق با اطلاعات فعلی: '+fa(matches.length,0)+'</b><p class="note">دادهٔ ساختگی نمونه، نه آگهی زنده. ترجیحات اعلام‌نشده فیلتر نمی‌شوند.'+
+      (matches.length>3?' سه نمونهٔ نخست نمایش داده می‌شود.':'')+'</p>'+
+      (cards?'<div class="chcards e31-results" data-result-flow="'+flow+'">'+cards+'</div>':
+        '<p>آگهی منطبق پیدا نشد. برای تغییر نتیجه، محدودیت دلخواه را صریحاً اصلاح کنید؛ هیچ قیدی خودکار حذف نشده است.</p>'),null);
   }
   function exec(r,t){
     var a=r.action;

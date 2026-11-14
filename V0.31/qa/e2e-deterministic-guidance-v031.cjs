@@ -93,6 +93,44 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
       assert(await page.locator('#chatB #e30-val-area').count()===1,'valuation form missing');
       assert((await page.evaluate(()=>S.tokens||0))===before,'payment occurred merely by sending a suggested prompt');
     });
+    await test('Guided rental results apply constraints, save a matching card and survive reload',async page=>{
+      await send(page,'می‌خوام در تهران یه خونه رهن و اجاره پیدا کنم.');
+      await send(page,'ودیعه تا ۳ میلیارد تومان و اجاره ماهانه تا ۷۰ میلیون تومان، سعادت‌آباد، حداقل ۶۰ متر و ۲ خواب و پارکینگ الزامی است.');
+      const before=await page.evaluate(()=>({fields:JSON.stringify(E30.discAPI.ctx().fields),tokens:S.tokens}));
+      await send(page,'با همین شرایط آگهی‌های نمونه رو نشون بده.');
+      const panel=page.locator('#chatB .e31-results').last();
+      const ids=await panel.locator('[data-cba="savL"]').evaluateAll(xs=>xs.map(x=>x.getAttribute('data-l')));
+      assert(ids.length>0,'successful guided rental fixture returned no real property card');
+      const valid=await page.evaluate(ids=>ids.every(id=>{const x=RLIST.find(x=>x.id===id);return x&&x.hood==='h1'&&x.dep<=30e9&&x.rent<=7e8&&x.m2>=60&&x.beds>=2&&x.park}),ids);
+      assert(valid,'guided cards violate an explicit rental constraint');
+      assert(await panel.locator('[data-cba="selL"]').count()===0,'preview used a selection action requiring a different workflow');
+      await panel.locator('[data-cba="savL"]').first().click();
+      await page.reload({waitUntil:'domcontentloaded'});await page.waitForTimeout(200);
+      const after=await page.evaluate(()=>({fields:JSON.stringify(E30.discAPI.ctx().fields),tokens:S.tokens,saved:S.savedListings}));
+      assert(before.fields===after.fields&&before.tokens===after.tokens,'showing/saving results altered preferences or deducted credit');
+      assert(after.saved.some(x=>x.listingId===ids[0]),'saved guided result did not survive reload');
+      assert(await page.locator('#chatB .e31-results .pcard').count()>0,'graphical search result did not survive reload');
+    });
+    await test('Enghelab zero-match result never replaces constraints with unrelated listings',async page=>{
+      await send(page,'می‌خوام در تهران یه خونه رهن و اجاره پیدا کنم.');
+      await send(page,'ودیعه ۱.۲ میلیارد تومان و اجاره ۱۰ میلیون تومان، انقلاب، حداقل ۶۰ متر و یک خواب می‌خواهم.');
+      await send(page,'با همین شرایط آگهی‌های نمونه رو نشون بده.');
+      const last=page.locator('#chatB .msg.bot').last();
+      assert((await last.textContent()).includes('آگهی منطبق پیدا نشد'),'zero matches were not reported honestly');
+      assert(await last.locator('.pcard').count()===0,'non-matching cards were substituted for the empty result');
+      const fields=await page.evaluate(()=>({hood:E30.discAPI.getF('hood'),dep:E30.discAPI.getF('budget_dep'),rent:E30.discAPI.getF('budget_rent'),size:E30.discAPI.getF('m2')}));
+      assert(fields.hood==='h8'&&fields.dep.v[1]===12e9&&fields.rent.v[1]===1e8&&fields.size===60,'explicit zero-result constraints changed');
+    });
+    await test('Guided purchase results use purchase prices and the declared total budget',async page=>{
+      await send(page,'می‌خوام برای خرید آپارتمان در تهران راهنمایی بشم.');
+      const target=await page.evaluate(()=>{const b=BLIST[0],f=E30.discAPI.setF;f('hood',b.hood,{src:'answer'});f('buy_budget',{v:[b.m2*b.ppm,b.m2*b.ppm]},{src:'answer'});f('m2',b.m2,{src:'answer'});f('rooms',b.beds,{src:'answer'});return {id:b.id,total:b.m2*b.ppm,hood:b.hood}});
+      await send(page,'با همین شرایط آگهی‌های نمونه رو نشون بده.');
+      const panel=page.locator('#chatB .e31-results').last();
+      assert(await panel.getAttribute('data-result-flow')==='buy','purchase query rendered rental results');
+      const ids=await panel.locator('[data-cba="savB"]').evaluateAll(xs=>xs.map(x=>x.getAttribute('data-l')));
+      assert(ids.includes(target.id),'successful purchase fixture did not render its matching card');
+      assert(await page.evaluate(({ids,target})=>ids.every(id=>{const b=BLIST.find(x=>x.id===id);return b&&b.hood===target.hood&&b.m2*b.ppm<=target.total}),{ids,target}),'purchase total-price constraint failed');
+    });
     await test('Stored item and contract summaries do not fabricate entries',async page=>{
       await send(page,'قراردادهای ذخیره‌شده رو داخل چت نشون بده.');
       assert((await page.locator('#chatB').textContent()).includes('هنوز قراردادی ثبت نشده'),'empty contract list not honest');
