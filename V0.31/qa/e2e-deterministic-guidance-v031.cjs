@@ -301,6 +301,39 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
       await page.locator('#chatB [data-cv="!save"]').last().click();
       assert(await page.evaluate(()=>S.library.some(x=>x.type==='invest'&&x.artifact.data.risk==='medium'&&x.artifact.data.liquidity==='all')),'saved analysis lost normalized preference meanings');
     });
+    await test('Additional investment preferences reach the saved report without contaminating rental budgets',async page=>{
+      await send(page,await page.evaluate(()=>E30.guide.actions.invest.prompt));
+      const values={'need-invest-objective':'هدف درآمد اجاره','need-invest-capital':'۳۰ میلیارد تومان','need-invest-asset':'آپارتمان مسکونی','need-invest-financing':'بخشی وام','need-invest-income':'۱۰ میلیون تومان','need-invest-management':'مدیر می‌گیرم','need-invest-exit':'نگهداری بلندمدت'};
+      for(const [id,value] of Object.entries(values)){
+        await send(page,await page.evaluate(id=>E30.guide.actions[id].prompt,id));await send(page,value);
+      }
+      assert(await page.evaluate(()=>E30.discAPI.getF('budget_rent')===null),'target income invented a rental search budget');
+      await send(page,await page.evaluate(()=>E30.guide.actions['start-service'].prompt));await send(page,'درسته');
+      await page.locator('#chatB [data-cv="!save"]').last().click();
+      const result=await page.evaluate(()=>({report:S.library.find(x=>x.type==='invest'),done:wd('invp').done,credits:S.tokens}));
+      const d=result.report?.artifact?.data;
+      assert(result.done&&result.credits===500&&d?.assetType==='residential'&&d.financing==='mixed'&&d.expectedCash===100000000&&d.management==='delegate'&&d.exitStrategy==='hold'&&d.cap===300000000000,'optional investment details did not reach the real saved analysis: '+JSON.stringify(result));
+      await page.reload({waitUntil:'domcontentloaded'});await page.waitForTimeout(200);
+      assert(await page.evaluate(id=>S.library.some(x=>x.id===id&&x.artifact.data.expectedCash===100000000),result.report.id),'optional investment details were lost on reload');
+    });
+    await test('Explicit per-meter price preference filters actual purchase cards independently of total budget',async page=>{
+      await send(page,await page.evaluate(()=>E30.guide.actions.buy.prompt));
+      const price=await page.evaluate(()=>BLIST[0].ppm);
+      await send(page,await page.evaluate(()=>E30.guide.registry.find(r=>r.action==='preference:price_per_m2').prompt));await send(page,String(price/10)+' تومان');
+      await send(page,await page.evaluate(()=>E30.guide.actions.sample.prompt));
+      const ids=await page.locator('#chatB .e31-results').last().locator('[data-cba="savB"]').evaluateAll(xs=>xs.map(x=>x.getAttribute('data-l')));
+      assert(ids.length>0&&await page.evaluate(({ids,price})=>ids.every(id=>BLIST.find(x=>x.id===id)?.ppm===price)&&E30.discAPI.getF('buy_budget')===null,{ids,price}),'per-meter preference changed total budget or returned mismatched cards');
+    });
+    await test('Explicit landlord rules survive optional handoff and internal draft registration',async page=>{
+      await send(page,await page.evaluate(()=>E30.guide.actions.landlord.prompt));
+      await send(page,await page.evaluate(()=>E30.guide.actions['need-listing-intent'].prompt));await send(page,'اجاره مسکونی');
+      await send(page,await page.evaluate(()=>E30.guide.actions['need-rental-rules'].prompt));await send(page,'حیوان خانگی پذیرفته نیست');
+      await send(page,await page.evaluate(()=>E30.guide.actions['start-service'].prompt));await send(page,'درسته');
+      await send(page,'نارمک');await send(page,'۵۰۰ میلیون تومان');await send(page,'صفر');
+      assert(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='l_sum'&&wd('lndl').data.rules?.[0]==='حیوان خانگی پذیرفته نیست'),'handoff lost explicit landlord rules');
+      await page.locator('#chatB [data-cv="!ok"]').last().click();
+      assert(await page.evaluate(()=>wd('lndl').data.registered&&wd('lndl').data.rules[0]==='حیوان خانگی پذیرفته نیست'),'registered internal draft lost explicit rules');
+    });
     const catalogContext=await browser.newContext(),catalogPage=await catalogContext.newPage();
     await catalogPage.goto(base,{waitUntil:'domcontentloaded'});await catalogPage.evaluate(()=>doLogin('QA'));
     const preferenceCases=await catalogPage.evaluate(()=>E30.guide.registry.filter(r=>r.action.startsWith('preference:')).map(r=>({id:r.id,prompt:r.prompt,slot:r.action.split(':')[1]})));
@@ -308,7 +341,7 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
     assert(preferenceCases.length>=30,'actual runtime preference registry was not loaded');
     for(const entry of preferenceCases){
       await test('Registered preference '+entry.id+' can be skipped and reach its selected service output',async page=>{
-        const slot=entry.slot,flow=slot.startsWith('invest_')?'invest':['buy_budget','budget_scope','purpose'].includes(slot)?'buy':['prop_area','prop_rooms','ownership','docs','sale_motivation','sale_urgency','expected_price','min_price'].includes(slot)?'sell':slot==='listing_intent'?'landlord':'rent';
+        const slot=entry.slot,flow=slot.startsWith('invest_')?'invest':['buy_budget','budget_scope','purpose','price_per_m2'].includes(slot)?'buy':['property_floor','prop_area','prop_rooms','ownership','docs','sale_motivation','sale_urgency','expected_price','min_price'].includes(slot)?'sell':['listing_intent','rental_rules','stay_rules'].includes(slot)?'landlord':'rent';
         await send(page,await page.evaluate(f=>E30.guide.actions[f].prompt,flow));
         const credits=await page.evaluate(()=>S.tokens);
         await send(page,entry.prompt);

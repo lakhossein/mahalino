@@ -204,7 +204,7 @@ E30.flows=(function(){
        var h=findH(D.hood);
        return '<b>آماده‌سازی آگهی</b><div class="sect">'+
        '<div class="kv"><span>عنوان پیشنهادی</span><b>'+(D.prop_rooms!=null?fa(D.prop_rooms,0)+' خواب ':'تعداد خواب نامشخص، ')+fa(D.prop_area||0,0)+' متری، '+esc(h.n)+'</b></div>'+
-       '<div class="kv"><span>نکات برجسته</span><b>'+(D.prop_age===0?'نوساز':(D.prop_age!=null?fa(D.prop_age,0)+' سال ساخت':'عمر بنا نامشخص'))+(D.floor?'، طبقهٔ '+fa(D.floor,0):'')+'</b></div>'+
+       '<div class="kv"><span>نکات برجسته</span><b>'+(D.prop_age===0?'نوساز':(D.prop_age!=null?fa(D.prop_age,0)+' سال ساخت':'عمر بنا نامشخص'))+(D.floor!=null?'، طبقهٔ '+(D.floor===0?'همکف':fa(D.floor,0)):'')+'</b></div>'+
        '<div class="kv"><span>قیمت اعلامی</span><b>'+rial(D.ask||0)+'</b></div></div>این آگهی را تأیید می‌کنید؟'},
      chips:function(){return [['تأیید آگهی','!ok'],['تغییر قیمت','!rp']]},
      acts:{ok:function(D){D.approved=true;save();botC('✓ آگهی در وضعیت «آمادهٔ انتشار» ثبت شد. (انتشار واقعی نیازمند بک‌اند است — در سامانهٔ داخلی ثبت شد)',null);ceJump('s_inq')},rp:function(){ceJump('s_price')}}},

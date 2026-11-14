@@ -240,7 +240,7 @@ E30.guide=(function(){
       depOpen:!dep||!!dep.open,rentBOpen:!rent||!!rent.open,
       B:{depB:dep&&dep.v?dep.v[1]:null,rentB:rent&&rent.v?rent.v[1]:null},
       P:{beds:f('rooms')||0,minM2:f('m2')||0,maxAge:age,minAge:(f('prop_age_range')||[0])[0],_ageHard:age!=null,prefRules:rules},
-      PR:{beds:f('rooms')||0,m2:[f('m2')||0,Infinity],age:f('prop_age_range')||[0,age==null?Infinity:age],
+      PR:{ppm:(f('price_per_m2')||{}).v||[0,Infinity],beds:f('rooms')||0,m2:[f('m2')||0,Infinity],age:f('prop_age_range')||[0,age==null?Infinity:age],
         floorR:[-Infinity,Infinity],prefRules:rules}};
     if(floor&&floor.level==='required'){D.P.requiredFloor=floor;D.PR.requiredFloor=floor}
     var all=flow==='buy'?BLIST:RLIST;

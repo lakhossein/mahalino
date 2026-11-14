@@ -16163,6 +16163,16 @@ E30.disc=(function(){
     budget_rent:{l:'اجارهٔ ماهانه',kind:'moneyRange',fin:true},
     buy_budget:{l:'بودجهٔ خرید',kind:'moneyRange',fin:true},
     budget_scope:{l:'ماهیت بودجه',kind:'enum'},
+    price_per_m2:{l:'قیمت هر متر خرید',kind:'moneyRange',fin:true},
+    property_floor:{l:'طبقهٔ ملک فروشنده',kind:'count'},
+    invest_asset:{l:'نوع دارایی سرمایه‌گذاری',kind:'enum'},
+    invest_financing:{l:'منبع تأمین سرمایه',kind:'enum'},
+    invest_income:{l:'درآمد اجارهٔ هدف',kind:'moneyRange',fin:true},
+    invest_management:{l:'مدیریت ملک سرمایه‌ای',kind:'enum'},
+    invest_exit:{l:'راهبرد خروج از سرمایه‌گذاری',kind:'enum'},
+    invest_loan_context:{l:'زمینهٔ صریح وام',kind:'bool'},
+    rental_rules:{l:'قوانین پذیرش مستأجر',kind:'text'},
+    stay_rules:{l:'قوانین پذیرش مهمان',kind:'text'},
     rooms:{l:'خواب',kind:'count'},
     m2:{l:'متراژ',kind:'count'},
     prop_age:{l:'عمر بنا',kind:'count'},
@@ -16342,6 +16352,7 @@ E30.disc=(function(){
       var commuteImportant=!/مهم نیست|اهمیت ندارد|نزدیکی.*نمی ?خوام/.test(nt);
       if(getF('work_commute')!==commuteImportant){setF('work_commute',commuteImportant,{src:src});found++}
     }
+    if((financialFlow==='invest'||COL.wf==='invest')&&/وام|تسهیلات/.test(nt)){setF('invest_loan_context',!/بدون وام|وام نمی|وام ندار|وام لازم نیست/.test(nt),{src:src});found++}
     if(/مهاجرت/.test(nt)&&!getF('migrating')){setF('migrating','yes',{src:src});found++}
     /* rooms / m2 / age — word-numbers included («دو خواب») */
     var WN={'یک':1,'یک ':1,'دو':2,'سه':3,'چهار':4,'پنج':5};
@@ -16462,13 +16473,14 @@ E30.disc=(function(){
       buy:[{id:'buy_budget',w:20},{id:'purpose',w:19},{id:'persona',w:18},{id:'household',w:17},
            {id:'hood',w:16},{id:'m2',w:15},{id:'rooms',w:14},{id:'prop_age',w:13},
            {id:'floor_preference',w:12},{id:'prefs',w:11},{id:'timeline',w:10},
-           {id:'budget_scope',w:2,cond:function(){return !!getF('buy_budget')}}],
-      sell:[{id:'prop_area',w:9},{id:'hood',w:9},{id:'prop_rooms',w:6},{id:'ownership',w:7},{id:'docs',w:5,cond:function(){return getF('ownership')==='inherited'}},
+           {id:'price_per_m2',w:3},{id:'budget_scope',w:2,cond:function(){return !!getF('buy_budget')}}],
+      sell:[{id:'prop_area',w:9},{id:'hood',w:9},{id:'prop_rooms',w:6},{id:'prop_age',w:5},{id:'property_floor',w:5},{id:'ownership',w:7},{id:'docs',w:5,cond:function(){return getF('ownership')==='inherited'}},
             {id:'sale_motivation',w:6},{id:'sale_urgency',w:7},{id:'expected_price',w:5},{id:'min_price',w:4,cond:function(){return getF('sale_urgency')==='fast'}}],
-      invest:[{id:'invest_objective',w:10},{id:'invest_capital',w:9},{id:'invest_horizon',w:6},{id:'invest_liquidity',w:5},
-              {id:'invest_risk',w:5},{id:'hood',w:4},{id:'prop_new',w:2}]
+      invest:[{id:'invest_objective',w:10},{id:'invest_capital',w:9},{id:'invest_asset',w:8},{id:'invest_horizon',w:6},{id:'invest_liquidity',w:5},
+              {id:'invest_risk',w:5},{id:'hood',w:4},{id:'invest_financing',w:3,cond:function(){return getF('invest_loan_context')===true}},{id:'invest_income',w:3,cond:function(){return getF('invest_objective')==='rent_income'}},{id:'invest_management',w:2},{id:'invest_exit',w:2},{id:'prop_new',w:1}]
     };
     REQ.landlord=[{id:'listing_intent',w:12},{id:'hood',w:8},{id:'prop_area',w:7},
+      {id:'rental_rules',w:4,cond:function(){return getF('listing_intent')==='res'}},{id:'stay_rules',w:4,cond:function(){return getF('listing_intent')==='stay'}},
       {id:'prop_rooms',w:3,cond:function(){return getF('listing_intent')==='res'}},
       {id:'expected_price',w:2,cond:function(){return getF('listing_intent')==='res'}}];
     var list=REQ[wf]||[],out=[],i,p=personaOf(wf);
@@ -16496,6 +16508,15 @@ E30.disc=(function(){
 
   /* ── question bank: per field — several natural templates + why ── */
   var ASK={
+    price_per_m2:{q:['بازهٔ قیمت هر متر خرید را به تومان بنویسید.']},
+    property_floor:{q:['ملک فروشی در کدام طبقه است؟ (همکف هم قابل ثبت است)']},
+    invest_asset:{q:['نوع دارایی دلخواه: آپارتمان مسکونی، زمین، تجاری یا پروژهٔ ساخت؟']},
+    invest_financing:{q:['منبع سرمایه: شخصی، بخشی وام، یا هنوز مشخص نیست؟']},
+    invest_income:{q:['درآمد اجارهٔ ماهانهٔ هدف را به تومان بنویسید.']},
+    invest_management:{q:['مدیریت ملک را خودتان انجام می‌دهید، مدیر می‌گیرید یا زمان ندارید؟']},
+    invest_exit:{q:['راهبرد خروج: فروش، نگهداری بلندمدت یا هنوز مشخص نیست؟']},
+    rental_rules:{q:['قوانین پذیرش مستأجر را بنویسید؛ برای نبود شرط «ندارد» بفرستید.']},
+    stay_rules:{q:['قوانین پذیرش مهمان را بنویسید؛ برای نبود شرط «ندارد» بفرستید.']},
     budget_dep:{q:['ودیعه‌ای که در نظر دارید حدوداً چقدر است؟ (می‌توانید بازه بگویید یا «بدون سقف»)',
                    'برای ودیعه چه بازه‌ای در نظر گرفته‌اید؟'],
       why:'ودیعه و اجاره با هم تعیین می‌کنند چه گزینه‌هایی واقعاً در دسترس شماست.'},
@@ -16604,7 +16625,7 @@ E30.disc=(function(){
     COL.confirming=null;COL.expecting=id;saveCollector();
     if(id==='budget_pair'){COL.budgetPair=true;budgetCard(true);return true}
     var q=id==='persona'?'پرسونای جست‌وجو را توصیف کنید: دانشجو، زوج، جوان، خانواده یا توصیف خودتان.':
-      id==='floor_preference'?'طبقهٔ دلخواه یا بازهٔ طبقات را بنویسید.':ASK[id]&&ASK[id].q[0];
+      id==='floor_preference'?'طبقهٔ دلخواه یا بازهٔ طبقات را بنویسید.':id==='prop_age'&&COL.wf==='sell'?'عمر بنای ملک فروشی چند سال است؟':ASK[id]&&ASK[id].q[0];
     if(!q){COL.expecting=null;saveCollector();return false}
     botC(q+'<p class="note">اختیاری است؛ برای رد این پرسش «رد» بفرستید یا نتیجه را با اطلاعات فعلی ببینید.</p>',null);
     return true;
@@ -16652,7 +16673,7 @@ E30.disc=(function(){
   };
   function show(id,v){
     if(v===null||v===undefined)return '';
-    if(id==='budget_dep'||id==='budget_rent'||id==='buy_budget'||id==='invest_capital'||id==='expected_price'||id==='min_price'){
+    if(id==='budget_dep'||id==='budget_rent'||id==='buy_budget'||id==='invest_capital'||id==='expected_price'||id==='min_price'||id==='price_per_m2'||id==='invest_income'){
       if(v&&v.open)return 'بدون سقف';
       if(v&&v.v)return rial(v.v[0])+(v.v[1]!==v.v[0]?' تا '+rial(v.v[1]):'');
       return '';
@@ -16668,6 +16689,9 @@ E30.disc=(function(){
       return Object.keys(v||{}).map(function(k){return ({parking:'پارکینگ',elevator:'آسانسور',balcony:'بالکن',quiet:'سکوت',metro:'مترو',storage:'انباری'})[k]+': '+marks[v[k]]}).join('؛ ');
     }
     if(id==='floor_preference')return 'طبقات '+fa(v.min,0)+' تا '+fa(v.max,0)+(v.level==='required'?' (الزامی)':' (ترجیحی)');
+    var names={invest_asset:{residential:'آپارتمان مسکونی',land:'زمین',commercial:'تجاری',development:'پروژهٔ ساخت'},invest_financing:{cash:'شخصی',mixed:'بخشی وام',unknown:'هنوز مشخص نیست'},invest_management:{self:'مدیریت شخصی',delegate:'مدیر یا مشاور',none:'زمان ندارم'},invest_exit:{sell:'فروش',hold:'نگهداری بلندمدت',unknown:'هنوز مشخص نیست'}};
+    if(names[id])return names[id][v]||String(v);
+    if(id==='rental_rules'||id==='stay_rules')return v.length?v.join('، '):'ندارد';
     if(id==='purpose')return v==='invest'?'سرمایه‌گذاری':'سکونت';
     if(id==='invest_objective')return ({rent_income:'درآمد اجاره',appreciation:'رشد قیمت',inflation_hedge:'حفظ ارزش',land_bank:'زمین',resale:'فروش سریع',commercial:'تجاری',development:'توسعه',diversify:'تنوع'})[v]||String(v);
     if(id==='prop_new')return v==='preferred'?'نوساز ترجیحی (غیرالزامی)':v==='recent'?'ساخت چند سال اخیر':'نوساز';
@@ -16866,6 +16890,36 @@ E30.disc=(function(){
       markUnknown(id);return {ok:true,skip:true};
     }
     switch(id){
+      case 'price_per_m2': case 'invest_income':{
+        var range=parseMoneyRangeFA(t),one;
+        if(range&&range.ok){var values=range.value.split('|').map(Number);setF(id,{v:values},{src:'answer',hard:id==='price_per_m2'});return {ok:true}}
+        one=parseMoneyFA(t);if(!one||!one.ok)return {ok:false};setF(id,{v:[one.value,one.value]},{src:'answer',hard:id==='price_per_m2'});return {ok:true};
+      }
+      case 'property_floor':{
+        var raw=nt.replace(/طبقه|ملک|است|هست/g,' ').trim(),floor=/همکف/.test(raw)?0:/^-?\d+$/.test(raw)?Number(raw):null;
+        if(floor===null){var count=parseCountFA(raw);floor=count&&count.ok?count.value:null}
+        if(!Number.isInteger(floor)||floor< -10||floor>200)return {ok:false};setF(id,floor,{src:'answer'});return {ok:true};
+      }
+      case 'invest_asset':{
+        var asset=/زمین|land/.test(nt)?'land':/تجاری|مغازه|commercial/.test(nt)?'commercial':/ساخت|پروژه|development/.test(nt)?'development':/مسکونی|آپارتمان|residential/.test(nt)?'residential':null;
+        if(!asset)return {ok:false};setF(id,asset,{src:'answer'});return {ok:true};
+      }
+      case 'invest_financing':{
+        var finance=/بدون وام|شخصی|cash/.test(nt)?'cash':/وام|تسهیلات|mixed/.test(nt)?'mixed':/نمی ?دانم|مشخص نیست|unknown/.test(nt)?'unknown':null;
+        if(!finance)return {ok:false};setF(id,finance,{src:'answer'});return {ok:true};
+      }
+      case 'invest_management':{
+        var management=/زمان ندارم|وقت ندارم|none/.test(nt)?'none':/مدیر|مشاور|delegate/.test(nt)?'delegate':/خودم|شخصا|self/.test(nt)?'self':null;
+        if(!management)return {ok:false};setF(id,management,{src:'answer'});return {ok:true};
+      }
+      case 'invest_exit':{
+        var exit=/فروش|sell/.test(nt)?'sell':/نگهداری|بلندمدت|hold/.test(nt)?'hold':/مشخص نیست|تصمیم ندارم|unknown/.test(nt)?'unknown':null;
+        if(!exit)return {ok:false};setF(id,exit,{src:'answer'});return {ok:true};
+      }
+      case 'rental_rules': case 'stay_rules':{
+        var rules=/^ندارد$/.test(nt.trim())?[]:String(t).split(/[،,]/).map(function(x){return x.trim()}).filter(Boolean);
+        if(!rules.length&&!/^ندارد$/.test(nt.trim()))return {ok:false};setF(id,rules,{src:'answer'});return {ok:true};
+      }
       case 'persona':{
         var persona=/دانشجو/.test(nt)?'student':/زوج/.test(nt)?'couple':/جوان/.test(nt)?'young':/خانواده/.test(nt)?'family':null;
         if(!persona)return {ok:false};
@@ -17112,7 +17166,8 @@ E30.disc=(function(){
     }
     /* 1) multi-slot extraction — catch everything given */
     /* A persona choice does not assert household composition or children. */
-    var found=COL.expecting==='persona'?0:extract(t,'turn');
+    var targeted=['persona','price_per_m2','property_floor','invest_asset','invest_financing','invest_income','invest_management','invest_exit','rental_rules','stay_rules'].indexOf(COL.expecting)>=0;
+    var found=targeted?0:extract(t,'turn');
     /* 2) answer for the currently expected slot */
     var exp=COL.expecting,res=null;
     if(exp){
@@ -17318,6 +17373,7 @@ E30.disc=(function(){
           else if(x==='balcony')D2.PR.balc='yes';
         });
         D2.PR.prefRules=getF('prefRules')||{};
+        var unitPrice=getF('price_per_m2');if(unitPrice&&unitPrice.v)D2.PR.ppm=unitPrice.v.slice();
         var floorBuy=getF('floor_preference');
         if(floorBuy){D2.PR._floorRange=floorBuy;if(floorBuy.level==='required')D2.PR.requiredFloor={min:floorBuy.min,max:floorBuy.max}}
         D2._e30=1;save();
@@ -17336,6 +17392,7 @@ E30.disc=(function(){
         var D3=wd('sell').data;
         ['prop_area','prop_rooms','prop_age','sale_urgency'].forEach(function(id){var v3=getF(id);if(v3!=null)D3[id]=v3});
         var hp=getF('hood');if(hp)D3.hood=hp;
+        var actualFloor=getF('property_floor');if(actualFloor!=null)D3.floor=actualFloor;
         var ep=getF('expected_price');if(ep&&ep.v)D3.expected=ep.v[0];
         var mp=getF('min_price');if(mp&&mp.v)D3.minprice=mp.v[0];
         var own=getF('ownership');if(own)D3.ownership=own;
@@ -17354,6 +17411,9 @@ E30.disc=(function(){
         var lq=getF('invest_liquidity');if(lq)D4.liquidity=({'بالا':'all','مهم نیست':'long'})[lq]||lq;
         var rk=getF('invest_risk');if(rk)D4.risk=({'کم':'low','متوسط':'medium','بالا':'high'})[rk]||rk;
         var hp2=getF('hood');if(hp2)D4.hood=hp2;
+        var investmentMap={invest_asset:'assetType',invest_financing:'financing',invest_management:'management',invest_exit:'exitStrategy'};
+        Object.keys(investmentMap).forEach(function(k){var value=getF(k);if(value!=null)D4[investmentMap[k]]=value});
+        var income=getF('invest_income');if(income&&income.v)D4.expectedCash=income.v[1];
         D4._e30=1;D4.optionalNeedsSkipped=!!d.skipOptionalToHoods;save();
         ceJump(d.skipOptionalToHoods?'i_an':'i_obj');
         return true;
@@ -17365,6 +17425,8 @@ E30.disc=(function(){
         var lhood=getF('hood');if(lhood)D5.hood=lhood;
         var la=getF('prop_area');if(la!=null){D5.area=+la;D5.m2=+la}
         var lp=getF('expected_price');if(lp&&lp.v)D5.ask_price=lp.v[0];
+        if(getF('rental_rules')!=null)D5.rules=getF('rental_rules').slice();
+        if(getF('stay_rules')!=null)D5.stayRules=getF('stay_rules').slice();
         D5._e30=1;D5.optionalNeedsSkipped=!!d.skipOptionalToHoods;save();
         ceJump('l_role');
         return true;
@@ -17672,7 +17734,7 @@ E30.flows=(function(){
        var h=findH(D.hood);
        return '<b>آماده‌سازی آگهی</b><div class="sect">'+
        '<div class="kv"><span>عنوان پیشنهادی</span><b>'+(D.prop_rooms!=null?fa(D.prop_rooms,0)+' خواب ':'تعداد خواب نامشخص، ')+fa(D.prop_area||0,0)+' متری، '+esc(h.n)+'</b></div>'+
-       '<div class="kv"><span>نکات برجسته</span><b>'+(D.prop_age===0?'نوساز':(D.prop_age!=null?fa(D.prop_age,0)+' سال ساخت':'عمر بنا نامشخص'))+(D.floor?'، طبقهٔ '+fa(D.floor,0):'')+'</b></div>'+
+       '<div class="kv"><span>نکات برجسته</span><b>'+(D.prop_age===0?'نوساز':(D.prop_age!=null?fa(D.prop_age,0)+' سال ساخت':'عمر بنا نامشخص'))+(D.floor!=null?'، طبقهٔ '+(D.floor===0?'همکف':fa(D.floor,0)):'')+'</b></div>'+
        '<div class="kv"><span>قیمت اعلامی</span><b>'+rial(D.ask||0)+'</b></div></div>این آگهی را تأیید می‌کنید؟'},
      chips:function(){return [['تأیید آگهی','!ok'],['تغییر قیمت','!rp']]},
      acts:{ok:function(D){D.approved=true;save();botC('✓ آگهی در وضعیت «آمادهٔ انتشار» ثبت شد. (انتشار واقعی نیازمند بک‌اند است — در سامانهٔ داخلی ثبت شد)',null);ceJump('s_inq')},rp:function(){ceJump('s_price')}}},
@@ -19199,7 +19261,7 @@ E30.guide=(function(){
       depOpen:!dep||!!dep.open,rentBOpen:!rent||!!rent.open,
       B:{depB:dep&&dep.v?dep.v[1]:null,rentB:rent&&rent.v?rent.v[1]:null},
       P:{beds:f('rooms')||0,minM2:f('m2')||0,maxAge:age,minAge:(f('prop_age_range')||[0])[0],_ageHard:age!=null,prefRules:rules},
-      PR:{beds:f('rooms')||0,m2:[f('m2')||0,Infinity],age:f('prop_age_range')||[0,age==null?Infinity:age],
+      PR:{ppm:(f('price_per_m2')||{}).v||[0,Infinity],beds:f('rooms')||0,m2:[f('m2')||0,Infinity],age:f('prop_age_range')||[0,age==null?Infinity:age],
         floorR:[-Infinity,Infinity],prefRules:rules}};
     if(floor&&floor.level==='required'){D.P.requiredFloor=floor;D.PR.requiredFloor=floor}
     var all=flow==='buy'?BLIST:RLIST;
