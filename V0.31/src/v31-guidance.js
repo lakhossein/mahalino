@@ -30,6 +30,33 @@ E30.guide=(function(){
     {id:'build',group:'special',title:'ساخت و مصالح',prompt:'می‌خوام مسیر ساخت و مصالح رو بررسی کنم.',aliases:['خدمات ساخت و مصالح میخوام'],action:'flow:build',slots:['project_type','budget'],result:'فلو داخلی موجود، در صورت نصب',next:['services','projects'],test:'guide-build'},
     {id:'development',group:'special',title:'پروژه‌های ساختمانی',prompt:'می‌خوام پروژه‌های ساختمانی رو بررسی کنم.',aliases:['پروژه‌های ساختمانی جدید'],action:'flow:mkt',slots:['project_type','hood'],result:'فلو داخلی موجود، در صورت نصب',next:['invest','projects'],test:'guide-development'}
   ];
+  var PREFS={
+    persona:['پرسونا','می‌خواهم پرسونای جست‌وجویم را مشخص کنم.'],
+    household:['ترکیب خانوار','می‌خواهم ترکیب خانوار را مشخص کنم.'],
+    hood:['محدوده','می‌خواهم محدوده جست‌وجو را مشخص کنم.'],
+    m2:['متراژ','می‌خواهم حداقل متراژ را مشخص کنم.'],rooms:['تعداد خواب','می‌خواهم تعداد خواب را مشخص کنم.'],
+    prop_age:['عمر بنا','می‌خواهم عمر بنای دلخواه را مشخص کنم.'],
+    floor_preference:['طبقه','می‌خواهم طبقه دلخواه را مشخص کنم.'],
+    prefs:['امکانات','می‌خواهم امکانات دلخواه را مشخص کنم.']
+  };
+  function add(r){REGISTRY.push(Object.assign({group:'search',aliases:[],slots:[],next:[],test:'preference-'+r.id,result:'ترجیح اختیاری؛ بدون عملیات یا پرداخت خودکار'},r))}
+  function preferenceId(slot){return 'need-'+slot.replace(/_/g,'-').replace('m2','size')}
+  Object.keys(PREFS).forEach(function(slot){var x=PREFS[slot];add({id:preferenceId(slot),title:x[0],prompt:x[1],action:'preference:'+slot,slots:[slot]})});
+  Object.keys(E30.discAPI?E30.discAPI.SLOT_LABEL:{}).forEach(function(slot){
+    if(PREFS[slot]||slot==='budget_dep'||slot==='budget_rent')return;
+    var label=E30.discAPI.SLOT_LABEL[slot];
+    add({id:preferenceId(slot),title:label,prompt:'می‌خواهم «'+label+'» را مشخص کنم.',action:'preference:'+slot,slots:[slot]});
+  });
+  add({id:'skip-preference',title:'رد پرسش',prompt:'این پرسش را فعلاً رد کن.',action:'skip'});
+  add({id:'start-service',title:'شروع خدمت با اطلاعات فعلی',prompt:'با اطلاعات فعلی ادامه بده.',action:'start-service'});
+  ['student','couple','young','family'].forEach(function(value,i){add({id:'persona-'+value,
+    title:['دانشجو','زوج','جوان','خانواده'][i],
+    prompt:['پرسونای جست‌وجوی من دانشجو است.','پرسونای جست‌وجوی من زوج است.','پرسونای جست‌وجوی من جوان است.','پرسونای جست‌وجوی من خانواده است.'][i],
+    action:'persona:'+value,slots:['persona']})});
+  REGISTRY.forEach(function(r){
+    if(r.id==='rent-budget'){r.prompt='می‌خواهم سقف ودیعه و اجاره ماهانه را مشخص کنم.';r.aliases=[];r.action='preference:budget_pair'}
+    if(r.id==='rent-specs'){r.prompt='می‌خواهم متراژ و تعداد خواب را مشخص کنم.';r.aliases=[];r.action='preference:m2'}
+  });
   var BY_ID={},BY_PROMPT={};
   function norm(s){return String(s||'').replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/[\u200c\u200f]/g,' ').replace(/\s+/g,' ').replace(/[.!؟?]+$/g,'').trim().toLowerCase()}
   REGISTRY.forEach(function(r){
@@ -71,6 +98,8 @@ E30.guide=(function(){
   }
   function can(r){
     if(!r)return false;
+    if(r.action==='skip')return !!(E30.discAPI&&E30.discAPI.collector().expecting);
+    if(r.action==='start-service')return !!(E30.discAPI&&E30.discAPI.active());
     if(r.action.indexOf('flow:')===0)return !!(typeof SCRIPTS!=='undefined'&&SCRIPTS[r.action.split(':')[1]]);
     if(r.action==='valuation')return typeof CBACT.e30ValOpen==='function';
     if(r.action==='contracts')return typeof CBACT.e30ContractList==='function';
@@ -103,8 +132,24 @@ E30.guide=(function(){
     return node;
   }
   function suggestions(){
-    var node=effectiveNode(),ids=GROUPS[node]||GROUPS.home;
-    return ids.map(function(k){return BY_ID[k]}).filter(can).slice(0,node==='home'?4:3);
+    var col=E30.discAPI.collector(),ids=[],seen={};
+    if(col.active){
+      if(col.expecting==='persona')ids=['persona-student','persona-couple','persona-young','persona-family','skip-preference','sample'];
+      else if(col.expecting)ids=['skip-preference',col.wf==='rent'||col.wf==='buy'?'sample':'start-service'];
+      else{
+        E30.discAPI.missing(col.wf).forEach(function(f){
+          var id=f.id==='budget_dep'||f.id==='budget_rent'?'rent-budget':preferenceId(f.id);
+          if(BY_ID[id]&&!seen[id]){ids.push(id);seen[id]=true}
+        });
+        ids=ids.slice(0,4).concat(col.wf==='rent'||col.wf==='buy'?['sample','start-service']:['start-service']);
+      }
+      if(['compare','neighborhood','rent-area'].indexOf(state().node)>=0&&typeof HOODS!=='undefined'&&HOODS.some(function(h){return h.ll}))ids=ids.concat(['map']);
+    }else{
+      var node=effectiveNode();ids=GROUPS[node]||GROUPS.home;
+      if(CE.f&&CE.f!=='gate')return [];
+      ids=ids.slice(0,node==='home'?4:3);
+    }
+    return ids.map(function(k){return BY_ID[k]}).filter(can);
   }
   function card(){
     if(!S.auth||CURRENT!=='landing')return '';
@@ -149,7 +194,7 @@ E30.guide=(function(){
     var D={hood:f('hood'),budg:budget&&budget.v?budget.v[1]:0,budgOpen:!budget||!!budget.open,
       depOpen:!dep||!!dep.open,rentBOpen:!rent||!!rent.open,
       B:{depB:dep&&dep.v?dep.v[1]:null,rentB:rent&&rent.v?rent.v[1]:null},
-      P:{beds:f('rooms')||0,minM2:f('m2')||0,maxAge:age,_ageHard:age!=null,prefRules:rules},
+      P:{beds:f('rooms')||0,minM2:f('m2')||0,maxAge:age,minAge:(f('prop_age_range')||[0])[0],_ageHard:age!=null,prefRules:rules},
       PR:{beds:f('rooms')||0,m2:[f('m2')||0,Infinity],age:f('prop_age_range')||[0,age==null?Infinity:age],
         floorR:[-Infinity,Infinity],prefRules:rules}};
     if(floor&&floor.level==='required'){D.P.requiredFloor=floor;D.PR.requiredFloor=floor}
@@ -168,6 +213,19 @@ E30.guide=(function(){
   }
   function exec(r,t){
     var a=r.action;
+    if(a.indexOf('preference:')===0){
+      usrC(t);
+      if(!E30.discAPI.active())E30.discAPI.start(CE.f==='buy'?'buy':'rent',true);
+      return E30.discAPI.preference(a.split(':')[1]);
+    }
+    if(a.indexOf('persona:')===0){
+      usrC(t);E30.discAPI.answer('persona',t);
+      E30.discAPI.collector().expecting=null;
+      S.ctx30Collectors[S.ctx30ActiveKey]=Object.assign({},E30.discAPI.collector());save();
+      botC('پرسونای جست‌وجو ثبت شد؛ ترکیب خانوار و داشتن فرزند از آن فرض نمی‌شود.',null);return true;
+    }
+    if(a==='skip')return E30.discAPI.route('رد');
+    if(a==='start-service'){CBACT.e30UseKnown();return true}
     if(a.indexOf('discover:')===0){
       var flow=a.split(':')[1];
       /* Guided prompts may start directly from the legacy onboarding gate.
@@ -234,7 +292,7 @@ E30.guide=(function(){
     };
     var previousBot=botC;
     botC=function(h,chips){
-      var html=String(h||''),skip=/(تأیید مالی ضروری|تعارضی در شرایط|e30-paycard|e30-budget-card|e30-persona-card|e31-guide|data-e28ctr|e30-val-hood)/.test(html);
+      var html=String(h||''),skip=/(تعارضی در شرایط|e30-paycard|e31-guide|data-e28ctr|e30-val-hood)/.test(html);
       var startup=CE.f==='gate'&&state().node==='home'&&CE.i===0;
       if(!skip&&S.auth&&CURRENT==='landing'&&(startup||!(CE.f&&!E30.discAPI.active()))){
         html+=card();

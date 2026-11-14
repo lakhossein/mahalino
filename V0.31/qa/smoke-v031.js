@@ -83,6 +83,7 @@ async function send(page,text){
       fields:Object.keys(f),
       persona:E30.discAPI.personaOf('rent'),
       newness:f.prop_new&&{value:f.prop_new.v,kind:f.prop_new.kind,needsConfirmation:f.prop_new.requiresConfirmation},
+      expecting:E30.discAPI.collector().expecting,suggestions:E30.guide.suggestions().map(x=>x.id),
       bubbles:bubbles
     };
   });
@@ -91,16 +92,16 @@ async function send(page,text){
   ok('«نوساز مهمه» is an explicitly soft preference pending clarification, not a hard age limit',st.newness&&st.newness.value==='new'&&st.newness.kind==='soft',st.newness);
   ok('persona = couple (not student — دانشگاه is a location)',st.persona==='couple',st.persona);
   var weightKnown=st.fields.indexOf('work_weight')>=0;
-  ok('first question adaptive: weighting OR budget when weighting pre-extracted (§4.8/4.5)',weightKnown?st.bubbles.some(b=>/ودیعه|بازه/.test(b)):st.bubbles.some(b=>/کدوم یکی|اولویت بیشتری|یک اندازه|مهم‌تره/.test(b)),{weightKnown,seen:st.bubbles.slice(-2)});
+  ok('supplied work/education facts are retained while next preferences stay optional',st.expecting===null&&st.suggestions[0]==='rent-budget'&&st.suggestions.includes('sample'),{weightKnown,expecting:st.expecting,suggestions:st.suggestions});
 
   await send(page,'تقریباً هر دو مهمن. ترجیح می‌دم بیشتر از نیم ساعت در مسیر نباشم.');
   st=await page.evaluate(()=>{
     const bubbles=[...document.querySelectorAll('#chatB .msg.bot .bub')].map(b=>b.textContent);
     return {weight:(S.ctx30.fields.work_weight||{}).v,commute:(S.ctx30.fields.commute_max||{}).v,
-      askingBudget:bubbles.some(b=>/ودیعه/.test(b)&&/چقدر|بازه/.test(b)),last:bubbles[bubbles.length-1].slice(-160)};
+      askingBudget:E30.guide.suggestions().some(x=>x.id==='rent-budget')&&!document.querySelector('#chatB .e30-budget-card'),last:bubbles[bubbles.length-1].slice(-160)};
   });
   ok('weight=both + commute ceiling captured',st.weight==='both'&&!!st.commute,st);
-  ok('then financial question (budget next per §4.8)',st.askingBudget===true,st.last);
+  ok('budget remains an optional prompt after volunteered commute priorities',st.askingBudget===true,st.last);
 
   await send(page,'حدود یک میلیارد و نیم ودیعه و ماهی ۲۰ تا ۲۵ میلیون اجاره.');
   st=await page.evaluate(()=>{

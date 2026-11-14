@@ -96,6 +96,9 @@ const results=[];
       await page.locator('#chatIn').fill(prompt);
       await page.locator('#chatSend').click();
       await page.waitForTimeout(450);
+      assert(await page.locator('#chatB .e30-budget-card').count()===0,'entry forced a financial form');
+      await page.locator('#chatB [data-e31-id="rent-budget"]').last().click();
+      await page.locator('#chatSend').click();
       const card=page.locator('#chatB .e30-budget-card').last();
       assert(await card.count()===1,'combined rent budget card not shown');
       const choices=await card.locator('input[type="radio"]:checked').count();
@@ -113,9 +116,13 @@ const results=[];
       await page.locator('#chatIn').fill('دنبال خانه اجاره‌ای هستم');
       await page.locator('#chatSend').click();
       await page.waitForTimeout(300);
-      const options=page.locator('#chatB [data-cba="e30ChooseScenario"]');
-      assert(await options.count()===3,'guided opening lacks the expected 3 paths');
-      await options.first().click();
+      const ids=await page.locator('#chatB .e31-guide').last().locator('[data-e31-id]').evaluateAll(xs=>xs.map(x=>x.getAttribute('data-e31-id')));
+      assert(ids.slice(0,4).join('|')==='rent-budget|need-hood|need-persona|need-household','optional priorities do not match the approved order');
+      assert(ids.includes('sample'),'entry gated results behind preferences');
+      const before=await page.locator('#chatB .msg.user').count();
+      await page.locator('#chatB [data-e31-id="rent-budget"]').last().click();
+      assert(await page.locator('#chatB .msg.user').count()===before,'choosing a preference auto-submitted a message');
+      await page.locator('#chatSend').click();
       await page.waitForTimeout(250);
       assert(await page.locator('#chatB .e30-budget-card').count()===1,'budget-first scenario did not continue inside chat');
     });
@@ -123,15 +130,17 @@ const results=[];
       await page.evaluate(()=>botC('<button type="button" data-cf="rent">اجاره</button>',null));
       await page.locator('#chatB [data-cf="rent"]').last().click();
       await page.waitForTimeout(200);
-      assert(await page.locator('#chatB [data-cba="e30ChooseScenario"]').count()===3,
-        'rent click did not offer three recommended scenarios');
+      const rent=await page.locator('#chatB .e31-guide').last().locator('[data-e31-id]').evaluateAll(xs=>xs.map(x=>x.getAttribute('data-e31-id')));
+      assert(rent[0]==='rent-budget'&&rent.includes('sample'),'rent click did not offer optional needs and direct results');
+      assert(await page.locator('#chatB .e30-budget-card').count()===0,'rent entry forced a budget form');
       assert(await page.evaluate(()=>E30.discAPI.active()),'rent click did not start discovery');
       await page.evaluate(()=>{E30.discAPI.stop();botC('<button type="button" data-cf="buy">خرید</button>',null)});
       await page.locator('#chatB [data-cf="buy"]').last().click();
       await page.waitForTimeout(180);
       assert(await page.evaluate(()=>E30.discAPI.active()),'buy click did not start discovery');
-      assert(await page.locator('#chatB [data-cba="e30ChooseScenario"]').count()===6,
-        'purchase click did not add three tailored choices to chat');
+      const buy=await page.locator('#chatB .e31-guide').last().locator('[data-e31-id]').evaluateAll(xs=>xs.map(x=>x.getAttribute('data-e31-id')));
+      assert(buy.slice(0,4).join('|')==='need-buy-budget|need-purpose|need-persona|need-household'&&buy.includes('sample'),
+        'purchase click did not offer its own optional priorities and direct result');
     });
   }finally{await browser.close()}
   const pathOut=path.join(output,'guided-usability.json');

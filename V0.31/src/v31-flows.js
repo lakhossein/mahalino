@@ -19,6 +19,7 @@ E30.flows=(function(){
     if(pref.balcony==='forbidden'&&x.balc)return false;
     /* Every explicit maximum age is hard unless the collector deliberately marked it soft. */
     if(P._ageHard!==false&&Number.isFinite(Number(P.maxAge))&&P.maxAge!==''&&P.maxAge!=null&&x.age>Number(P.maxAge))return false;
+    if(P.minAge!=null&&Number.isFinite(Number(P.minAge))&&x.age<Number(P.minAge))return false;
     if(P.minM2!==''&&P.minM2!=null&&Number(P.minM2)>0&&x.m2<Number(P.minM2))return false;
     var exactFloor=P.floorNum!==undefined&&P.floorNum!==''&&P.floorNum!==null?Number(P.floorNum):null;
     if(exactFloor!==null&&Number.isFinite(exactFloor)&&x.floor!==exactFloor)return false;

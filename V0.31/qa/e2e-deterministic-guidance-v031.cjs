@@ -64,11 +64,14 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
       const input=page.locator('#chatIn');
       const before=await page.locator('#chatB .msg.user').count();
       await card.locator('[data-e31-id="rent-budget"]').click();
-      assert((await input.inputValue()).includes('۱.۲ میلیارد ودیعه'),'prompt did not prefill');
+      assert((await input.inputValue()).includes('سقف ودیعه و اجاره'),'neutral budget prompt did not prefill');
+      assert(await page.evaluate(()=>!E30.discAPI.getF('budget_dep')&&!E30.discAPI.getF('budget_rent')),'prefill fabricated financial preferences');
       assert(await page.locator('#chatB .msg.user').count()===before,'prefill submitted without user consent');
       await page.locator('#chatSend').click();await page.waitForTimeout(200);
+      assert(await page.locator('#chatB .e30-budget-card').count()===1,'explicit budget request did not open the combined input');
+      await send(page,'بودجه‌ام ۱.۲ میلیارد ودیعه و ۱۰ میلیون اجاره ماهانه است.');
       const budget=await page.evaluate(()=>E30.discAPI.getF('budget_dep'));
-      assert(budget&&budget.v&&budget.v[0]>0,'budget prompt failed to reach the real parser');
+      assert(budget&&budget.v&&budget.v[0]===12e9,'budget answer failed to reach the real parser');
     });
     await test('Comparison interrupts discovery without losing budget context',async page=>{
       await send(page,'می‌خوام در تهران یه خونه رهن و اجاره پیدا کنم.');
@@ -130,6 +133,38 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
       const ids=await panel.locator('[data-cba="savB"]').evaluateAll(xs=>xs.map(x=>x.getAttribute('data-l')));
       assert(ids.includes(target.id),'successful purchase fixture did not render its matching card');
       assert(await page.evaluate(({ids,target})=>ids.every(id=>{const b=BLIST.find(x=>x.id===id);return b&&b.hood===target.hood&&b.m2*b.ppm<=target.total}),{ids,target}),'purchase total-price constraint failed');
+    });
+    for(const flow of ['rent','buy'])await test('Every optional '+flow+' preference can be skipped before a successful result',async page=>{
+      const prompt=await page.evaluate(flow=>E30.guide.actions[flow].prompt,flow);await send(page,prompt);
+      const initial=await page.evaluate(()=>({expecting:E30.discAPI.collector().expecting,credits:S.tokens,requests:(S.reqs||[]).length}));
+      assert(initial.expecting===null,'entry asked an unsolicited preference question');
+      let previous=Infinity;
+      for(let i=0;i<35;i++){
+        const step=await page.evaluate(()=>({next:E30.guide.suggestions().find(x=>x.action.startsWith('preference:'))?.id,remaining:E30.discAPI.missing(E30.discAPI.collector().wf).length}));
+        if(!step.next)break;
+        assert(step.remaining<previous,'optional skips entered a no-progress loop');previous=step.remaining;
+        const before=await page.locator('#chatB .msg.user').count();
+        await page.locator('#chatB .e31-guide').last().locator('[data-e31-id="'+step.next+'"]').click();
+        assert(await page.locator('#chatB .msg.user').count()===before,'preference selection auto-submitted');
+        await page.locator('#chatSend').click();
+        await page.locator('#chatB .e31-guide').last().locator('[data-e31-id="skip-preference"]').click();
+        await page.locator('#chatSend').click();
+      }
+      const missing=await page.evaluate(()=>E30.discAPI.missing(E30.discAPI.collector().wf).length);
+      assert(missing===0,'some displayed preferences could not be skipped');
+      await page.locator('#chatB .e31-guide').last().locator('[data-e31-id="sample"]').click();await page.locator('#chatSend').click();
+      assert(await page.locator('#chatB .e31-results .pcard').count()>0,'skipping optional needs blocked a successful search');
+      const end=await page.evaluate(()=>({credits:S.tokens,requests:(S.reqs||[]).length,children:E30.discAPI.getF('children'),work:E30.discAPI.getF('work_loc')}));
+      assert(end.credits===initial.credits&&end.requests===initial.requests&&!end.children&&!end.work,'search invented personal data, charges or a follow-up service');
+    });
+    await test('Choosing a family persona does not assert household composition or schoolchildren',async page=>{
+      await send(page,'می‌خوام در تهران یه خونه رهن و اجاره پیدا کنم.');
+      await page.locator('#chatB [data-e31-id="need-persona"]').last().click();await page.locator('#chatSend').click();
+      await page.locator('#chatB [data-e31-id="persona-family"]').last().click();await page.locator('#chatSend').click();
+      const facts=await page.evaluate(()=>({persona:E30.discAPI.getF('persona'),household:E30.discAPI.getF('household'),children:E30.discAPI.getF('children'),missing:E30.discAPI.missing('rent').map(x=>x.id)}));
+      assert(facts.persona==='family'&&!facts.household&&!facts.children&&facts.missing.includes('household'),'persona fabricated household facts');
+      await send(page,'با همین شرایط آگهی‌های نمونه رو نشون بده.');
+      assert(await page.locator('#chatB .e31-results .pcard').count()>0,'persona refinement prevented completion of the search');
     });
     await test('Stored item and contract summaries do not fabricate entries',async page=>{
       await send(page,'قراردادهای ذخیره‌شده رو داخل چت نشون بده.');

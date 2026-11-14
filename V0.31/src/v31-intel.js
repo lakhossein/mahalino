@@ -117,6 +117,7 @@ E30.disc=(function(){
 
   /* ── persona classification — DYNAMIC (re-run after every update; §6.1) ── */
   function personaOf(wf){
+    if(getF('persona'))return getF('persona');
     var hh=getF('household'),kids=getF('children'),occ=getF('occupation')||'',stage=getF('life_stage')||'';
     var n=ctx();
     if(wf==='rent'||wf==='buy'){
@@ -170,9 +171,11 @@ E30.disc=(function(){
     life_stage:{l:'مرحلهٔ زندگی',kind:'enum'},
     occupation:{l:'شغل/تحصیل',kind:'text'},
     household:{l:'ترکیب خانوار',kind:'enum'},
+    persona:{l:'پرسونا',kind:'enum'},
     family_members:{l:'تعداد افراد',kind:'count'},
     children:{l:'فرزند',kind:'bool'},
     work_loc:{l:'محل کار',kind:'loc'},
+    work_commute:{l:'اهمیت رفت‌وآمد کاری',kind:'bool'},
     uni_loc:{l:'دانشگاه',kind:'loc'},
     work_weight:{l:'اهمیت محل کار',kind:'enum'},
     budget_dep:{l:'ودیعه',kind:'moneyRange',fin:true},
@@ -182,6 +185,7 @@ E30.disc=(function(){
     rooms:{l:'خواب',kind:'count'},
     m2:{l:'متراژ',kind:'count'},
     prop_age:{l:'عمر بنا',kind:'count'},
+    prop_age_range:{l:'بازهٔ عمر بنا',kind:'text'},
     prop_new:{l:'نوساز',kind:'enum'},
     prefs:{l:'الزامات',kind:'prefs'},
     timeline:{l:'زمان نقل مکان',kind:'text'},
@@ -353,11 +357,15 @@ E30.disc=(function(){
     if(/دانشجو(ام|م| هستم| هستم)|من دانشجو|دانشجوی\s/.test(nt)&&getF('occupation')!=='دانشجو'){setF('occupation','دانشجو',{src:src});found++}
     if(/بازنشسته|سالمند/.test(nt)&&getF('occupation')!=='بازنشسته'){setF('occupation','بازنشسته',{src:src});found++}
     if(/انتقال[یی]? (شغل|اداره)|ماموریت|جابه ?جا شدم.*کار|شغل جدید/.test(nt)){if(!getF('relocating')){setF('relocating','yes',{src:src});found++}}
+    if(/(?:نزدیک|نزدیکی|دسترسی|رفت ?و ?آمد|مسیر).{0,25}(?:محل کار|اداره|کارم|کاری)|(?:محل کار|اداره|کارم).{0,25}(?:نزدیک|دسترسی|رفت ?و ?آمد|مهم)/.test(nt)){
+      var commuteImportant=!/مهم نیست|اهمیت ندارد|نزدیکی.*نمی ?خوام/.test(nt);
+      if(getF('work_commute')!==commuteImportant){setF('work_commute',commuteImportant,{src:src});found++}
+    }
     if(/مهاجرت/.test(nt)&&!getF('migrating')){setF('migrating','yes',{src:src});found++}
     /* rooms / m2 / age — word-numbers included («دو خواب») */
     var WN={'یک':1,'یک ':1,'دو':2,'سه':3,'چهار':4,'پنج':5};
     var mm=nt.match(/(\d+|[۰-۹]+|یک|دو|سه|چهار|پنج)\s*خواب/);
-    if(mm){var nb=pd(mm[1]);if(!nb&&WN[mm[1]])nb=WN[mm[1]];if(nb>0&&nb<9&&getF('rooms')!=+nb){setF('rooms',+nb,{src:src});found++}}
+    if(mm){var nb=Number(pd(mm[1]));if(!Number.isFinite(nb)&&WN[mm[1]])nb=WN[mm[1]];if(nb>0&&nb<9&&getF('rooms')!=+nb){setF('rooms',+nb,{src:src});found++}}
     var m2=nt.match(/(\d+|[۰-۹]+)\s*متر/);if(m2){var nm2=pd(m2[1]);if(nm2>=15&&nm2<2000&&getF('m2')!=+nm2){setF('m2',+nm2,{src:src});found++}}
     if(/نوساز|تازه ?ساز|نو ساز/.test(nt)&&!/نوساز (نمی ?خوام|نمی ?خواهم|مهم نیست|لازم نیست)/.test(nt)){
       var newRequired=/نوساز.{0,22}(?:کاملا|کاملاً|الزامی|حتما|حتماً|باید|ضروری)|(?:کاملا|کاملاً|الزامی|حتما|حتماً|باید).{0,22}نوساز/.test(nt)&&
@@ -464,16 +472,16 @@ E30.disc=(function(){
   /* ── adaptive question selection (§4.5) — impact-scored, not list-ordered ── */
   function missing(wf){
     var REQ={
-      rent:[{id:'budget_dep',w:10},{id:'budget_rent',w:10},{id:'household',w:8},{id:'work_loc',w:6,cond:function(){return !getF('uni_loc')}},
-            {id:'uni_loc',w:6,cond:function(){return !getF('work_loc')||personaOf('rent')==='student'}},
-            {id:'work_weight',w:12,cond:function(){return !!getF('work_loc')&&!!getF('uni_loc')&&!getF('work_weight')}},
-            {id:'hood',w:5,cond:function(){return !getF('work_loc')&&!getF('uni_loc')}},
-            {id:'prop_new',w:5},{id:'rooms',w:4,cond:function(){return !!getF('household')}},{id:'m2',w:3},{id:'prop_age',w:3,cond:function(){return getF('prop_new')!=='new'}},
-            {id:'prefs',w:3},{id:'timeline',w:2}],
-      buy:[{id:'buy_budget',w:10},
-           {id:'budget_scope',w:9.5,cond:function(){var b=getF('buy_budget');return !!(b&&b.v)&&!getF('budget_scope')}},
-           {id:'purpose',w:9},{id:'household',w:6},{id:'hood',w:5},{id:'rooms',w:4,cond:function(){return !!getF('household')}},
-           {id:'prop_new',w:3},{id:'m2',w:3},{id:'prop_age',w:3},{id:'prefs',w:2},{id:'timeline',w:2}],
+      rent:[{id:'budget_dep',w:20},{id:'budget_rent',w:20},{id:'hood',w:19},{id:'persona',w:18},
+            {id:'household',w:17},{id:'m2',w:16},{id:'rooms',w:15},{id:'floor_preference',w:14},
+            {id:'prop_age',w:13},{id:'prefs',w:12},{id:'timeline',w:11},
+            {id:'work_loc',w:2,cond:function(){return getF('work_commute')===true}},
+            {id:'uni_loc',w:2,cond:function(){return getF('persona')==='student'}},
+            {id:'work_weight',w:2,cond:function(){return !!getF('work_loc')&&!!getF('uni_loc')}}],
+      buy:[{id:'buy_budget',w:20},{id:'purpose',w:19},{id:'persona',w:18},{id:'household',w:17},
+           {id:'hood',w:16},{id:'m2',w:15},{id:'rooms',w:14},{id:'prop_age',w:13},
+           {id:'floor_preference',w:12},{id:'prefs',w:11},{id:'timeline',w:10},
+           {id:'budget_scope',w:2,cond:function(){return !!getF('buy_budget')}}],
       sell:[{id:'prop_area',w:9},{id:'hood',w:9},{id:'prop_rooms',w:6},{id:'ownership',w:7},{id:'docs',w:5,cond:function(){return getF('ownership')==='inherited'}},
             {id:'sale_motivation',w:6},{id:'sale_urgency',w:7},{id:'expected_price',w:5},{id:'min_price',w:4,cond:function(){return getF('sale_urgency')==='fast'}}],
       invest:[{id:'invest_objective',w:10},{id:'invest_capital',w:9},{id:'invest_horizon',w:6},{id:'invest_liquidity',w:5},
@@ -489,13 +497,6 @@ E30.disc=(function(){
       var f=fMeta(it.id);
       if(f&&(f.status==='confirmed'||f.status==='unknown'))continue;
       var score=it.w+((f&&f.status==='inferred')?2:0);
-      if(wf==='rent'){
-        if(p==='student'&&it.id==='uni_loc')score+=6;
-        if(p==='student'&&it.id==='budget_rent')score+=2;
-        if(p==='family'&&(it.id==='rooms'||it.id==='prefs'))score+=6;
-        if(p==='retiree'&&(it.id==='prop_new'||it.id==='prefs'))score+=6;
-        if(p==='roommates'&&it.id==='budget_dep')score+=3;
-      }
       if(wf==='sell'){
         if(p==='urgent_seller'&&it.id==='min_price')score+=10;
         if(p==='heir'&&it.id==='docs')score+=8;
@@ -594,7 +595,7 @@ E30.disc=(function(){
   function resume(){
     try{
       var saved=S.ctx30Collectors&&S.ctx30Collectors[contextKey()];
-      if(saved&&saved.active&&saved.wf)COL=Object.assign({},saved);
+      if(saved&&saved.active&&saved.wf){COL=Object.assign({},saved);COL.optional=true}
       else COL={active:false,wf:null,fix:null,confirming:null,turns:0};
     }catch(e){COL={active:false,wf:null,fix:null,confirming:null,turns:0}}
     return COL.active;
@@ -602,20 +603,28 @@ E30.disc=(function(){
   function active(){return COL.active}
 
   function start(wf,silent,budgetFirst){
-    COL={active:true,wf:wf,fix:null,confirming:null,turns:0,finConfirmed:false};
+    COL={active:true,optional:true,wf:wf,fix:null,expecting:null,confirming:null,turns:0,finConfirmed:false};
     _lastPersona=personaOf(wf);
     saveCollector();
     if(!silent){
-      var p=personaOf(wf),tone=P_TONE[p]||P_TONE.general;
-      var greet='شنیدم. ';
-      if(tone.why&&/family|student|retiree|roommates|firstrent|firsttime/.test(p))greet+='('+tone.why+') ';
-      var sum=SUM.start(wf);
-      greet+=sum||'تا شناخته‌شدن شرایط‌تان، چند چیز کلیدی را یکی‌یکی می‌پرسم.';
-      botC(greet,null);
-      var hasConcreteFacts=!!(getF('work_loc')||getF('uni_loc')||getF('household')||getF('hood')||getF('prop_new')||getF('rooms')||getF('budget_dep')||getF('budget_rent'));
-      if(!budgetFirst&&!hasConcreteFacts&&scenarioCard(wf)){saveCollector();return true}
       askNext();
     }
+    return true;
+  }
+
+  function optionalHub(){
+    COL.expecting=null;saveCollector();
+    botC((SUM.start(COL.wf)||'چه خدمتی می‌خواهید دریافت کنید؟')+
+      '<p class="note">شناخت نیاز اختیاری است؛ پیشنهادهای شرایط را می‌توانید انتخاب، ویرایش یا رد کنید. با اطلاعات فعلی هم می‌توانید نتیجه بگیرید.</p>',null);
+  }
+  function preference(id){
+    if(!COL.active)return false;
+    COL.confirming=null;COL.expecting=id;saveCollector();
+    if(id==='budget_pair'){COL.budgetPair=true;budgetCard(true);return true}
+    var q=id==='persona'?'پرسونای جست‌وجو را توصیف کنید: دانشجو، زوج، جوان، خانواده یا توصیف خودتان.':
+      id==='floor_preference'?'طبقهٔ دلخواه یا بازهٔ طبقات را بنویسید.':ASK[id]&&ASK[id].q[0];
+    if(!q){COL.expecting=null;saveCollector();return false}
+    botC(q+'<p class="note">اختیاری است؛ برای رد این پرسش «رد» بفرستید یا نتیجه را با اطلاعات فعلی ببینید.</p>',null);
     return true;
   }
 
@@ -667,6 +676,9 @@ E30.disc=(function(){
       return '';
     }
     if(id==='household')return {single:'تنهایی',couple:'دو نفره',family:'خانواده',roommates:'هم‌خانه'}[v]||String(v);
+    if(id==='persona')return {student:'دانشجو',couple:'زوج',young:'جوان',family:'خانواده'}[v]||String(v);
+    if(id==='prop_age_range')return fa(v[0],0)+' تا '+fa(v[1],0)+' سال';
+    if(typeof v==='boolean')return v?'بله':'خیر';
     if(id==='work_loc'||id==='uni_loc'||id==='hood'){try{return findH(v).n}catch(e){return String(v)}}
     if(id==='prefs')return (v||[]).map(function(x){return ({parking:'پارکینگ',elevator:'آسانسور',balcony:'بالکن',quiet:'سکوت',metro:'مترو',storage:'انباری'})[x]||x}).join('، ');
     if(id==='prefRules'){
@@ -685,9 +697,9 @@ E30.disc=(function(){
   /* Guided, optional chat cards. Values enter the SAME evidence-aware collector;
      they are not a second flow engine and never fabricate a budget. */
   var budgetCardSequence=0;
-  function budgetCard(){
+  function budgetCard(force){
     var cardId=++budgetCardSequence;
-    var depMissing=!getF('budget_dep'),rentMissing=!getF('budget_rent');
+    var depMissing=force||!getF('budget_dep'),rentMissing=force||!getF('budget_rent');
     if(!depMissing&&!rentMissing)return false;
     var options=function(name,values){
       return values.map(function(v,i){
@@ -766,15 +778,12 @@ E30.disc=(function(){
   CBACT.e30PersonaSkip=function(){if(COL.active)ceSend('رد')};
   CBACT.e30UseKnown=function(){
     if(!COL.active)return;
-    if(COL.wf==='rent'&&(!getF('budget_dep')||!getF('budget_rent'))){
-      toast('برای جست‌وجوی دقیق، ابتدا ودیعه و اجاره را مشخص کن.');return;
-    }
     usrC('با اطلاعات فعلی ادامه بده');
     /* Explicit opt-out: do not recreate the same optional questionnaire in the
        deterministic hand-off after the user has asked for recommendations. */
     COL.skipOptionalToHoods=true;
     missing(COL.wf).forEach(function(item){
-      if(!FL[item.id].fin)markUnknown(item.id);
+      markUnknown(item.id);
     });
     COL.expecting=null;saveCollector();
     complete();
@@ -800,6 +809,7 @@ E30.disc=(function(){
     if(COL.confirming&&(/financial|contradiction|final/.test(COL.confirming.type)))return;
     if(financialPending()){promptFinancial();return}
     if(hardContradiction()){promptContradiction();return}
+    if(COL.optional){optionalHub();return}
     var wf=COL.wf;
     var m=missing(wf);
     var cl=needClarify();
@@ -870,9 +880,20 @@ E30.disc=(function(){
        will still offer «بدون سقف» later, so nothing is silently defaulted (§2.1).
        «رد» must be standalone — it is a substring of «میلیارد». */
     if(/مهم نیست|فرقی نداره|فرقی ندارد|بی ?خیال|نمی ?دانم|نمی ?دونم|فعلاً نه|فعلا نه|(^|\s)رد(\s|$|[.,!؟])/.test(nt)&&!/بدون سقف|نامحدود/.test(nt)){
+      if(id==='prop_age')markUnknown('prop_age_range');
       markUnknown(id);return {ok:true,skip:true};
     }
     switch(id){
+      case 'persona':{
+        var persona=/دانشجو/.test(nt)?'student':/زوج/.test(nt)?'couple':/جوان/.test(nt)?'young':/خانواده/.test(nt)?'family':null;
+        if(!persona)return {ok:false};
+        setF('persona',persona,{src:'answer'});return {ok:true};
+      }
+      case 'floor_preference':{
+        if(/^\d+(?:\s*(?:تا|الی|-)\s*\d+)?$/.test(nt.trim()))nt='طبقه '+nt;
+        if(!/طبقه|طبقات/.test(nt))return {ok:false};
+        extractPrefs(nt,'answer');return {ok:!!getF('floor_preference')};
+      }
       case 'budget_dep': case 'budget_rent': case 'buy_budget': case 'invest_capital': case 'expected_price': case 'min_price':{
         if(/بدون سقف|نامحدود|سقف ندار/.test(nt)&&id!=='min_price'){setF(id,{open:true},{src:'answer',fin:true});return {ok:true}}
         /* two-amount sentence while a financial slot is expected → capture its own share */
@@ -923,7 +944,13 @@ E30.disc=(function(){
         if(/مهم نیست|فرقی/.test(nt)){markUnknown('prop_new');return {ok:true,skip:true}}
         return {ok:false};
       }
-      case 'prop_age': case 'rooms': case 'm2': case 'prop_area': case 'prop_rooms': case 'family_members':{
+      case 'prop_age':{
+        var ar=parseAgeRangeFA(t);if(!ar.ok)return {ok:false};
+        if(ar.skip){markUnknown(id);markUnknown('prop_age_range');return {ok:true,skip:true}}
+        var ages=ar.value.split('|').map(Number);
+        setF(id,ages[1],{src:'answer',hard:true});setF('prop_age_range',ages,{src:'answer',hard:true});return {ok:true};
+      }
+      case 'rooms': case 'm2': case 'prop_area': case 'prop_rooms': case 'family_members':{
         var c=parseCountFA(stripFin(t));
         if(c&&c.ok&&c.value>0&&c.value<2000){setF(id,c.value,{src:'answer',hard:id==='prop_age'});return {ok:true}}
         return {ok:false};
@@ -1025,6 +1052,14 @@ E30.disc=(function(){
     if(/^\s*(منو|راهنما|لغو|بستن|انصراف)\s*$/.test(nt)){usrC(t);stop();botC('جمع‌بندی همین‌جا نگه داشته شد — هر وقت خواستید دوباره شروع کنید. چیزی از دست نرفته است.',null);return true}
     usrC(t);
     COL.turns++;
+    if(COL.optional&&COL.budgetPair&&/^(مهم نیست|رد|رد کردن)$/.test(nt.trim())){
+      ['budget_dep','budget_rent'].forEach(function(id){if(nt.trim()==='مهم نیست'||!getF(id))markUnknown(id)});
+      COL.budgetPair=false;COL.expecting=null;saveCollector();optionalHub();return true;
+    }
+    if(COL.optional&&!COL.expecting&&!COL.fix&&!COL.confirming&&/^(مهم نیست|رد|رد کردن|نمی ?دانم|نمی ?دونم)$/.test(nt.trim())){
+      missing(COL.wf).forEach(function(item){markUnknown(item.id)});
+      COL.skipOptionalToHoods=true;saveCollector();complete();return true;
+    }
     /* mid-flow meta-questions get a brief honest answer, then the flow resumes (§4.6) */
     if(/کلید چیست|کلید چیه|کلید چطور|چند کلید|بنا چیست|بنا چیه|بنا چطور|چند بنا|موجودی|شارژ/.test(nt)){
       var bal=S.tokens||0;
@@ -1094,11 +1129,15 @@ E30.disc=(function(){
       askNext();return true;
     }
     /* 1) multi-slot extraction — catch everything given */
-    var found=extract(t,'turn');
+    /* A persona choice does not assert household composition or children. */
+    var found=COL.expecting==='persona'?0:extract(t,'turn');
     /* 2) answer for the currently expected slot */
     var exp=COL.expecting,res=null;
     if(exp){
       res=answer(exp,t);
+      if(COL.optional&&!res.ok){
+        botC('مقدار «'+esc(SLOT_LABEL[exp]||exp)+'» روشن نبود؛ دوباره بنویسید یا «رد» بفرستید.',null);return true;
+      }
       if(res.ok){
         if(res.skip)COL.skipCount=(COL.skipCount||0)+1;
         if(!res.skip&&FL[exp].fin){
@@ -1106,6 +1145,7 @@ E30.disc=(function(){
           botC('ثبت شد: <b>'+esc(show(exp,getF(exp)))+'</b>',null);
         }
         COL.expecting=null;
+        COL.budgetPair=false;
         if(res.skip&&COL.skipCount>=8){
           /* Avoid trapping an unsure user in an endless questionnaire. Keep
              every unprovided field explicitly unknown; never invent money. */
@@ -1152,7 +1192,7 @@ E30.disc=(function(){
     var wf=COL.wf;
     /* a pending inference-clarification resolves BEFORE the final card (§4.4) */
     var cl=needClarify();
-    if(cl){
+    if(cl&&!COL.optional){
       var f=fMeta(cl);f._clar=true;
       botC(ASK[cl].q[0],null);
       COL.confirming={type:'clarify'};
@@ -1183,7 +1223,7 @@ E30.disc=(function(){
   }
   CBACT.e30fix=function(el){
     var slot=el.getAttribute('data-slot');
-    if(!COL.active)COL={active:true,wf:COL.wf||guessWf(),fix:null,confirming:null,turns:0};
+    if(!COL.active)COL={active:true,optional:true,wf:COL.wf||guessWf(),fix:null,confirming:null,turns:0};
     COL.fix=slot;COL.confirming=null;saveCollector();
     botC('مقدار جدید برای «'+esc(SLOT_LABEL[slot]||slot)+'» را بنویسید (یا «پاک کن»):',null);
   };
@@ -1215,6 +1255,7 @@ E30.disc=(function(){
         else if(getF('prop_new')==='new'&&isHard('prop_new')){P.maxAge=3;P._ageHard=true}
         else if(getF('prop_new')==='new'||getF('prop_new')==='preferred'){P.maxAge=30;P._ageHard=false;P._preferNew=true} /* soft preference, never silently harden */
         else{P.maxAge=30;P._ageHard=false} /* «مهم نیست» → wide, soft */
+        P.minAge=(getF('prop_age_range')||[0])[0];
         (getF('prefs')||[]).forEach(function(x){
           if(x==='elevator')P.elev=true;else if(x==='parking')P.park=true;
           else if(x==='metro')P.metro=5;else if(x==='quiet')P.quiet=5;
@@ -1237,7 +1278,15 @@ E30.disc=(function(){
         if(getF('commute_max'))P._commuteMax=getF('commute_max');
         D._e30=1;save();
         /* jump to the first missing REQUIRED step — financial never skipped (§2.1) */
-        if(!dep||!dep.v)ceJump('dep');
+        if(d.skipOptionalToHoods&&(!dep||!dep.v||!rent||!rent.v)){
+          D.B=D.B||{};
+          if(!dep||!dep.v){D.B.depB=null;D.depOpen=true}
+          if(!rent||!rent.v){D.B.rentB=null;D.rentBOpen=true}
+          D.P.beds=getF('rooms')||0;D.P.minM2=getF('m2')||0;
+          var skipHood=getF('hood');if(skipHood)D.hood=skipHood;
+          ceJump(skipHood?'mk':'hoods');
+        }
+        else if(!dep||!dep.v)ceJump('dep');
         else if(!rent||!rent.v)ceJump('rentb');
         else if(d.skipOptionalToHoods){
           var chosenHood=getF('hood');
@@ -1268,7 +1317,7 @@ E30.disc=(function(){
         var v2;
         if((v2=getF('rooms'))!=null)D2.PR.beds=+v2;
         if((v2=getF('m2'))!=null)D2.PR.m2=[+v2,Math.max(+v2+30,120)];
-        if((v2=getF('prop_age'))!=null)D2.PR.age=[0,+v2];
+        if((v2=getF('prop_age'))!=null)D2.PR.age=getF('prop_age_range')||[0,+v2];
         if(getF('prop_new')==='new'||getF('prop_new')==='preferred'){
           if(isHard('prop_new'))D2.PR.age=[0,3];
           else D2.PR._preferNew=true;
@@ -1281,7 +1330,14 @@ E30.disc=(function(){
         var floorBuy=getF('floor_preference');
         if(floorBuy){D2.PR._floorRange=floorBuy;if(floorBuy.level==='required')D2.PR.requiredFloor={min:floorBuy.min,max:floorBuy.max}}
         D2._e30=1;save();
-        if(!bud||!bud.v)ceJump('budg');else ceJump('imps');
+        if(d.skipOptionalToHoods){
+          if(!bud||!bud.v){D2.budg=0;D2.budgOpen=true}
+          D2.PR.beds=getF('rooms')||0;
+          if(!getF('m2'))D2.PR.m2=[0,100000];
+          if(getF('prop_age')==null&&!isHard('prop_new'))D2.PR.age=[0,100];
+          var buyHood=getF('hood');if(buyHood)D2.hood=buyHood;
+          ceJump(buyHood?'mk':'hoods');
+        }else if(!bud||!bud.v)ceJump('budg');else ceJump('imps');
         return true;
       }
       if(wf==='sell'){
@@ -1382,6 +1438,7 @@ E30.disc=(function(){
 
   E30.discAPI={route:route,active:active,start:start,stop:stop,reset:reset,bindChat:bindChat,useChat:useChat,forgetChat:forgetChat,resume:resume,
     getF:getF,setF:setF,ctx:ctx,personaOf:personaOf,
+    preference:preference,collector:function(){return COL},
     profileCard:profileCard,missing:missing,show:show,markUnknown:markUnknown,SLOT_LABEL:SLOT_LABEL,
     extract:extract,answer:answer};
   E30._dbg={normHalf:normHalf,segMoney:segMoney,finScan:finScan}; /* unit-debug surface */
