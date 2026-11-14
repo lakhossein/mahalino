@@ -1186,6 +1186,15 @@ E30.disc=(function(){
   }
   function stop(){COL={active:false,wf:null,fix:null,confirming:null,turns:0};saveCollector()}
   function reset(){stop();useChat(null);saveCollector()}
+  function resumePrompt(){
+    if(!COL.active)return false;
+    if(COL.confirming&&COL.confirming.type==='financial'){promptFinancial();return true}
+    if(COL.confirming&&COL.confirming.type==='contradiction'){promptContradiction();return true}
+    if(COL.confirming&&COL.confirming.type==='final'){complete();return true}
+    var id=COL.fix||COL.expecting;
+    if(id)return preference(COL.budgetPair?'budget_pair':id);
+    askNext();return true;
+  }
 
   /* ── completion: profile card → explicit confirm → hand-off (§4.7) ── */
   function complete(){
@@ -1439,6 +1448,7 @@ E30.disc=(function(){
   E30.discAPI={route:route,active:active,start:start,stop:stop,reset:reset,bindChat:bindChat,useChat:useChat,forgetChat:forgetChat,resume:resume,
     getF:getF,setF:setF,ctx:ctx,personaOf:personaOf,
     preference:preference,collector:function(){return COL},
+    resumePrompt:resumePrompt,
     profileCard:profileCard,missing:missing,show:show,markUnknown:markUnknown,SLOT_LABEL:SLOT_LABEL,
     extract:extract,answer:answer};
   E30._dbg={normHalf:normHalf,segMoney:segMoney,finScan:finScan}; /* unit-debug surface */

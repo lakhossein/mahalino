@@ -166,6 +166,61 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
       await send(page,'با همین شرایط آگهی‌های نمونه رو نشون بده.');
       assert(await page.locator('#chatB .e31-results .pcard').count()>0,'persona refinement prevented completion of the search');
     });
+    await test('Direct contract form suspends and resumes the original needs without restarting search',async page=>{
+      await send(page,'می‌خوام در تهران یه خونه رهن و اجاره پیدا کنم.');
+      await send(page,'ودیعه ۱.۲ میلیارد تومان و اجاره ۱۰ میلیون تومان.');
+      const before=await page.evaluate(()=>({fields:JSON.stringify(E30.discAPI.ctx().fields),tokens:S.tokens,confirming:E30.discAPI.collector().confirming?.type}));
+      const users=await page.locator('#chatB .msg.user').count();
+      await send(page,await page.evaluate(()=>E30.guide.actions['contract-start'].prompt));
+      const phase=await page.evaluate(()=>({active:E30.discAPI.active(),form:!!document.querySelector('#chatB [data-e28ctr]'),after:HIST.slice(HIST.map(x=>x.r).lastIndexOf('user')+1).length}));
+      assert(phase.form&&!phase.active&&phase.after===1,'contract entry restarted discovery or added multiple introductory answers');
+      assert(await page.locator('#chatB .msg.user').count()===users+1,'contract entry fabricated a user turn');
+      await page.locator('#chatB [data-e31-id="resume-service"]').last().click();await page.locator('#chatSend').click();
+      const after=await page.evaluate(()=>({active:E30.discAPI.active(),fields:JSON.stringify(E30.discAPI.ctx().fields),tokens:S.tokens,confirming:E30.discAPI.collector().confirming?.type}));
+      assert(after.active&&before.fields===after.fields&&before.tokens===after.tokens&&before.confirming===after.confirming,'contract side task lost the original collector, financial consent or credit');
+    });
+    await test('Valuation side task resumes the same pending preference after reload',async page=>{
+      await send(page,'می‌خوام در تهران یه خونه رهن و اجاره پیدا کنم.');
+      await send(page,await page.evaluate(()=>E30.guide.actions['need-size'].prompt));
+      const before=await page.evaluate(()=>({expecting:E30.discAPI.collector().expecting,fields:JSON.stringify(E30.discAPI.ctx().fields),tokens:S.tokens}));
+      await send(page,await page.evaluate(()=>E30.guide.actions.valuation.prompt));
+      assert(await page.locator('#chatB #e30-val-area').count()===1,'valuation side form missing');
+      await page.reload({waitUntil:'domcontentloaded'});await page.waitForTimeout(200);
+      await send(page,await page.evaluate(()=>E30.guide.actions['resume-service'].prompt));
+      const resumed=await page.evaluate(()=>({expecting:E30.discAPI.collector().expecting,fields:JSON.stringify(E30.discAPI.ctx().fields),tokens:S.tokens,active:E30.discAPI.active()}));
+      assert(resumed.active&&resumed.expecting===before.expecting&&resumed.fields===before.fields&&resumed.tokens===before.tokens,'reload lost suspended preference context');
+      await send(page,'۷۰ متر');await send(page,await page.evaluate(()=>E30.guide.actions.sample.prompt));
+      assert(await page.locator('#chatB .e31-results .pcard').count()>0,'resumed preference could not complete its search');
+      assert(await page.evaluate(()=>E30.discAPI.getF('m2'))===70,'resumed answer did not reach the original preference');
+    });
+    await test('Build requires an approved active project and then completes its own demonstrated service',async page=>{
+      await send(page,'می‌خوام در تهران یه خونه رهن و اجاره پیدا کنم.');
+      const before=await page.evaluate(()=>({flows:S.wfs.length,credits:S.tokens}));
+      await send(page,await page.evaluate(()=>E30.guide.actions.build.prompt));
+      const rejected=await page.evaluate(()=>({flows:S.wfs.length,credits:S.tokens,orders:(S.wfs||[]).filter(w=>w.m==='build').flatMap(w=>w.data.orders||[]).length}));
+      assert(rejected.flows===before.flows&&rejected.credits===before.credits&&rejected.orders===0,'missing project fabricated a construction workflow or order');
+      const unrelated=await page.evaluate(()=>{
+        const old=wfNew('build');old.data={projectWfId:'unrelated-project',orders:[{i:1,q:'قبلی',d:'قبلی'}],ph:[10,0,0,0,0]};
+        const w=wfNew('mkt');w.data={role:'con',bid:{prj:0,amt:8e9,dur:18,adj:'none'},confirmed:true};save();
+        return {id:old.id,data:JSON.stringify(old.data),project:w.id};
+      });
+      await send(page,await page.evaluate(()=>E30.guide.actions.build.prompt));
+      await send(page,'0');
+      await page.locator('#chatB [data-cv="!all"]').last().click();
+      await page.locator('#chatB [data-cv="!done"]').last().click();
+      const end=await page.evaluate(id=>({done:wd('build').done,orders:wd('build').data.orders,project:wd('build').data.projectWfId,unrelated:JSON.stringify(wfOf(id).data),credits:S.tokens,requests:S.reqs.filter(r=>r.cat==='build')}),unrelated.id);
+      assert(end.done&&end.orders.length===1&&end.requests.length>=1&&end.credits===before.credits&&end.project===unrelated.project&&end.unrelated===unrelated.data,'approved construction service failed completion or changed an unrelated project');
+    });
+    await test('Legacy transaction entry commands use the optional collector and preserve a return path',async page=>{
+      await page.evaluate(()=>ceVal('F:rent'));
+      assert(await page.evaluate(()=>E30.discAPI.active()&&E30.discAPI.collector().wf==='rent'&&!E30.discAPI.collector().expecting),'legacy rent command forced the old questionnaire');
+      await page.evaluate(()=>ceVal('F:buy'));
+      assert(await page.evaluate(()=>E30.discAPI.active()&&E30.discAPI.collector().wf==='buy'&&!E30.discAPI.collector().expecting),'legacy buy command bypassed optional needs');
+      await send(page,await page.evaluate(()=>E30.guide.actions['resume-service'].prompt));
+      assert(await page.evaluate(()=>E30.discAPI.active()&&E30.discAPI.collector().wf==='rent'),'switching transactions lost the original collector');
+      await send(page,await page.evaluate(()=>E30.guide.actions.sample.prompt));
+      assert(await page.locator('#chatB .e31-results .pcard').count()>0,'resumed legacy entry failed to complete a search');
+    });
     await test('Stored item and contract summaries do not fabricate entries',async page=>{
       await send(page,'قراردادهای ذخیره‌شده رو داخل چت نشون بده.');
       assert((await page.locator('#chatB').textContent()).includes('هنوز قراردادی ثبت نشده'),'empty contract list not honest');

@@ -17155,6 +17155,15 @@ E30.disc=(function(){
   }
   function stop(){COL={active:false,wf:null,fix:null,confirming:null,turns:0};saveCollector()}
   function reset(){stop();useChat(null);saveCollector()}
+  function resumePrompt(){
+    if(!COL.active)return false;
+    if(COL.confirming&&COL.confirming.type==='financial'){promptFinancial();return true}
+    if(COL.confirming&&COL.confirming.type==='contradiction'){promptContradiction();return true}
+    if(COL.confirming&&COL.confirming.type==='final'){complete();return true}
+    var id=COL.fix||COL.expecting;
+    if(id)return preference(COL.budgetPair?'budget_pair':id);
+    askNext();return true;
+  }
 
   /* ── completion: profile card → explicit confirm → hand-off (§4.7) ── */
   function complete(){
@@ -17408,6 +17417,7 @@ E30.disc=(function(){
   E30.discAPI={route:route,active:active,start:start,stop:stop,reset:reset,bindChat:bindChat,useChat:useChat,forgetChat:forgetChat,resume:resume,
     getF:getF,setF:setF,ctx:ctx,personaOf:personaOf,
     preference:preference,collector:function(){return COL},
+    resumePrompt:resumePrompt,
     profileCard:profileCard,missing:missing,show:show,markUnknown:markUnknown,SLOT_LABEL:SLOT_LABEL,
     extract:extract,answer:answer};
   E30._dbg={normHalf:normHalf,segMoney:segMoney,finScan:finScan}; /* unit-debug surface */
@@ -18980,6 +18990,7 @@ E30.guide=(function(){
   });
   add({id:'skip-preference',title:'رد پرسش',prompt:'این پرسش را فعلاً رد کن.',action:'skip'});
   add({id:'start-service',title:'شروع خدمت با اطلاعات فعلی',prompt:'با اطلاعات فعلی ادامه بده.',action:'start-service'});
+  add({id:'resume-service',title:'بازگشت به کار قبلی',prompt:'به کار قبلی برگرد.',action:'resume',result:'بازگردانی وضعیت و مرحلهٔ کار قبلی'});
   ['student','couple','young','family'].forEach(function(value,i){add({id:'persona-'+value,
     title:['دانشجو','زوج','جوان','خانواده'][i],
     prompt:['پرسونای جست‌وجوی من دانشجو است.','پرسونای جست‌وجوی من زوج است.','پرسونای جست‌وجوی من جوان است.','پرسونای جست‌وجوی من خانواده است.'][i],
@@ -19027,8 +19038,34 @@ E30.guide=(function(){
     if(!c.guide31)c.guide31={node:'home',seq:0};
     return c.guide31;
   }
-  function can(r){
+  function activeBuildProject(){
+    var id=S.active&&S.active.mkt,w=(S.wfs||[]).filter(function(w){return w.id===id&&!w.cancelled&&w.m==='mkt'})[0],d=w&&w.data;
+    if(!d||!(d.confirmed||d.chosen))return null;
+    var index=d.chosen?d.chosen.prj:d.bid&&d.bid.prj;
+    return typeof PRJ!=='undefined'&&Number.isInteger(index)&&PRJ[index]?w:null;
+  }
+  function rentalTarget(code){
+    var contracts=(S.contracts||[]).filter(function(c){return c&&c.code===code});
+    if(contracts.length!==1||contracts[0].kind!=='rent'||contracts[0].status!=='signed_internal')return null;
+    var c=contracts[0],work=(S.wfs||[]).filter(function(w){return w.m==='rent'&&!w.cancelled&&w.data&&w.data.signed&&w.data.code===code&&(!c.wfId||w.id===c.wfId)});
+    return work.length===1?work[0]:null;
+  }
+  function buildReady(){
+    var project=activeBuildProject(),id=S.active&&S.active.build;
+    var work=(S.wfs||[]).filter(function(w){return w.id===id&&w.m==='build'&&!w.cancelled})[0];
+    return !!(project&&work&&work.data&&work.data.projectWfId===project.id);
+  }
+  function can(r,explicit){
     if(!r)return false;
+    if(r.id==='saved'&&!explicit)return !!(S.savedListings||[]).length;
+    if(r.id==='library'&&!explicit)return !!(S.library||[]).length;
+    if(r.id==='projects'&&!explicit)return !!(S.projects||[]).length;
+    if(r.id==='termination'&&!explicit)return (S.contracts||[]).some(function(c){return c&&rentalTarget(c.code)});
+    if(r.id==='build'&&!explicit)return !!activeBuildProject();
+    if(r.action==='resume'){
+      var payment=E30.pay&&E30.pay.session();
+      return !!explicit||!!state().suspended&&!(payment&&/^(processing|paid|executing)$/.test(payment.state));
+    }
     if(r.action==='skip')return !!(E30.discAPI&&E30.discAPI.collector().expecting);
     if(r.action==='start-service')return !!(E30.discAPI&&E30.discAPI.active());
     if(r.action.indexOf('flow:')===0)return !!(typeof SCRIPTS!=='undefined'&&SCRIPTS[r.action.split(':')[1]]);
@@ -19036,7 +19073,7 @@ E30.guide=(function(){
     if(r.action==='contracts')return typeof CBACT.e30ContractList==='function';
     if(r.action==='services')return typeof CBACT.e30RequestService==='function';
     if(r.action==='guaranteed')return typeof CBACT.e30RequestGRT==='function';
-    if(r.action==='contract-start')return !!E30.discAPI;
+    if(r.action==='contract-start')return typeof E28!=='undefined'&&typeof E28.ctrStart==='function';
     if(r.action==='map')return typeof E30.chatMap==='function';
     if(r.action==='native'&&r.id==='reminder')return typeof E28!=='undefined';
     return true;
@@ -19077,14 +19114,15 @@ E30.guide=(function(){
       if(['compare','neighborhood','rent-area'].indexOf(state().node)>=0&&typeof HOODS!=='undefined'&&HOODS.some(function(h){return h.ll}))ids=ids.concat(['map']);
     }else{
       var node=effectiveNode();ids=GROUPS[node]||GROUPS.home;
-      if(CE.f&&CE.f!=='gate')return [];
+      if(CE.f&&CE.f!=='gate')return state().suspended?[BY_ID['resume-service']]:[];
       ids=ids.slice(0,node==='home'?4:3);
     }
-    return ids.map(function(k){return BY_ID[k]}).filter(can);
+    if(state().suspended)ids=ids.concat(['resume-service']);
+    return ids.map(function(k){return BY_ID[k]}).filter(function(r){return can(r,false)});
   }
-  function card(){
+  function card(onlyResume){
     if(!S.auth||CURRENT!=='landing')return '';
-    var options=suggestions();
+    var options=onlyResume?[BY_ID['resume-service']].filter(function(r){return can(r,false)}):suggestions();
     if(!options.length)return '';
     var st=state();st.seq=(st.seq||0)+1;
     return '<section class="e31-guide" aria-label="پرامپت‌های پیشنهادی"><div class="e31-guide-title">✦ پرامپت‌های پیشنهادی برای ادامه</div>'+
@@ -19142,8 +19180,56 @@ E30.guide=(function(){
       (cards?'<div class="chcards e31-results" data-result-flow="'+flow+'">'+cards+'</div>':
         '<p>آگهی منطبق پیدا نشد. برای تغییر نتیجه، محدودیت دلخواه را صریحاً اصلاح کنید؛ هیچ قیدی خودکار حذف نشده است.</p>'),null);
   }
+  function suspend(){
+    var st=state(),col=E30.discAPI.collector();
+    if(!st.suspended&&(col.active||(CE.f&&CE.f!=='gate'))){
+      var flow=col.active?({invest:'invp',landlord:'lndl'}[col.wf]||col.wf):CE.f;
+      st.suspended={collector:JSON.parse(JSON.stringify(col)),ce:JSON.parse(JSON.stringify(CE)),
+        flow:flow,activeId:S.active&&S.active[flow]||null,node:col.wf||({invp:'invest',lndl:'landlord'}[CE.f]||CE.f),
+        contract:typeof E28!=='undefined'?{kind:E28.ctrKind||null,done:E28.ctrDone||null}:null};
+    }
+    E30.discAPI.stop();CE.f=null;save();
+  }
+  function resumeService(){
+    var st=state(),saved=st.suspended;if(!saved){botC('کار معلقی برای بازگشت ثبت نشده است.',null);return true}
+    var pay=E30.pay&&E30.pay.session();
+    if(pay&&/processing|paid|executing/.test(pay.state)){botC('عملیات خدمت در حال انجام است؛ پس از پایان می‌توانید بازگردید.',null);return true}
+    if(pay&&/^(presented|awaiting_confirm|selected|priced|insufficient)$/.test(pay.state))E30.pay.cancel(pay.payId,true);
+    if(saved.flow){if(!S.active)S.active={};S.active[saved.flow]=saved.activeId}
+    Object.assign(CE,saved.ce);
+    if(!S.ctx30Collectors)S.ctx30Collectors={};
+    S.ctx30Collectors[S.ctx30ActiveKey]=saved.collector;
+    E30.discAPI.resume();st.suspended=null;setNode(saved.node||'home');save();
+    if(saved.contract&&typeof E28!=='undefined'){E28.ctrKind=saved.contract.kind;E28.ctrDone=saved.contract.done}
+    if(E30.discAPI.active())return E30.discAPI.resumePrompt();
+    var work=saved.activeId&&(S.wfs||[]).filter(function(w){return w.id===saved.activeId})[0];
+    if(work&&work.done){CE.f=null;botC('کار قبلی به پایان رسیده است؛ وضعیت و اطلاعات ذخیره‌شدهٔ آن حفظ شده‌اند.',null);return true}
+    if(CE.f)ceStep();else botC('به کار قبلی برگشتید؛ اطلاعات گفت‌وگو حفظ شده است.',null);
+    return true;
+  }
+  function contractStart(){
+    suspend();
+    var parent=state().suspended;
+    if(parent&&parent.flow==='rent'){
+      if(!parent.activeId)parent.activeId=wfNew('rent').id;
+      wfNew('rent');save();
+    }
+    var work=wd('rent');
+    if(work.data.ctr&&work.data.ctr.finalized)wfNew('rent');
+    E28.ctrStart('rent');
+  }
+  function terminationChoices(){
+    var cs=(S.contracts||[]).filter(function(c){return c&&c.code});
+    if(!cs.length){botC('قرارداد قابل ارجاعی ثبت نشده است. ابتدا قرارداد هدف را ثبت یا بازیابی کنید؛ هیچ قراردادی خودکار انتخاب نمی‌شود.',null);return}
+    botC('<b>قرارداد هدف را انتخاب کنید</b><div class="sect">'+cs.map(function(c){
+      return '<div class="fld"><b>'+esc(c.title||c.code)+'</b> · <span dir="ltr">'+esc(c.code)+'</span> · '+esc(c.status||'نامشخص')+
+        '<div class="qr">'+(rentalTarget(c.code)?'<button data-cba="e31TermStart" data-code="'+qesc(c.code)+'">شروع بررسی فسخ این قرارداد</button>':'')+
+        '<button data-cba="e31TermGuide" data-code="'+qesc(c.code)+'">چک‌لیست پیگیری همین قرارداد</button></div></div>';
+    }).join('')+'</div><p class="note">شروع عملیات درون‌چتی فقط برای اجاره‌نامهٔ فعال و دارای فلو معتبر ممکن است. انتخاب قرارداد یا دیدن راهنما به‌تنهایی فسخ نیست.</p>',null);
+  }
   function exec(r,t){
     var a=r.action;
+    if(a==='resume'){usrC(t);return resumeService()}
     if(a.indexOf('preference:')===0){
       usrC(t);
       if(!E30.discAPI.active())E30.discAPI.start(CE.f==='buy'?'buy':'rent',true);
@@ -19170,20 +19256,17 @@ E30.guide=(function(){
     }
     if(a==='native')return false; /* Existing engine owns the answer and validation. */
     usrC(t);
+    if(['valuation','termination','services','guaranteed'].indexOf(a)>=0||a.indexOf('flow:')===0)suspend();
     if(a==='compare'){compare(t);return true}
     if(a==='sample'){sample();return true}
     if(a==='map'){E30.chatMap({hood:E30.discAPI.getF('hood')||undefined});return true}
     if(a==='valuation'){CBACT.e30ValOpen();return true}
     if(a==='contracts'){CBACT.e30ContractList();return true}
     if(a==='contract-start'){
-      botC('برای تنظیم قرارداد اجاره، ابتدا اطلاعات ملک و شرایط مالی را در مسیر اجاره مشخص می‌کنیم. ثبت یا امضای قرارداد بدون تأیید شما انجام نمی‌شود.',null);
-      if(E30.discAPI.active())E30.discAPI.stop();
-      E30.discAPI.start('rent',false);return true;
+      contractStart();return true;
     }
     if(a==='termination'){
-      var all=S.contracts||[],c=all.filter(function(x){return x&&x.code})[0];
-      if(c&&E29&&typeof E29.termAI==='function'){E29.termAI(c.code);return true}
-      botC('قرارداد قابل ارجاعی در این مرورگر پیدا نشد. فسخ خودکار انجام نمی‌شود؛ ابتدا قرارداد را در همین گفت‌وگو پیدا یا ثبت کنید.',null);return true;
+      terminationChoices();return true;
     }
     if(a==='services'){CBACT.e30RequestService();return true}
     if(a==='guaranteed'){CBACT.e30RequestGRT();return true}
@@ -19192,7 +19275,8 @@ E30.guide=(function(){
     if(a==='projects'){showList(S.projects,'پروژه‌های فعلی','هنوز پروژه‌ای در این مرورگر ثبت نشده است.',function(x){return '<div class="kv"><span>'+esc(x.name||x.title||'پروژه')+'</span><b>ذخیره‌شده</b></div>'});return true}
     if(a.indexOf('flow:')===0){
       var f=a.split(':')[1];
-      if(SCRIPTS[f]){botC('این فلو در همین محیط گفت‌وگو اجرا می‌شود. وضعیت و اطلاعات نهایی فقط در مراحل صریح ثبت خواهد شد.',null);ceStart(f);return true}
+      if(f==='build'&&!activeBuildProject()){botC('برای ساخت و تأمین، ابتدا پروژه و پیمانکار تأییدشده را در مسیر پروژه‌ها مشخص کنید. پروژهٔ پیش‌فرضی ساخته یا انتخاب نشده است.',null);return true}
+      if(SCRIPTS[f]){botC('این مسیر نمایشی با دادهٔ نمونه در همین گفت‌وگو اجرا می‌شود. وضعیت و اطلاعات نهایی فقط در مراحل صریح ثبت خواهد شد.',null);ceStart(f);return true}
     }
     return false;
   }
@@ -19204,13 +19288,47 @@ E30.guide=(function(){
       botC('برای شروع، منظورتان خرید خانه است یا رهن و اجاره؟ یک پرامپت از پیشنهادهای همین گفت‌وگو انتخاب کنید.'+card(),null);
       return true;
     }
-    if(!r||!can(r))return false;
+    if(!r||!can(r,true))return false;
     setNode(r.id);
     return exec(r,String(t));
   }
   var installed=false;
   function install(){
     if(installed)return;installed=true;
+    CBACT.e31TermGuide=function(el){var code=el.getAttribute('data-code');if(code)return E29.termAI(code)};
+    CBACT.e31TermStart=function(el){
+      var code=el.getAttribute('data-code'),work=rentalTarget(code);
+      if(!work){botC('قرارداد انتخابی دیگر شرایط شروع فسخ را ندارد؛ فهرست را دوباره بررسی کنید.',null);return false}
+      suspend();wfSet('rent',work.id);
+      CE.f='rent';CE.i=SCRIPTS.rent.findIndex(function(s){return s.id==='termq'});CE.li=0;CE.hist=[];
+      usrC('شروع بررسی فسخ قرارداد '+code);ceStep();return true;
+    };
+    CBACT.e30StartRent=function(){usrC('شروع قرارداد اجاره');contractStart();return true};
+    ['e30ValOpen','e30RequestService','e30RequestGRT'].forEach(function(key){
+      var original=CBACT[key];if(typeof original!=='function')return;
+      CBACT[key]=function(){suspend();return original.apply(this,arguments)};
+    });
+    var entryVal=ceVal,entryStart=ceStart,entryStep=ceStep;
+    function buildUnavailable(){botC('برای ادامهٔ ساخت و تأمین، ابتدا یک پروژه با پیمانکار تأییدشده انتخاب کنید. هیچ سفارش یا پیشرفت فرضی ثبت نشد.',null)}
+    ceVal=function(v){
+      var m=/^F:(rent|buy|sell|invp|lndl)$/.exec(String(v));
+      if(m){suspend();usrC('شروع '+({rent:'اجاره',buy:'خرید',sell:'فروش',invp:'سرمایه‌گذاری',lndl:'اجاره‌دادن ملک'})[m[1]]);E30.discAPI.start(({invp:'invest',lndl:'landlord'})[m[1]]||m[1],false);return}
+      if(String(v)==='F:build'&&!activeBuildProject()||String(v)!=='F:build'&&CE.f==='build'&&!buildReady()){buildUnavailable();return}
+      return entryVal.apply(this,arguments);
+    };
+    ceStart=function(flow){
+      if(flow==='build'&&!activeBuildProject()){buildUnavailable();return}
+      if(['mkt','build','stay','grt'].indexOf(flow)>=0&&E30.discAPI.active())suspend();
+      if(flow==='build'){
+        var project=activeBuildProject(),id=S.active&&S.active.build;
+        var existing=(S.wfs||[]).filter(function(w){return w.id===id&&w.m==='build'&&!w.cancelled})[0];
+        if(!existing||existing.done||!existing.data||existing.data.projectWfId!==project.id){
+          existing=wfNew('build');existing.data.projectWfId=project.id;save();
+        }
+      }
+      return entryStart.apply(this,arguments);
+    };
+    ceStep=function(){if(CE.f==='build'&&!buildReady()){buildUnavailable();return}return entryStep.apply(this,arguments)};
     CBACT.e31Prefill=function(el){
       var r=BY_ID[el.getAttribute('data-e31-id')];
       var s=state();
@@ -19225,9 +19343,10 @@ E30.guide=(function(){
     botC=function(h,chips){
       var html=String(h||''),skip=/(تعارضی در شرایط|e30-paycard|e31-guide|data-e28ctr|e30-val-hood)/.test(html);
       var startup=CE.f==='gate'&&state().node==='home'&&CE.i===0;
-      if(!skip&&S.auth&&CURRENT==='landing'&&(startup||!(CE.f&&!E30.discAPI.active()))){
+      if(!skip&&S.auth&&CURRENT==='landing'&&(startup||!(CE.f&&!E30.discAPI.active())||state().suspended)){
         html+=card();
       }
+      if(skip&&S.auth&&CURRENT==='landing'&&state().suspended&&!/e31-guide/.test(html))html+=card(true);
       return previousBot(html,chips);
     };
     /* Empty-chat starter: visible in the chat canvas without creating a fake
@@ -19253,7 +19372,8 @@ E30.guide=(function(){
       return previousSend(t);
     };
   }
-  return {registry:REGISTRY,install:install,route:route,suggestions:suggestions,normalize:norm,getCurrent:function(){return state().node},actions:BY_ID};
+  return {registry:REGISTRY,install:install,route:route,suggestions:suggestions,normalize:norm,getCurrent:function(){return state().node},actions:BY_ID,
+    canSuggest:function(id){return can(BY_ID[id],false)}};
 })();
 
 
