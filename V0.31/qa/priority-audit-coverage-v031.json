@@ -146,31 +146,35 @@
       "source_position": "1 و 2",
       "name": "سقف ودیعه و اجارهٔ ماهانه با هم",
       "kind": "optional-need",
-      "entry_state": "rent: explicit request for سقف ودیعه و اجارهٔ ماهانه با هم",
+      "entry_state": "Active rental discovery with no confirmed budget, or explicit request to edit the budget pair",
       "preconditions": [
-        "Active rent discovery; field missing or explicitly edited; skipping must not block a service."
+        "Rent intent explicitly selected via visible composer",
+        "Both amounts remain optional until the user chooses to provide them",
+        "Financial facts require explicit confirmation; previously answered budget is not suggested again"
       ],
       "input_cases": [
-        "Valid explicit input for سقف ودیعه و اجارهٔ ماهانه با هم",
-        "Missing/empty data",
-        "Invalid input preserves state",
-        "Cancel/skip",
-        "Resume after reload",
-        "Edit confirmed preference",
-        "Skip all preferences then request a service",
-        "۱.۲ میلیارد ودیعه و ۱۰ میلیون اجاره",
-        "Explicit rials; zero rent; edit preserves both amounts"
+        "ودیعه تا ۳ میلیارد تومان و اجاره ماهانه تا ۷۰ میلیون تومان",
+        "Edit both caps to ۴ میلیارد / ۹۰ میلیون تومان",
+        "abc-invalid-budget retains collector and invents no amount",
+        "Skip combined budget with no existing amount, then request usable sample listings",
+        "۱ تومان deposit / ۱ تومان rent produces honest zero matches",
+        "Contract side task and return; reload results without losing budget or billing"
       ],
       "handler": {
-        "source": "src/v31-intel.js and src/v31-guidance.js",
-        "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for rent:dep+rentb",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "source": "src/v31-guidance.js exec(preference:budget_pair) -> src/v31-intel.js preference/budgetCard/feed/promptFinancial -> src/v31-guidance.js sample",
+        "target": "CBACT.e31Prefill -> #chatSend -> E30.discAPI.preference('budget_pair') -> real financial parser -> explicit confirmation -> constrained sample result",
+        "resolution": "Concrete source path mapped; browser execution pending the next CI review"
       },
-      "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
-      "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
+      "expected_transition": "Suggestion click only prefills; explicit send opens the combined card with no radio defaults; both labeled amounts parse and await confirmation; answer/skip/edit leads to independently usable search.",
+      "terminal_state": "Matched cards obey both caps or explicit zero matches preserve constraints; no implicit charge or follow-on service; reload and side-task resume preserve the same pair.",
+      "evidence_ids": [
+        "PA-RB-ANSWER-EDIT",
+        "PA-RB-INVALID-SKIP",
+        "PA-RB-ZERO-MATCH",
+        "PA-RB-SIDE-TASK-RESUME"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Four assertion-bearing composer/UI tests added in step 2; CI result has not yet been reviewed. Do not promote to automated until the current-revision report passes."
     },
     {
       "flow": "rent",
@@ -4016,37 +4020,43 @@
       "scenario_id": "rent-budget",
       "name": "ثبت بودجه",
       "visible_when": [
-        "وقتی مبلغ خالی است یا کاربر قصد اصلاح دارد؛ پیش‌فرض تومان، تبدیل ریال صریح و association درست دو مبلغ"
+        "Active rent collector and one or both budget facts are missing; or the user explicitly sends the budget-edit prompt"
       ],
       "not_visible_when": [
-        "Context/data/handler required by visible_when is absent. Direct requests must receive an honest fallback."
+        "Both budget facts are already confirmed: absent from current suggestions and last rendered guide; previous historical messages are retained"
       ],
       "selected_action": "preference:budget_pair",
       "outcome": "وقتی مبلغ خالی است یا کاربر قصد اصلاح دارد؛ پیش‌فرض تومان، تبدیل ریال صریح و association درست دو مبلغ",
       "success_path": [
-        "Prepare valid context and suitable sample data for rent-budget",
-        "Assert visible suggestion; click only prefills composer",
-        "Submit composer; assert preference:budget_pair handler and state transition",
-        "Complete ثبت بودجه independently; assert persisted result and no unintended debit/action"
+        "Click visible rent-budget suggestion; no submission, financial mutation or debit",
+        "Send composer; real combined card appears without selected defaults",
+        "Send labeled amounts; explicit financial confirmation; both caps become available",
+        "Explicit edit updates both caps; render matching sample cards; every card obeys both caps"
       ],
       "empty_data_path": [
-        "Remove data required by rent-budget",
-        "Assert suggestion hidden when prerequisite is absent",
-        "Explicit request returns empty result, missing prerequisite or stated inability without invented completion"
+        "Submit invalid nonnumeric answer; collector remains active without fabricated amounts",
+        "Skip an unanswered pair; request sample search with unknown budget",
+        "Confirm infeasible ۱ تومان caps; return explicit zero matches without unrelated properties"
       ],
       "cancel_path": [
-        "Open rent-budget in valid context",
-        "Decline preference or cancel operation",
-        "Assert cancelled/skipped state, unchanged unrelated context and no debit without explicit confirmation"
+        "Click skip-preference and explicitly submit it",
+        "Both unprovided budget fields remain unknown and the question clears",
+        "Sample search remains usable and creates no charge or follow-on request"
       ],
       "resume_path": [
-        "Persist in-progress rent-budget workflow",
-        "Reload or return from side service",
-        "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
+        "Confirmed rental budget -> explicit contract-start side service",
+        "Contract form suspends discovery; visible resume-service suggestion only prefills",
+        "Send resume prompt; same rental collector and pair return",
+        "Sample result completes without charge; edited facts and cards persist after reload"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-RB-ANSWER-EDIT",
+        "PA-RB-INVALID-SKIP",
+        "PA-RB-ZERO-MATCH",
+        "PA-RB-SIDE-TASK-RESUME"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Four assertion-bearing composer/UI tests added in step 2; CI result has not yet been reviewed. Do not promote to automated until the current-revision report passes."
     },
     {
       "scenario_id": "rent-specs",
