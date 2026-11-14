@@ -601,9 +601,9 @@ E30.init=function(){
          the current chat and save it as a contract-related guidance artifact. */
   try{
     E29.termAI=function(code){
-      var c=null;
-      (S.contracts||[]).some(function(x){if(x.code===code){c=x;return true}return false});
-      if(!c){toast('قرارداد یافت نشد');return false}
+      var matches=(S.contracts||[]).filter(function(x){return code&&x.code===code});
+      if(matches.length!==1){toast(matches.length?'شناسهٔ قرارداد یکتا نیست؛ قرارداد هدف را اصلاح کنید.':'قرارداد هدف را با شناسهٔ معتبر انتخاب کنید.');return false}
+      var c=matches[0];
       var h='<div class="e29-detail e30-term-guide"><h4>چک‌لیست پیگیری فسخ قرارداد (رایگان)</h4><div class="sect">'+
         '<div class="kv"><span>قرارداد</span><b>'+esc(c.title||'بدون عنوان')+'</b></div>'+
         '<div class="kv"><span>شناسه</span><b dir="ltr">'+esc(String(code))+'</b></div>'+
@@ -632,7 +632,7 @@ E30.init=function(){
     };
     CBACT.e29termAI=function(el){
       var code=el.getAttribute('data-code');
-      if(!code){(S.contracts||[]).some(function(c){if(c.status==='terminated'){code=c.code;return true}return false})}
+      if(!code){botC('ابتدا قرارداد هدف را با شناسهٔ مشخص انتخاب کنید؛ هیچ قراردادی خودکار انتخاب نمی‌شود.',null);return false}
       return E29.termAI(code);
     };
     CBACT.e29termLater=function(){usrC('فعلاً نه');botC('هر وقت خواستید چک‌لیست رایگان پیگیری فسخ را از همین گفتگو باز کنید.',null)};

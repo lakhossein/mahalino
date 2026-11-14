@@ -60,3 +60,15 @@ body.authed #tokchip{display:none!important}
 .e31-prompt:hover{border-color:var(--brand)}.e31-prompt:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .e31-prompt span{flex:none;opacity:.55}.e31-guide-note{font-size:11px;color:var(--muted);margin:8px 0 0;line-height:1.7}
 @media(max-width:520px){.e31-guide{padding:10px}.e31-prompt{font-size:12px;min-height:46px}}
+
+/* Use the available desktop canvas for in-chat data and forms. */
+body.authed.widemain .ch-main{width:100%;max-width:1280px;min-width:0;margin-inline:auto}
+.ch-main .msg.bot{max-width:100%;width:100%;min-width:0}
+.ch-main .msg.bot>.bub{width:100%;min-width:0;box-sizing:border-box}
+.e31-price-chart{display:grid;gap:16px;margin-block:20px;padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.e31-price-row{display:grid;grid-template-columns:minmax(90px,1fr) minmax(90px,3fr) minmax(140px,1fr);align-items:center;gap:16px;min-width:0}
+.e31-price-label,.e31-price-value{overflow-wrap:anywhere}
+.e31-price-value{font-variant-numeric:tabular-nums;text-align:end;font-size:12px}
+.e31-price-track{height:16px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.e31-price-track>span{display:block;height:100%;background:var(--brand);border-radius:4px}
+@media(max-width:600px){.e31-price-chart{padding:12px}.e31-price-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}.e31-price-track{grid-column:1/-1;grid-row:2}.e31-price-value{font-size:11px}}

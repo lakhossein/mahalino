@@ -19,6 +19,7 @@ E30.flows=(function(){
     if(pref.balcony==='forbidden'&&x.balc)return false;
     /* Every explicit maximum age is hard unless the collector deliberately marked it soft. */
     if(P._ageHard!==false&&Number.isFinite(Number(P.maxAge))&&P.maxAge!==''&&P.maxAge!=null&&x.age>Number(P.maxAge))return false;
+    if(P.minAge!=null&&Number.isFinite(Number(P.minAge))&&x.age<Number(P.minAge))return false;
     if(P.minM2!==''&&P.minM2!=null&&Number(P.minM2)>0&&x.m2<Number(P.minM2))return false;
     var exactFloor=P.floorNum!==undefined&&P.floorNum!==''&&P.floorNum!==null?Number(P.floorNum):null;
     if(exactFloor!==null&&Number.isFinite(exactFloor)&&x.floor!==exactFloor)return false;
@@ -162,7 +163,7 @@ E30.flows=(function(){
      q:function(D){return 'تا کامل شدن مدارک، فروش فقط به‌صورت «قیمت‌گذاری و آماده‌سازی» پیش می‌رود — معامله رسمی نیازمند سند کامل است. فعلاً ارزیابی و برنامهٔ فروش را می‌چینیم.'},
      chips:function(){return [['متوجهم، ادامه','ok']]},set:function(){return null}},
     {id:'s_area',count:true,q:'متراژ ملک چند متر است؟ (عدد تایپ کنید)',kind:'num',
-     set:function(D,v){var n=pd(v);if(!n||n<10||n>5000)return 'ERR';D.prop_area=n;return null},
+     set:function(D,v){var n=Number(pd(String(v)));if(!Number.isFinite(n)||n<10||n>5000)return 'ERR';D.prop_area=n;return null},
      err:'متراژ را با عدد بنویسید (مثلاً ۸۵).'},
     {id:'s_rooms',count:true,q:'چند خواب است؟',chips:function(){return [['۰','0'],['۱','1'],['۲','2'],['۳','3'],['۳+','4']]},
      set:function(D,v){D.prop_rooms=+v;return null}},
@@ -202,8 +203,8 @@ E30.flows=(function(){
     {id:'s_prep',q:function(D){
        var h=findH(D.hood);
        return '<b>آماده‌سازی آگهی</b><div class="sect">'+
-       '<div class="kv"><span>عنوان پیشنهادی</span><b>'+fa(D.prop_rooms||2,0)+' خواب '+fa(D.prop_area||0,0)+' متری، '+esc(h.n)+'</b></div>'+
-       '<div class="kv"><span>نکات برجسته</span><b>'+(D.prop_age===0?'نوساز':fa(D.prop_age||0,0)+' سال ساخت')+(D.floor?'، طبقهٔ '+fa(D.floor,0):'')+'</b></div>'+
+       '<div class="kv"><span>عنوان پیشنهادی</span><b>'+(D.prop_rooms!=null?fa(D.prop_rooms,0)+' خواب ':'تعداد خواب نامشخص، ')+fa(D.prop_area||0,0)+' متری، '+esc(h.n)+'</b></div>'+
+       '<div class="kv"><span>نکات برجسته</span><b>'+(D.prop_age===0?'نوساز':(D.prop_age!=null?fa(D.prop_age,0)+' سال ساخت':'عمر بنا نامشخص'))+(D.floor!=null?'، طبقهٔ '+(D.floor===0?'همکف':fa(D.floor,0)):'')+'</b></div>'+
        '<div class="kv"><span>قیمت اعلامی</span><b>'+rial(D.ask||0)+'</b></div></div>این آگهی را تأیید می‌کنید؟'},
      chips:function(){return [['تأیید آگهی','!ok'],['تغییر قیمت','!rp']]},
      acts:{ok:function(D){D.approved=true;save();botC('✓ آگهی در وضعیت «آمادهٔ انتشار» ثبت شد. (انتشار واقعی نیازمند بک‌اند است — در سامانهٔ داخلی ثبت شد)',null);ceJump('s_inq')},rp:function(){ceJump('s_price')}}},
@@ -249,7 +250,7 @@ E30.flows=(function(){
     var all=(HOODS||[]).filter(function(x){return x&&x.buyBase>0});
     var h=D.hood?findH(D.hood):all.slice().sort(function(a,b){return a.buyBase-b.buyBase})[0];
     if(!h)return '<div class="note">دادهٔ نمونه‌ای برای تحلیل وجود ندارد. ارزیابی قابل ارائه نیست.</div>';
-    var objective=D.objective||'unknown',asset=D.assetType||((objective==='land_bank')?'land':objective==='commercial'?'commercial':'residential');
+    var objective=D.objective||'unknown',asset=D.assetType||((objective==='land_bank')?'land':objective==='commercial'?'commercial':D.optionalNeedsSkipped?'unknown':'residential');
     var area=Math.max(1,Number(D.prop_area)||70),cap=Number(D.cap)||0;
     var benchmark=Math.round(h.buyBase*area);
     var maxArea=cap>0?Math.floor(cap/h.buyBase):null;
@@ -266,6 +267,7 @@ E30.flows=(function(){
       yieldRow('تحمل ریسک',esc(({low:'کم',medium:'متوسط',high:'زیاد'})[D.risk]||'تعیین نشده'))+
       yieldRow('محلهٔ مبنای نمونه',hLabel);
     if(mismatch)return out+yieldRow('تعارض هدف و دارایی','هدف سرمایه‌گذاری و نوع دارایی انتخابی همخوانی ندارند')+'</div><div class="note">پیش از تفسیر بازده، هدف یا نوع دارایی را اصلاح کنید؛ از این دادهٔ متناقض توصیهٔ مالی ساخته نمی‌شود.</div>';
+    if(asset==='unknown')return out+'</div><div class="note">نوع دارایی مشخص نشده است؛ برای جلوگیری از تعمیم فرضی، بازده یا توصیهٔ شخصی محاسبه نشد. می‌توانید همین گزارش محدود را ذخیره کنید یا اختیاری اطلاعات بیشتری بدهید.</div>';
     if(asset!=='residential'){
       out+=yieldRow('کفایت داده برای این دارایی','دادهٔ تخصصی قیمت/اجاره موجود نیست')+
         '</div><div class="note">برای '+selectedLabel+'، اعداد اجاره و رشد آپارتمان مسکونی قابل تعمیم نیستند؛ بنابراین بازده ساختگی نمایش داده نمی‌شود. ارزیابی نیازمند اطلاعات قیمت، مجوز، کاربری، سند، هزینه و نقدشوندگی همان دارایی است.</div>';
@@ -333,16 +335,17 @@ E30.flows=(function(){
      set:function(D,v){if(/همه|کل/.test(v)){D.hood=null;return null}var id=hoodFromText(v);if(!id)return 'ERR';D.hood=id;return null},
      err:'نام محله یا «کل شهر» را بنویسید.'},
     {id:'i_an',q:function(D){return '<b>تحلیل مقدماتی سرمایه‌گذاری (رایگان، نمونه)</b>'+investCard(D)+(D.objective==='land_bank'?'<div class="note">برای زمین: وضعیت کاربری و سند باید به‌طور مستقل استعلام شود — محلینو مشاور حقوقی نیست.</div>':'')},
-     chips:function(){return [['ثبت تحلیل در کتابخانه','!save'],['محلهٔ دیگر','!oh'],['پایان','!end']]},
+     chips:function(){return [['ثبت تحلیل در کتابخانه','!save'],['تکمیل اختیاری جزئیات','!refine'],['محلهٔ دیگر','!oh'],['پایان','!end']]},
      acts:{
        save:function(D){
          var html='<h4>تحلیل سرمایه‌گذاری</h4>'+investCard(D);
          var it=E29.libAPI.saveArtifact({type:'invest',title:'تحلیل سرمایه‌گذاری — '+(D.hood?findH(D.hood).n:'کل شهر'),
-           summary:'هدف: '+({rent_income:'درآمد اجاره',appreciation:'رشد قیمت',inflation_hedge:'حفظ ارزش',land_bank:'زمین',resale:'فروش سریع',commercial:'تجاری'})[D.objective||'']+' — بازده بر پایهٔ دادهٔ نمونه',
+           summary:'هدف: '+(({rent_income:'درآمد اجاره',appreciation:'رشد قیمت',inflation_hedge:'حفظ ارزش',land_bank:'زمین',resale:'فروش سریع',commercial:'تجاری'})[D.objective||'']||'هدف مشخص نشده')+' — گزارش بر پایهٔ دادهٔ نمونه',
            artifact:{html:html,data:{objective:D.objective,cap:D.cap,hood:D.hood,horizon:D.horizon,liquidity:D.liquidity,risk:D.risk,assetType:D.assetType,financing:D.financing,expectedCash:D.expectedCash,management:D.management,exitStrategy:D.exitStrategy}},tokenCost:0,txnId:null});
          botC('✓ در کتابخانه ذخیره شد (بدون هزینه — این تحلیل از دادهٔ نمونهٔ داخلی ساخته می‌شود).',null);
          ceJump('i_done');
        },
+       refine:function(D){D.optionalNeedsSkipped=false;save();ceJump('i_obj')},
        oh:function(){ceJump('i_hood')},
        end:function(){ceJump('i_done')}
      }},
@@ -396,12 +399,12 @@ E30.flows=(function(){
          '<div class="kv"><span>نرخ هر شب</span><b>'+rial(D.nightlyRate||0)+'</b></div>'+
          '<div class="kv"><span>ظرفیت</span><b>'+fa(D.stayCapacity||0,0)+' نفر</b></div>'+
          '<div class="kv"><span>حداقل اقامت</span><b>'+fa(D.minNights||0,0)+' شب</b></div>'+
-         '<div class="kv"><span>قوانین</span><b>'+esc((D.stayRules||[]).join('، ')||'ندارد')+'</b></div></div><div class="note">ثبت داخلی به معنی بررسی مجوز، رزرو فعال یا انتشار عمومی نیست.</div>ثبت پیش‌نویس شود؟';
+         '<div class="kv"><span>قوانین</span><b>'+esc(D.stayRules==null?'مشخص نشده':D.stayRules.join('، ')||'ندارد')+'</b></div></div><div class="note">ثبت داخلی به معنی بررسی مجوز، رزرو فعال یا انتشار عمومی نیست.</div>ثبت پیش‌نویس شود؟';
        return '<b>خلاصهٔ آگهی موجر</b><div class="sect">'+
        '<div class="kv"><span>محله</span><b>'+esc(D.hood?findH(D.hood).n:'—')+'</b></div>'+
        '<div class="kv"><span>ودیعهٔ درخواستی</span><b>'+rial(D.ask_dep||0)+'</b></div>'+
        '<div class="kv"><span>اجارهٔ درخواستی</span><b>'+rial(D.ask_rent||0)+'</b></div>'+
-       '<div class="kv"><span>شرط‌ها</span><b>'+esc((D.rules||[]).join('، ')||'ندارد')+'</b></div></div>ثبت شود؟'},
+       '<div class="kv"><span>شرط‌ها</span><b>'+esc(D.rules==null?'مشخص نشده':D.rules.join('، ')||'ندارد')+'</b></div></div>ثبت شود؟'},
      chips:function(){return [['ثبت','!ok'],['ویرایش','!ed']]},
      acts:{ok:function(D){
          if(D.ltype==='stay'&&!(D.nightlyRate>0&&D.stayCapacity>0&&D.minNights>0)){botC('اطلاعات اقامتگاه کامل نیست و هنوز ثبت نشده است.',null);return}
@@ -426,6 +429,23 @@ E30.flows=(function(){
         }}});
       SCRIPTS.buy.find(function(s){return s.id==='lg'}).acts.nx=function(){ceJump('buy_ctr')};
     }
+    var projectTrack=SCRIPTS.mkt&&SCRIPTS.mkt.find(function(step){return step.id==='trk'});
+    if(projectTrack)projectTrack.q=function(D){
+      var id=S.active&&S.active.mkt,project=D.bid?D.bid.prj:D.chosen?D.chosen.prj:D.prjI;
+      if(!Number.isInteger(project)||typeof PRJ==='undefined'||!PRJ[project])return 'پروژهٔ هدف مشخص نشده است؛ هیچ پیشرفتی فرض نشده است.';
+      var works=(S.wfs||[]).filter(function(w){return !!id&&w.m==='build'&&!w.cancelled&&w.data&&w.data.projectWfId===id});
+      var build=works.length===1?works[0]:null,B=build&&build.data,ph=B&&B.ph;
+      var valid=Array.isArray(ph)&&ph.length===5&&ph.every(function(n){return Number.isFinite(n)&&n>=0&&n<=100}),weights=[12,34,22,18,14];
+      var percent=valid?Math.round(ph.reduce(function(sum,n,i){return sum+weights[i]*n},0)/100):null;
+      return '<b>گردش کار '+esc(PRJ[project].t)+'</b><div class="sect">'+
+        '<div class="kv"><span>تأیید داخلی پیمانکار</span><b>'+(D.confirmed||D.chosen?'ثبت شده':'ثبت نشده')+'</b></div>'+
+        '<div class="kv"><span>سفارش‌های همین پروژه</span><b>'+fa(B&&Array.isArray(B.orders)?B.orders.length:0,0)+'</b></div>'+
+        '<div class="kv"><span>پیشرفت ثبت‌شده</span><b>'+(percent==null?'ثبت نشده':fa(percent,0)+'٪')+'</b></div>'+
+        '<div class="kv"><span>تحویل داخلی</span><b>'+(build&&build.done?'ثبت شده':'ثبت نشده')+'</b></div></div><p class="note">فقط اطلاعات ثبت‌شدهٔ همین پروژه نمایش داده می‌شود؛ تأیید داخلی و نمایشی معادل قرارداد یا پیشرفت واقعی نیست.</p>';
+    };
+    var optionalSell={s_rooms:'prop_rooms',s_age:'prop_age',s_floor:'floor',s_motiv:'motivation',s_urg:'sale_urgency'};
+    SELL.forEach(function(step){var field=optionalSell[step.id];if(!field)return;var prior=step.pre;step.pre=function(D){return !D.optionalNeedsSkipped&&(!prior||prior(D))}});
+    LNDL.forEach(function(step){if(step.id!=='l_rules'&&step.id!=='l_stay_rules')return;var prior=step.pre;step.pre=function(D){return !D.optionalNeedsSkipped&&(!prior||prior(D))}});
     SCRIPTS.sell=SELL;
     SCRIPTS.invp=INVP;
     SCRIPTS.lndl=LNDL;
