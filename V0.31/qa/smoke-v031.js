@@ -159,6 +159,7 @@ async function send(page,text){
       expDep:expDep&&expDep.ok?expDep.value:null,
       e30:!!D._e30,persona:D.P?D.P.persona:null,
       age:D.P?D.P.maxAge:null,ageHard:D.P?!!D.P._ageHard:null,
+      beds:D.P?D.P.beds:null,minM2:D.P?D.P.minM2:null,
       newFact:S.ctx30.fields.prop_new||null,
       wfStep:(function(){try{return wd('rent').step}catch(e){return null}})()
     };
@@ -166,7 +167,7 @@ async function send(page,text){
   ok('hand-off into deterministic rent engine',st.ce==='rent',st);
   ok('confirmed rent EXACTLY as parsed — never the 500M default (defect 2.1)',st.rentB===st.expRentUp&&st.rentB!==500000000,{rentB:st.rentB,expected:st.expRentUp});
   ok('confirmed deposit preserved exactly',st.depB===st.expDep,{depB:st.depB,expected:st.expDep});
-  ok('auto-advanced past known steps (imps/beds/who) to first unknown — no re-asking (§4.2)',st.stepId==='age'||st.stepId==='m2',st);
+  ok('explicit optional skip enters the neighborhood service without re-asking known size or beds',st.stepId==='hoods'&&st.beds===2&&st.minM2===60,st);
   ok('ambiguous «نوساز مهمه» never creates a hard age cutoff after optional skip',st.ageHard===false&&st.age>=20,st);
   ok('workflow record step synced with conversation stage (defect 2.4)',st.wfStep===st.stepIx+1,{wfStep:st.wfStep,ix:st.stepIx});
 
