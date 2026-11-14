@@ -272,6 +272,25 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
         if(width>=1440)assert(state.width>=1120&&state.width<=1281,'desktop chat canvas did not use the requested width: '+state.width);
       }
     });
+    await test('Legacy termination guidance requires a unique explicit contract ID and preserves unrelated contracts',async page=>{
+      const initial=await page.evaluate(()=>{
+        S.contracts=[{code:'FIRST',title:'اول',status:'terminated',kind:'rent'},{code:'SECOND',title:'دوم',status:'terminated',kind:'rent'}];save();
+        const before={contracts:JSON.stringify(S.contracts),library:S.library.length,credits:S.tokens};
+        const missing=CBACT.e29termAI({getAttribute:()=>null}),invalid=E29.termAI('MISSING');
+        return {before,missing,invalid,after:{contracts:JSON.stringify(S.contracts),library:S.library.length,credits:S.tokens}};
+      });
+      assert(initial.missing===false&&initial.invalid===false&&JSON.stringify(initial.before)===JSON.stringify(initial.after),'legacy entry selected a contract without an explicit valid ID');
+      const selected=await page.evaluate(()=>{
+        const before=JSON.stringify(S.contracts),ok=CBACT.e29termAI({getAttribute:()=> 'SECOND'});
+        return {ok,unchanged:JSON.stringify(S.contracts)===before,reports:S.library.filter(x=>x.e30TerminationGuidance).map(x=>x.entityId),credits:S.tokens};
+      });
+      assert(selected.ok&&selected.unchanged&&selected.reports.length===1&&selected.reports[0]==='SECOND'&&selected.credits===initial.before.credits,'explicit guidance changed a contract, charged credit or used the wrong ID');
+      const duplicate=await page.evaluate(()=>{
+        S.contracts.push({code:'SECOND',status:'terminated',kind:'rent'});save();const before=JSON.stringify(S.library);
+        return {ok:E29.termAI('SECOND'),unchanged:JSON.stringify(S.library)===before};
+      });
+      assert(duplicate.ok===false&&duplicate.unchanged,'duplicate contract ID silently selected the first match');
+    });
     await test('Investment risk and liquidity preferences retain their meaning in the saved report',async page=>{
       await send(page,await page.evaluate(()=>E30.guide.actions.invest.prompt));
       await send(page,await page.evaluate(()=>E30.guide.actions['need-invest-risk'].prompt));await send(page,'ریسک متوسط');

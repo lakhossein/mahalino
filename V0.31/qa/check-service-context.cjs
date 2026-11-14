@@ -28,3 +28,16 @@ b.c.S.active={mkt:'p1'};b.c.S.wfs=[{id:'p1',m:'mkt',data:{chosen:{prj:0,b:0}}}];
 assert.equal(b.c.E30.guide.canSuggest('build'),true);
 b.c.S.wfs[0].cancelled=true;assert.equal(b.c.E30.guide.canSuggest('build'),false);
 console.log('PASS service context: explicit contract targets, no automatic selection, resume, inventory and approved-project gates');
+
+// Exercise the actual legacy handlers too; they must not retain a first-item fallback.
+const legacy=runtime('rent'),shell=fs.readFileSync(path.join(__dirname,'..','src','v31-shell.js'),'utf8');
+legacy.c.E29={};legacy.c.toast=function(){};
+vm.runInContext(shell.slice(shell.indexOf('    E29.termAI=function(code){'),shell.indexOf('    CBACT.e29termLater=function()')),legacy.c);
+legacy.c.S.contracts=[{code:'A',status:'terminated'},{code:'B',status:'terminated'}];
+const unchanged=JSON.stringify(legacy.c.S.contracts);
+assert.equal(legacy.c.CBACT.e29termAI({getAttribute:()=>null}),false);
+assert.equal(legacy.c.E29.termAI('MISSING'),false);
+assert.equal(JSON.stringify(legacy.c.S.contracts),unchanged);
+legacy.c.S.contracts.push({code:'B',status:'terminated'});
+assert.equal(legacy.c.E29.termAI('B'),false,'ambiguous target selected its first match');
+console.log('PASS legacy termination entry: missing, nonexistent and ambiguous target IDs are rejected without selection');
