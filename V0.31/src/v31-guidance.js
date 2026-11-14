@@ -128,6 +128,7 @@ E30.guide=(function(){
     if(r.id==='library'&&!explicit)return !!(S.library||[]).length;
     if(r.id==='projects'&&!explicit)return !!(S.projects||[]).length;
     if(r.id==='termination'&&!explicit)return (S.contracts||[]).some(function(c){return c&&rentalTarget(c.code)});
+    if(r.id==='development'&&!explicit)return typeof SCRIPTS!=='undefined'&&!!SCRIPTS.mkt&&typeof PRJ!=='undefined'&&Array.isArray(PRJ)&&PRJ.length>0;
     if(r.id==='build'&&!explicit)return !!activeBuildProject();
     if(r.action==='resume'){
       var payment=E30.pay&&E30.pay.session();
@@ -226,6 +227,14 @@ E30.guide=(function(){
         '<b class="e31-price-value">'+esc(price)+'</b></div>';
     }).join('');
     botC(header+(rows?'<div class="e31-price-chart" role="group" aria-label="مقایسهٔ قیمت نمونهٔ خرید هر متر مربع">'+rows+'</div>':'<p>دادهٔ نمونهٔ محله در دسترس نیست.</p>'),null);
+  }
+  function developmentCatalog(){
+    var projects=typeof PRJ!=='undefined'&&Array.isArray(PRJ)?PRJ:[];
+    if(!projects.length){botC('پروژهٔ نمونه‌ای برای مقایسه در دسترس نیست. پروژه، پیشنهاد یا نقش پیش‌فرضی ثبت نشده است.',null);return}
+    botC('<b>پروژه‌های ساختمانی نمونه</b><p class="note">دیدن پروژه‌ها به تعیین نقش نیاز ندارد. نقش فقط با انتخاب عملیات مربوط مشخص می‌شود. همهٔ پروژه‌ها و پیشنهادها دادهٔ نمایشی‌اند.</p><div class="chcards e31-project-catalog">'+projects.map(function(p,i){
+      return '<div class="ccard"><div class="cb"><b>'+esc(p.t)+'</b><p>'+esc(p.loc)+' · '+esc(p.area)+' · '+esc(p.dur)+'</p><p>'+esc(p.scope)+'</p></div><div class="btns">'+
+        '<button data-cba="e31ProjectBid" data-i="'+i+'">ثبت پیشنهاد به‌عنوان پیمانکار</button><button data-cba="e31ProjectEmployer" data-i="'+i+'">بررسی پیمانکارها به‌عنوان کارفرما</button><button data-cba="detPr" data-i="'+i+'">جزئیات همین پروژه</button></div></div>';
+    }).join('')+'</div>',null);
   }
   function sample(){
     var col=S.ctx30Collectors&&S.ctx30Collectors[S.ctx30ActiveKey];
@@ -351,6 +360,7 @@ E30.guide=(function(){
     if(a==='projects'){showList(S.projects,'پروژه‌های فعلی','هنوز پروژه‌ای در این مرورگر ثبت نشده است.',function(x){return '<div class="kv"><span>'+esc(x.name||x.title||'پروژه')+'</span><b>ذخیره‌شده</b></div>'});return true}
     if(a.indexOf('flow:')===0){
       var f=a.split(':')[1];
+      if(f==='mkt'){developmentCatalog();return true}
       if(f==='build'&&!activeBuildProject()){botC('برای ساخت و تأمین، ابتدا پروژه و پیمانکار تأییدشده را در مسیر پروژه‌ها مشخص کنید. پروژهٔ پیش‌فرضی ساخته یا انتخاب نشده است.',null);return true}
       if(SCRIPTS[f]){botC('این مسیر نمایشی با دادهٔ نمونه در همین گفت‌وگو اجرا می‌شود. وضعیت و اطلاعات نهایی فقط در مراحل صریح ثبت خواهد شد.',null);ceStart(f);return true}
     }
@@ -372,6 +382,31 @@ E30.guide=(function(){
   var installed=false;
   function install(){
     if(installed)return;installed=true;
+    function startProjectAction(el,role){
+      var raw=el.getAttribute('data-i'),i=Number(raw);
+      if(raw==null||raw===''||!Number.isInteger(i)||typeof PRJ==='undefined'||!PRJ[i]){toast('پروژهٔ هدف در دسترس نیست.');return null}
+      suspend();var w=wfNew('mkt');w.data.role=role;w.data.prjI=i;
+      CE.f='mkt';CE.i=SCRIPTS.mkt.findIndex(function(s){return s.id===(role==='con'?'bid':'prj')});CE.li=0;CE.hist=[];
+      w.step=CE.i+1;save();return {work:w,index:i};
+    }
+    CBACT.e31ProjectBid=function(el){
+      var selected=startProjectAction(el,'con');if(!selected)return;
+      usrC('ثبت پیشنهاد برای پروژهٔ '+PRJ[selected.index].t+' به‌عنوان پیمانکار');ceStep();
+    };
+    CBACT.e31ProjectEmployer=function(el){
+      var selected=startProjectAction(el,'emp');if(!selected)return;
+      usrC('بررسی پیمانکارهای پروژهٔ '+PRJ[selected.index].t+' به‌عنوان کارفرما');
+      var bids=typeof BIDS!=='undefined'&&Array.isArray(BIDS)?BIDS:[];
+      botC('<b>پیشنهادهای نمونه برای '+esc(PRJ[selected.index].t)+'</b><p class="note">انتخاب زیر فقط تأیید داخلی و نمایشی است؛ هیچ قرارداد رسمی ایجاد نمی‌کند.</p><div class="sect">'+bids.map(function(b,bi){
+        return '<div class="fld"><b>'+esc(b.n)+'</b> · '+esc(rial(b.amt))+' · '+fa(b.dur,0)+' ماه <button data-cba="e31ProjectChoose" data-wf="'+qesc(selected.work.id)+'" data-p="'+selected.index+'" data-b="'+bi+'">تأیید همین پیمانکار</button></div>';
+      }).join('')+'</div>'+(bids.length?'':'<p>پیشنهاد پیمانکاری موجود نیست؛ تأییدی ثبت نشده است.</p>'),null);
+    };
+    CBACT.e31ProjectChoose=function(el){
+      var w=(S.wfs||[]).filter(function(w){return w.id===el.getAttribute('data-wf')&&!w.cancelled&&w.m==='mkt'})[0];
+      var rawP=el.getAttribute('data-p'),rawB=el.getAttribute('data-b'),p=Number(rawP),b=Number(rawB);
+      if(rawP==null||rawB==null||!Number.isInteger(p)||!Number.isInteger(b)||CE.f!=='mkt'||!w||w.done||w.data.chosen||w.data.role!=='emp'||S.active.mkt!==w.id||w.data.prjI!==p||!PRJ[p]||typeof BIDS==='undefined'||!BIDS[b]){toast('این انتخاب دیگر به پروژهٔ فعال مربوط نیست؛ دوباره پروژه را انتخاب کنید.');return false}
+      return ACT.mChoose(el);
+    };
     CBACT.e31TermGuide=function(el){var code=el.getAttribute('data-code');if(code)return E29.termAI(code)};
     CBACT.e31TermStart=function(el){
       var code=el.getAttribute('data-code'),work=rentalTarget(code);

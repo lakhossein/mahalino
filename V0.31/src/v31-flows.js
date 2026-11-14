@@ -429,6 +429,20 @@ E30.flows=(function(){
         }}});
       SCRIPTS.buy.find(function(s){return s.id==='lg'}).acts.nx=function(){ceJump('buy_ctr')};
     }
+    var projectTrack=SCRIPTS.mkt&&SCRIPTS.mkt.find(function(step){return step.id==='trk'});
+    if(projectTrack)projectTrack.q=function(D){
+      var id=S.active&&S.active.mkt,project=D.bid?D.bid.prj:D.chosen?D.chosen.prj:D.prjI;
+      if(!Number.isInteger(project)||typeof PRJ==='undefined'||!PRJ[project])return 'پروژهٔ هدف مشخص نشده است؛ هیچ پیشرفتی فرض نشده است.';
+      var works=(S.wfs||[]).filter(function(w){return !!id&&w.m==='build'&&!w.cancelled&&w.data&&w.data.projectWfId===id});
+      var build=works.length===1?works[0]:null,B=build&&build.data,ph=B&&B.ph;
+      var valid=Array.isArray(ph)&&ph.length===5&&ph.every(function(n){return Number.isFinite(n)&&n>=0&&n<=100}),weights=[12,34,22,18,14];
+      var percent=valid?Math.round(ph.reduce(function(sum,n,i){return sum+weights[i]*n},0)/100):null;
+      return '<b>گردش کار '+esc(PRJ[project].t)+'</b><div class="sect">'+
+        '<div class="kv"><span>تأیید داخلی پیمانکار</span><b>'+(D.confirmed||D.chosen?'ثبت شده':'ثبت نشده')+'</b></div>'+
+        '<div class="kv"><span>سفارش‌های همین پروژه</span><b>'+fa(B&&Array.isArray(B.orders)?B.orders.length:0,0)+'</b></div>'+
+        '<div class="kv"><span>پیشرفت ثبت‌شده</span><b>'+(percent==null?'ثبت نشده':fa(percent,0)+'٪')+'</b></div>'+
+        '<div class="kv"><span>تحویل داخلی</span><b>'+(build&&build.done?'ثبت شده':'ثبت نشده')+'</b></div></div><p class="note">فقط اطلاعات ثبت‌شدهٔ همین پروژه نمایش داده می‌شود؛ تأیید داخلی و نمایشی معادل قرارداد یا پیشرفت واقعی نیست.</p>';
+    };
     var optionalSell={s_rooms:'prop_rooms',s_age:'prop_age',s_floor:'floor',s_motiv:'motivation',s_urg:'sale_urgency'};
     SELL.forEach(function(step){var field=optionalSell[step.id];if(!field)return;var prior=step.pre;step.pre=function(D){return !D.optionalNeedsSkipped&&(!prior||prior(D))}});
     LNDL.forEach(function(step){if(step.id!=='l_rules'&&step.id!=='l_stay_rules')return;var prior=step.pre;step.pre=function(D){return !D.optionalNeedsSkipped&&(!prior||prior(D))}});
