@@ -152,7 +152,7 @@ E30.guide=(function(){
       if(CE.f==='gate'){CE.f=null;CE.i=0;CE.li=0;CE.hist=[];}
       if(E30.discAPI.active())E30.discAPI.stop();
       usrC(t);
-      E30.discAPI.extract(t,'guided-prompt');
+      E30.discAPI.extract(t,'guided-prompt',flow);
       E30.discAPI.start(flow,false);
       return true;
     }

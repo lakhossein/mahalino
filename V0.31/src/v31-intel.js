@@ -333,8 +333,9 @@ E30.disc=(function(){
     }
     return changed;
   }
-  function extract(text,src){
+  function extract(text,src,wf){
     var t=String(text||''),nt=nz(t),found=0,i;
+    var financialFlow=wf||(COL.active?COL.wf:null);
     evidence(t);
     /* household */
     if(/تنهایی|فقط خودم|یه نفر|یک نفر|مجردم/.test(nt)){if(getF('household')!=='single'){setF('household','single',{src:src});found++}}
@@ -414,7 +415,7 @@ E30.disc=(function(){
       return segMoney(nt.slice(i0,i1));
     }
     if(!fs.dep&&!fs.rent){
-      if(/بودجه|سرمایه|پولم|میلیارد/.test(nt)&&(BUY_VERB.test(nt)||/سرمایه ?گذاری/.test(nt))){var bv=moneyAfter('بودجه|سرمایه|پولم');if(bv){var bdId=(getF('purpose')==='invest'||(/سرمایه ?گذاری/.test(nt)&&!excludesInvestment(nt)))?'invest_capital':'buy_budget';if(JSON.stringify(getF(bdId))!==JSON.stringify({v:bv})){setF(bdId,{v:bv},{src:src,fin:true,requiresConfirmation:true});found++}}}
+      if(/بودجه|سرمایه|پولم|میلیارد/.test(nt)&&(BUY_VERB.test(nt)||/سرمایه ?گذاری/.test(nt))){var bv=moneyAfter('بودجه|سرمایه|پولم');if(bv){var bdId=(financialFlow?financialFlow==='invest':(getF('purpose')==='invest'||(/سرمایه ?گذاری/.test(nt)&&!excludesInvestment(nt))))?'invest_capital':'buy_budget';if(JSON.stringify(getF(bdId))!==JSON.stringify({v:bv})){setF(bdId,{v:bv},{src:src,fin:true,requiresConfirmation:true});found++}}}
       else if(/ودیعه|رهن/.test(nt)){var dv=moneyAfter('ودیعه|رهن|پول جلو');if(dv){setF('budget_dep',/بدون سقف|نامحدود/.test(nt)?{open:true}:{v:dv},{src:src,fin:true});found++}}
       else if(/اجاره|کرایه|ماهانه/.test(nt)){var rv2=moneyAfter('اجاره|کرایه|ماهانه');if(rv2){setF('budget_rent',{v:rv2},{src:src,fin:true});found++}}
     }
@@ -1374,7 +1375,7 @@ E30.disc=(function(){
     }
     if(!intent)return false;
     usrC(t);
-    extract(t,'open'); /* harvest the opening message (§4.2) */
+    extract(t,'open',intent); /* bind opening money to the selected workflow */
     _lastPersona=null;
     return start(intent,false,/بودجه|هزینه|قیمت|پول پیش|ودیعه|رهن|ماهی|ماهانه|بهترین گزینه/.test(nt));
   }
