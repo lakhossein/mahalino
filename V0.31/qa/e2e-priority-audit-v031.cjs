@@ -63,8 +63,14 @@ async function snapshot(page){
    }
    async function result(){
     await send(await page.evaluate(()=>E30.guide.actions.sample.prompt));
-    const panel=page.locator('#chatB .e31-results').last();
-    check(await panel.isVisible(),'Search renders an in-chat terminal result');
+    // Empty results deliberately have no .e31-results card container.
+    // Scope to this response so previous successful cards cannot satisfy it.
+    const panel=page.locator('#chatB .msg.bot').last();
+    const text=await panel.textContent();
+    const hasCards=await panel.locator('.e31-results').count()>0;
+    const noMatches=text.includes('آگهی منطبق پیدا نشد');
+    check(await panel.isVisible()&&(hasCards||noMatches),
+     'Current response contains matched cards or the explicit zero-match result');
     const ids=await panel.locator('[data-cba="savL"]').evaluateAll(xs=>xs.map(x=>x.getAttribute('data-l')));
     return {panel,ids,state:await snapshot(page)};
    }
@@ -127,13 +133,18 @@ async function snapshot(page){
    check(found.state.credits===before.credits&&found.state.requests===before.requests,'Skipping an optional budget never charges or starts a dependent operation');
   });
   await test('PA-RB-ZERO-MATCH',async({page,check,send,prompt,result,confirmBudget})=>{
-   await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));await prompt('rent-budget');
+   await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const previous=await result();
+   check(previous.ids.length>0,'Earlier unconstrained result has real cards, making stale-history detection meaningful');
+   await prompt('rent-budget');
    await send('ودیعه تا ۱ تومان و اجاره ماهانه تا ۱ تومان');
    await confirmBudget(10,10);
    const found=await result();
    check(found.ids.length===0&&await found.panel.locator('.pcard').count()===0&&found.state.lastText.includes('آگهی منطبق پیدا نشد'),
     'Infeasible explicit caps produce honest zero results without substituted properties',['empty-data','service-terminal']);
    check(found.state.deposit.v[1]===10&&found.state.rent.v[1]===10,'Empty result preserves both explicit constraints');
+   check(await page.locator('#chatB .e31-results .pcard').count()>0,
+    'Earlier cards remain in history but are not treated as matches for the current zero-result query');
   });
   await test('PA-RB-SIDE-TASK-RESUME',async({page,check,act,send,prompt,result,confirmBudget})=>{
    await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));await prompt('rent-budget');

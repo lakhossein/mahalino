@@ -173,8 +173,24 @@
         "PA-RB-ZERO-MATCH",
         "PA-RB-SIDE-TASK-RESUME"
       ],
-      "status": "unverified",
-      "reason": "Four assertion-bearing composer/UI tests added in step 2; CI result has not yet been reviewed. Do not promote to automated until the current-revision report passes."
+      "status": "failed",
+      "reason": "Last reviewed CI on cd6daf5: 3/4 mapped browser tests PASS; PA-RB-ZERO-MATCH FAIL due to card-only test helper. Helper corrected in step 3, pending current-revision CI review. No complete coverage claimed.",
+      "last_review": {
+        "revision": "cd6daf56dbc6f4ce7992bd135aa16b848462629d",
+        "run_ids": [
+          43647147512,
+          43647151837
+        ],
+        "passing_test_ids": [
+          "PA-RB-ANSWER-EDIT",
+          "PA-RB-INVALID-SKIP",
+          "PA-RB-SIDE-TASK-RESUME"
+        ],
+        "failed_test_ids": [
+          "PA-RB-ZERO-MATCH"
+        ],
+        "cause": "Test helper incorrectly required .e31-results even for an honest empty result. Current helper correction awaits next CI review."
+      }
     },
     {
       "flow": "rent",
@@ -4055,8 +4071,24 @@
         "PA-RB-ZERO-MATCH",
         "PA-RB-SIDE-TASK-RESUME"
       ],
-      "status": "unverified",
-      "reason": "Four assertion-bearing composer/UI tests added in step 2; CI result has not yet been reviewed. Do not promote to automated until the current-revision report passes."
+      "status": "failed",
+      "reason": "Last reviewed CI on cd6daf5: 3/4 mapped browser tests PASS; PA-RB-ZERO-MATCH FAIL due to card-only test helper. Helper corrected in step 3, pending current-revision CI review. No complete coverage claimed.",
+      "last_review": {
+        "revision": "cd6daf56dbc6f4ce7992bd135aa16b848462629d",
+        "run_ids": [
+          43647147512,
+          43647151837
+        ],
+        "passing_test_ids": [
+          "PA-RB-ANSWER-EDIT",
+          "PA-RB-INVALID-SKIP",
+          "PA-RB-SIDE-TASK-RESUME"
+        ],
+        "failed_test_ids": [
+          "PA-RB-ZERO-MATCH"
+        ],
+        "cause": "Test helper incorrectly required .e31-results even for an honest empty result. Current helper correction awaits next CI review."
+      }
     },
     {
       "scenario_id": "rent-specs",
