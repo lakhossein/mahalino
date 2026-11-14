@@ -78,7 +78,9 @@ E30.autoRun=function(){
     val=E30.autoAnswer(CE.f);
     if(val===null)break;
     var done=null;
-    try{done=st.set?st.set(wd(CE.f).data,val):null}catch(e){break}
+    /* autoAnswer returns already normalized stored values, including prices
+       whose steps do not use the generic st.money parser. */
+    try{done=st.set?moneyCanonical(function(){return st.set(wd(CE.f).data,val)}):null}catch(e){break}
     if(done==='ERR')break;
     botC('✓ همین را از حرف‌های قبلی‌تان داشتم — دوباره نمی‌پرسم.');
     CE.i++;CE.li=0;save();
