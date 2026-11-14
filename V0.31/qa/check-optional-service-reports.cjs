@@ -8,6 +8,9 @@ for(const id of ['s_rooms','s_age','s_floor','s_motiv','s_urg']){
   assert.equal(step.pre({optionalNeedsSkipped:true}),false,'skipped seller preference asked again: '+id);
   assert.equal(step.pre({}),true,'explicit seller refinement was removed: '+id);
 }
+const area=c.SCRIPTS.sell.find(s=>s.id==='s_area'),property={};
+assert.equal(area.set(property,'۸۵'),null);assert.equal(property.prop_area,85);
+assert.equal(area.set(property,'نامعتبر'),'ERR');
 const report=c.E30.flowsAPI.investCard({optionalNeedsSkipped:true});
 assert(report.includes('نوع دارایی مشخص نشده'));
 assert(!report.includes('بازده ناخالص سالانهٔ نمونه'),'missing asset produced invented personal yield');

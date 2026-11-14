@@ -17630,7 +17630,7 @@ E30.flows=(function(){
      q:function(D){return 'تا کامل شدن مدارک، فروش فقط به‌صورت «قیمت‌گذاری و آماده‌سازی» پیش می‌رود — معامله رسمی نیازمند سند کامل است. فعلاً ارزیابی و برنامهٔ فروش را می‌چینیم.'},
      chips:function(){return [['متوجهم، ادامه','ok']]},set:function(){return null}},
     {id:'s_area',count:true,q:'متراژ ملک چند متر است؟ (عدد تایپ کنید)',kind:'num',
-     set:function(D,v){var n=pd(v);if(!n||n<10||n>5000)return 'ERR';D.prop_area=n;return null},
+     set:function(D,v){var n=Number(pd(String(v)));if(!Number.isFinite(n)||n<10||n>5000)return 'ERR';D.prop_area=n;return null},
      err:'متراژ را با عدد بنویسید (مثلاً ۸۵).'},
     {id:'s_rooms',count:true,q:'چند خواب است؟',chips:function(){return [['۰','0'],['۱','1'],['۲','2'],['۳','3'],['۳+','4']]},
      set:function(D,v){D.prop_rooms=+v;return null}},
@@ -17807,7 +17807,7 @@ E30.flows=(function(){
        save:function(D){
          var html='<h4>تحلیل سرمایه‌گذاری</h4>'+investCard(D);
          var it=E29.libAPI.saveArtifact({type:'invest',title:'تحلیل سرمایه‌گذاری — '+(D.hood?findH(D.hood).n:'کل شهر'),
-           summary:'هدف: '+({rent_income:'درآمد اجاره',appreciation:'رشد قیمت',inflation_hedge:'حفظ ارزش',land_bank:'زمین',resale:'فروش سریع',commercial:'تجاری'})[D.objective||'']+' — بازده بر پایهٔ دادهٔ نمونه',
+           summary:'هدف: '+(({rent_income:'درآمد اجاره',appreciation:'رشد قیمت',inflation_hedge:'حفظ ارزش',land_bank:'زمین',resale:'فروش سریع',commercial:'تجاری'})[D.objective||'']||'هدف مشخص نشده')+' — گزارش بر پایهٔ دادهٔ نمونه',
            artifact:{html:html,data:{objective:D.objective,cap:D.cap,hood:D.hood,horizon:D.horizon,liquidity:D.liquidity,risk:D.risk,assetType:D.assetType,financing:D.financing,expectedCash:D.expectedCash,management:D.management,exitStrategy:D.exitStrategy}},tokenCost:0,txnId:null});
          botC('✓ در کتابخانه ذخیره شد (بدون هزینه — این تحلیل از دادهٔ نمونهٔ داخلی ساخته می‌شود).',null);
          ceJump('i_done');

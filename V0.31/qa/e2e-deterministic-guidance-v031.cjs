@@ -243,7 +243,7 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
       await page.evaluate(()=>ceVal('single'));
       await send(page,'۸۵');await send(page,'نارمک');
       const quote=await page.evaluate(()=>({step:SCRIPTS[CE.f]?.[CE.i]?.id,data:wd('sell').data,text:document.querySelector('#chatB .msg.bot:last-child')?.textContent}));
-      assert(quote.step==='s_val'&&quote.data.prop_area===85&&quote.data.hood==='h6'&&/ارزیابی بازار/.test(quote.text),'seller opt-out reintroduced optional questions or failed its real quote');
+      assert(quote.step==='s_val'&&quote.data.prop_area===85&&quote.data.hood==='h6'&&/ارزیابی بازار/.test(quote.text),'seller opt-out reintroduced optional questions or failed its real quote: '+JSON.stringify(quote));
       assert(quote.data.prop_rooms==null&&quote.data.prop_age==null&&quote.data.floor==null&&quote.data.sale_urgency==null,'seller quote invented skipped property facts');
     });
     await test('Landlord opt-out keeps unknown rules distinct from explicitly having no restrictions',async page=>{
