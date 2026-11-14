@@ -629,6 +629,8 @@ async function drainDisc(page,final){
     await run('H16','Personalized investment goal and risk reach a saved report and tracked completed request',async page=>{
       await send(page,'حدود ۳۰ میلیارد تومان سرمایه دارم. می‌خوام یه ملک بخرم که اجاره ماهانه بده.');await drainDisc(page);
       const initialCapital=await page.evaluate(()=>wd('invp').data.cap);
+      // Personalization is now explicitly opt-in after the limited report.
+      if(await curStep(page)==='i_an')await choice(page,'!refine');
       if(initialCapital!==300000000000)throw Error('The stated 30B toman capital changed during handoff: '+initialCapital);
       // User-facing inputs are toman; saved historical financial values remain
       // rial. Replay the same 30B toman capital and request 10M toman income.

@@ -18,7 +18,7 @@ E30.guide=(function(){
     {id:'map',group:'neighborhood',title:'نقشه داخل گفت‌وگو',prompt:'نقشه محله‌ها رو همین‌جا نشون بده.',aliases:['نقشه رو نشون بده'],action:'map',slots:['hood'],result:'نقشهٔ موجود داخل چت',next:['compare','sample','rent'],test:'guide-map'},
     {id:'valuation',group:'services',title:'تخمین نمونهٔ ارزش ملک',prompt:'می‌خوام ارزش ملک رو با داده‌های نمونه تخمین بزنم.',aliases:['تخمین ارزش ملک','ارزش‌گذاری ملک'],action:'valuation',slots:['hood','prop_area','prop_age'],result:'فرم داخلی و تأیید هزینه پیش از اجرا',next:['sell','neighborhood','contracts'],test:'guide-valuation'},
     {id:'contracts',group:'contract',title:'مدیریت قرارداد',prompt:'قراردادهای ذخیره‌شده رو داخل چت نشون بده.',aliases:['قراردادهای من رو نشون بده'],action:'contracts',slots:['contract_id'],result:'فهرست قراردادهای واقعاً ذخیره‌شده',next:['contract-start','termination','library'],test:'guide-contracts'},
-    {id:'contract-start',group:'contract',title:'شروع قرارداد اجاره',prompt:'می‌خوام مسیر تنظیم قرارداد اجاره رو داخل چت شروع کنم.',aliases:['میخوام قرارداد اجاره تنظیم کنم'],action:'contract-start',slots:['budget_dep','budget_rent','contract_details'],result:'ورود به کشف نیاز و سپس مسیر قرارداد؛ بدون ثبت خودکار',next:['contracts','rent-budget','rent'],test:'guide-contract-start'},
+    {id:'contract-start',group:'contract',title:'شروع قرارداد اجاره',prompt:'می‌خوام مسیر تنظیم قرارداد اجاره رو داخل چت شروع کنم.',aliases:['میخوام قرارداد اجاره تنظیم کنم'],action:'contract-start',slots:['budget_dep','budget_rent','contract_details'],result:'ورود مستقیم به فرم قرارداد؛ بدون ثبت خودکار',next:['contracts','rent-budget','rent'],test:'guide-contract-start'},
     {id:'termination',group:'contract',title:'پیگیری فسخ',prompt:'می‌خوام وضعیت فسخ قرارداد و چک‌لیست تسویه رو ببینم.',aliases:['چک‌لیست فسخ قرارداد را بده'],action:'termination',slots:['contract_id'],result:'چک‌لیست رایگان، بدون امضا یا فسخ خودکار',next:['contracts','library'],test:'guide-termination'},
     {id:'services',group:'services',title:'پیش‌درخواست خدمات ملک',prompt:'می‌خوام برای خدمات و تعمیرات ملک درخواست ثبت کنم.',aliases:['درخواست تعمیرات ملک دارم'],action:'services',slots:['service_type','details'],result:'پیش‌درخواست درون‌چتی، نه سفارش نهایی',next:['contracts','library'],test:'guide-services'},
     {id:'guaranteed',group:'services',title:'پیش‌درخواست اجارهٔ تضمینی',prompt:'می‌خوام پیش‌درخواست اجارهٔ تضمینی رو ثبت کنم.',aliases:['اجاره تضمینی چطور است'],action:'guaranteed',slots:['address','prop_area'],result:'فرم پیش‌درخواست بدون ادعای تضمین',next:['contracts','library'],test:'guide-guaranteed'},
@@ -116,6 +116,7 @@ E30.guide=(function(){
   }
   function can(r,explicit){
     if(!r)return false;
+    if((r.id==='compare'||r.id==='neighborhood')&&!explicit)return typeof HOODS!=='undefined'&&HOODS.filter(function(h){return Number(h.buyBase)>0}).length>=2;
     if(r.id==='rent-area'&&!explicit)return false; /* No verified adjacency dataset. */
     if(r.id==='saved'&&!explicit)return !!(S.savedListings||[]).length;
     if(r.id==='library'&&!explicit)return !!(S.library||[]).length;
@@ -204,10 +205,12 @@ E30.guide=(function(){
     var header='<b>مقایسهٔ نمایشی محله‌ها</b><p class="note">فقط دادهٔ داخلی و ساختگی Mahalino، نه تحلیل زندهٔ بازار. قیمت خرید نمونه به‌ازای هر متر مربع، با واحد تومان؛ دادهٔ دسترسی و زمان سفر تأیید نشده است.</p>';
     /* Coordinates alone do not establish adjacency, commuting or transit access.
        Never substitute arbitrary neighborhoods for an unsupported area query. */
-    if(/اطراف|نزدیک|سمت|انقلاب/.test(t)){
+    if(/اطراف|نزدیک|سمت/.test(t)){
       botC(header+'<p class="e31-geo-unavailable">دادهٔ تأییدشده‌ای برای تعیین محله‌های نزدیک محدودهٔ درخواستی ندارم. محله‌ای را به‌عنوان همجوار پیشنهاد نمی‌کنم. برای مقایسهٔ عمومی قیمت، نام محله‌های موجود را مشخص کنید یا «قیمت نمونهٔ محله‌های موجود رو مقایسه کن» را بفرستید.</p>',null);return;
     }
-    var named=list.filter(function(h){return t.indexOf(norm(h.n||''))>=0}),picks=named.length?named:list.slice(0,3);
+    var tokens=' '+norm(t.replace(/[،,؛:()«»]/g,' '))+' ';
+    var named=list.filter(function(h){return tokens.indexOf(' '+norm(h.n||'')+' ')>=0}),picks=named.length?named:list.slice(0,3);
+    if(picks.length<2){botC(header+'<p>برای مقایسه حداقل دو محلهٔ دارای داده لازم است؛ محلهٔ دوم را مشخص کنید.</p>',null);return}
     var prices=picks.map(function(h){return Number(h.buyBase)||0}),max=Math.max.apply(null,[0].concat(prices));
     var rows=picks.map(function(h){
       var value=Number(h.buyBase),valid=isFinite(value)&&value>0;
@@ -350,6 +353,7 @@ E30.guide=(function(){
   function route(t){
     if(!S.auth||CURRENT!=='landing')return false;
     var nt=norm(t),r=BY_PROMPT[nt];
+    if(!r&&/مقایسه/.test(nt)&&/محله/.test(nt))r=BY_ID.compare;
     if(!r&&/^(یه|یک) (خونه|خانه) (برام|برای من )? ?پیدا کن$/.test(nt)){
       setNode('home');usrC(String(t));
       botC('برای شروع، منظورتان خرید خانه است یا رهن و اجاره؟ یک پرامپت از پیشنهادهای همین گفت‌وگو انتخاب کنید.'+card(),null);

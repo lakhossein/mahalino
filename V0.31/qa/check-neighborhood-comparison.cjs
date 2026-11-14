@@ -12,4 +12,9 @@ assert.equal((output.match(/class="e31-price-row"/g)||[]).length,hoods.length);
 for(const h of hoods){assert(output.includes(h.n));assert(output.includes(r.c.rial(h.buyBase)))}
 assert.equal(JSON.stringify(r.c.E30.discAPI.ctx().fields),before,'comparison modified search constraints');
 assert.equal(r.c.S.tokens,500);
+g.route('محلهٔ '+hoods[0].n+' را مقایسه کن.');
+assert(!r.messages.at(-1).includes('e31-price-row'),'single neighborhood was presented as a comparison');
+assert(r.messages.at(-1).includes('حداقل دو محله'));
+g.route('محلهٔ '+hoods[0].n+' و '+hoods[1].n+' را مقایسه کن.');
+assert.equal((r.messages.at(-1).match(/class="e31-price-row"/g)||[]).length,2,'named comparison substituted arbitrary neighborhoods');
 console.log('PASS neighborhood comparisons: actual labeled sample values, no invented adjacency or constraint mutation');

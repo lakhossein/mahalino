@@ -223,6 +223,39 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
       await send(page,await page.evaluate(()=>E30.guide.actions.sample.prompt));
       assert(await page.locator('#chatB .e31-results .pcard').count()>0,'resumed legacy entry failed to complete a search');
     });
+    await test('Skipping investment preferences produces an honest limited report that can be saved and resumed',async page=>{
+      await send(page,await page.evaluate(()=>E30.guide.actions.invest.prompt));
+      const before=await page.evaluate(()=>S.tokens);
+      await send(page,await page.evaluate(()=>E30.guide.actions['start-service'].prompt));
+      await send(page,'درسته');
+      const limited=await page.evaluate(()=>({step:SCRIPTS[CE.f]?.[CE.i]?.id,data:JSON.stringify(wd('invp').data),html:document.querySelector('#chatB .msg.bot:last-child')?.textContent}));
+      assert(limited.step==='i_an'&&/نوع دارایی مشخص نشده/.test(limited.html),'opt-out restarted investment questions or fabricated a personalized yield');
+      await page.locator('#chatB [data-cv="!save"]').last().click();
+      const saved=await page.evaluate(()=>({report:S.library.find(x=>x.type==='invest'),done:wd('invp').done,tokens:S.tokens}));
+      assert(saved.done&&saved.report&&!saved.report.artifact.data.cap&&!saved.report.artifact.data.assetType&&saved.tokens===before,'limited investment report failed completion or invented a capital/asset');
+      await page.reload({waitUntil:'domcontentloaded'});await page.waitForTimeout(200);
+      assert(await page.evaluate(id=>S.library.some(x=>x.id===id)&&wd('invp').done,saved.report.id),'limited report or completion was lost on reload');
+    });
+    await test('Seller opt-out skips optional property details but retains the prerequisites for pricing',async page=>{
+      await send(page,await page.evaluate(()=>E30.guide.actions.sell.prompt));
+      await send(page,await page.evaluate(()=>E30.guide.actions['start-service'].prompt));await send(page,'درسته');
+      // Authority and quote inputs belong to the selected pricing operation.
+      await page.evaluate(()=>ceVal('single'));
+      await send(page,'۸۵');await send(page,'نارمک');
+      const quote=await page.evaluate(()=>({step:SCRIPTS[CE.f]?.[CE.i]?.id,data:wd('sell').data,text:document.querySelector('#chatB .msg.bot:last-child')?.textContent}));
+      assert(quote.step==='s_val'&&quote.data.prop_area===85&&quote.data.hood==='h6'&&/ارزیابی بازار/.test(quote.text),'seller opt-out reintroduced optional questions or failed its real quote');
+      assert(quote.data.prop_rooms==null&&quote.data.prop_age==null&&quote.data.floor==null&&quote.data.sale_urgency==null,'seller quote invented skipped property facts');
+    });
+    await test('Landlord opt-out keeps unknown rules distinct from explicitly having no restrictions',async page=>{
+      await send(page,await page.evaluate(()=>E30.guide.actions.landlord.prompt));
+      await send(page,await page.evaluate(()=>E30.guide.actions['start-service'].prompt));await send(page,'درسته');
+      await page.evaluate(()=>ceVal('res'));await send(page,'نارمک');
+      await send(page,'۵۰۰ میلیون تومان');await send(page,'صفر');
+      const preview=await page.evaluate(()=>({step:SCRIPTS[CE.f]?.[CE.i]?.id,rules:wd('lndl').data.rules,text:document.querySelector('#chatB .msg.bot:last-child')?.textContent}));
+      assert(preview.step==='l_sum'&&preview.rules==null&&/مشخص نشده/.test(preview.text),'landlord opt-out asserted nonexistent acceptance rules or restarted preferences');
+      await page.locator('#chatB [data-cv="!ok"]').last().click();
+      assert(await page.evaluate(()=>wd('lndl').data.registered&&wd('lndl').data.listingStatus==='draft_internal'),'optional-rule skip blocked the selected draft service');
+    });
     await test('Sample price charts use actual values and remain inside a wide responsive chat',async page=>{
       for(const width of [1600,1440,980,600,360]){
         await page.setViewportSize({width,height:900});

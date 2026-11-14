@@ -1352,14 +1352,14 @@ E30.disc=(function(){
       if(wf==='sell'){
         ceStart('sell');
         var D3=wd('sell').data;
-        ['prop_area','prop_rooms','sale_urgency'].forEach(function(id){var v3=getF(id);if(v3!=null)D3[id]=v3});
+        ['prop_area','prop_rooms','prop_age','sale_urgency'].forEach(function(id){var v3=getF(id);if(v3!=null)D3[id]=v3});
         var hp=getF('hood');if(hp)D3.hood=hp;
         var ep=getF('expected_price');if(ep&&ep.v)D3.expected=ep.v[0];
         var mp=getF('min_price');if(mp&&mp.v)D3.minprice=mp.v[0];
         var own=getF('ownership');if(own)D3.ownership=own;
         var dc=getF('docs');if(dc)D3.docs=dc;
         var mo=getF('sale_motivation');if(mo)D3.motivation=mo;
-        D3._e30=1;save();
+        D3._e30=1;D3.optionalNeedsSkipped=!!d.skipOptionalToHoods;save();
         ceJump('s_own');
         return true;
       }
@@ -1372,8 +1372,8 @@ E30.disc=(function(){
         var lq=getF('invest_liquidity');if(lq)D4.liquidity=lq;
         var rk=getF('invest_risk');if(rk)D4.risk=rk;
         var hp2=getF('hood');if(hp2)D4.hood=hp2;
-        D4._e30=1;save();
-        ceJump('i_obj');
+        D4._e30=1;D4.optionalNeedsSkipped=!!d.skipOptionalToHoods;save();
+        ceJump(d.skipOptionalToHoods?'i_an':'i_obj');
         return true;
       }
       if(wf==='landlord'){
@@ -1383,7 +1383,7 @@ E30.disc=(function(){
         var lhood=getF('hood');if(lhood)D5.hood=lhood;
         var la=getF('prop_area');if(la!=null){D5.area=+la;D5.m2=+la}
         var lp=getF('expected_price');if(lp&&lp.v)D5.ask_price=lp.v[0];
-        D5._e30=1;save();
+        D5._e30=1;D5.optionalNeedsSkipped=!!d.skipOptionalToHoods;save();
         ceJump('l_role');
         return true;
       }
