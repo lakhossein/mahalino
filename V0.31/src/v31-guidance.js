@@ -50,6 +50,7 @@ E30.guide=(function(){
   add({id:'skip-preference',title:'رد پرسش',prompt:'این پرسش را فعلاً رد کن.',action:'skip'});
   add({id:'start-service',title:'شروع خدمت با اطلاعات فعلی',prompt:'با اطلاعات فعلی ادامه بده.',action:'start-service'});
   add({id:'resume-service',title:'بازگشت به کار قبلی',prompt:'به کار قبلی برگرد.',action:'resume',result:'بازگردانی وضعیت و مرحلهٔ کار قبلی'});
+  add({id:'pause-service',title:'توقف خدمت',prompt:'این خدمت را فعلاً متوقف کن.',action:'pause',result:'توقف بدون ثبت نهایی و حفظ اطلاعات برای ادامه'});
   ['student','couple','young','family'].forEach(function(value,i){add({id:'persona-'+value,
     title:['دانشجو','زوج','جوان','خانواده'][i],
     prompt:['پرسونای جست‌وجوی من دانشجو است.','پرسونای جست‌وجوی من زوج است.','پرسونای جست‌وجوی من جوان است.','پرسونای جست‌وجوی من خانواده است.'][i],
@@ -135,6 +136,7 @@ E30.guide=(function(){
       return !!explicit||!!state().suspended&&!(payment&&/^(processing|paid|executing)$/.test(payment.state));
     }
     if(r.action==='skip')return !!(E30.discAPI&&E30.discAPI.collector().expecting);
+    if(r.action==='pause')return !!(CE.f&&CE.f!=='gate'&&!state().suspended);
     if(r.action==='start-service')return !!(E30.discAPI&&E30.discAPI.active());
     if(r.action.indexOf('flow:')===0)return !!(typeof SCRIPTS!=='undefined'&&SCRIPTS[r.action.split(':')[1]]);
     if(r.action==='valuation')return typeof CBACT.e30ValOpen==='function';
@@ -182,7 +184,7 @@ E30.guide=(function(){
       if(['compare','neighborhood','rent-area'].indexOf(state().node)>=0&&typeof HOODS!=='undefined'&&HOODS.some(function(h){return h.ll}))ids=ids.concat(['map']);
     }else{
       var node=effectiveNode();ids=GROUPS[node]||GROUPS.home;
-      if(CE.f&&CE.f!=='gate')return state().suspended?[BY_ID['resume-service']]:[];
+      if(CE.f&&CE.f!=='gate')return state().suspended?[BY_ID['resume-service']]:[BY_ID['pause-service']];
       ids=ids.slice(0,node==='home'?4:3);
     }
     if(state().suspended)ids=ids.concat(['resume-service']);
@@ -315,6 +317,13 @@ E30.guide=(function(){
   function exec(r,t){
     var a=r.action;
     if(a==='resume'){usrC(t);return resumeService()}
+    if(a==='pause'){
+      var payment=E30.pay&&E30.pay.session();
+      if(payment&&/^(processing|paid|executing)$/.test(payment.state)){botC('عملیات در حال انجام است؛ پس از پایان می‌توانید خدمت را متوقف کنید.',null);return true}
+      if(payment&&/^(presented|awaiting_confirm|selected|priced|insufficient)$/.test(payment.state))E30.pay.cancel(payment.payId,true);
+      usrC(t);suspend();setNode('home');
+      botC('خدمت متوقف شد؛ اطلاعات برای ادامه حفظ شده است. این توقف هیچ ثبت نهایی یا پرداختی انجام نمی‌دهد.',null);return true;
+    }
     if(a.indexOf('preference:')===0){
       usrC(t);
       if(!E30.discAPI.active())E30.discAPI.start(CE.f==='buy'?'buy':'rent',true);

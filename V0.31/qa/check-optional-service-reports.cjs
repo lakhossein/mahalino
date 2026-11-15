@@ -11,6 +11,9 @@ for(const id of ['s_rooms','s_age','s_floor','s_motiv','s_urg']){
 const area=c.SCRIPTS.sell.find(s=>s.id==='s_area'),property={};
 assert.equal(area.set(property,'۸۵'),null);assert.equal(property.prop_area,85);
 assert.equal(area.set(property,'نامعتبر'),'ERR');
+assert.equal(area.pre({_e30:1,prop_area:90}),false,'confirmed discovery area must not be asked again');
+assert.equal(area.pre({_e30:1}),true,'missing area remains a valuation prerequisite');
+assert.equal(c.SCRIPTS.sell.find(s=>s.id==='s_hood').pre({_e30:1,hood:'h1'}),false);
 const report=c.E30.flowsAPI.investCard({optionalNeedsSkipped:true});
 assert(report.includes('نوع دارایی مشخص نشده'));
 assert(!report.includes('بازده ناخالص سالانهٔ نمونه'),'missing asset produced invented personal yield');
