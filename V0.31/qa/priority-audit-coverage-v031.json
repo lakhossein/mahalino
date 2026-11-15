@@ -4616,9 +4616,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-BUILD-PROJECT-SCOPED"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Browser contract added for missing project, invalid supplier, pause/reload/resume at each service step and persisted project-scoped completion; execution pending."
     },
     {
       "flow": "build",
@@ -4648,9 +4650,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-BUILD-PROJECT-SCOPED"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Browser contract added for missing project, invalid supplier, pause/reload/resume at each service step and persisted project-scoped completion; execution pending."
     },
     {
       "flow": "stay",

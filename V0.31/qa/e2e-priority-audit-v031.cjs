@@ -456,6 +456,34 @@ async function snapshot(page){
     'Valid nights reaches reservation preview without automatic booking',['success','cancel','resume']);
   },['step:stay:list','step:stay:ngt']);
 
+  await test('PA-BUILD-PROJECT-SCOPED',async h=>{
+   const {page,check,send,act}=h;
+   const initial=await snapshot(page);
+   await send(await page.evaluate(()=>E30.guide.actions.build.prompt));
+   check(await page.evaluate(()=>!S.wfs.some(w=>w.m==='build'))&&
+    (await page.locator('#chatB .msg.bot').last().textContent()).includes('پروژه'),
+    'Missing approved project produces prerequisite message without invented workflow',['empty-data']);
+   // Fixture represents a previously approved project; all operations below use UI.
+   const project=await page.evaluate(()=>{const w=wfNew('mkt');w.data={role:'con',bid:{prj:0,amt:8e9,dur:18,adj:'none'},confirmed:true};save();return w.id});
+   await send(await page.evaluate(()=>E30.guide.actions.build.prompt));
+   await exerciseStep(h,'build','sup');
+   await send('999999');
+   check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='sup'&&!wd('build').data.orders?.length),'Invalid supplier creates no order');
+   await send('0');
+   check(await page.evaluate(()=>wd('build').data.orders.length===1&&wd('build').data.orders[0].status==='draft_internal'&&!wd('build').data.ph),
+    'Explicit supplier creates one internal draft without assumed progress');
+   await exerciseStep(h,'build','ph');
+   check(await page.evaluate(()=>wd('build').data.ph==null),'Viewing or resuming phases does not invent progress');
+   await chip(h,'!p');
+   check(await page.evaluate(()=>JSON.stringify(wd('build').data.ph)==='[10,0,0,0,0]'&&!wd('build').done),'Explicit progress starts at zero and does not deliver');
+   await chip(h,'!all');await chip(h,'!done');
+   const completed=await page.evaluate(()=>({id:wd('build').id,data:JSON.stringify(wd('build').data),done:wd('build').done}));
+   check(completed.done&&await page.evaluate(id=>wd('build').data.projectWfId===id,project),'Completion stays attached to the approved project');
+   await act('reload completed project build',()=>page.reload({waitUntil:'domcontentloaded'}));
+   check(await page.evaluate(({id,data})=>wfOf(id).done&&JSON.stringify(wfOf(id).data)===data,completed)&&
+    (await snapshot(page)).credits===initial.credits,'Completed build persists with exact facts and no debit',['success','cancel','resume']);
+  },['step:build:sup','step:build:ph']);
+
   for(const legacy of [{"flow":"invb","id":"prjs"},{"flow":"invb","id":"scn"},{"flow":"invb","id":"cap"},{"flow":"invb","id":"yld"},{"flow":"invb","id":"price"},{"flow":"invb","id":"pay"},{"flow":"invb","id":"trk"},{"flow":"invr","id":"props"},{"flow":"invr","id":"cap"},{"flow":"invr","id":"cmp"},{"flow":"invr","id":"fund"},{"flow":"invr","id":"pay"},{"flow":"invr","id":"end"}]){
    await test('PA-RETIRED-'+legacy.flow+'-'+legacy.id,async({page,check,act,send})=>{
     const before=await snapshot(page);
