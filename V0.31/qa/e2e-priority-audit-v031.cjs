@@ -424,7 +424,11 @@ async function snapshot(page){
     await send(value);
    }
    check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='list'&&wd('stay').data.city==='تهران'&&wd('stay').data.date==='هفتهٔ بعد'&&wd('stay').data.ppl===2)&&
-    await page.locator('#chatB .msg.bot').last().locator('.ccard').count()>0,'Valid destination, date and travelers reach usable accommodation cards',['success','empty-data','cancel','resume']);
+    await page.locator('#chatB .msg.bot').last().locator('.pcard').count()>0,'Valid destination, date and travelers reach usable accommodation cards');
+   const ids=await page.locator('#chatB .msg.bot').last().locator('[data-cba="selS"]').evaluateAll(xs=>xs.map(x=>x.getAttribute('data-l')));
+   const expected=await page.evaluate(()=>SLIST.filter(x=>x.city==='تهران').map(x=>x.id));
+   check(ids.length===expected.length&&ids.every(x=>expected.includes(x)),
+    'Every accommodation card belongs to an actual sample in the requested city',['success','empty-data','cancel','resume']);
   },['step:stay:city','step:stay:date','step:stay:ppl']);
 
   for(const legacy of [{"flow":"invb","id":"prjs"},{"flow":"invb","id":"scn"},{"flow":"invb","id":"cap"},{"flow":"invb","id":"yld"},{"flow":"invb","id":"price"},{"flow":"invb","id":"pay"},{"flow":"invb","id":"trk"},{"flow":"invr","id":"props"},{"flow":"invr","id":"cap"},{"flow":"invr","id":"cmp"},{"flow":"invr","id":"fund"},{"flow":"invr","id":"pay"},{"flow":"invr","id":"end"}]){
