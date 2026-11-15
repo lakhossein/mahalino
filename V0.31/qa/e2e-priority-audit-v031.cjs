@@ -340,7 +340,14 @@ async function snapshot(page){
     if(inputs[id])await send(inputs[id]);
     else if(id==='s_prep')await chip(h,'!ok');
     else if(id==='s_inq')await chip(h,'!neg');
-    else if(id==='s_ctr')await chip(h,'!later');
+    else if(id==='s_ctr'){
+     const before=await serviceState(page,'sell');await chip(h,'!open');
+     check(await page.evaluate(()=>!wd('buy').data.ctr)&&
+      (await page.locator('#chatB .msg.bot').last().textContent()).includes('مدارک'),
+      'Incomplete ownership documents block the contract form and charge');
+     check((await serviceState(page,'sell')).credits===before.credits,'Rejected contract opening never debits');
+     await chip(h,'!later');
+    }
     else throw Error('Unexpected seller step '+id);
    }
    check(sellerRows.every(x=>seen.includes(x)),'All ten seller service rows exercised, including incomplete ownership documents');

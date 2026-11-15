@@ -248,13 +248,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for rent:beds",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-rent-beds-answer-edit",
+        "PA-MATRIX-rent-beds-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "rent",
@@ -329,7 +332,7 @@
       "handler": {
         "source": "src/v31-guidance.js and src/v31-intel.js",
         "target": "need-household -> composer -> preference:household -> feed/answer('household') -> sample",
-        "resolution": "Source mapped; new UI assertions pending CI"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
@@ -337,8 +340,8 @@
         "PA-HOUSEHOLD-ANSWER-EDIT",
         "PA-HOUSEHOLD-SKIP"
       ],
-      "status": "unverified",
-      "reason": "Household answer/edit/reload and skip browser journeys added; execution awaits next CI review."
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "rent",
@@ -365,13 +368,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for rent:age",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-rent-age-answer-edit",
+        "PA-MATRIX-rent-age-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "rent",
@@ -398,13 +404,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for rent:m2",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-rent-m2-answer-edit",
+        "PA-MATRIX-rent-m2-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "rent",
@@ -431,13 +440,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for rent:floor",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-rent-floor-answer-edit",
+        "PA-MATRIX-rent-floor-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "rent",
@@ -464,13 +476,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for rent:elev",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-rent-elev-answer-edit",
+        "PA-MATRIX-rent-elev-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "rent",
@@ -497,13 +512,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for rent:park",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-rent-park-answer-edit",
+        "PA-MATRIX-rent-park-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "rent",
@@ -530,13 +548,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for rent:extra",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-rent-extra-answer-edit",
+        "PA-MATRIX-rent-extra-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "rent",
@@ -1067,13 +1088,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for buy:budg",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-buy-budg-answer-edit",
+        "PA-MATRIX-buy-budg-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "buy",
@@ -1138,13 +1162,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for buy:age",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه؛ رفع خطای گزارش‌شده و آزمون ادامهٔ خرید",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-buy-age-answer-edit",
+        "PA-MATRIX-buy-age-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "buy",
@@ -1171,13 +1198,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for buy:m2",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-buy-m2-answer-edit",
+        "PA-MATRIX-buy-m2-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "buy",
@@ -1204,13 +1234,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for buy:ppm",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-buy-ppm-answer-edit",
+        "PA-MATRIX-buy-ppm-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "buy",
@@ -1237,13 +1270,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for buy:floor",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-buy-floor-answer-edit",
+        "PA-MATRIX-buy-floor-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "buy",
@@ -1270,13 +1306,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for buy:beds",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-buy-beds-answer-edit",
+        "PA-MATRIX-buy-beds-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "buy",
@@ -1303,13 +1342,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for buy:feat",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-buy-feat-answer-edit",
+        "PA-MATRIX-buy-feat-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "buy",
@@ -1763,18 +1805,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.sell step s_own through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-SELLER"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -1794,18 +1839,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.sell step s_docs through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-SELLER"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -1825,18 +1873,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.sell step s_note through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-SELLER"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -1863,13 +1914,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for sell:s_area",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-sell-s_area-answer-edit",
+        "PA-MATRIX-sell-s_area-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -1896,13 +1950,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for sell:s_rooms",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-sell-s_rooms-answer-edit",
+        "PA-MATRIX-sell-s_rooms-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -1929,13 +1986,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for sell:s_age",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-sell-s_age-answer-edit",
+        "PA-MATRIX-sell-s_age-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -1962,13 +2022,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for sell:s_floor",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-sell-s_floor-answer-edit",
+        "PA-MATRIX-sell-s_floor-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -1995,13 +2058,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for sell:s_hood",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-sell-s_hood-answer-edit",
+        "PA-MATRIX-sell-s_hood-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -2028,13 +2094,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for sell:s_motiv",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-sell-s_motiv-answer-edit",
+        "PA-MATRIX-sell-s_motiv-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -2061,13 +2130,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for sell:s_urg",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-sell-s_urg-answer-edit",
+        "PA-MATRIX-sell-s_urg-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -2087,18 +2159,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.sell step s_val through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-SELLER"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -2118,18 +2193,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.sell step s_price through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-SELLER"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -2149,18 +2227,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.sell step s_min through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-SELLER"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -2180,18 +2261,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.sell step s_prep through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-SELLER"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -2211,18 +2295,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.sell step s_inq through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-SELLER"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -2242,18 +2329,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.sell step s_ctr through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-SELLER"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "sell",
@@ -2273,18 +2363,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.sell step s_done through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-SELLER"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "invp",
@@ -2311,13 +2404,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for invp:i_obj",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-invp-i_obj-answer-edit",
+        "PA-MATRIX-invp-i_obj-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "invp",
@@ -2344,13 +2440,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for invp:i_cap",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-invp-i_cap-answer-edit",
+        "PA-MATRIX-invp-i_cap-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "invp",
@@ -2377,13 +2476,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for invp:i_liq",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-invp-i_liq-answer-edit",
+        "PA-MATRIX-invp-i_liq-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "invp",
@@ -2410,13 +2512,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for invp:i_hor",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-invp-i_hor-answer-edit",
+        "PA-MATRIX-invp-i_hor-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "invp",
@@ -2443,13 +2548,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for invp:i_risk",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-invp-i_risk-answer-edit",
+        "PA-MATRIX-invp-i_risk-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "invp",
@@ -2476,13 +2584,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for invp:i_asset",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-invp-i_asset-answer-edit",
+        "PA-MATRIX-invp-i_asset-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "invp",
@@ -2509,13 +2620,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for invp:i_fin",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-invp-i_fin-answer-edit",
+        "PA-MATRIX-invp-i_fin-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "invp",
@@ -2542,13 +2656,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for invp:i_income",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-invp-i_income-answer-edit",
+        "PA-MATRIX-invp-i_income-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "invp",
@@ -2575,13 +2692,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for invp:i_mgmt",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-invp-i_mgmt-answer-edit",
+        "PA-MATRIX-invp-i_mgmt-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "invp",
@@ -2608,13 +2728,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for invp:i_exit",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-invp-i_exit-answer-edit",
+        "PA-MATRIX-invp-i_exit-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "invp",
@@ -2641,13 +2764,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for invp:i_hood",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-invp-i_hood-answer-edit",
+        "PA-MATRIX-invp-i_hood-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "invp",
@@ -2667,18 +2793,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.invp step i_an through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-INVESTMENT"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "invp",
@@ -2698,18 +2827,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.invp step i_done through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-INVESTMENT"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "lndl",
@@ -2729,18 +2861,23 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.lndl step l_role through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-LANDLORD-price",
+        "PA-SERVICE-LANDLORD-res",
+        "PA-SERVICE-LANDLORD-stay"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "lndl",
@@ -2767,13 +2904,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for lndl:l_hood",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-lndl-l_hood-answer-edit",
+        "PA-MATRIX-lndl-l_hood-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "lndl",
@@ -2793,18 +2933,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.lndl step l_advice through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-LANDLORD-price"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "lndl",
@@ -2824,18 +2967,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.lndl step l_price through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-LANDLORD-res"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "lndl",
@@ -2855,18 +3001,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.lndl step l_rent through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-LANDLORD-res"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "lndl",
@@ -2893,13 +3042,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for lndl:l_rules",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-lndl-l_rules-answer-edit",
+        "PA-MATRIX-lndl-l_rules-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "lndl",
@@ -2919,18 +3071,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.lndl step l_stay_rate through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-LANDLORD-stay"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "lndl",
@@ -2950,18 +3105,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.lndl step l_stay_capacity through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-LANDLORD-stay"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "lndl",
@@ -2981,18 +3139,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.lndl step l_stay_min through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-LANDLORD-stay"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "lndl",
@@ -3019,13 +3180,16 @@
       "handler": {
         "source": "src/v31-intel.js and src/v31-guidance.js",
         "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for lndl:l_stay_rules",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-MATRIX-lndl-l_stay_rules-answer-edit",
+        "PA-MATRIX-lndl-l_stay_rules-skip"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "lndl",
@@ -3045,18 +3209,22 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.lndl step l_sum through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-LANDLORD-res",
+        "PA-SERVICE-LANDLORD-stay"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "invb",
@@ -3079,14 +3247,16 @@
       "handler": {
         "source": "§7 retirement decision",
         "target": "Assert absence from SCRIPTS, guidance and investment navigation",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "No executable legacy route/suggestion; historical versions and stored user data preserved.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage.",
-      "retirement_reason": "§7 explicitly retires invb/invr from V0.31 executable scripts and investment navigation. Retain every historical row and prove route absence."
+      "evidence_ids": [
+        "PA-RETIRED-invb-prjs"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress.",
+      "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them."
     },
     {
       "flow": "invb",
@@ -3109,14 +3279,16 @@
       "handler": {
         "source": "§7 retirement decision",
         "target": "Assert absence from SCRIPTS, guidance and investment navigation",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "No executable legacy route/suggestion; historical versions and stored user data preserved.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage.",
-      "retirement_reason": "§7 explicitly retires invb/invr from V0.31 executable scripts and investment navigation. Retain every historical row and prove route absence."
+      "evidence_ids": [
+        "PA-RETIRED-invb-scn"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress.",
+      "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them."
     },
     {
       "flow": "invb",
@@ -3139,14 +3311,16 @@
       "handler": {
         "source": "§7 retirement decision",
         "target": "Assert absence from SCRIPTS, guidance and investment navigation",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "No executable legacy route/suggestion; historical versions and stored user data preserved.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage.",
-      "retirement_reason": "§7 explicitly retires invb/invr from V0.31 executable scripts and investment navigation. Retain every historical row and prove route absence."
+      "evidence_ids": [
+        "PA-RETIRED-invb-cap"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress.",
+      "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them."
     },
     {
       "flow": "invb",
@@ -3169,14 +3343,16 @@
       "handler": {
         "source": "§7 retirement decision",
         "target": "Assert absence from SCRIPTS, guidance and investment navigation",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "No executable legacy route/suggestion; historical versions and stored user data preserved.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage.",
-      "retirement_reason": "§7 explicitly retires invb/invr from V0.31 executable scripts and investment navigation. Retain every historical row and prove route absence."
+      "evidence_ids": [
+        "PA-RETIRED-invb-yld"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress.",
+      "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them."
     },
     {
       "flow": "invb",
@@ -3199,14 +3375,16 @@
       "handler": {
         "source": "§7 retirement decision",
         "target": "Assert absence from SCRIPTS, guidance and investment navigation",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "No executable legacy route/suggestion; historical versions and stored user data preserved.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage.",
-      "retirement_reason": "§7 explicitly retires invb/invr from V0.31 executable scripts and investment navigation. Retain every historical row and prove route absence."
+      "evidence_ids": [
+        "PA-RETIRED-invb-price"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress.",
+      "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them."
     },
     {
       "flow": "invb",
@@ -3229,14 +3407,16 @@
       "handler": {
         "source": "§7 retirement decision",
         "target": "Assert absence from SCRIPTS, guidance and investment navigation",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "No executable legacy route/suggestion; historical versions and stored user data preserved.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage.",
-      "retirement_reason": "§7 explicitly retires invb/invr from V0.31 executable scripts and investment navigation. Retain every historical row and prove route absence."
+      "evidence_ids": [
+        "PA-RETIRED-invb-pay"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress.",
+      "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them."
     },
     {
       "flow": "invb",
@@ -3259,14 +3439,16 @@
       "handler": {
         "source": "§7 retirement decision",
         "target": "Assert absence from SCRIPTS, guidance and investment navigation",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "No executable legacy route/suggestion; historical versions and stored user data preserved.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage.",
-      "retirement_reason": "§7 explicitly retires invb/invr from V0.31 executable scripts and investment navigation. Retain every historical row and prove route absence."
+      "evidence_ids": [
+        "PA-RETIRED-invb-trk"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress.",
+      "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them."
     },
     {
       "flow": "invr",
@@ -3289,14 +3471,16 @@
       "handler": {
         "source": "§7 retirement decision",
         "target": "Assert absence from SCRIPTS, guidance and investment navigation",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "No executable legacy route/suggestion; historical versions and stored user data preserved.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage.",
-      "retirement_reason": "§7 explicitly retires invb/invr from V0.31 executable scripts and investment navigation. Retain every historical row and prove route absence."
+      "evidence_ids": [
+        "PA-RETIRED-invr-props"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress.",
+      "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them."
     },
     {
       "flow": "invr",
@@ -3319,14 +3503,16 @@
       "handler": {
         "source": "§7 retirement decision",
         "target": "Assert absence from SCRIPTS, guidance and investment navigation",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "No executable legacy route/suggestion; historical versions and stored user data preserved.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage.",
-      "retirement_reason": "§7 explicitly retires invb/invr from V0.31 executable scripts and investment navigation. Retain every historical row and prove route absence."
+      "evidence_ids": [
+        "PA-RETIRED-invr-cap"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress.",
+      "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them."
     },
     {
       "flow": "invr",
@@ -3349,14 +3535,16 @@
       "handler": {
         "source": "§7 retirement decision",
         "target": "Assert absence from SCRIPTS, guidance and investment navigation",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "No executable legacy route/suggestion; historical versions and stored user data preserved.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage.",
-      "retirement_reason": "§7 explicitly retires invb/invr from V0.31 executable scripts and investment navigation. Retain every historical row and prove route absence."
+      "evidence_ids": [
+        "PA-RETIRED-invr-cmp"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress.",
+      "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them."
     },
     {
       "flow": "invr",
@@ -3379,14 +3567,16 @@
       "handler": {
         "source": "§7 retirement decision",
         "target": "Assert absence from SCRIPTS, guidance and investment navigation",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "No executable legacy route/suggestion; historical versions and stored user data preserved.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage.",
-      "retirement_reason": "§7 explicitly retires invb/invr from V0.31 executable scripts and investment navigation. Retain every historical row and prove route absence."
+      "evidence_ids": [
+        "PA-RETIRED-invr-fund"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress.",
+      "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them."
     },
     {
       "flow": "invr",
@@ -3409,14 +3599,16 @@
       "handler": {
         "source": "§7 retirement decision",
         "target": "Assert absence from SCRIPTS, guidance and investment navigation",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "No executable legacy route/suggestion; historical versions and stored user data preserved.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage.",
-      "retirement_reason": "§7 explicitly retires invb/invr from V0.31 executable scripts and investment navigation. Retain every historical row and prove route absence."
+      "evidence_ids": [
+        "PA-RETIRED-invr-pay"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress.",
+      "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them."
     },
     {
       "flow": "invr",
@@ -3439,14 +3631,16 @@
       "handler": {
         "source": "§7 retirement decision",
         "target": "Assert absence from SCRIPTS, guidance and investment navigation",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "No executable legacy route/suggestion; historical versions and stored user data preserved.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage.",
-      "retirement_reason": "§7 explicitly retires invb/invr from V0.31 executable scripts and investment navigation. Retain every historical row and prove route absence."
+      "evidence_ids": [
+        "PA-RETIRED-invr-end"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress.",
+      "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them."
     },
     {
       "flow": "mkt",
@@ -3749,18 +3943,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.stay step city through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "دادهٔ اجرای جست‌وجو/محاسبه؛ فقط هنگام درخواست خدمت، نه پرسش‌نامهٔ ورود",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-STAY-INPUTS"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "stay",
@@ -3780,18 +3977,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.stay step date through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "دادهٔ اجرای جست‌وجو/محاسبه؛ فقط هنگام درخواست خدمت، نه پرسش‌نامهٔ ورود",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-STAY-INPUTS"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "stay",
@@ -3811,18 +4011,21 @@
         "Missing/empty data",
         "Invalid input preserves state",
         "Cancel/skip",
-        "Resume after reload"
+        "Resume after reload",
+        "Whitespace-only composer submission at this exact step preserves state and balance; pause, reload and resume restores the same active workflow before completing the selected branch."
       ],
       "handler": {
         "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
         "target": "SCRIPTS.stay step ppl through ceStep/ceVal",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "resolution": "Mapped to actual composer/buttons and read-only runtime observations in e2e-priority-audit-v031.cjs."
       },
       "expected_transition": "دادهٔ اجرای جست‌وجو/محاسبه؛ فقط هنگام درخواست خدمت، نه پرسش‌نامهٔ ورود",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
-      "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "evidence_ids": [
+        "PA-SERVICE-STAY-INPUTS"
+      ],
+      "status": "automated",
+      "reason": "Executable browser contract mapped; every required phase and assertion must PASS on the current tested revision. Assignment alone never counts as verified progress."
     },
     {
       "flow": "stay",

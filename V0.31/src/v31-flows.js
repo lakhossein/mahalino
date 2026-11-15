@@ -219,6 +219,9 @@ E30.flows=(function(){
      chips:function(){return [['باز کردن فرم قرارداد','!open'],['بررسی وضعیت قرارداد','!status'],['خروج با وضعیت توافق اولیه','!later']]},
      set:function(){return null},
      acts:{open:function(D){
+       if((D.ownership==='inherited'||D.ownership==='joint')&&D.docsOk!=='yes'){
+         botC('مدارک وراثت یا رضایت شرکا هنوز کامل نیست؛ فرم قرارداد باز نشد و هزینه‌ای دریافت نشد. فعلاً می‌توانید قیمت‌گذاری و آماده‌سازی را ادامه دهید.',null);return;
+       }
        var old=wd('buy').data.ctr;
        if(D.sellerContractDraft&&old&&old.draftCode!==D.sellerContractDraft){botC('پیش‌نویس مبایعه‌نامهٔ مربوط به این فروش با قرارداد فعال متفاوت است؛ برای جلوگیری از اتصال اشتباه، قرارداد فعلی باز نشد.',null);return}
        if(!D.sellerContractDraft&&old&&old.finalized){botC('یک قرارداد خرید دیگر قبلاً در سامانه ثبت شده است. برای جلوگیری از اتصال اشتباه، ابتدا یک فلو خرید تازه ایجاد کنید.',null);return}
