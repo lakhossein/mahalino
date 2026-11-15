@@ -472,7 +472,7 @@ E30.init=function(){
       return wrapped;
     }
     function paidSource(fn){
-      try{return /\b(?:spend|doRentVisit)\s*\(/.test(Function.prototype.toString.call(fn))}catch(e){return false}
+      try{var action=fn.e30PaidDelegate||fn;return /\b(?:spend|doRentVisit)\s*\(/.test(Function.prototype.toString.call(action))}catch(e){return false}
     }
     var legacyGuarded=[];
     [[ACT,'ACT'],[CBACT,'CBACT']].forEach(function(pair){

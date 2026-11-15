@@ -4814,8 +4814,19 @@
       "evidence_ids": [
         "PA-STAY-EMPTY-INVALID"
       ],
-      "status": "unverified",
-      "reason": "Browser regression for empty city inventory, explicit all-city fallback, invalid nights and pause/resume added; execution pending. No PASS claimed."
+      "status": "automated",
+      "reason": "PA-STAY-EMPTY-INVALID passed in both 43720539092 and 43720534896 on 0acc6cb, with empty inventory, explicit fallback, invalid input, pause/reload/resume and usable reservation preview. Fresh current-revision evidence remains mandatory.",
+      "last_review": {
+        "revision": "0acc6cbd50af4c0d9bc54f4ddc3a0b91dad768ce",
+        "run_ids": [
+          43720539092,
+          43720534896
+        ],
+        "passing_test_ids": [
+          "PA-STAY-EMPTY-INVALID"
+        ],
+        "failed_test_ids": []
+      }
     },
     {
       "flow": "stay",
@@ -4847,8 +4858,19 @@
       "evidence_ids": [
         "PA-STAY-EMPTY-INVALID"
       ],
-      "status": "unverified",
-      "reason": "Browser regression for empty city inventory, explicit all-city fallback, invalid nights and pause/resume added; execution pending. No PASS claimed."
+      "status": "automated",
+      "reason": "PA-STAY-EMPTY-INVALID passed in both 43720539092 and 43720534896 on 0acc6cb, with empty inventory, explicit fallback, invalid input, pause/reload/resume and usable reservation preview. Fresh current-revision evidence remains mandatory.",
+      "last_review": {
+        "revision": "0acc6cbd50af4c0d9bc54f4ddc3a0b91dad768ce",
+        "run_ids": [
+          43720539092,
+          43720534896
+        ],
+        "passing_test_ids": [
+          "PA-STAY-EMPTY-INVALID"
+        ],
+        "failed_test_ids": []
+      }
     },
     {
       "flow": "stay",

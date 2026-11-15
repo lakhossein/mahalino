@@ -465,6 +465,7 @@ E30.flows=(function(){
         if(D.bid){botC('پیشنهاد این گردش کار قبلاً ثبت شده است؛ ثبت تکراری انجام نشد.',null);return}
         return submitBid(D);
       };
+      market('send').acts.b.e30PaidDelegate=submitBid;
     }
     if(SCRIPTS.build){
       var supply=SCRIPTS.build.find(function(s){return s.id==='sup'}),phase=SCRIPTS.build.find(function(s){return s.id==='ph'});

@@ -30,3 +30,8 @@ const counts=runtime('rent').c;
 for(const v of ['۲.۵','۲٫۵','نیم','2.5'])assert.equal(counts.parseCountFA(v).ok,false,'fractional count rounded: '+v);
 assert.equal(counts.parseCountFA('دو شب').value,2);
 console.log('PASS contractor money parsing and fractional-count rejection without rounding');
+
+const guardedBid=c.SCRIPTS.mkt.find(s=>s.id==='send').acts.b;
+assert.equal(typeof guardedBid.e30PaidDelegate,'function');
+assert(/\bspend\s*\(/.test(Function.prototype.toString.call(guardedBid.e30PaidDelegate)),'guarded bid must retain its payment discovery source');
+console.log('PASS delegated contractor action retains explicit payment discovery');
