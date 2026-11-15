@@ -85,3 +85,10 @@ test('empty contract fields are rejected',()=>{
  const f=fixture();f.manifest.scenarios[0].success_path=[];
  assert.equal(result(f).releaseApproved,false);
 });
+
+test('progress counts only rows with all required current evidence',()=>{
+ const f=fixture();assert.equal(result(f).verifiedRows,150);
+ f.report.tests[0].phases=[];
+ const partial=result(f);assert.equal(partial.verifiedRows,149);assert.equal(partial.verifiedPercent,99.33);
+ f.report.revision='stale';assert.equal(result(f).verifiedRows,0);
+});

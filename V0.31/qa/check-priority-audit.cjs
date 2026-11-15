@@ -72,7 +72,13 @@ function validate(manifest,markdown,report,revision){
   checkRow(row,id,stepFields,'evidence_ids',phases);
  }
  for(const row of scenarios)checkRow(row,'scenario:'+row.scenario_id,scenarioFields,'test_ids',['visible','hidden','composer-prefill','composer-send','success','empty-data','cancel','resume']);
- return {schemaVersion:1,revision,steps:steps.length,scenarios:scenarios.length,releaseApproved:problems.length===0,problems};
+ const globalFailure=problems.some(p=>['manifest','source','steps','scenarios','evidence'].includes(p.id));
+ const blocked=new Set(problems.map(p=>p.id));
+ const verifiedSteps=globalFailure?0:steps.filter(r=>!blocked.has('step:'+r.flow+':'+r.legacy_step_id)).length;
+ const verifiedScenarios=globalFailure?0:scenarios.filter(r=>!blocked.has('scenario:'+r.scenario_id)).length;
+ const verifiedRows=verifiedSteps+verifiedScenarios,totalRows=steps.length+scenarios.length;
+ return {schemaVersion:1,revision,steps:steps.length,scenarios:scenarios.length,verifiedSteps,verifiedScenarios,verifiedRows,totalRows,
+  verifiedPercent:totalRows?Math.round(10000*verifiedRows/totalRows)/100:0,releaseApproved:problems.length===0,problems};
 }
 
 if(require.main===module){
@@ -87,7 +93,8 @@ if(require.main===module){
   const report=fs.existsSync(evidencePath)?JSON.parse(fs.readFileSync(evidencePath,'utf8')):null;
   const result=validate(manifest,markdown,report,revision);
   fs.writeFileSync(path.join(dir,'priority-audit-results.json'),JSON.stringify(result,null,2)+'\n');
-  console.log(JSON.stringify({steps:result.steps,scenarios:result.scenarios,releaseApproved:result.releaseApproved,problems:result.problems.length}));
+  console.log(JSON.stringify({steps:result.steps,scenarios:result.scenarios,verifiedRows:result.verifiedRows,totalRows:result.totalRows,
+   verifiedPercent:result.verifiedPercent,releaseApproved:result.releaseApproved,problems:result.problems.length}));
   if(!result.releaseApproved){console.error('PRIORITY AUDIT GATE FAILED: see priority-audit-results.json; unverified coverage cannot authorize release.');process.exitCode=1}
  }catch(error){
   fs.writeFileSync(path.join(dir,'priority-audit-results.json'),JSON.stringify({releaseApproved:false,error:String(error)})+'\n');

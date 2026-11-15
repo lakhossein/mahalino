@@ -215,6 +215,244 @@ async function snapshot(page){
    const found=await result();check(found.ids.length>0,'Unknown household does not block sample search',['service-terminal']);
    check(found.state.credits===baseline.credits&&found.state.requests===baseline.requests,'Skip and search do not bill or create operations');
   },['step:rent:who']);
+
+  const preferenceMatrix=[{"flow": "rent", "id": "beds", "slot": "rooms", "answer": "۱", "expected": 1, "edit": "۲", "edited": 2}, {"flow": "rent", "id": "m2", "slot": "m2", "answer": "۶۰", "expected": 60, "edit": "۷۰", "edited": 70}, {"flow": "rent", "id": "age", "slot": "prop_age", "answer": "تا ۱۰ سال", "expected": 10, "edit": "تا ۲۰ سال", "edited": 20}, {"flow": "rent", "id": "floor", "slot": "floor_preference", "answer": "طبقه ۱ تا ۵ الزامی است", "expected": {"min": 1, "max": 5, "level": "required"}, "edit": "طبقه ۱ تا ۱۰ الزامی است", "edited": {"min": 1, "max": 10, "level": "required"}}, {"flow": "buy", "id": "beds", "slot": "rooms", "answer": "۱", "expected": 1, "edit": "۲", "edited": 2}, {"flow": "buy", "id": "m2", "slot": "m2", "answer": "۶۰", "expected": 60, "edit": "۷۰", "edited": 70}, {"flow": "buy", "id": "age", "slot": "prop_age", "answer": "تا ۱۰ سال", "expected": 10, "edit": "تا ۲۰ سال", "edited": 20}, {"flow": "buy", "id": "floor", "slot": "floor_preference", "answer": "طبقه ۱ تا ۵ الزامی است", "expected": {"min": 1, "max": 5, "level": "required"}, "edit": "طبقه ۱ تا ۱۰ الزامی است", "edited": {"min": 1, "max": 10, "level": "required"}}, {"flow": "buy", "id": "budg", "slot": "buy_budget", "answer": "۱۰۰ میلیارد تومان", "expected": {"v": [1000000000000, 1000000000000]}, "edit": "۲۰۰ میلیارد تومان", "edited": {"v": [2000000000000, 2000000000000]}}, {"flow": "buy", "id": "ppm", "slot": "price_per_m2", "answer": "۱۰۰ میلیون تا ۹۰۰ میلیون تومان", "expected": {"v": [1000000000, 9000000000]}, "edit": "۵۰ میلیون تا ۹۰۰ میلیون تومان", "edited": {"v": [500000000, 9000000000]}}, {"flow": "sell", "id": "s_area", "slot": "prop_area", "answer": "۸۵", "expected": 85, "edit": "۹۰", "edited": 90}, {"flow": "sell", "id": "s_rooms", "slot": "prop_rooms", "answer": "۲", "expected": 2, "edit": "۳", "edited": 3}, {"flow": "sell", "id": "s_age", "slot": "prop_age", "answer": "تا ۱۰ سال", "expected": 10, "edit": "تا ۲۰ سال", "edited": 20}, {"flow": "sell", "id": "s_floor", "slot": "property_floor", "answer": "۲", "expected": 2, "edit": "۳", "edited": 3}, {"flow": "sell", "id": "s_hood", "slot": "hood", "answer": "نارمک", "expected": "h6", "edit": "سعادت‌آباد", "edited": "h1"}, {"flow": "sell", "id": "s_motiv", "slot": "sale_motivation", "answer": "مهاجرت", "expected": "مهاجرت", "edit": "تعویض ملک", "edited": "تعویض ملک"}, {"flow": "sell", "id": "s_urg", "slot": "sale_urgency", "answer": "عجله ندارم", "expected": "maxvalue", "edit": "فروش سریع", "edited": "fast"}, {"flow": "invp", "id": "i_obj", "slot": "invest_objective", "answer": "هدف درآمد اجاره", "expected": "rent_income", "edit": "حفظ ارزش", "edited": "inflation_hedge"}, {"flow": "invp", "id": "i_cap", "slot": "invest_capital", "answer": "۳۰ میلیارد تومان", "expected": {"v": [300000000000, 300000000000]}, "edit": "۴۰ میلیارد تومان", "edited": {"v": [400000000000, 400000000000]}}, {"flow": "invp", "id": "i_liq", "slot": "invest_liquidity", "answer": "نقدشوندگی بالا", "expected": "بالا", "edit": "قفل بلندمدت", "edited": "مهم نیست"}, {"flow": "invp", "id": "i_hor", "slot": "invest_horizon", "answer": "۵ سال", "expected": "میان‌مدت", "edit": "۱۰ سال", "edited": "بلندمدت"}, {"flow": "invp", "id": "i_risk", "slot": "invest_risk", "answer": "ریسک متوسط", "expected": "متوسط", "edit": "ریسک زیاد", "edited": "بالا"}, {"flow": "invp", "id": "i_asset", "slot": "invest_asset", "answer": "آپارتمان مسکونی", "expected": "residential", "edit": "زمین", "edited": "land"}, {"flow": "invp", "id": "i_fin", "slot": "invest_financing", "answer": "سرمایه شخصی", "expected": "cash", "edit": "بخشی وام", "edited": "mixed"}, {"flow": "invp", "id": "i_income", "slot": "invest_income", "answer": "۱۰ میلیون تومان", "expected": {"v": [100000000, 100000000]}, "edit": "۲۰ میلیون تومان", "edited": {"v": [200000000, 200000000]}}, {"flow": "invp", "id": "i_mgmt", "slot": "invest_management", "answer": "خودم", "expected": "self", "edit": "مدیر می‌گیرم", "edited": "delegate"}, {"flow": "invp", "id": "i_exit", "slot": "invest_exit", "answer": "فروش ملک", "expected": "sell", "edit": "نگهداری بلندمدت", "edited": "hold"}, {"flow": "invp", "id": "i_hood", "slot": "hood", "answer": "نارمک", "expected": "h6", "edit": "سعادت‌آباد", "edited": "h1"}, {"flow": "lndl", "id": "l_hood", "slot": "hood", "answer": "نارمک", "expected": "h6", "edit": "سعادت‌آباد", "edited": "h1"}, {"flow": "lndl", "id": "l_rules", "slot": "rental_rules", "answer": "حیوان خانگی پذیرفته نیست", "expected": ["حیوان خانگی پذیرفته نیست"], "edit": "ندارد", "edited": []}, {"flow": "lndl", "id": "l_stay_rules", "slot": "stay_rules", "answer": "سیگار ممنوع", "expected": ["سیگار ممنوع"], "edit": "ندارد", "edited": []}, {"flow": "rent", "id": "elev", "slot": "prefs", "field": "prefRules", "answer": "آسانسور الزامی است", "expected": {"elevator": "required"}, "edit": "آسانسور ترجیح دارد", "edited": {"elevator": "preferred"}}, {"flow": "rent", "id": "park", "slot": "prefs", "field": "prefRules", "answer": "پارکینگ الزامی است", "expected": {"parking": "required"}, "edit": "پارکینگ ترجیح دارد", "edited": {"parking": "preferred"}}, {"flow": "rent", "id": "extra", "slot": "prefs", "field": "prefRules", "answer": "بالکن الزامی است", "expected": {"balcony": "required"}, "edit": "بالکن ترجیح دارد", "edited": {"balcony": "preferred"}}, {"flow": "buy", "id": "feat", "slot": "prefs", "field": "prefRules", "answer": "انباری الزامی است", "expected": {"storage": "required"}, "edit": "انباری ترجیح دارد", "edited": {"storage": "preferred"}}];
+  for(const spec of preferenceMatrix){
+   for(const mode of ['answer-edit','skip'])await test('PA-MATRIX-'+spec.flow+'-'+spec.id+'-'+mode,
+    async({page,check,act,send,prompt,result})=>{
+     const flow=({invp:'invest',lndl:'landlord'})[spec.flow]||spec.flow;
+     await send(await page.evaluate(f=>E30.guide.actions[f].prompt,flow));
+     const baseline=await snapshot(page);
+     async function request(){
+      const text=await page.evaluate(slot=>E30.guide.registry.find(r=>r.action==='preference:'+slot)?.prompt,spec.slot);
+      check(!!text,'Actual runtime registry exposes preference '+spec.slot);
+      await send(text);
+      check(await page.evaluate(()=>!!E30.discAPI.collector().expecting),'Explicit preference request opens its actual question');
+     }
+     await request();
+     if(mode==='skip'){
+      await prompt('skip-preference');
+      check(await page.evaluate(slot=>E30.discAPI.getF(slot)==null&&!E30.discAPI.collector().expecting,spec.slot),
+       'Skipped '+spec.slot+' stays unknown',['skip']);
+     }else{
+      await send(spec.answer);
+      check(await page.evaluate(({slot,value})=>JSON.stringify(E30.discAPI.getF(slot))===JSON.stringify(value),{slot:spec.field||spec.slot,value:spec.expected}),
+       'Answer parsed to expected '+spec.slot,['answer']);
+      await request();await send(spec.edit);
+      check(await page.evaluate(({slot,value})=>JSON.stringify(E30.discAPI.getF(slot))===JSON.stringify(value),{slot:spec.field||spec.slot,value:spec.edited}),
+       'Edited value stored for '+spec.slot,['edit']);
+      const before=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
+      await act('reload confirmed preference',async()=>{await page.reload({waitUntil:'domcontentloaded'});await page.waitForTimeout(200)});
+      check(await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields))===before,'Confirmed preference survives reload',['reload']);
+     }
+     if(flow==='rent'||flow==='buy'){
+      await send(await page.evaluate(()=>E30.guide.actions.sample.prompt));
+      const last=page.locator('#chatB .msg.bot').last(),text=await last.textContent();
+      const count=await last.locator('.pcard').count();
+      check(count>0||text.includes('آگهی منطبق پیدا نشد'),'Search terminates honestly after '+spec.slot,['service-terminal']);
+      if(mode==='skip')check(count>0,'Skipping optional preference still produces matching sample cards');
+      const ids=await last.locator('[data-cba="savL"],[data-cba="savB"]').evaluateAll(xs=>xs.map(x=>x.getAttribute('data-l')));
+      const rows=await page.evaluate(({flow,ids})=>(flow==='buy'?BLIST:RLIST).filter(x=>ids.includes(x.id)),{flow,ids});
+      check(rows.length===count,'Every rendered card identifies an actual sample record');
+      if(mode==='answer-edit')for(const x of rows){
+       if(spec.slot==='rooms')check(x.beds>=spec.edited,'Each card respects edited bedroom minimum');
+       if(spec.slot==='m2')check(x.m2>=spec.edited,'Each card respects edited size minimum');
+       if(spec.slot==='prop_age')check(x.age<=spec.edited,'Each card respects maximum age');
+       if(spec.slot==='floor_preference')check(x.floor>=spec.edited.min&&x.floor<=spec.edited.max,'Each card respects required floor range');
+       if(spec.slot==='buy_budget')check(x.m2*x.ppm<=spec.edited.v[1],'Actual card total is within purchase budget');
+       if(spec.slot==='price_per_m2')check(x.ppm>=spec.edited.v[0]&&x.ppm<=spec.edited.v[1],'Actual card unit price is within edited range');
+      }
+
+     }else{
+      // Explicitly choose the service with current facts; do not bypass handoff.
+      await send(await page.evaluate(()=>E30.guide.actions['start-service'].prompt));await send('درسته');
+      if(flow==='invest'){
+       await page.locator('#chatB [data-cv="!save"]').last().click();
+       check(await page.evaluate(()=>wd('invp').done&&S.library.some(x=>x.type==='invest')),
+        'Selected investment analysis completes and is saved',['service-terminal']);
+       if(mode==='answer-edit'){
+        const saved=await page.evaluate(()=>S.library.filter(x=>x.type==='invest').at(-1).artifact.data);
+        const keys={invest_objective:'objective',invest_capital:'cap',invest_liquidity:'liquidity',invest_horizon:'horizon',invest_risk:'risk',invest_asset:'assetType',invest_financing:'financing',invest_income:'expectedCash',invest_management:'management',invest_exit:'exitStrategy',hood:'hood'};
+        let expected=spec.edited;
+        if(expected&&expected.v)expected=expected.v[1];
+        if(spec.slot==='invest_liquidity')expected='long';
+        if(spec.slot==='invest_risk')expected='high';
+        check(saved[keys[spec.slot]]===expected,'Saved analysis consumes the edited '+spec.slot+' value');
+       }
+      }else if(flow==='sell'){
+       await page.locator('#chatB [data-cv="single"]').last().click();
+       // The chosen quote has real area/hood prerequisites even after opt-out.
+       for(let i=0;i<8;i++){
+        const step=await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id);
+        if(step==='s_val')break;
+        const inputs={s_area:'۸۵',s_rooms:'۲',s_age:'۱۰',s_floor:'۲',s_hood:'نارمک',s_motiv:'تعویض ملک',s_urg:'maxvalue'};
+        check(!!inputs[step],'Quote reaches only known prerequisite steps: '+step);
+        await send(inputs[step]);
+       }
+       check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='s_val')&&
+        (await page.locator('#chatB .msg.bot').last().textContent()).includes('ارزیابی بازار'),
+        'Selected seller quote reaches real sample valuation',['service-terminal']);
+       if(mode==='answer-edit'&&spec.slot==='prop_area')check(await page.evaluate(()=>wd('sell').data.prop_area)===spec.edited,'Seller valuation preserves edited area');
+       if(mode==='answer-edit'&&spec.slot==='hood')check(await page.evaluate(()=>wd('sell').data.hood)===spec.edited,'Seller valuation preserves edited neighborhood');
+      }else{
+       const branch=spec.slot==='rental_rules'?'res':spec.slot==='stay_rules'?'stay':'price';
+       await page.locator('#chatB [data-cv="'+branch+'"]').last().click();
+       if(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='l_hood'))await send('نارمک');
+       if(branch==='price'){
+        check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='l_advice'),'Landlord reaches selected price advice');
+        await page.locator('#chatB [data-cv="!end"]').last().click();
+        check(await page.evaluate(()=>CE.f===null&&!wd('lndl').data.registered),'Price advice completes independently',['service-terminal']);
+       }else{
+        const inputs={l_price:'۱ میلیارد تومان',l_rent:'صفر',l_stay_rate:'۲ میلیون تومان',l_stay_capacity:'۴',l_stay_min:'۲'};
+        for(let i=0;i<6;i++){
+         const step=await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id);if(step==='l_sum')break;
+         check(!!inputs[step],'Draft requests only relevant missing service inputs: '+step);await send(inputs[step]);
+        }
+        check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='l_sum'),'Draft reaches actual confirmation');
+        await page.locator('#chatB [data-cv="!ok"]').last().click();
+        const d=await page.evaluate(()=>wd('lndl').data),rules=branch==='res'?d.rules:d.stayRules;
+        check(d.registered&&d.listingStatus==='draft_internal'&&(mode==='skip'?rules==null:Array.isArray(rules)&&rules.length===0),
+         'Confirmed internal draft preserves unknown skipped rules versus explicit empty rules',['service-terminal']);
+       }
+      }
+     }
+     check((await snapshot(page)).credits===baseline.credits,'Preference and free sample output never debit credit');
+    },['step:'+spec.flow+':'+spec.id]);
+  }
+
+  // At every mapped service step: empty submission, reversible pause, reload,
+  // exact resume, then the selected branch's independently usable result.
+  async function serviceState(page,flow){return page.evaluate(f=>({flow:CE.f,step:SCRIPTS[CE.f]?.[CE.i]?.id||null,
+   active:S.active[f],data:JSON.stringify(wd(f).data),done:wd(f).done,credits:S.tokens,requests:(S.reqs||[]).length}),flow)}
+  async function exerciseStep(h,flow,id){
+   const {page,check,act,send}=h,before=await serviceState(page,flow);
+   check(before.flow===flow&&before.step===id,'Reached actual '+flow+':'+id+' through UI');
+   await act('empty composer submission at '+id,async()=>{await page.locator('#chatIn').fill('   ');await page.locator('#chatSend').click();await page.waitForTimeout(100)});
+   check(JSON.stringify(await serviceState(page,flow))===JSON.stringify(before),'Missing input cannot advance, debit or create a request at '+id);
+   await h.prompt('pause-service');
+   const paused=await serviceState(page,flow);
+   check(paused.flow===null&&paused.data===before.data&&paused.credits===before.credits&&paused.requests===before.requests,
+    'Pausing '+id+' leaves exact facts and operations unchanged');
+   await act('reload paused '+id,()=>page.reload({waitUntil:'domcontentloaded'}));
+   await send(await page.evaluate(()=>E30.guide.actions['resume-service'].prompt));
+   const after=await serviceState(page,flow);
+   check(after.active===before.active&&after.data===before.data&&after.credits===before.credits&&after.requests===before.requests&&
+    (before.done?after.flow===null:after.flow===flow&&after.step===id),'Resume '+id+' restores exact workflow, facts and step once');
+  }
+  async function beginService(h,id){
+   await h.send(await h.page.evaluate(id=>E30.guide.actions[id].prompt,id));
+   await h.send(await h.page.evaluate(()=>E30.guide.actions['start-service'].prompt));await h.send('درسته');
+  }
+  async function chip(h,value){
+   const b=h.page.locator('#chatB [data-cv="'+value+'"]').last();h.check(await b.isVisible(),'Actual action '+value+' is visible');
+   await h.act('click service action '+value,async()=>{await b.click();await h.page.waitForTimeout(180)});
+  }
+  const sellerRows=['s_own','s_docs','s_note','s_val','s_price','s_min','s_prep','s_inq','s_ctr','s_done'];
+  await test('PA-SERVICE-SELLER',async h=>{
+   const {page,check,send}=h;await beginService(h,'sell');const seen=[];
+   const inputs={s_own:'inherited',s_docs:'no',s_note:'ok',s_area:'۸۵',s_hood:'نارمک',s_val:'ok',s_price:'۱۲ میلیارد تومان',s_min:'۱۱ میلیارد تومان'};
+   for(let n=0;n<24;n++){
+    const id=await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id);
+    if(sellerRows.includes(id)){await exerciseStep(h,'sell',id);seen.push(id)}
+    if(id==='s_done')break;
+    if(id==='s_price'||id==='s_min'){
+     const before=await serviceState(page,'sell');await send(id==='s_min'?'۲۰ میلیارد تومان':'نامعتبر');
+     const after=await serviceState(page,'sell');check(after.step===before.step&&after.credits===before.credits,'Invalid '+id+' cannot commit or advance');
+    }
+    if(inputs[id])await send(inputs[id]);
+    else if(id==='s_prep')await chip(h,'!ok');
+    else if(id==='s_inq')await chip(h,'!neg');
+    else if(id==='s_ctr'){
+     const before=await serviceState(page,'sell');await chip(h,'!open');
+     check(await page.evaluate(()=>!(S.wfs||[]).some(w=>w.m==='buy'&&w.data&&w.data.ctr))&&
+      (await page.locator('#chatB .msg.bot').last().textContent()).includes('مدارک'),
+      'Incomplete ownership documents block the contract form and charge');
+     check((await serviceState(page,'sell')).credits===before.credits,'Rejected contract opening never debits');
+     await chip(h,'!later');
+    }
+    else throw Error('Unexpected seller step '+id);
+   }
+   check(sellerRows.every(x=>seen.includes(x)),'All ten seller service rows exercised, including incomplete ownership documents');
+   const end=await page.evaluate(()=>({d:wd('sell').data,done:wd('sell').done,req:S.reqs.find(r=>r.id===wd('sell').data.saleReqId),contracts:S.contracts||[]}));
+   check(end.d.prop_area===85&&end.d.hood==='h6'&&end.d.deal>=end.d.minprice&&end.req&&/توافق اولیه/.test(end.req.status)&&!end.done&&end.contracts.length===0,
+    'Seller reaches tracked simulated agreement without claiming a signed contract',['success','empty-data','cancel','resume']);
+  },sellerRows.map(x=>'step:sell:'+x));
+
+  const landlordBranches={price:['l_role','l_advice'],res:['l_role','l_price','l_rent','l_sum'],stay:['l_role','l_stay_rate','l_stay_capacity','l_stay_min','l_sum']};
+  for(const [branch,rows] of Object.entries(landlordBranches))await test('PA-SERVICE-LANDLORD-'+branch,async h=>{
+   const {page,check,send,act}=h;await beginService(h,'landlord');const seen=[];
+   const answers={l_hood:'نارمک',l_price:'۱ میلیارد تومان',l_rent:'صفر',l_stay_rate:'۲ میلیون تومان',l_stay_capacity:'۴',l_stay_min:'۲'};
+   for(let n=0;n<16;n++){
+    const id=await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id);
+    if(rows.includes(id)){await exerciseStep(h,'lndl',id);seen.push(id)}
+    if(id==='l_role'){await chip(h,branch);continue}
+    if(id==='l_advice'){await chip(h,'!end');break}
+    if(id==='l_sum'){await chip(h,'!ok');break}
+    if(answers[id]){
+     if(id!=='l_hood'){
+      const before=await serviceState(page,'lndl');await send(id==='l_stay_capacity'?'۵۱':id==='l_stay_min'?'۹۱':'نامعتبر');
+      const after=await serviceState(page,'lndl');check(after.step===before.step&&after.credits===before.credits,'Invalid '+id+' leaves step and balance unchanged');
+     }
+     await send(answers[id]);
+    }else throw Error('Unexpected landlord step '+id);
+   }
+   check(rows.every(x=>seen.includes(x)),'Every selected landlord branch step has full pause/resume and empty-input evidence');
+   const end=await serviceState(page,'lndl');
+   if(branch==='price')check(end.flow===null&&await page.evaluate(()=>!wd('lndl').data.registered),'Price advice ends without a listing');
+   else check(await page.evaluate(b=>{const d=wd('lndl').data;return d.registered&&d.listingStatus==='draft_internal'&&d.ltype===b&&
+    (b==='res'?d.ask_rent===0&&d.zeroRent:d.nightlyRate===2e7&&d.stayCapacity===4&&d.minNights===2)},branch),'Selected landlord draft records exact inputs and internal-only status');
+   await act('reload completed landlord branch',()=>page.reload({waitUntil:'domcontentloaded'}));
+   check((await serviceState(page,'lndl')).data===end.data,'Landlord result survives reload unchanged',['success','empty-data','cancel','resume']);
+  },rows.map(x=>'step:lndl:'+x));
+
+  await test('PA-SERVICE-INVESTMENT',async h=>{
+   const {page,check,send,act}=h;await beginService(h,'invest');
+   await exerciseStep(h,'invp','i_an');
+   check((await page.locator('#chatB .msg.bot').last().textContent()).includes('نوع دارایی مشخص نشده'),'Missing optional asset produces honest incomplete analysis');
+   await chip(h,'!save');await exerciseStep(h,'invp','i_done');
+   const end=await page.evaluate(()=>({done:wd('invp').done,items:S.library.filter(x=>x.type==='invest'),reqs:S.reqs.filter(x=>x.cat==='invest')}));
+   check(end.done&&end.items.length===1&&end.reqs.length===1,'Analysis save and completed request are created once');
+   await act('reload completed investment',()=>page.reload({waitUntil:'domcontentloaded'}));
+   check(await page.evaluate(()=>S.library.filter(x=>x.type==='invest').length===1&&wd('invp').done),'Completed result persists once',['success','empty-data','cancel','resume']);
+  },['step:invp:i_an','step:invp:i_done']);
+
+  await test('PA-SERVICE-STAY-INPUTS',async h=>{
+   const {page,check,send}=h;await send(await page.evaluate(()=>E30.guide.actions.stay.prompt));
+   for(const [id,value] of [['city','تهران'],['date','هفتهٔ بعد'],['ppl','۲']]){
+    await exerciseStep(h,'stay',id);
+    if(id==='ppl'){await send('صفر');check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='ppl'),'Zero travelers is rejected')}
+    await send(value);
+   }
+   check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='list'&&wd('stay').data.city==='تهران'&&wd('stay').data.date==='هفتهٔ بعد'&&wd('stay').data.ppl===2)&&
+    await page.locator('#chatB .msg.bot').last().locator('.pcard').count()>0,'Valid destination, date and travelers reach usable accommodation cards');
+   const ids=await page.locator('#chatB .msg.bot').last().locator('[data-cba="selS"]').evaluateAll(xs=>xs.map(x=>x.getAttribute('data-l')));
+   const expected=await page.evaluate(()=>SLIST.filter(x=>x.city==='تهران').map(x=>x.id));
+   check(ids.length===expected.length&&ids.every(x=>expected.includes(x)),
+    'Every accommodation card belongs to an actual sample in the requested city',['success','empty-data','cancel','resume']);
+  },['step:stay:city','step:stay:date','step:stay:ppl']);
+
+  for(const legacy of [{"flow":"invb","id":"prjs"},{"flow":"invb","id":"scn"},{"flow":"invb","id":"cap"},{"flow":"invb","id":"yld"},{"flow":"invb","id":"price"},{"flow":"invb","id":"pay"},{"flow":"invb","id":"trk"},{"flow":"invr","id":"props"},{"flow":"invr","id":"cap"},{"flow":"invr","id":"cmp"},{"flow":"invr","id":"fund"},{"flow":"invr","id":"pay"},{"flow":"invr","id":"end"}]){
+   await test('PA-RETIRED-'+legacy.flow+'-'+legacy.id,async({page,check,act,send})=>{
+    const before=await snapshot(page);
+    function absent(row){return page.evaluate(({flow,id})=>({
+     script:!!SCRIPTS[flow],step:!!SCRIPTS[flow]?.some(x=>x.id===id),
+     suggestion:E30.guide.registry.some(r=>r.action==='flow:'+flow),
+     button:!!document.querySelector('[data-cv="F:'+flow+'"]'),
+     active:CE.f===flow
+    }),row)}
+    let state=await absent(legacy);
+    check(!state.script&&!state.step&&!state.suggestion&&!state.button&&!state.active,'Retired step is absent from runtime scripts, visible entry and guide registry');
+    await send('F:'+legacy.flow);
+    state=await absent(legacy);
+    check(!state.active&&!state.script,'Legacy command cannot enter retired workflow');
+    await act('reload after legacy route request',async()=>{await page.reload({waitUntil:'domcontentloaded'});await page.waitForTimeout(200)});
+    state=await absent(legacy);
+    check(!state.active&&!state.script&&!state.step&&!state.suggestion&&!state.button,
+      'Retired route remains unavailable after reload',['route-absent']);
+    const after=await snapshot(page);check(after.credits===before.credits&&after.requests===before.requests,
+      'Legacy request does not charge or create an operation');
+   },['step:'+legacy.flow+':'+legacy.id]);
+  }
  }catch(error){
   report.tests.push({id:'PA-RB-HARNESS',result:'FAIL',surface:'browser-ui',covers,phases:[],assertions:[],trace:[],error:String(error.stack||error)});
   console.error(error);

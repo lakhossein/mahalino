@@ -162,7 +162,7 @@ E30.flows=(function(){
     {id:'s_note',pre:function(D){return D.docsOk==='no'||D.docsOk==='unknown'},
      q:function(D){return 'تا کامل شدن مدارک، فروش فقط به‌صورت «قیمت‌گذاری و آماده‌سازی» پیش می‌رود — معامله رسمی نیازمند سند کامل است. فعلاً ارزیابی و برنامهٔ فروش را می‌چینیم.'},
      chips:function(){return [['متوجهم، ادامه','ok']]},set:function(){return null}},
-    {id:'s_area',count:true,q:'متراژ ملک چند متر است؟ (عدد تایپ کنید)',kind:'num',
+    {id:'s_area',pre:function(D){return !(D._e30&&D.prop_area>=10&&D.prop_area<=5000)},count:true,q:'متراژ ملک چند متر است؟ (عدد تایپ کنید)',kind:'num',
      set:function(D,v){var n=Number(pd(String(v)));if(!Number.isFinite(n)||n<10||n>5000)return 'ERR';D.prop_area=n;return null},
      err:'متراژ را با عدد بنویسید (مثلاً ۸۵).'},
     {id:'s_rooms',count:true,q:'چند خواب است؟',chips:function(){return [['۰','0'],['۱','1'],['۲','2'],['۳','3'],['۳+','4']]},
@@ -171,7 +171,7 @@ E30.flows=(function(){
      set:function(D,v){D.prop_age=+v;return null}},
     {id:'s_floor',count:true,q:'طبقه چندم است؟',kind:'num',chips:function(){return [['همکف','0'],['۱','1'],['۲','2'],['۳+','3']]},
      set:function(D,v){D.floor=+pd(v)||0;return null}},
-    {id:'s_hood',q:'ملک در کدام محله است؟',
+    {id:'s_hood',pre:function(D){return !(D._e30&&D.hood)},q:'ملک در کدام محله است؟',
      set:function(D,v){var id=hoodFromText(v);if(!id)return 'ERR';D.hood=id;return null},
      err:'نام محله را دقیق بنویسید (مثلاً نارمک) یا از کارت‌ها انتخاب کنید.',
      cards:function(D){defP(D);return HOODS.slice(0,3).map(function(h){return chatHoodCard(h,'buy',D)}).join('')}},
@@ -219,6 +219,9 @@ E30.flows=(function(){
      chips:function(){return [['باز کردن فرم قرارداد','!open'],['بررسی وضعیت قرارداد','!status'],['خروج با وضعیت توافق اولیه','!later']]},
      set:function(){return null},
      acts:{open:function(D){
+       if((D.ownership==='inherited'||D.ownership==='joint')&&D.docsOk!=='yes'){
+         botC('مدارک وراثت یا رضایت شرکا هنوز کامل نیست؛ فرم قرارداد باز نشد و هزینه‌ای دریافت نشد. فعلاً می‌توانید قیمت‌گذاری و آماده‌سازی را ادامه دهید.',null);return;
+       }
        var old=wd('buy').data.ctr;
        if(D.sellerContractDraft&&old&&old.draftCode!==D.sellerContractDraft){botC('پیش‌نویس مبایعه‌نامهٔ مربوط به این فروش با قرارداد فعال متفاوت است؛ برای جلوگیری از اتصال اشتباه، قرارداد فعلی باز نشد.',null);return}
        if(!D.sellerContractDraft&&old&&old.finalized){botC('یک قرارداد خرید دیگر قبلاً در سامانه ثبت شده است. برای جلوگیری از اتصال اشتباه، ابتدا یک فلو خرید تازه ایجاد کنید.',null);return}
