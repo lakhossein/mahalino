@@ -457,7 +457,7 @@ E30.flows=(function(){
     if(SCRIPTS.mkt){
       var market=function(id){return SCRIPTS.mkt.find(function(s){return s.id===id})};
       choice(market('role'),'role',['con','emp']);choice(market('adj'),'adj',['none','full','cap10']);
-      market('bid').set=function(D,v){var n=Number(pd(String(v)));if(!Number.isFinite(n)||n<=0)return 'ERR';D.bidAmt=n;return null};
+      market('bid').set=function(D,v){var parsed=parseMoneyFA(v);if(!parsed||!parsed.ok||parsed.value<=0)return 'ERR';D.bidAmt=parsed.value;return null};
       market('bid').q='قیمت پایهٔ پیشنهاد را با مبلغ مشخص وارد کنید (تومان).';
       var submitBid=market('send').acts.b;
       market('send').acts.b=function(D){

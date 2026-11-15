@@ -209,6 +209,7 @@ retireBetween('VIEWS.invest=function(){','/* ═══ ۱۴) مارکت',
 
 /* Toman is the public currency; preserve historical canonical storage. */
 retireBetween('function parseMoneyFA(input){','function parseCountFA(input){',readSrc('v31-money.js')+'\n');
+rep("return {ok:true,value:Math.round(pr.value)};","if(!Number.isSafeInteger(pr.value))return {ok:false,msg:'عدد صحیح وارد کنید؛ مقدار اعشاری گرد نمی‌شود.'};return {ok:true,value:pr.value};");
 rep("function rial(v){return fa(v,0)+' ریال'}","function rial(v){return fa(Number(v)/10,Number(v)%10?1:0)+' تومان'}");
 rep("function rShort(v){v=+v||0;","function rShort(v){v=(+v||0)/10;");
 rep("if(st.set){done=st.set(D,v)}","if(st.set){done=(st.money||st.moneyRange)?moneyCanonical(function(){return st.set(D,v)}):st.set(D,v)}");

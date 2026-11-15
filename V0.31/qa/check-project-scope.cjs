@@ -21,3 +21,12 @@ const count=c.S.wfs.length;c.E30.guide.route(c.E30.guide.actions.development.pro
 assert(r.messages.at(-1).includes('e31-project-catalog'));
 assert.equal(c.S.wfs.length,count,'browsing projects created an operational workflow');
 console.log('PASS project scope: role-free catalog, delayed approval identity, unrelated state and read-only progress');
+
+const bidStep=c.SCRIPTS.mkt.find(s=>s.id==='bid'),amount={};
+assert.equal(bidStep.set(amount,'۸ میلیارد تومان'),null);assert.equal(amount.bidAmt,8e10);
+c.moneyCanonical(()=>{assert.equal(bidStep.set(amount,'80000000000'),null)});assert.equal(amount.bidAmt,8e10);
+assert.equal(bidStep.set(amount,'نامعتبر'),'ERR');assert.equal(amount.bidAmt,8e10);
+const counts=runtime('rent').c;
+for(const v of ['۲.۵','۲٫۵','نیم','2.5'])assert.equal(counts.parseCountFA(v).ok,false,'fractional count rounded: '+v);
+assert.equal(counts.parseCountFA('دو شب').value,2);
+console.log('PASS contractor money parsing and fractional-count rejection without rounding');

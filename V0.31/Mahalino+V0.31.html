@@ -3134,7 +3134,7 @@ function parseCountFA(input){
   var cleaned=t.replace(/(^|\s)(خواب|خوابه|اتاق|متر|متری|متراژ|سال|ساله|طبقه|مسافر|نفر|شب|عدد|تا|الی|حدود|تقریبا|تقریباً)(?=\s|$)/g,' ');
   var pr=parseNumberWords(cleaned);
   if(!pr.ok)return {ok:false,msg:'یک عدد یا عبارت مثل «دو» یا «هفتاد» بنویسید.'};
-  return {ok:true,value:Math.round(pr.value)};
+  if(!Number.isSafeInteger(pr.value))return {ok:false,msg:'عدد صحیح وارد کنید؛ مقدار اعشاری گرد نمی‌شود.'};return {ok:true,value:pr.value};
 }
 /* V0.31 — money range normalization. A suffix on either side can describe
    both endpoints, but two explicitly different magnitude words must remain
@@ -17988,7 +17988,7 @@ E30.flows=(function(){
     if(SCRIPTS.mkt){
       var market=function(id){return SCRIPTS.mkt.find(function(s){return s.id===id})};
       choice(market('role'),'role',['con','emp']);choice(market('adj'),'adj',['none','full','cap10']);
-      market('bid').set=function(D,v){var n=Number(pd(String(v)));if(!Number.isFinite(n)||n<=0)return 'ERR';D.bidAmt=n;return null};
+      market('bid').set=function(D,v){var parsed=parseMoneyFA(v);if(!parsed||!parsed.ok||parsed.value<=0)return 'ERR';D.bidAmt=parsed.value;return null};
       market('bid').q='قیمت پایهٔ پیشنهاد را با مبلغ مشخص وارد کنید (تومان).';
       var submitBid=market('send').acts.b;
       market('send').acts.b=function(D){
