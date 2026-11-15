@@ -431,6 +431,31 @@ async function snapshot(page){
     'Every accommodation card belongs to an actual sample in the requested city',['success','empty-data','cancel','resume']);
   },['step:stay:city','step:stay:date','step:stay:ppl']);
 
+  await test('PA-STAY-EMPTY-INVALID',async h=>{
+   const {page,check,send,act}=h;
+   await send(await page.evaluate(()=>E30.guide.actions.stay.prompt));
+   await send('مشهد');await send('هفتهٔ بعد');await send('۲');
+   const panel=page.locator('#chatB .msg.bot').last();
+   check((await panel.textContent()).includes('موجود نیست')&&await panel.locator('.pcard').count()===0,
+    'Unavailable city returns explicit empty inventory without substitute cards',['empty-data']);
+   await exerciseStep(h,'stay','list');
+   await chip(h,'!all');
+   const first=page.locator('#chatB .msg.bot').last().locator('[data-cba="selS"]').first();
+   check(await first.isVisible(),'Explicit all-cities action reveals actual available sample');
+   await act('explicitly choose accommodation after all-cities request',async()=>{await first.click();await page.waitForTimeout(180)});
+   await chip(h,'!nx');
+   check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='ngt'),'Explicit sample choice reaches nights');
+   for(const value of ['صفر','-۱','۹۱','۲.۵','نامعتبر']){
+    const before=await serviceState(page,'stay');await send(value);
+    const after=await serviceState(page,'stay');
+    check(after.step==='ngt'&&await page.evaluate(()=>wd('stay').data.nights==null)&&after.credits===before.credits,
+     'Invalid night input cannot invent five nights, advance or charge: '+value);
+   }
+   await exerciseStep(h,'stay','ngt');await send('۳');
+   check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='book'&&wd('stay').data.nights===3&&!wd('stay').data.code),
+    'Valid nights reaches reservation preview without automatic booking',['success','cancel','resume']);
+  },['step:stay:list','step:stay:ngt']);
+
   for(const legacy of [{"flow":"invb","id":"prjs"},{"flow":"invb","id":"scn"},{"flow":"invb","id":"cap"},{"flow":"invb","id":"yld"},{"flow":"invb","id":"price"},{"flow":"invb","id":"pay"},{"flow":"invb","id":"trk"},{"flow":"invr","id":"props"},{"flow":"invr","id":"cap"},{"flow":"invr","id":"cmp"},{"flow":"invr","id":"fund"},{"flow":"invr","id":"pay"},{"flow":"invr","id":"end"}]){
    await test('PA-RETIRED-'+legacy.flow+'-'+legacy.id,async({page,check,act,send})=>{
     const before=await snapshot(page);

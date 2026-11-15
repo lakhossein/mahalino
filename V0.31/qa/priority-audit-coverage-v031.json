@@ -4811,9 +4811,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-STAY-EMPTY-INVALID"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Browser regression for empty city inventory, explicit all-city fallback, invalid nights and pause/resume added; execution pending. No PASS claimed."
     },
     {
       "flow": "stay",
@@ -4842,9 +4844,11 @@
       },
       "expected_transition": "دادهٔ اجرای جست‌وجو/محاسبه؛ فقط هنگام درخواست خدمت، نه پرسش‌نامهٔ ورود",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-STAY-EMPTY-INVALID"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Browser regression for empty city inventory, explicit all-city fallback, invalid nights and pause/resume added; execution pending. No PASS claimed."
     },
     {
       "flow": "stay",
