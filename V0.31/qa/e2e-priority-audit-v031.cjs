@@ -24,8 +24,8 @@ async function snapshot(page){
  try{
   browser=await chromium.launch({headless:true,executablePath:process.env.QA_CHROMIUM_EXECUTABLE||undefined,
    args:process.env.QA_NO_SANDBOX==='1'?['--no-sandbox']:[]});
-  async function test(id,fn){
-   const entry={id,result:'FAIL',surface:'browser-ui',covers,phases:[],assertions:[],trace:[]};
+  async function test(id,fn,rowCovers=covers){
+   const entry={id,result:'FAIL',surface:'browser-ui',covers:rowCovers,phases:[],assertions:[],trace:[]};
    report.tests.push(entry);write();
    const context=await browser.newContext({viewport:{width:1300,height:900}});
    const page=await context.newPage(),errors=[];
@@ -159,11 +159,40 @@ async function snapshot(page){
    const found=await result();
    check(found.ids.length>0&&found.state.credits===before.credits,'Resumed budget reaches usable results without debit',['service-terminal']);
   });
+
+  await test('PA-PERSONA-ANSWER-EDIT',async({page,check,act,send,prompt,result})=>{
+   await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const baseline=await snapshot(page);
+   await prompt('need-persona');await prompt('persona-family');
+   let facts=await page.evaluate(()=>({persona:E30.discAPI.getF('persona'),household:E30.discAPI.getF('household'),children:E30.discAPI.getF('children')}));
+   check(facts.persona==='family'&&!facts.household&&!facts.children,
+    'Family persona is saved without inventing household size or schoolchildren',['answer']);
+   check(!(await snapshot(page)).suggestions.includes('need-persona'),'Answered persona is not suggested again');
+   await send(await page.evaluate(()=>E30.guide.actions['need-persona'].prompt));
+   await prompt('persona-couple');
+   facts=await page.evaluate(()=>({persona:E30.discAPI.getF('persona'),household:E30.discAPI.getF('household'),children:E30.discAPI.getF('children')}));
+   check(facts.persona==='couple'&&!facts.household&&!facts.children,
+    'Explicit persona edit preserves unknown household and children',['edit']);
+   const found=await result();check(found.ids.length>0,'Persona refinement reaches usable sample listings',['service-terminal']);
+   await act('browser reload after persona edit',async()=>{await page.reload({waitUntil:'domcontentloaded'});await page.waitForTimeout(200)});
+   const restored=await page.evaluate(()=>({persona:E30.discAPI.getF('persona'),household:E30.discAPI.getF('household'),children:E30.discAPI.getF('children')}));
+   check(restored.persona==='couple'&&!restored.household&&!restored.children&&await page.locator('#chatB .e31-results .pcard').count()>0,
+    'Edited persona, unknown personal facts and usable results survive reload',['reload']);
+   const end=await snapshot(page);check(end.credits===baseline.credits&&end.requests===baseline.requests,'Persona journey incurs no charge or implicit service');
+  },['step:rent:persona']);
+  await test('PA-PERSONA-SKIP',async({page,check,send,prompt,result})=>{
+   await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const baseline=await snapshot(page);await prompt('need-persona');await prompt('skip-preference');
+   check(await page.evaluate(()=>!E30.discAPI.collector().expecting&&!E30.discAPI.getF('persona')&&!E30.discAPI.getF('household')&&!E30.discAPI.getF('children')),
+    'Skipping persona clears the question without assuming personal facts',['skip']);
+   const found=await result();check(found.ids.length>0,'Skipped persona still reaches usable search results',['service-terminal']);
+   check(found.state.credits===baseline.credits&&found.state.requests===baseline.requests,'Skipping persona creates no charge or operation');
+  },['step:rent:persona']);
  }catch(error){
   report.tests.push({id:'PA-RB-HARNESS',result:'FAIL',surface:'browser-ui',covers,phases:[],assertions:[],trace:[],error:String(error.stack||error)});
   console.error(error);
  }finally{write();if(browser)await browser.close()}
  const failed=report.tests.filter(x=>x.result!=='PASS');
- console.log('PRIORITY AUDIT BUDGET: '+(report.tests.length-failed.length)+' passed, '+failed.length+' failed');
+ console.log('PRIORITY AUDIT: '+(report.tests.length-failed.length)+' passed, '+failed.length+' failed');
  if(failed.length)process.exitCode=1;
 })().catch(error=>{console.error(error);process.exitCode=2});

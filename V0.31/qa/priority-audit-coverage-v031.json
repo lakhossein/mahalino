@@ -173,23 +173,21 @@
         "PA-RB-ZERO-MATCH",
         "PA-RB-SIDE-TASK-RESUME"
       ],
-      "status": "failed",
-      "reason": "Last reviewed CI on cd6daf5: 3/4 mapped browser tests PASS; PA-RB-ZERO-MATCH FAIL due to card-only test helper. Helper corrected in step 3, pending current-revision CI review. No complete coverage claimed.",
+      "status": "automated",
+      "reason": "All four mapped browser tests passed on a033bc5 in push run 43651639198 and PR run 43651643979. Gate still requires all mapped tests to pass on each tested revision.",
       "last_review": {
-        "revision": "cd6daf56dbc6f4ce7992bd135aa16b848462629d",
+        "revision": "a033bc504bb4a65418a4bb3d5f1583c294d8d339",
         "run_ids": [
-          43647147512,
-          43647151837
+          43651639198,
+          43651643979
         ],
         "passing_test_ids": [
           "PA-RB-ANSWER-EDIT",
           "PA-RB-INVALID-SKIP",
+          "PA-RB-ZERO-MATCH",
           "PA-RB-SIDE-TASK-RESUME"
         ],
-        "failed_test_ids": [
-          "PA-RB-ZERO-MATCH"
-        ],
-        "cause": "Test helper incorrectly required .e31-results even for an honest empty result. Current helper correction awaits next CI review."
+        "failed_test_ids": []
       }
     },
     {
@@ -281,15 +279,18 @@
         "Skip all preferences then request a service"
       ],
       "handler": {
-        "source": "src/v31-intel.js and src/v31-guidance.js",
-        "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for rent:persona",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "source": "src/v31-guidance.js",
+        "target": "e31Prefill -> composer send -> preference:persona / persona:family / persona:couple -> E30.discAPI",
+        "resolution": "UI assertions pending CI"
       },
       "expected_transition": "بدون فرض ترکیب خانوار یا داشتن فرزند",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PERSONA-ANSWER-EDIT",
+        "PA-PERSONA-SKIP"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Composer-driven answer/edit/reload and skip tests added; next CI review required."
     },
     {
       "flow": "rent",
@@ -4071,23 +4072,21 @@
         "PA-RB-ZERO-MATCH",
         "PA-RB-SIDE-TASK-RESUME"
       ],
-      "status": "failed",
-      "reason": "Last reviewed CI on cd6daf5: 3/4 mapped browser tests PASS; PA-RB-ZERO-MATCH FAIL due to card-only test helper. Helper corrected in step 3, pending current-revision CI review. No complete coverage claimed.",
+      "status": "automated",
+      "reason": "All four mapped browser tests passed on a033bc5 in push run 43651639198 and PR run 43651643979. Gate still requires all mapped tests to pass on each tested revision.",
       "last_review": {
-        "revision": "cd6daf56dbc6f4ce7992bd135aa16b848462629d",
+        "revision": "a033bc504bb4a65418a4bb3d5f1583c294d8d339",
         "run_ids": [
-          43647147512,
-          43647151837
+          43651639198,
+          43651643979
         ],
         "passing_test_ids": [
           "PA-RB-ANSWER-EDIT",
           "PA-RB-INVALID-SKIP",
+          "PA-RB-ZERO-MATCH",
           "PA-RB-SIDE-TASK-RESUME"
         ],
-        "failed_test_ids": [
-          "PA-RB-ZERO-MATCH"
-        ],
-        "cause": "Test helper incorrectly required .e31-results even for an honest empty result. Current helper correction awaits next CI review."
+        "failed_test_ids": []
       }
     },
     {
