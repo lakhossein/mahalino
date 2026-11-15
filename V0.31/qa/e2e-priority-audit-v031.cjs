@@ -215,6 +215,97 @@ async function snapshot(page){
    const found=await result();check(found.ids.length>0,'Unknown household does not block sample search',['service-terminal']);
    check(found.state.credits===baseline.credits&&found.state.requests===baseline.requests,'Skip and search do not bill or create operations');
   },['step:rent:who']);
+
+  const preferenceMatrix=[{"flow":"rent","id":"beds","slot":"rooms","answer":"۱","expected":1,"edit":"۲","edited":2},{"flow":"rent","id":"m2","slot":"m2","answer":"۶۰","expected":60,"edit":"۷۰","edited":70},{"flow":"rent","id":"age","slot":"prop_age","answer":"تا ۱۰ سال","expected":10,"edit":"تا ۲۰ سال","edited":20},{"flow":"rent","id":"floor","slot":"floor_preference","answer":"طبقه ۱ تا ۵ الزامی است","expected":{"min":1,"max":5,"level":"required"},"edit":"طبقه ۱ تا ۱۰ الزامی است","edited":{"min":1,"max":10,"level":"required"}},{"flow":"buy","id":"beds","slot":"rooms","answer":"۱","expected":1,"edit":"۲","edited":2},{"flow":"buy","id":"m2","slot":"m2","answer":"۶۰","expected":60,"edit":"۷۰","edited":70},{"flow":"buy","id":"age","slot":"prop_age","answer":"تا ۱۰ سال","expected":10,"edit":"تا ۲۰ سال","edited":20},{"flow":"buy","id":"floor","slot":"floor_preference","answer":"طبقه ۱ تا ۵ الزامی است","expected":{"min":1,"max":5,"level":"required"},"edit":"طبقه ۱ تا ۱۰ الزامی است","edited":{"min":1,"max":10,"level":"required"}},{"flow":"buy","id":"budg","slot":"buy_budget","answer":"۱۰۰ میلیارد تومان","expected":{"v":[1000000000000,1000000000000]},"edit":"۲۰۰ میلیارد تومان","edited":{"v":[2000000000000,2000000000000]}},{"flow":"buy","id":"ppm","slot":"price_per_m2","answer":"۱۰۰ میلیون تا ۹۰۰ میلیون تومان","expected":{"v":[1000000000,9000000000]},"edit":"۵۰ میلیون تا ۹۰۰ میلیون تومان","edited":{"v":[500000000,9000000000]}},{"flow":"sell","id":"s_area","slot":"prop_area","answer":"۸۵","expected":85,"edit":"۹۰","edited":90},{"flow":"sell","id":"s_rooms","slot":"prop_rooms","answer":"۲","expected":2,"edit":"۳","edited":3},{"flow":"sell","id":"s_age","slot":"prop_age","answer":"تا ۱۰ سال","expected":10,"edit":"تا ۲۰ سال","edited":20},{"flow":"sell","id":"s_floor","slot":"property_floor","answer":"۲","expected":2,"edit":"۳","edited":3},{"flow":"sell","id":"s_hood","slot":"hood","answer":"نارمک","expected":"h6","edit":"سعادت‌آباد","edited":"h1"},{"flow":"sell","id":"s_motiv","slot":"sale_motivation","answer":"مهاجرت","expected":"مهاجرت","edit":"تعویض ملک","edited":"تعویض ملک"},{"flow":"sell","id":"s_urg","slot":"sale_urgency","answer":"عجله ندارم","expected":"maxvalue","edit":"فروش سریع","edited":"fast"},{"flow":"invp","id":"i_obj","slot":"invest_objective","answer":"هدف درآمد اجاره","expected":"rent_income","edit":"حفظ ارزش","edited":"inflation_hedge"},{"flow":"invp","id":"i_cap","slot":"invest_capital","answer":"۳۰ میلیارد تومان","expected":{"v":[300000000000,300000000000]},"edit":"۴۰ میلیارد تومان","edited":{"v":[400000000000,400000000000]}},{"flow":"invp","id":"i_liq","slot":"invest_liquidity","answer":"نقدشوندگی بالا","expected":"بالا","edit":"سریع","edited":"بالا"},{"flow":"invp","id":"i_hor","slot":"invest_horizon","answer":"۵ سال","expected":"میان‌مدت","edit":"۱۰ سال","edited":"بلندمدت"},{"flow":"invp","id":"i_risk","slot":"invest_risk","answer":"ریسک متوسط","expected":"متوسط","edit":"ریسک زیاد","edited":"بالا"},{"flow":"invp","id":"i_asset","slot":"invest_asset","answer":"آپارتمان مسکونی","expected":"residential","edit":"زمین","edited":"land"},{"flow":"invp","id":"i_fin","slot":"invest_financing","answer":"سرمایه شخصی","expected":"cash","edit":"بخشی وام","edited":"mixed"},{"flow":"invp","id":"i_income","slot":"invest_income","answer":"۱۰ میلیون تومان","expected":{"v":[100000000,100000000]},"edit":"۲۰ میلیون تومان","edited":{"v":[200000000,200000000]}},{"flow":"invp","id":"i_mgmt","slot":"invest_management","answer":"خودم","expected":"self","edit":"مدیر می‌گیرم","edited":"delegate"},{"flow":"invp","id":"i_exit","slot":"invest_exit","answer":"فروش ملک","expected":"sell","edit":"نگهداری بلندمدت","edited":"hold"},{"flow":"invp","id":"i_hood","slot":"hood","answer":"نارمک","expected":"h6","edit":"سعادت‌آباد","edited":"h1"},{"flow":"lndl","id":"l_hood","slot":"hood","answer":"نارمک","expected":"h6","edit":"سعادت‌آباد","edited":"h1"},{"flow":"lndl","id":"l_rules","slot":"rental_rules","answer":"حیوان خانگی پذیرفته نیست","expected":["حیوان خانگی پذیرفته نیست"],"edit":"ندارد","edited":[]},{"flow":"lndl","id":"l_stay_rules","slot":"stay_rules","answer":"سیگار ممنوع","expected":["سیگار ممنوع"],"edit":"ندارد","edited":[]}];
+  for(const spec of preferenceMatrix){
+   for(const mode of ['answer-edit','skip'])await test('PA-MATRIX-'+spec.flow+'-'+spec.id+'-'+mode,
+    async({page,check,act,send,prompt,result})=>{
+     const flow=({invp:'invest',lndl:'landlord'})[spec.flow]||spec.flow;
+     await send(await page.evaluate(f=>E30.guide.actions[f].prompt,flow));
+     const baseline=await snapshot(page);
+     async function request(){
+      const text=await page.evaluate(slot=>E30.guide.registry.find(r=>r.action==='preference:'+slot)?.prompt,spec.slot);
+      check(!!text,'Actual runtime registry exposes preference '+spec.slot);
+      await send(text);
+      check(await page.evaluate(()=>!!E30.discAPI.collector().expecting),'Explicit preference request opens its actual question');
+     }
+     await request();
+     if(mode==='skip'){
+      await prompt('skip-preference');
+      check(await page.evaluate(slot=>E30.discAPI.getF(slot)==null&&!E30.discAPI.collector().expecting,spec.slot),
+       'Skipped '+spec.slot+' stays unknown',['skip']);
+     }else{
+      await send(spec.answer);
+      check(await page.evaluate(({slot,value})=>JSON.stringify(E30.discAPI.getF(slot))===JSON.stringify(value),{slot:spec.slot,value:spec.expected}),
+       'Answer parsed to expected '+spec.slot,['answer']);
+      await request();await send(spec.edit);
+      check(await page.evaluate(({slot,value})=>JSON.stringify(E30.discAPI.getF(slot))===JSON.stringify(value),{slot:spec.slot,value:spec.edited}),
+       'Edited value stored for '+spec.slot,['edit']);
+      const before=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
+      await act('reload confirmed preference',async()=>{await page.reload({waitUntil:'domcontentloaded'});await page.waitForTimeout(200)});
+      check(await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields))===before,'Confirmed preference survives reload',['reload']);
+     }
+     if(flow==='rent'||flow==='buy'){
+      await send(await page.evaluate(()=>E30.guide.actions.sample.prompt));
+      const last=page.locator('#chatB .msg.bot').last(),text=await last.textContent();
+      const count=await last.locator('.pcard').count();
+      check(count>0||text.includes('آگهی منطبق پیدا نشد'),'Search terminates honestly after '+spec.slot,['service-terminal']);
+      if(mode==='skip')check(count>0,'Skipping optional preference still produces matching sample cards');
+     }else{
+      // Explicitly choose the service with current facts; do not bypass handoff.
+      await send(await page.evaluate(()=>E30.guide.actions['start-service'].prompt));await send('درسته');
+      if(flow==='invest'){
+       await page.locator('#chatB [data-cv="!save"]').last().click();
+       check(await page.evaluate(()=>wd('invp').done&&S.library.some(x=>x.type==='invest')),
+        'Selected investment analysis completes and is saved',['service-terminal']);
+      }else if(flow==='sell'){
+       await page.locator('#chatB [data-cv="single"]').last().click();
+       // The chosen quote has real area/hood prerequisites even after opt-out.
+       for(let i=0;i<8;i++){
+        const step=await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id);
+        if(step==='s_val')break;
+        const inputs={s_area:'۸۵',s_rooms:'۲',s_age:'۱۰',s_floor:'۲',s_hood:'نارمک',s_motiv:'تعویض ملک',s_urg:'maxvalue'};
+        check(!!inputs[step],'Quote reaches only known prerequisite steps: '+step);
+        await send(inputs[step]);
+       }
+       check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='s_val')&&
+        (await page.locator('#chatB .msg.bot').last().textContent()).includes('ارزیابی بازار'),
+        'Selected seller quote reaches real sample valuation',['service-terminal']);
+      }else{
+       await page.locator('#chatB [data-cv="price"]').last().click();
+       if(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='l_hood'))await send('نارمک');
+       check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='l_advice'),'Landlord reaches selected price advice');
+       await page.locator('#chatB [data-cv="!end"]').last().click();
+       check(await page.evaluate(()=>CE.f===null&&!wd('lndl').data.registered),
+        'Price advice completes independently without publishing a draft',['service-terminal']);
+      }
+     }
+     check((await snapshot(page)).credits===baseline.credits,'Preference and free sample output never debit credit');
+    },['step:'+spec.flow+':'+spec.id]);
+  }
+
+  for(const legacy of [{"flow":"invb","id":"prjs"},{"flow":"invb","id":"scn"},{"flow":"invb","id":"cap"},{"flow":"invb","id":"yld"},{"flow":"invb","id":"price"},{"flow":"invb","id":"pay"},{"flow":"invb","id":"trk"},{"flow":"invr","id":"props"},{"flow":"invr","id":"cap"},{"flow":"invr","id":"cmp"},{"flow":"invr","id":"fund"},{"flow":"invr","id":"pay"},{"flow":"invr","id":"end"}]){
+   await test('PA-RETIRED-'+legacy.flow+'-'+legacy.id,async({page,check,act,send})=>{
+    const before=await snapshot(page);
+    function absent(row){return page.evaluate(({flow,id})=>({
+     script:!!SCRIPTS[flow],step:!!SCRIPTS[flow]?.some(x=>x.id===id),
+     suggestion:E30.guide.registry.some(r=>r.action==='flow:'+flow),
+     button:!!document.querySelector('[data-cv="F:'+flow+'"]'),
+     active:CE.f===flow
+    }),row)}
+    let state=await absent(legacy);
+    check(!state.script&&!state.step&&!state.suggestion&&!state.button&&!state.active,'Retired step is absent from runtime scripts, visible entry and guide registry');
+    await send('F:'+legacy.flow);
+    state=await absent(legacy);
+    check(!state.active&&!state.script,'Legacy command cannot enter retired workflow');
+    await act('reload after legacy route request',async()=>{await page.reload({waitUntil:'domcontentloaded'});await page.waitForTimeout(200)});
+    state=await absent(legacy);
+    check(!state.active&&!state.script&&!state.step&&!state.suggestion&&!state.button,
+      'Retired route remains unavailable after reload',['route-absent']);
+    const after=await snapshot(page);check(after.credits===before.credits&&after.requests===before.requests,
+      'Legacy request does not charge or create an operation');
+   },['step:'+legacy.flow+':'+legacy.id]);
+  }
  }catch(error){
   report.tests.push({id:'PA-RB-HARNESS',result:'FAIL',surface:'browser-ui',covers,phases:[],assertions:[],trace:[],error:String(error.stack||error)});
   console.error(error);
