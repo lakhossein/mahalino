@@ -17970,6 +17970,61 @@ E30.flows=(function(){
       var originalStayQuestion=stayStep('list').q;
       stayStep('list').q=function(D){return stayList(D.city).length?originalStayQuestion(D):'برای شهر '+esc(D.city||'')+' اقامتگاه نمونه‌ای موجود نیست. شهری دیگر یا «همهٔ شهرها» را صریحاً انتخاب کنید؛ مقصد شما خودکار تغییر نکرده است.'};
     }
+    /* Explicit service inputs must never manufacture a value or a project. */
+    function choice(step,field,values){
+      var previous=step.set;step.set=function(D,v){if(values.indexOf(String(v))<0)return 'ERR';return previous?previous(D,v):(D[field]=v,null)};
+      step.err='یکی از گزینه‌های همین مرحله را انتخاب کنید.';
+    }
+    choice(SELL.find(function(s){return s.id==='s_role'}),'sellerRole',['owner','agent','developer','heir']);
+    choice(SELL.find(function(s){return s.id==='s_own'}),'ownership',['single','inherited','joint','mort']);
+    choice(SELL.find(function(s){return s.id==='s_docs'}),'docsOk',['yes','no','unknown']);
+    choice(SELL.find(function(s){return s.id==='s_urg'}),'sale_urgency',['fast','maxvalue']);
+    [['s_rooms','prop_rooms',0,20],['s_age','prop_age',0,200],['s_floor','floor',-10,200]].forEach(function(rule){
+      var step=SELL.find(function(s){return s.id===rule[0]});
+      step.set=function(D,v){var n=Number(pd(String(v)));if(!Number.isInteger(n)||n<rule[2]||n>rule[3])return 'ERR';D[rule[1]]=n;return null};
+      step.err='عدد صحیح در محدودهٔ مجاز وارد کنید.';
+    });
+    choice(LNDL.find(function(s){return s.id==='l_role'}),'ltype',['res','stay','price']);
+    if(SCRIPTS.mkt){
+      var market=function(id){return SCRIPTS.mkt.find(function(s){return s.id===id})};
+      choice(market('role'),'role',['con','emp']);choice(market('adj'),'adj',['none','full','cap10']);
+      market('bid').set=function(D,v){var n=Number(pd(String(v)));if(!Number.isFinite(n)||n<=0)return 'ERR';D.bidAmt=n;return null};
+      market('bid').q='قیمت پایهٔ پیشنهاد را با مبلغ مشخص وارد کنید (تومان).';
+      var submitBid=market('send').acts.b;
+      market('send').acts.b=function(D){
+        if(D.role!=='con'||!Number.isInteger(D.prjI)||!PRJ[D.prjI]||!(D.bidAmt>0)||['none','full','cap10'].indexOf(D.adj)<0){botC('پروژه، مبلغ و شرط تعدیل باید صریح و معتبر باشند؛ پیشنهادی ارسال و هزینه‌ای دریافت نشد.',null);return}
+        if(D.bid){botC('پیشنهاد این گردش کار قبلاً ثبت شده است؛ ثبت تکراری انجام نشد.',null);return}
+        return submitBid(D);
+      };
+    }
+    if(SCRIPTS.build){
+      var supply=SCRIPTS.build.find(function(s){return s.id==='sup'}),phase=SCRIPTS.build.find(function(s){return s.id==='ph'});
+      supply.set=function(D,v){
+        var ix=/^\d+$/.test(String(v))?Number(v):supIndexFromText(v);
+        if(!Number.isInteger(ix)||ix<0||!SUPS[ix])return 'ERR';
+        if(!D.orders)D.orders=[];
+        D.orders.push({i:ix,q:'نیازمند تعیین مقدار',d:'نیازمند توافق زمان تحویل',status:'draft_internal'});
+        addReq('build','تأمین','پیش‌درخواست '+SUPS[ix].t,'پیش‌نویس داخلی','مقدار و زمان تحویل هنوز توافق نشده است');save();return null;
+      };
+      function phases(D){return Array.isArray(D.ph)&&D.ph.length===5&&D.ph.every(function(n){return Number.isFinite(n)&&n>=0&&n<=100})?D.ph:null}
+      phase.q=function(D){return '<b>پیشرفت داخلی پروژه</b><p>'+(phases(D)?D.ph.map(function(n){return fa(n,0)+'٪'}).join(' · '):'پیشرفتی ثبت نشده است؛ مقدار اولیه فرض نشده است.')+'</p><p class="note">تغییرهای زیر شبیه‌سازی داخلی‌اند و پیشرفت واقعی یا تحویل رسمی را اثبات نمی‌کنند.</p>'};
+      phase.chips=function(D){var p=phases(D);return p&&p.every(function(n){return n===100})?[['ثبت تحویل داخلی','!done']]:[['افزایش شبیه‌سازی ۱۰٪','!p'],['تکمیل شبیه‌سازی','!all']]};
+      phase.acts.p=function(D){var p=phases(D);D.ph=p?p.slice():[0,0,0,0,0];for(var i=0;i<5;i++)if(D.ph[i]<100){D.ph[i]=Math.min(100,D.ph[i]+10);break}save();ceStep()};
+      var finish=phase.acts.done;
+      phase.acts.done=function(D){var p=phases(D);if(!p||!p.every(function(n){return n===100})){botC('تمام مراحل هنوز تکمیل نشده‌اند؛ تحویل ثبت نشد.',null);return}return finish(D)};
+    }
+    if(SCRIPTS.stay){
+      var booking=stayStep('book'),book=booking.acts.b,checkin=stayStep('chk'),arrive=checkin.acts.c,review=stayStep('revt'),writeReview=review.set;
+      booking.acts.b=function(D){
+        if(!SLIST.some(function(s){return s.id===D.stay})||!Number.isInteger(D.nights)||D.nights<1||D.nights>90){botC('اقامتگاه و تعداد شب معتبر انتخاب نشده است؛ رزرو و پرداخت انجام نشد.',null);return}
+        if(D.code){botC('این رزرو قبلاً ثبت شده است؛ پرداخت تکراری انجام نشد.',null);return}
+        return book(D);
+      };
+      checkin.q=function(D){return D.code?'کد ورود نمایشی: <b>'+esc(D.code)+'#</b> — ورود انجام شد؟':'رزرو تأییدشده‌ای برای نمایش کد ورود وجود ندارد.'};
+      checkin.acts.c=function(D){if(!D.code){botC('بدون رزرو ثبت‌شده، ورود قابل ثبت نیست.',null);return}if(D.checked){botC('ورود قبلاً ثبت شده است.',null);return}return arrive(D)};
+      review.set=function(D,v){if(!D.checked||!Number.isInteger(RVS)||RVS<1||RVS>5||!String(v).trim()||D.reviewSubmitted)return 'ERR';var result=writeReview(D,v);if(result!=='ERR'){D.reviewSubmitted=true;save()}return result};
+    }
+
     if(!SCRIPTS.buy.some(function(s){return s.id==='buy_ctr'})){
       var ix=SCRIPTS.buy.findIndex(function(s){return s.id==='escA'});
       SCRIPTS.buy.splice(ix,0,{id:'buy_ctr',q:'پیش از تسویه، مبایعه‌نامهٔ داخلی را تکمیل و ثبت کنید. انتقال رسمی سند خارج از سامانه انجام می‌شود.',
