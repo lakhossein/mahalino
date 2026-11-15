@@ -28,3 +28,14 @@ assert(summary.q({ltype:'res',rules:[]}).includes('ندارد'));
 assert(summary.q({ltype:'stay'}).includes('مشخص نشده'));
 assert(summary.q({ltype:'stay',stayRules:[]}).includes('ندارد'));
 console.log('PASS optional service reports: no repeated skipped details, no invented asset yield, unknown vs explicit empty rules');
+
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const html=fs.readFileSync(path.join(__dirname,'../Mahalino+V0.31.html'),'utf8');
+vm.runInContext(html.match(/var SLIST=\[[\s\S]*?\];/)[0],c);
+for(const city of ['تهران','شیراز','رامسر']){
+ const expected=c.SLIST.filter(x=>x.city===city).map(x=>x.id);
+ assert.deepEqual(Array.from(c.stayList(city),x=>x.id),Array.from(expected));
+}
+for(const city of ['مشهد','ساری','ناموجود',''])assert.equal(c.stayList(city).length,0,'unavailable city substituted unrelated accommodation: '+city);
+assert.equal(c.stayList(' شيراز ').length,1);
+console.log('PASS accommodation city inventory: exact sample identities, normalized input, honest empty results');

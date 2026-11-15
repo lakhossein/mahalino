@@ -422,6 +422,14 @@ E30.flows=(function(){
   ];
 
   function install(){
+    /* Never substitute another city when the requested sample inventory is empty. */
+    stayList=function(city){
+      var normalize=function(v){return String(v||'').replace(/[يى]/g,'ی').replace(/ك/g,'ک').trim()};
+      var requested=normalize(city);
+      if(!requested)return [];
+      return SLIST.filter(function(item){return normalize(item.city)===requested});
+    };
+
     if(!SCRIPTS.buy.some(function(s){return s.id==='buy_ctr'})){
       var ix=SCRIPTS.buy.findIndex(function(s){return s.id==='escA'});
       SCRIPTS.buy.splice(ix,0,{id:'buy_ctr',q:'پیش از تسویه، مبایعه‌نامهٔ داخلی را تکمیل و ثبت کنید. انتقال رسمی سند خارج از سامانه انجام می‌شود.',
