@@ -188,6 +188,33 @@ async function snapshot(page){
    const found=await result();check(found.ids.length>0,'Skipped persona still reaches usable search results',['service-terminal']);
    check(found.state.credits===baseline.credits&&found.state.requests===baseline.requests,'Skipping persona creates no charge or operation');
   },['step:rent:persona']);
+
+  await test('PA-HOUSEHOLD-ANSWER-EDIT',async({page,check,act,send,prompt,result})=>{
+   await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const baseline=await snapshot(page);
+   await prompt('need-household');await send('فقط خودم');
+   check(await page.evaluate(()=>E30.discAPI.getF('household')==='single'&&!E30.discAPI.getF('children')),
+    'Single-person household is recorded without inventing children',['answer']);
+   check(!(await snapshot(page)).suggestions.includes('need-household'),'Answered household is absent from current suggestions');
+   await send(await page.evaluate(()=>E30.guide.actions['need-household'].prompt));await send('من و همسرم');
+   check(await page.evaluate(()=>E30.discAPI.getF('household')==='couple'&&!E30.discAPI.getF('children')),
+    'Explicit edit changes household to couple without assuming children',['edit']);
+   const found=await result();check(found.ids.length>0,'Household refinement reaches usable listings',['service-terminal']);
+   await act('reload household result',async()=>{await page.reload({waitUntil:'domcontentloaded'});await page.waitForTimeout(200)});
+   check(await page.evaluate(()=>E30.discAPI.getF('household')==='couple'&&!E30.discAPI.getF('children'))&&
+    await page.locator('#chatB .e31-results .pcard').count()>0,
+    'Edited household and usable result survive reload without invented children',['reload']);
+   const end=await snapshot(page);check(end.credits===baseline.credits&&end.requests===baseline.requests,
+    'Household changes and search do not charge or create implicit operations');
+  },['step:rent:who']);
+  await test('PA-HOUSEHOLD-SKIP',async({page,check,send,prompt,result})=>{
+   await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const baseline=await snapshot(page);await prompt('need-household');await prompt('skip-preference');
+   check(await page.evaluate(()=>!E30.discAPI.collector().expecting&&!E30.discAPI.getF('household')&&!E30.discAPI.getF('children')),
+    'Skipped household remains unknown and leaves no active question',['skip']);
+   const found=await result();check(found.ids.length>0,'Unknown household does not block sample search',['service-terminal']);
+   check(found.state.credits===baseline.credits&&found.state.requests===baseline.requests,'Skip and search do not bill or create operations');
+  },['step:rent:who']);
  }catch(error){
   report.tests.push({id:'PA-RB-HARNESS',result:'FAIL',surface:'browser-ui',covers,phases:[],assertions:[],trace:[],error:String(error.stack||error)});
   console.error(error);

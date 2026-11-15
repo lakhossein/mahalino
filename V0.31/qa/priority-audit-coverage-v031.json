@@ -289,8 +289,20 @@
         "PA-PERSONA-ANSWER-EDIT",
         "PA-PERSONA-SKIP"
       ],
-      "status": "unverified",
-      "reason": "Composer-driven answer/edit/reload and skip tests added; next CI review required."
+      "status": "automated",
+      "reason": "Both mapped persona browser tests passed in push 43656630328 and PR 43656634968 on 47c2cf0; current-revision evidence remains mandatory.",
+      "last_review": {
+        "revision": "47c2cf054df42a6e60280999c4d5adc61101e964",
+        "run_ids": [
+          43656630328,
+          43656634968
+        ],
+        "passing_test_ids": [
+          "PA-PERSONA-ANSWER-EDIT",
+          "PA-PERSONA-SKIP"
+        ],
+        "failed_test_ids": []
+      }
     },
     {
       "flow": "rent",
@@ -315,15 +327,18 @@
         "Skip all preferences then request a service"
       ],
       "handler": {
-        "source": "src/v31-intel.js and src/v31-guidance.js",
-        "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for rent:who",
-        "resolution": "unverified; browser trace must establish actual handler before claiming coverage"
+        "source": "src/v31-guidance.js and src/v31-intel.js",
+        "target": "need-household -> composer -> preference:household -> feed/answer('household') -> sample",
+        "resolution": "Source mapped; new UI assertions pending CI"
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-HOUSEHOLD-ANSWER-EDIT",
+        "PA-HOUSEHOLD-SKIP"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Household answer/edit/reload and skip browser journeys added; execution awaits next CI review."
     },
     {
       "flow": "rent",
