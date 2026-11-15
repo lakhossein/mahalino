@@ -270,6 +270,15 @@ async function snapshot(page){
        await page.locator('#chatB [data-cv="!save"]').last().click();
        check(await page.evaluate(()=>wd('invp').done&&S.library.some(x=>x.type==='invest')),
         'Selected investment analysis completes and is saved',['service-terminal']);
+       if(mode==='answer-edit'){
+        const saved=await page.evaluate(()=>S.library.filter(x=>x.type==='invest').at(-1).artifact.data);
+        const keys={invest_objective:'objective',invest_capital:'cap',invest_liquidity:'liquidity',invest_horizon:'horizon',invest_risk:'risk',invest_asset:'assetType',invest_financing:'financing',invest_income:'expectedCash',invest_management:'management',invest_exit:'exitStrategy',hood:'hood'};
+        let expected=spec.edited;
+        if(expected&&expected.v)expected=expected.v[1];
+        if(spec.slot==='invest_liquidity')expected='long';
+        if(spec.slot==='invest_risk')expected='high';
+        check(saved[keys[spec.slot]]===expected,'Saved analysis consumes the edited '+spec.slot+' value');
+       }
       }else if(flow==='sell'){
        await page.locator('#chatB [data-cv="single"]').last().click();
        // The chosen quote has real area/hood prerequisites even after opt-out.
@@ -286,12 +295,25 @@ async function snapshot(page){
        if(mode==='answer-edit'&&spec.slot==='prop_area')check(await page.evaluate(()=>wd('sell').data.prop_area)===spec.edited,'Seller valuation preserves edited area');
        if(mode==='answer-edit'&&spec.slot==='hood')check(await page.evaluate(()=>wd('sell').data.hood)===spec.edited,'Seller valuation preserves edited neighborhood');
       }else{
-       await page.locator('#chatB [data-cv="price"]').last().click();
+       const branch=spec.slot==='rental_rules'?'res':spec.slot==='stay_rules'?'stay':'price';
+       await page.locator('#chatB [data-cv="'+branch+'"]').last().click();
        if(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='l_hood'))await send('نارمک');
-       check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='l_advice'),'Landlord reaches selected price advice');
-       await page.locator('#chatB [data-cv="!end"]').last().click();
-       check(await page.evaluate(()=>CE.f===null&&!wd('lndl').data.registered),
-        'Price advice completes independently without publishing a draft',['service-terminal']);
+       if(branch==='price'){
+        check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='l_advice'),'Landlord reaches selected price advice');
+        await page.locator('#chatB [data-cv="!end"]').last().click();
+        check(await page.evaluate(()=>CE.f===null&&!wd('lndl').data.registered),'Price advice completes independently',['service-terminal']);
+       }else{
+        const inputs={l_price:'۱ میلیارد تومان',l_rent:'صفر',l_stay_rate:'۲ میلیون تومان',l_stay_capacity:'۴',l_stay_min:'۲'};
+        for(let i=0;i<6;i++){
+         const step=await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id);if(step==='l_sum')break;
+         check(!!inputs[step],'Draft requests only relevant missing service inputs: '+step);await send(inputs[step]);
+        }
+        check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='l_sum'),'Draft reaches actual confirmation');
+        await page.locator('#chatB [data-cv="!ok"]').last().click();
+        const d=await page.evaluate(()=>wd('lndl').data),rules=branch==='res'?d.rules:d.stayRules;
+        check(d.registered&&d.listingStatus==='draft_internal'&&(mode==='skip'?rules==null:Array.isArray(rules)&&rules.length===0),
+         'Confirmed internal draft preserves unknown skipped rules versus explicit empty rules',['service-terminal']);
+       }
       }
      }
      check((await snapshot(page)).credits===baseline.credits,'Preference and free sample output never debit credit');
@@ -307,7 +329,7 @@ async function snapshot(page){
    check(before.flow===flow&&before.step===id,'Reached actual '+flow+':'+id+' through UI');
    await act('empty composer submission at '+id,async()=>{await page.locator('#chatIn').fill('   ');await page.locator('#chatSend').click();await page.waitForTimeout(100)});
    check(JSON.stringify(await serviceState(page,flow))===JSON.stringify(before),'Missing input cannot advance, debit or create a request at '+id);
-   await send(await page.evaluate(()=>E30.guide.actions['pause-service'].prompt));
+   await h.prompt('pause-service');
    const paused=await serviceState(page,flow);
    check(paused.flow===null&&paused.data===before.data&&paused.credits===before.credits&&paused.requests===before.requests,
     'Pausing '+id+' leaves exact facts and operations unchanged');
@@ -342,7 +364,7 @@ async function snapshot(page){
     else if(id==='s_inq')await chip(h,'!neg');
     else if(id==='s_ctr'){
      const before=await serviceState(page,'sell');await chip(h,'!open');
-     check(await page.evaluate(()=>!wd('buy').data.ctr)&&
+     check(await page.evaluate(()=>!(S.wfs||[]).some(w=>w.m==='buy'&&w.data&&w.data.ctr))&&
       (await page.locator('#chatB .msg.bot').last().textContent()).includes('مدارک'),
       'Incomplete ownership documents block the contract form and charge');
      check((await serviceState(page,'sell')).credits===before.credits,'Rejected contract opening never debits');

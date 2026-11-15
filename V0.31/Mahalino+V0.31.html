@@ -19503,7 +19503,7 @@ E30.guide=(function(){
     botC=function(h,chips){
       var html=String(h||''),skip=/(تعارضی در شرایط|e30-paycard|e31-guide|data-e28ctr|e30-val-hood)/.test(html);
       var startup=CE.f==='gate'&&state().node==='home'&&CE.i===0;
-      if(!skip&&S.auth&&CURRENT==='landing'&&(startup||!(CE.f&&!E30.discAPI.active())||state().suspended)){
+      if(!skip&&S.auth&&CURRENT==='landing'&&(startup||!(CE.f&&!E30.discAPI.active())||state().suspended||can(BY_ID['pause-service'],false))){
         html+=card();
       }
       if(skip&&S.auth&&CURRENT==='landing'&&state().suspended&&!/e31-guide/.test(html))html+=card(true);
