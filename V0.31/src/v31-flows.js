@@ -430,6 +430,15 @@ E30.flows=(function(){
       return SLIST.filter(function(item){return normalize(item.city)===requested});
     };
 
+    if(SCRIPTS.stay){
+      var stayStep=function(id){return SCRIPTS.stay.find(function(s){return s.id===id})};
+      stayStep('ngt').set=function(D,v){var n=Number(pd(String(v)));if(!Number.isInteger(n)||n<1||n>90)return 'ERR';D.nights=n;return null};
+      stayStep('ngt').err='تعداد شب را بین ۱ تا ۹۰ وارد کنید.';
+      stayStep('rev').set=function(D,v){var n=Number(pd(String(v)));if(!Number.isInteger(n)||n<1||n>5)return 'ERR';RVS=n;return null};
+      stayStep('rev').err='امتیاز را از ۱ تا ۵ وارد کنید.';
+      var originalStayQuestion=stayStep('list').q;
+      stayStep('list').q=function(D){return stayList(D.city).length?originalStayQuestion(D):'برای شهر '+esc(D.city||'')+' اقامتگاه نمونه‌ای موجود نیست. شهری دیگر یا «همهٔ شهرها» را صریحاً انتخاب کنید؛ مقصد شما خودکار تغییر نکرده است.'};
+    }
     if(!SCRIPTS.buy.some(function(s){return s.id==='buy_ctr'})){
       var ix=SCRIPTS.buy.findIndex(function(s){return s.id==='escA'});
       SCRIPTS.buy.splice(ix,0,{id:'buy_ctr',q:'پیش از تسویه، مبایعه‌نامهٔ داخلی را تکمیل و ثبت کنید. انتقال رسمی سند خارج از سامانه انجام می‌شود.',

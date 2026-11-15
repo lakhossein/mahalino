@@ -39,3 +39,14 @@ for(const city of ['تهران','شیراز','رامسر']){
 for(const city of ['مشهد','ساری','ناموجود',''])assert.equal(c.stayList(city).length,0,'unavailable city substituted unrelated accommodation: '+city);
 assert.equal(c.stayList(' شيراز ').length,1);
 console.log('PASS accommodation city inventory: exact sample identities, normalized input, honest empty results');
+
+const stayStart=html.indexOf('SCRIPTS.stay=['),stayEnd=html.indexOf('var CBACT={}',stayStart);
+vm.runInContext(html.slice(stayStart,stayEnd),c);c.pd=v=>String(v);c.esc=v=>String(v);c.RVS=0;
+c.E30.flowsAPI.install();
+const nights=c.SCRIPTS.stay.find(s=>s.id==='ngt'),rating=c.SCRIPTS.stay.find(s=>s.id==='rev');
+for(const value of ['0','-1','91','2.5','abc']){const d={nights:3};assert.equal(nights.set(d,value),'ERR');assert.equal(d.nights,3)}
+assert.equal(nights.set({},'90'),null);
+for(const value of ['0','-1','6','1.5','abc']){c.RVS=4;assert.equal(rating.set({},value),'ERR');assert.equal(c.RVS,4)}
+assert.equal(rating.set({},'5'),null);assert.equal(c.RVS,5);
+const missing=c.SCRIPTS.stay.find(s=>s.id==='list').q({city:'مشهد'});assert(missing.includes('موجود نیست'));assert(!missing.includes('تهران'));
+console.log('PASS stay inputs: invalid nights/ratings preserve prior values; absent destination has explicit empty message');
