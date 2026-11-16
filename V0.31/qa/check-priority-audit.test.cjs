@@ -32,7 +32,7 @@ test('source inventory retains 125 rows, 25 scenarios, combined budget, persona 
  assert.equal(original.steps.filter(x=>x.kind==='retired').length,13);
  assert.equal(result(fixture()).releaseApproved,true);
 });
-test('unverified inventory cannot pass without browser evidence',()=>{
+test('inventory cannot pass without current browser evidence',()=>{
  const r=validate(original,doc,null,revision);
  assert.equal(r.releaseApproved,false);
  assert.equal(r.verifiedRows,0);

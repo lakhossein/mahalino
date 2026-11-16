@@ -40,12 +40,12 @@
         "PA-GATE-OPTIONAL-ENTRY"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-GATE-OPTIONAL-ENTRY"
@@ -62,22 +62,21 @@
       "source_position": "2",
       "name": "محل کار؟",
       "kind": "gate",
-      "entry_state": "gate: explicit request for محل کار؟",
+      "entry_state": "Request-entry gate before a service is selected; legacy workplace question must be absent.",
       "preconditions": [
         "Explicit request for محل کار؟; preserve unrelated workflows and conversation context.",
         "No inferred workplace, school or household data; only explicit route detection."
       ],
       "input_cases": [
-        "Valid explicit input for محل کار؟",
-        "Missing/empty data",
-        "Invalid input preserves state",
-        "Cancel/skip",
-        "Resume after reload"
+        "Ambiguous housing request asks transaction type only",
+        "Empty entry preserves unknown personal facts",
+        "Single user explicitly has no fixed workplace",
+        "Side task, reload and resume preserve the chosen service"
       ],
       "handler": {
-        "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
-        "target": "SCRIPTS.gate step work through ceStep/ceVal",
-        "resolution": "Runtime UI journey and required transitions reviewed in the mapped passing tests; the release gate revalidates current-revision evidence."
+        "source": "build_v031.js retireBetween(work,menu); src/v31-guidance.js discover routing",
+        "target": "SCRIPTS.gate contains only hello/menu; workplace data belongs to optional service discovery after explicit commuting context",
+        "resolution": "PA-GATE-OPTIONAL-ENTRY observes actual runtime registry absence and usable request routing after interruption."
       },
       "expected_transition": "فقط در فلو مرتبط و با زمینهٔ صریح رفت‌وآمد کاری",
       "terminal_state": "Requested route selected without personal questionnaire; ambiguous request clarified.",
@@ -85,12 +84,12 @@
         "PA-GATE-OPTIONAL-ENTRY"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-GATE-OPTIONAL-ENTRY"
@@ -107,22 +106,21 @@
       "source_position": "3",
       "name": "مدرسهٔ فرزندان؟",
       "kind": "gate",
-      "entry_state": "gate: explicit request for مدرسهٔ فرزندان؟",
+      "entry_state": "Request-entry gate before a service is selected; legacy school question must be absent.",
       "preconditions": [
         "Explicit request for مدرسهٔ فرزندان؟; preserve unrelated workflows and conversation context.",
         "No inferred workplace, school or household data; only explicit route detection."
       ],
       "input_cases": [
-        "Valid explicit input for مدرسهٔ فرزندان؟",
-        "Missing/empty data",
-        "Invalid input preserves state",
-        "Cancel/skip",
-        "Resume after reload"
+        "Ambiguous housing request asks transaction type only",
+        "Empty entry invents no child or school facts",
+        "Explicitly childless user receives no school question",
+        "Side task, reload and resume preserve the chosen service"
       ],
       "handler": {
-        "source": "SCRIPTS runtime registry; src/v31-flows.js overrides",
-        "target": "SCRIPTS.gate step school through ceStep/ceVal",
-        "resolution": "Runtime UI journey and required transitions reviewed in the mapped passing tests; the release gate revalidates current-revision evidence."
+        "source": "build_v031.js retireBetween(work,menu); src/v31-guidance.js discover routing",
+        "target": "SCRIPTS.gate contains only hello/menu; school context must not be collected in the entry gate",
+        "resolution": "PA-GATE-OPTIONAL-ENTRY observes actual runtime registry absence and usable request routing after interruption."
       },
       "expected_transition": "فقط در فلو مرتبط و با زمینهٔ صریح فرزند مدرسه‌رو",
       "terminal_state": "Requested route selected without personal questionnaire; ambiguous request clarified.",
@@ -130,12 +128,12 @@
         "PA-GATE-OPTIONAL-ENTRY"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-GATE-OPTIONAL-ENTRY"
@@ -175,12 +173,12 @@
         "PA-GATE-OPTIONAL-ENTRY"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-GATE-OPTIONAL-ENTRY"
@@ -226,12 +224,12 @@
         "PA-RB-SIDE-TASK-RESUME"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RB-ANSWER-EDIT",
@@ -265,9 +263,9 @@
         "Skip all preferences then request a service"
       ],
       "handler": {
-        "source": "src/v31-intel.js and src/v31-guidance.js",
-        "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for rent:imps",
-        "resolution": "Runtime UI journey and required transitions reviewed in the mapped passing tests; the release gate revalidates current-revision evidence."
+        "source": "src/v31-guidance.js preference:prefs -> src/v31-intel.js optional need collector",
+        "target": "Visible need-preferences composer action; explicit requirement/preference text stored in the selected workflow prefRules and consumed by its search result",
+        "resolution": "Mapped answer/edit and skip journeys check preference state, actual service result and reload."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه؛ مدرسه/کار فقط با زمینهٔ مرتبط و صریح",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
@@ -276,12 +274,12 @@
         "PA-MATRIX-rent-imps-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-rent-imps-answer-edit",
@@ -324,12 +322,12 @@
         "PA-MATRIX-rent-beds-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-rent-beds-answer-edit",
@@ -372,12 +370,12 @@
         "PA-PERSONA-SKIP"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PERSONA-ANSWER-EDIT",
@@ -420,12 +418,12 @@
         "PA-HOUSEHOLD-SKIP"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-HOUSEHOLD-ANSWER-EDIT",
@@ -468,12 +466,12 @@
         "PA-MATRIX-rent-age-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-rent-age-answer-edit",
@@ -516,12 +514,12 @@
         "PA-MATRIX-rent-m2-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-rent-m2-answer-edit",
@@ -564,12 +562,12 @@
         "PA-MATRIX-rent-floor-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-rent-floor-answer-edit",
@@ -612,12 +610,12 @@
         "PA-MATRIX-rent-elev-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-rent-elev-answer-edit",
@@ -660,12 +658,12 @@
         "PA-MATRIX-rent-park-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-rent-park-answer-edit",
@@ -708,12 +706,12 @@
         "PA-MATRIX-rent-extra-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-rent-extra-answer-edit",
@@ -753,12 +751,12 @@
         "PA-RENT-VISIT-CONTRACT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RENT-VISIT-CONTRACT"
@@ -797,12 +795,12 @@
         "PA-RENT-VISIT-CONTRACT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RENT-VISIT-CONTRACT"
@@ -841,12 +839,12 @@
         "PA-RENT-VISIT-CONTRACT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RENT-VISIT-CONTRACT"
@@ -885,12 +883,12 @@
         "PA-RENT-VISIT-CONTRACT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RENT-VISIT-CONTRACT"
@@ -930,12 +928,12 @@
         "PA-RENT-VISIT-CONTRACT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RENT-VISIT-CONTRACT"
@@ -974,12 +972,12 @@
         "PA-RENT-VISIT-CONTRACT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RENT-VISIT-CONTRACT"
@@ -1018,12 +1016,12 @@
         "PA-RENT-VISIT-CONTRACT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RENT-VISIT-CONTRACT"
@@ -1062,12 +1060,12 @@
         "PA-RENT-VISIT-CONTRACT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RENT-VISIT-CONTRACT"
@@ -1106,12 +1104,12 @@
         "PA-RENT-VISIT-CONTRACT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RENT-VISIT-CONTRACT"
@@ -1151,12 +1149,12 @@
         "PA-TERMINATION-SETTLEMENT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-TERMINATION-SETTLEMENT"
@@ -1196,12 +1194,12 @@
         "PA-TERMINATION-SETTLEMENT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-TERMINATION-SETTLEMENT"
@@ -1241,12 +1239,12 @@
         "PA-TERMINATION-SETTLEMENT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-TERMINATION-SETTLEMENT"
@@ -1286,12 +1284,12 @@
         "PA-TERMINATION-SETTLEMENT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-TERMINATION-SETTLEMENT"
@@ -1331,12 +1329,12 @@
         "PA-TERMINATION-SETTLEMENT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-TERMINATION-SETTLEMENT"
@@ -1376,12 +1374,12 @@
         "PA-TERMINATION-SETTLEMENT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-TERMINATION-SETTLEMENT"
@@ -1421,12 +1419,12 @@
         "PA-TERMINATION-SETTLEMENT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-TERMINATION-SETTLEMENT"
@@ -1468,12 +1466,12 @@
         "PA-MATRIX-buy-budg-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-buy-budg-answer-edit",
@@ -1505,9 +1503,9 @@
         "Skip all preferences then request a service"
       ],
       "handler": {
-        "source": "src/v31-intel.js and src/v31-guidance.js",
-        "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for buy:imps",
-        "resolution": "Runtime UI journey and required transitions reviewed in the mapped passing tests; the release gate revalidates current-revision evidence."
+        "source": "src/v31-guidance.js preference:prefs -> src/v31-intel.js optional need collector",
+        "target": "Visible need-preferences composer action; explicit requirement/preference text stored in the selected workflow prefRules and consumed by its search result",
+        "resolution": "Mapped answer/edit and skip journeys check preference state, actual service result and reload."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه؛ مدرسه/کار فقط با زمینهٔ مرتبط و صریح",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
@@ -1516,12 +1514,12 @@
         "PA-MATRIX-buy-imps-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-buy-imps-answer-edit",
@@ -1569,12 +1567,12 @@
         "PA-MATRIX-buy-age-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-buy-age-answer-edit",
@@ -1617,12 +1615,12 @@
         "PA-MATRIX-buy-m2-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-buy-m2-answer-edit",
@@ -1665,12 +1663,12 @@
         "PA-MATRIX-buy-ppm-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-buy-ppm-answer-edit",
@@ -1713,12 +1711,12 @@
         "PA-MATRIX-buy-floor-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-buy-floor-answer-edit",
@@ -1761,12 +1759,12 @@
         "PA-MATRIX-buy-beds-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-buy-beds-answer-edit",
@@ -1809,12 +1807,12 @@
         "PA-MATRIX-buy-feat-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-buy-feat-answer-edit",
@@ -1855,12 +1853,12 @@
         "PA-PURCHASE-STAGED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PURCHASE-SINGLE",
@@ -1901,12 +1899,12 @@
         "PA-PURCHASE-STAGED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PURCHASE-SINGLE",
@@ -1947,12 +1945,12 @@
         "PA-PURCHASE-STAGED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PURCHASE-SINGLE",
@@ -1993,12 +1991,12 @@
         "PA-PURCHASE-STAGED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PURCHASE-SINGLE",
@@ -2039,12 +2037,12 @@
         "PA-PURCHASE-STAGED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PURCHASE-SINGLE",
@@ -2085,12 +2083,12 @@
         "PA-PURCHASE-STAGED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PURCHASE-SINGLE",
@@ -2131,12 +2129,12 @@
         "PA-PURCHASE-STAGED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PURCHASE-SINGLE",
@@ -2177,12 +2175,12 @@
         "PA-PURCHASE-STAGED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PURCHASE-SINGLE",
@@ -2222,12 +2220,12 @@
         "PA-PURCHASE-STAGED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PURCHASE-STAGED"
@@ -2266,12 +2264,12 @@
         "PA-PURCHASE-STAGED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PURCHASE-STAGED"
@@ -2310,12 +2308,12 @@
         "PA-PURCHASE-SINGLE"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PURCHASE-SINGLE"
@@ -2355,12 +2353,12 @@
         "PA-PURCHASE-STAGED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PURCHASE-SINGLE",
@@ -2401,12 +2399,12 @@
         "PA-PURCHASE-STAGED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PURCHASE-SINGLE",
@@ -2446,12 +2444,12 @@
         "PA-SERVICE-SELLER"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-SELLER"
@@ -2491,12 +2489,12 @@
         "PA-SERVICE-SELLER"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-SELLER"
@@ -2536,12 +2534,12 @@
         "PA-SERVICE-SELLER"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-SELLER"
@@ -2581,12 +2579,12 @@
         "PA-SERVICE-SELLER"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-SELLER"
@@ -2628,12 +2626,12 @@
         "PA-MATRIX-sell-s_area-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-sell-s_area-answer-edit",
@@ -2676,12 +2674,12 @@
         "PA-MATRIX-sell-s_rooms-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-sell-s_rooms-answer-edit",
@@ -2724,12 +2722,12 @@
         "PA-MATRIX-sell-s_age-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-sell-s_age-answer-edit",
@@ -2772,12 +2770,12 @@
         "PA-MATRIX-sell-s_floor-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-sell-s_floor-answer-edit",
@@ -2820,12 +2818,12 @@
         "PA-MATRIX-sell-s_hood-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-sell-s_hood-answer-edit",
@@ -2868,12 +2866,12 @@
         "PA-MATRIX-sell-s_motiv-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-sell-s_motiv-answer-edit",
@@ -2916,12 +2914,12 @@
         "PA-MATRIX-sell-s_urg-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-sell-s_urg-answer-edit",
@@ -2962,12 +2960,12 @@
         "PA-SERVICE-SELLER"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-SELLER"
@@ -3007,12 +3005,12 @@
         "PA-SERVICE-SELLER"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-SELLER"
@@ -3052,12 +3050,12 @@
         "PA-SERVICE-SELLER"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-SELLER"
@@ -3097,12 +3095,12 @@
         "PA-SERVICE-SELLER"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-SELLER"
@@ -3142,12 +3140,12 @@
         "PA-SERVICE-SELLER"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-SELLER"
@@ -3187,12 +3185,12 @@
         "PA-SERVICE-SELLER"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-SELLER"
@@ -3232,12 +3230,12 @@
         "PA-SERVICE-SELLER"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-SELLER"
@@ -3279,12 +3277,12 @@
         "PA-MATRIX-invp-i_obj-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-invp-i_obj-answer-edit",
@@ -3327,12 +3325,12 @@
         "PA-MATRIX-invp-i_cap-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-invp-i_cap-answer-edit",
@@ -3375,12 +3373,12 @@
         "PA-MATRIX-invp-i_liq-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-invp-i_liq-answer-edit",
@@ -3423,12 +3421,12 @@
         "PA-MATRIX-invp-i_hor-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-invp-i_hor-answer-edit",
@@ -3471,12 +3469,12 @@
         "PA-MATRIX-invp-i_risk-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-invp-i_risk-answer-edit",
@@ -3519,12 +3517,12 @@
         "PA-MATRIX-invp-i_asset-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-invp-i_asset-answer-edit",
@@ -3567,12 +3565,12 @@
         "PA-MATRIX-invp-i_fin-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-invp-i_fin-answer-edit",
@@ -3615,12 +3613,12 @@
         "PA-MATRIX-invp-i_income-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-invp-i_income-answer-edit",
@@ -3663,12 +3661,12 @@
         "PA-MATRIX-invp-i_mgmt-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-invp-i_mgmt-answer-edit",
@@ -3711,12 +3709,12 @@
         "PA-MATRIX-invp-i_exit-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-invp-i_exit-answer-edit",
@@ -3759,12 +3757,12 @@
         "PA-MATRIX-invp-i_hood-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-invp-i_hood-answer-edit",
@@ -3805,12 +3803,12 @@
         "PA-SERVICE-INVESTMENT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-INVESTMENT"
@@ -3850,12 +3848,12 @@
         "PA-SERVICE-INVESTMENT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-INVESTMENT"
@@ -3897,12 +3895,12 @@
         "PA-SERVICE-LANDLORD-stay"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-LANDLORD-price",
@@ -3946,12 +3944,12 @@
         "PA-MATRIX-lndl-l_hood-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-lndl-l_hood-answer-edit",
@@ -3992,12 +3990,12 @@
         "PA-SERVICE-LANDLORD-price"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-LANDLORD-price"
@@ -4037,12 +4035,12 @@
         "PA-SERVICE-LANDLORD-res"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-LANDLORD-res"
@@ -4082,12 +4080,12 @@
         "PA-SERVICE-LANDLORD-res"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-LANDLORD-res"
@@ -4129,12 +4127,12 @@
         "PA-MATRIX-lndl-l_rules-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-lndl-l_rules-answer-edit",
@@ -4175,12 +4173,12 @@
         "PA-SERVICE-LANDLORD-stay"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-LANDLORD-stay"
@@ -4220,12 +4218,12 @@
         "PA-SERVICE-LANDLORD-stay"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-LANDLORD-stay"
@@ -4265,12 +4263,12 @@
         "PA-SERVICE-LANDLORD-stay"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-LANDLORD-stay"
@@ -4312,12 +4310,12 @@
         "PA-MATRIX-lndl-l_stay_rules-skip"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MATRIX-lndl-l_stay_rules-answer-edit",
@@ -4359,12 +4357,12 @@
         "PA-SERVICE-LANDLORD-stay"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-LANDLORD-res",
@@ -4402,13 +4400,13 @@
         "PA-RETIRED-invb-prjs"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RETIRED-invb-prjs"
@@ -4445,13 +4443,13 @@
         "PA-RETIRED-invb-scn"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RETIRED-invb-scn"
@@ -4488,13 +4486,13 @@
         "PA-RETIRED-invb-cap"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RETIRED-invb-cap"
@@ -4531,13 +4529,13 @@
         "PA-RETIRED-invb-yld"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RETIRED-invb-yld"
@@ -4574,13 +4572,13 @@
         "PA-RETIRED-invb-price"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RETIRED-invb-price"
@@ -4617,13 +4615,13 @@
         "PA-RETIRED-invb-pay"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RETIRED-invb-pay"
@@ -4660,13 +4658,13 @@
         "PA-RETIRED-invb-trk"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RETIRED-invb-trk"
@@ -4703,13 +4701,13 @@
         "PA-RETIRED-invr-props"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RETIRED-invr-props"
@@ -4746,13 +4744,13 @@
         "PA-RETIRED-invr-cap"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RETIRED-invr-cap"
@@ -4789,13 +4787,13 @@
         "PA-RETIRED-invr-cmp"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RETIRED-invr-cmp"
@@ -4832,13 +4830,13 @@
         "PA-RETIRED-invr-fund"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RETIRED-invr-fund"
@@ -4875,13 +4873,13 @@
         "PA-RETIRED-invr-pay"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RETIRED-invr-pay"
@@ -4918,13 +4916,13 @@
         "PA-RETIRED-invr-end"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "retirement_reason": "Approved removal of investment token/fund purchase routes: absent SCRIPTS, entry buttons and guide actions; legacy command and reload cannot reactivate them.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RETIRED-invr-end"
@@ -4955,9 +4953,9 @@
         "Skip all preferences then request a service"
       ],
       "handler": {
-        "source": "src/v31-intel.js and src/v31-guidance.js",
-        "target": "E30.discAPI.preference / E30.discAPI.route; resolve field for mkt:role",
-        "resolution": "Runtime UI journey and required transitions reviewed in the mapped passing tests; the release gate revalidates current-revision evidence."
+        "source": "src/v31-guidance.js project catalog and e31ProjectBid/e31ProjectEmployer handlers",
+        "target": "Choose contractor/employer operation on an actual project card; role is stored on its independently identified workflow",
+        "resolution": "PA-MARKET-ROLE-CHOICE checks browsing without role creation, explicit role selection, role change, terminal result, reload and preservation of the other project."
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
@@ -4965,12 +4963,12 @@
         "PA-MARKET-ROLE-CHOICE"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-MARKET-ROLE-CHOICE"
@@ -5009,12 +5007,12 @@
         "PA-PROJECT-EMPLOYER"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PROJECT-EMPLOYER"
@@ -5053,12 +5051,12 @@
         "PA-PROJECT-CONTRACTOR"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PROJECT-CONTRACTOR"
@@ -5097,12 +5095,12 @@
         "PA-PROJECT-CONTRACTOR"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PROJECT-CONTRACTOR"
@@ -5141,12 +5139,12 @@
         "PA-PROJECT-CONTRACTOR"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PROJECT-CONTRACTOR"
@@ -5185,12 +5183,12 @@
         "PA-PROJECT-CONTRACTOR"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PROJECT-CONTRACTOR"
@@ -5229,12 +5227,12 @@
         "PA-PROJECT-CONTRACTOR"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-PROJECT-CONTRACTOR"
@@ -5274,12 +5272,12 @@
         "PA-BUILD-PROJECT-SCOPED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-BUILD-PROJECT-SCOPED"
@@ -5319,12 +5317,12 @@
         "PA-BUILD-PROJECT-SCOPED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-BUILD-PROJECT-SCOPED"
@@ -5364,12 +5362,12 @@
         "PA-SERVICE-STAY-INPUTS"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-STAY-INPUTS"
@@ -5409,12 +5407,12 @@
         "PA-SERVICE-STAY-INPUTS"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-STAY-INPUTS"
@@ -5454,12 +5452,12 @@
         "PA-SERVICE-STAY-INPUTS"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SERVICE-STAY-INPUTS"
@@ -5498,12 +5496,12 @@
         "PA-STAY-EMPTY-INVALID"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-STAY-EMPTY-INVALID"
@@ -5542,12 +5540,12 @@
         "PA-STAY-EMPTY-INVALID"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-STAY-EMPTY-INVALID"
@@ -5586,12 +5584,12 @@
         "PA-STAY-BOOK-CHECKIN"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-STAY-BOOK-CHECKIN"
@@ -5630,12 +5628,12 @@
         "PA-STAY-BOOK-CHECKIN"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-STAY-BOOK-CHECKIN"
@@ -5674,12 +5672,12 @@
         "PA-STAY-BOOK-CHECKIN"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-STAY-BOOK-CHECKIN"
@@ -5718,12 +5716,12 @@
         "PA-STAY-BOOK-CHECKIN"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-STAY-BOOK-CHECKIN"
@@ -5769,12 +5767,12 @@
         "PA-SCENARIO-rent"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-rent"
@@ -5822,12 +5820,12 @@
         "PA-RB-SIDE-TASK-RESUME"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-RB-ANSWER-EDIT",
@@ -5874,12 +5872,12 @@
         "PA-SCENARIO-SPECS"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-SPECS"
@@ -5923,12 +5921,12 @@
         "PA-SCENARIO-rent-area"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-rent-area"
@@ -5972,12 +5970,12 @@
         "PA-SCENARIO-SAMPLE"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-SAMPLE"
@@ -6021,12 +6019,12 @@
         "PA-SCENARIO-buy"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-buy"
@@ -6070,12 +6068,12 @@
         "PA-SCENARIO-sell"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-sell"
@@ -6119,12 +6117,12 @@
         "PA-SCENARIO-invest"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-invest"
@@ -6168,12 +6166,12 @@
         "PA-SCENARIO-landlord"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-landlord"
@@ -6217,12 +6215,12 @@
         "PA-SCENARIO-neighborhood"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-neighborhood"
@@ -6266,12 +6264,12 @@
         "PA-SCENARIO-compare"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-compare"
@@ -6314,8 +6312,19 @@
       "test_ids": [
         "PA-SCENARIO-MAP"
       ],
-      "status": "unverified",
-      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
+      "status": "automated",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
+      "last_review": {
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
+        "run_ids": [
+          43850328294,
+          43850320068
+        ],
+        "passing_test_ids": [
+          "PA-SCENARIO-MAP"
+        ],
+        "failed_test_ids": []
+      }
     },
     {
       "scenario_id": "valuation",
@@ -6353,12 +6362,12 @@
         "PA-SCENARIO-VALUATION"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-VALUATION"
@@ -6402,12 +6411,12 @@
         "PA-SCENARIO-contracts"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-contracts"
@@ -6451,12 +6460,12 @@
         "PA-SCENARIO-CONTRACT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-CONTRACT"
@@ -6501,12 +6510,12 @@
         "PA-TERMINATION-SETTLEMENT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-TERMINATION-EMPTY",
@@ -6551,12 +6560,12 @@
         "PA-SCENARIO-services"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-services"
@@ -6600,12 +6609,12 @@
         "PA-SCENARIO-guaranteed"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-guaranteed"
@@ -6649,12 +6658,12 @@
         "PA-SCENARIO-saved"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-saved"
@@ -6698,12 +6707,12 @@
         "PA-SCENARIO-library"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-library"
@@ -6747,12 +6756,12 @@
         "PA-SCENARIO-projects"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-projects"
@@ -6796,12 +6805,12 @@
         "PA-SCENARIO-REMINDER"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-REMINDER"
@@ -6846,12 +6855,12 @@
         "PA-STAY-BOOK-CHECKIN"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-STAY",
@@ -6896,12 +6905,12 @@
         "PA-BUILD-PROJECT-SCOPED"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-BUILD-PROJECT-SCOPED"
@@ -6945,12 +6954,12 @@
         "PA-SCENARIO-DEVELOPMENT"
       ],
       "status": "automated",
-      "reason": "All mapped browser assertions, transitions and required phases passed on b6c24fc in runs 43848721074 and 43848710836. Fresh evidence for the tested revision remains mandatory.",
+      "reason": "All mapped browser assertions, transitions and required phases passed on eda8fb0 in runs 43850328294 and 43850320068. Every revision must still pass the unchanged evidence gate.",
       "last_review": {
-        "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+        "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
         "run_ids": [
-          43848721074,
-          43848710836
+          43850328294,
+          43850320068
         ],
         "passing_test_ids": [
           "PA-SCENARIO-DEVELOPMENT"
@@ -6960,20 +6969,20 @@
     }
   ],
   "execution_review": {
-    "revision": "b6c24fc0c9c4d5498682851152cce3b0daf4dc2c",
+    "revision": "eda8fb0dbfe5874b788c755b392267002e152534",
     "run_ids": [
-      43848721074,
-      43848710836
+      43850328294,
+      43850320068
     ],
     "browser_tests": 135,
-    "passed": 134,
-    "failed": 1,
-    "verified_rows": 85,
+    "passed": 135,
+    "failed": 0,
+    "verified_rows": 149,
     "total_rows": 150,
-    "verified_percent": 56.67,
+    "verified_percent": 99.33,
     "releaseApproved": false,
-    "reviewed_passing_rows": 149,
-    "remaining_rows": 1,
-    "note": "149 rows have complete passing evidence; their reviewed status is promoted in the following commit. Map remains unverified until the strengthened tile-failure test passes. The measured percentage here belongs to the reviewed runs, before status promotion."
+    "reviewed_passing_rows": 150,
+    "remaining_rows": 0,
+    "note": "Both reviewed runs passed every browser suite and all 135 audit tests. Their only gate problem was the map's old unverified label. This commit records its reviewed passing evidence. The next current-revision gate must independently verify all 150 rows; this review is not a bypass or inherited PASS."
   }
 }
