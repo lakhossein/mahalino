@@ -93,6 +93,7 @@ if(require.main===module){
   const report=fs.existsSync(evidencePath)?JSON.parse(fs.readFileSync(evidencePath,'utf8')):null;
   const result=validate(manifest,markdown,report,revision);
   fs.writeFileSync(path.join(dir,'priority-audit-results.json'),JSON.stringify(result,null,2)+'\n');
+  console.log('AUDIT GAPS '+JSON.stringify(result.problems));
   console.log(JSON.stringify({steps:result.steps,scenarios:result.scenarios,verifiedRows:result.verifiedRows,totalRows:result.totalRows,
    verifiedPercent:result.verifiedPercent,releaseApproved:result.releaseApproved,problems:result.problems.length}));
   if(!result.releaseApproved){console.error('PRIORITY AUDIT GATE FAILED: see priority-audit-results.json; unverified coverage cannot authorize release.');process.exitCode=1}

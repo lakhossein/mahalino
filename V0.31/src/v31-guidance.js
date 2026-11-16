@@ -349,6 +349,7 @@ E30.guide=(function(){
       E30.discAPI.start(flow,false);
       return true;
     }
+    if(a==='native'&&r.id==='reminder'){suspend();setNode('reminder');return E28.remAuto(normFa(t),t)}
     if(a==='native')return false; /* Existing engine owns the answer and validation. */
     usrC(t);
     if(['valuation','termination','services','guaranteed'].indexOf(a)>=0||a.indexOf('flow:')===0)suspend();

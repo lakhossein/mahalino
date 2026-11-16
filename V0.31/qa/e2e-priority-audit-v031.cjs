@@ -550,11 +550,13 @@ async function snapshot(page){
    await exerciseStep(h,'stay','chk');await chip(h,'!c');
    const end=await page.evaluate(()=>({id:wd('stay').id,code:wd('stay').data.code,checked:wd('stay').data.checked,tokens:S.tokens}));
    check(end.checked&&end.tokens===before.credits-30,'Explicit check-in completes once with exactly one booking charge');
+   await h.prompt('pause-service');
    await act('reload booked accommodation',()=>page.reload({waitUntil:'domcontentloaded'}));
    check(await page.evaluate(({id,code})=>wfOf(id).data.checked&&wfOf(id).data.code===code,end),
     'Booking identity and check-in survive reload');
    // Check-in independently completes the reservation; its optional review
    // remains resumable until explicitly submitted.
+   await send(await page.evaluate(()=>E30.guide.actions['resume-service'].prompt));
    await exerciseStep(h,'stay','rev');
    await send('۶');check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='rev'),'Out-of-range rating does not advance');
    await send('۴');await exerciseStep(h,'stay','revt');
@@ -709,7 +711,7 @@ async function snapshot(page){
    await prompt('rent-budget');await send('ودیعه تا ۱ تومان و اجاره ماهانه تا ۱ تومان');await confirmBudget(10,10);
    const zero=await result();check(zero.ids.length===0&&zero.state.lastText.includes('آگهی منطبق پیدا نشد'),
     'Impossible explicit caps produce honest empty response',['empty-data']);
-   await prompt('rent-budget');await send('ودیعه تا ۴ میلیارد تومان و اجاره ماهانه تا ۹۰ میلیون تومان');await confirmBudget(40e9,9e8);
+   await explicitRequest(h,'rent-budget');await send('ودیعه تا ۴ میلیارد تومان و اجاره ماهانه تا ۹۰ میلیون تومان');await confirmBudget(40e9,9e8);
    const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
    await send(await page.evaluate(()=>E30.guide.actions.valuation.prompt));await resumeDiscovery(h,fields);
   },['scenario:sample']);
@@ -725,8 +727,11 @@ async function snapshot(page){
    // Simulate unavailable tile transport, leaving application code untouched.
    await page.route('**/*tile*',route=>route.abort());
    await send(await page.evaluate(()=>E30.guide.actions.map.prompt));
-   check((await page.locator('#chatB .e30-chat-map-card').last().textContent()).length>0,
-    'Unavailable transport retains the labeled map card and its controls',['empty-data']);
+   const offline=page.locator('#chatB .e30-chat-map-card').last();
+   await act('load map with unavailable tile transport',()=>offline.locator('[data-cba="e30MapLoad"]').click());
+   await offline.locator('.mapnote').waitFor({state:'visible',timeout:15000});
+   check((await offline.locator('.mapnote').textContent()).includes('برخی قطعات نقشه بارگیری نشد')&&await offline.locator('.leaflet-marker-icon').count()>0,
+    'Failed tile transport shows an honest warning and retains usable location markers',['empty-data']);
    await resumeDiscovery(h,fields);
   },['scenario:map']);
 
@@ -837,7 +842,7 @@ async function snapshot(page){
    await explicitRequest(h,'stay');
    check(await page.evaluate(()=>CE.f==='stay'&&SCRIPTS[CE.f][CE.i].id==='city'&&!wd('stay').data.city),
     'Requested accommodation has no invented destination',['empty-data']);
-   await exerciseStep(h,'stay','city');await send('تهران');await send('هفتهٔ بعد');await send('۲');
+   await send('تهران');await send('هفتهٔ بعد');await send('۲');
    check(await page.locator('#chatB .msg.bot').last().locator('.pcard').count()>0,'Actual accommodation search returns matching sample cards',['success']);
    await send(await page.evaluate(()=>E30.guide.actions['resume-service'].prompt));
    await resumeDiscovery(h,fields);
@@ -918,7 +923,9 @@ async function snapshot(page){
    await exerciseStep(h,'rent','hoods');await send('سعادت‌آباد');
    await exerciseStep(h,'rent','mk');await chip(h,'ok');
    await exerciseStep(h,'rent','list');
-   const noSelection=await serviceState(page,'rent');await chip(h,'!skp');
+   const noSelection=await serviceState(page,'rent');
+   check(await page.locator('#chatB .msg.bot').last().locator('[data-cv="!skp"]').count()===0,'Continue is unavailable without a selected property');
+   await send('!skp');
    check((await serviceState(page,'rent')).step==='list'&&(await snapshot(page)).credits===noSelection.credits,
     'Missing property cannot start a visit or charge');
    await act('select actual matched rental card',()=>page.locator('#chatB [data-cba="selL"]').last().click());

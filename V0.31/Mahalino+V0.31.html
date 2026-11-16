@@ -8492,7 +8492,7 @@ ACT.cpropSave=function(){
     if(!depText||!rentText||!Number.isFinite(dep)||!Number.isFinite(rent)||dep<0||rent<0||(dep===0&&rent===0)){toast('مبلغ‌های ودیعه و اجاره را درست وارد کنید؛ رهن کامل با اجارهٔ صفر پذیرفته است');return}
     c.terms.start=v('cp-start');if(!c.terms.start){toast('تاریخ شروع را انتخاب کنید');return}
     c.terms.duration=v('cp-dur')||'یک‌ساله';c.terms.deposit=dep;c.terms.rent=rent;c.terms.paymentDay=v('cp-pay')||'پنجم هر ماه';
-    ctx.D.B.depB=dep;ctx.D.dur=c.terms.duration;
+    ctx.D.B=ctx.D.B||{};ctx.D.B.depB=dep;ctx.D.dur=c.terms.duration;
   }else{
     var price=10*Number(v('cp-price')),delivery=v('cp-delivery');
     if(!price){toast('قیمت را وارد کنید');return}
@@ -19466,6 +19466,7 @@ E30.guide=(function(){
       E30.discAPI.start(flow,false);
       return true;
     }
+    if(a==='native'&&r.id==='reminder'){suspend();setNode('reminder');return E28.remAuto(normFa(t),t)}
     if(a==='native')return false; /* Existing engine owns the answer and validation. */
     usrC(t);
     if(['valuation','termination','services','guaranteed'].indexOf(a)>=0||a.indexOf('flow:')===0)suspend();
