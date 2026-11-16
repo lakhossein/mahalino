@@ -24,7 +24,9 @@ async function snapshot(page){
  try{
   browser=await chromium.launch({headless:true,executablePath:process.env.QA_CHROMIUM_EXECUTABLE||undefined,
    args:process.env.QA_NO_SANDBOX==='1'?['--no-sandbox']:[]});
-  async function test(id,fn,rowCovers=covers){
+  const pending=[];
+  async function test(id,fn,rowCovers=covers){pending.push(()=>execute(id,fn,rowCovers))}
+  async function execute(id,fn,rowCovers){
    const entry={id,result:'FAIL',surface:'browser-ui',covers:rowCovers,phases:[],assertions:[],trace:[]};
    report.tests.push(entry);write();
    const context=await browser.newContext({viewport:{width:1300,height:900}});
@@ -337,7 +339,7 @@ async function snapshot(page){
    await send(await page.evaluate(()=>E30.guide.actions['resume-service'].prompt));
    const after=await serviceState(page,flow);
    check(after.active===before.active&&after.data===before.data&&after.credits===before.credits&&after.requests===before.requests&&
-    (before.done?after.flow===null:after.flow===flow&&after.step===id),'Resume '+id+' restores exact workflow, facts and step once');
+    (before.done&&!(flow==='stay'&&['rev','revt'].includes(id))?after.flow===null:after.flow===flow&&after.step===id),'Resume '+id+' restores exact workflow, facts and step once');
   }
   async function beginService(h,id){
    await h.send(await h.page.evaluate(id=>E30.guide.actions[id].prompt,id));
@@ -547,8 +549,160 @@ async function snapshot(page){
    check(end.checked&&end.tokens===before.credits-30,'Explicit check-in completes once with exactly one booking charge');
    await act('reload booked accommodation',()=>page.reload({waitUntil:'domcontentloaded'}));
    check(await page.evaluate(({id,code})=>wfOf(id).data.checked&&wfOf(id).data.code===code,end),
-    'Booking identity and check-in survive reload',['success','cancel','resume']);
-  },['step:stay:book','step:stay:chk']);
+    'Booking identity and check-in survive reload');
+   // Check-in independently completes the reservation; its optional review
+   // remains resumable until explicitly submitted.
+   await exerciseStep(h,'stay','rev');
+   await send('۶');check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='rev'),'Out-of-range rating does not advance');
+   await send('۴');await exerciseStep(h,'stay','revt');
+   await send('اقامت آزمایشی رضایت‌بخش بود');
+   check(await page.evaluate(()=>wd('stay').data.reviewSubmitted&&S.reviews.length===1&&S.reviews[0].s===4&&
+    S.reviews[0].t==='اقامت آزمایشی رضایت‌بخش بود'&&S.reqs.filter(r=>r.kind==='نظر').length===1),
+    'Explicit review has exact text and rating and is recorded once');
+   await act('reload completed review',()=>page.reload({waitUntil:'domcontentloaded'}));
+   check(await page.evaluate(()=>wd('stay').data.reviewSubmitted&&S.reviews.length===1&&S.reviews[0].s===4&&S.tokens===470),
+    'Completed booking and optional review persist with one charge',['success','empty-data','cancel','resume']);
+  },['step:stay:book','step:stay:chk','step:stay:rev','step:stay:revt']);
+
+  async function registerContract(h,kind){
+   const {page,act,check}=h;
+   await act('fill and submit contract parties',async()=>{
+    await page.locator('#cl-name').fill('طرف اول آزمون');await page.locator('#cl-id').fill('1234567891');
+    await page.locator('#co-name').fill('طرف دوم آزمون');await page.locator('#co-id').fill('9876543210');
+    await page.locator('#co-mobile').fill('09123334455');
+    await page.locator('#chatB [data-act="cpartySave"]').last().click();
+   });
+   check(await page.evaluate(k=>wd(k).data.ctr.step===2,kind),'Actual parties pass validation');
+   await act('fill and submit property and financial terms',async()=>{
+    await page.locator('#cp-postal').fill('1234567890');await page.locator('#cp-addr').fill('نشانی آزمایشی، پلاک ۱');
+    await page.locator('#cp-area').fill('70');
+    const tomorrow=new Date(Date.now()+864e5).toISOString().slice(0,10);
+    if(kind==='buy'){
+     await page.locator('#cp-price').fill('14000000000');await page.locator('#cp-delivery').fill(tomorrow);
+    }else{
+     await page.locator('#cp-start').fill(tomorrow);await page.locator('#cp-dep').fill('1000000000');await page.locator('#cp-rent').fill('0');
+    }
+    await page.locator('#chatB [data-act="cpropSave"]').last().click();
+   });
+   check(await page.evaluate(k=>wd(k).data.ctr.step===3,kind),'Exact property terms reach review');
+   await act('explicitly approve both contract parties',async()=>{
+    await page.locator('label.switch:has(#ca-me)').click();await page.locator('label.switch:has(#ca-owner)').click();
+    await page.locator('#ca-me-name').fill('طرف اول آزمون');await page.locator('#ca-owner-name').fill('طرف دوم آزمون');
+    await page.locator('#chatB [data-act="capprove"]').last().click();
+    await page.locator('#chatB [data-act="cfinalize"]').last().click();
+   });
+   const before=await snapshot(page);
+   check(await page.evaluate(k=>!wd(k).data.ctr.finalized&&S.paySession?.state==='presented'&&S.paySession?.cost===60,kind),
+    'Both approvals still require a separate explicit 60-token payment');
+   await act('confirm contract payment',async()=>{await page.locator('#chatB [data-paygo]').last().click();await page.waitForTimeout(250)});
+   check(await page.evaluate(k=>wd(k).data.ctr.finalized&&S.contracts.some(c=>c.code===wd(k).data.code&&c.status==='signed_internal'),kind)&&
+    (await snapshot(page)).credits===before.credits-60,'Internal contract is registered once after explicit payment');
+  }
+
+  const rentalRows=['hoods','mk','list','day','time','visit','vform','vadd','ctr0'];
+  await test('PA-RENT-VISIT-CONTRACT',async h=>{
+   const {page,send,check,act}=h;await beginService(h,'rent');
+   await exerciseStep(h,'rent','hoods');await send('سعادت‌آباد');
+   await exerciseStep(h,'rent','mk');await chip(h,'ok');
+   await exerciseStep(h,'rent','list');
+   const noSelection=await serviceState(page,'rent');await chip(h,'!skp');
+   check((await serviceState(page,'rent')).step==='list'&&(await snapshot(page)).credits===noSelection.credits,
+    'Missing property cannot start a visit or charge');
+   await act('select actual matched rental card',()=>page.locator('#chatB [data-cba="selL"]').last().click());
+   await chip(h,'!skp');await exerciseStep(h,'rent','day');
+   const day=await page.evaluate(()=>SCRIPTS.rent.find(s=>s.id==='day').chips(wd('rent').data)[0][1]);await chip(h,day);
+   await exerciseStep(h,'rent','time');
+   const time=await page.evaluate(()=>SCRIPTS.rent.find(s=>s.id==='time').chips(wd('rent').data)[0][1]);await chip(h,time);
+   await exerciseStep(h,'rent','visit');
+   const before=await snapshot(page);await chip(h,'!go');
+   check((await snapshot(page)).credits===before.credits&&await page.locator('#chatB [data-paygo]').last().isVisible(),
+    'Visit quote requires explicit payment');
+   await act('confirm visit payment',async()=>{await page.locator('#chatB [data-paygo]').last().click();await page.waitForTimeout(250)});
+   check((await snapshot(page)).credits===before.credits-20,'Visit debits exactly 20 tokens');
+   await exerciseStep(h,'rent','vform');await chip(h,'!add');
+   await exerciseStep(h,'rent','vadd');await send('بررسی فشار آب');await send('تمام');
+   // The visit checklist is a loop with an explicit completion choice.
+   if(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='vform'))await chip(h,'!nx');
+   await exerciseStep(h,'rent','ctr0');await chip(h,'!open');await registerContract(h,'rent');
+   check(await page.evaluate(()=>wd('rent').data.vlist.some(x=>x.t==='بررسی فشار آب')&&wd('rent').data.signed&&S.tokens===420),
+    'Selected visit and internal contract independently complete with the actual custom checklist');
+   await act('reload registered rental contract',()=>page.reload({waitUntil:'domcontentloaded'}));
+   check(await page.evaluate(()=>wd('rent').data.signed&&S.tokens===420&&S.contracts.length===1),
+    'Contract identity and exact balance persist',['success','empty-data','cancel','resume']);
+  },rentalRows.map(x=>'step:rent:'+x));
+
+  const terminationRows=['termq','treason','tdate','tmin','totp','tai','tpay'];
+  await test('PA-TERMINATION-SETTLEMENT',async h=>{
+   const {page,send,check,act}=h;
+   // Existing signed agreements are fixture data; every operation is through UI.
+   const fixture=await page.evaluate(()=>{
+    const w=wfNew('rent');w.data={signed:true,code:'AUDIT-TARGET',B:{depB:1e10,rentB:0},ctr:{finalized:true}};
+    const other=wfNew('rent');other.data={signed:true,code:'AUDIT-OTHER',B:{depB:2e10,rentB:1e8}};
+    S.contracts=[{code:'AUDIT-TARGET',kind:'rent',status:'signed_internal',wfId:w.id,title:'قرارداد هدف'},
+     {code:'AUDIT-OTHER',kind:'rent',status:'signed_internal',wfId:other.id,title:'قرارداد نامرتبط'}];save();
+    return {id:w.id,other:JSON.stringify(other),contract:JSON.stringify(S.contracts[1])};
+   });
+   await send(await page.evaluate(()=>E30.guide.actions.termination.prompt));
+   check(await page.locator('#chatB [data-cba="e31TermStart"]').count()===2&&await page.evaluate(()=>!CE.f),
+    'Multiple agreements require explicit target selection');
+   await act('select only target agreement',()=>page.locator('#chatB [data-cba="e31TermStart"][data-code="AUDIT-TARGET"]').click());
+   await exerciseStep(h,'rent','termq');await chip(h,'!go');
+   await exerciseStep(h,'rent','treason');await send('توافق');
+   await exerciseStep(h,'rent','tdate');await send('۳۰ روز دیگر');
+   await exerciseStep(h,'rent','tmin');await chip(h,'!send');
+   await exerciseStep(h,'rent','totp');await send('هنوز دریافت نکردم');
+   check(await page.evaluate(()=>!wd('rent').data.term.ok&&SCRIPTS[CE.f]?.[CE.i]?.id==='totp'),
+    'Unconfirmed counterparty cannot authorize settlement');
+   await chip(h,'confirmed');await exerciseStep(h,'rent','tai');await chip(h,'!skip');await chip(h,'!pay');
+   await exerciseStep(h,'rent','tpay');
+   check(await page.evaluate(()=>!wd('rent').data.term.paid),'Viewing settlement does not pay');
+   await chip(h,'!pay');
+   check(await page.evaluate(({id,other,contract})=>wfOf(id).done&&wfOf(id).data.term.paid&&
+    S.contracts[0].status==='terminated'&&JSON.stringify(wfOf(JSON.parse(other).id))===other&&JSON.stringify(S.contracts[1])===contract,fixture),
+    'Explicit settlement terminates only selected agreement and preserves unrelated workflow');
+   await act('reload settled agreement',()=>page.reload({waitUntil:'domcontentloaded'}));
+   check(await page.evaluate(()=>S.contracts[0].status==='terminated'&&S.tokens===500),
+    'Settlement state persists without invented monetary transfer',['success','empty-data','cancel','resume']);
+  },terminationRows.map(x=>'step:rent:'+x));
+
+  const purchaseRows=['hoods','mk','liq','list','lgsc','lg','buy_ctr','escA','escN','escP','escC','ut'];
+  for(const staged of [false,true])await test('PA-PURCHASE-'+(staged?'STAGED':'SINGLE'),async h=>{
+   const {page,send,check,act}=h;
+   await page.evaluate(()=>{S.tokens=1000;save();renderTok()});await beginService(h,'buy');
+   await exerciseStep(h,'buy','hoods');await send('نارمک');
+   await exerciseStep(h,'buy','mk');await chip(h,'ok');
+   await exerciseStep(h,'buy','liq');await chip(h,'skip');
+   await exerciseStep(h,'buy','list');
+   await act('select matched purchase card',()=>page.locator('#chatB [data-cba="selB"]').last().click());await chip(h,'!skp');
+   await exerciseStep(h,'buy','lgsc');await chip(h,'ok');
+   await exerciseStep(h,'buy','lg');await chip(h,'!lg');
+   await act('confirm legal report payment',async()=>{await page.locator('#chatB [data-paygo]').last().click();await page.waitForTimeout(250)});
+   check(await page.evaluate(()=>!!wd('buy').data.legal&&S.tokens===900),'Actual legal report costs exactly 100 tokens');
+   await chip(h,'!nx');await exerciseStep(h,'buy','buy_ctr');await chip(h,'!continue');
+   check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='buy_ctr'&&!wd('buy').data.signed),'Missing signed contract blocks escrow');
+   await chip(h,'!open');await registerContract(h,'buy');await chip(h,'!continue');
+   await exerciseStep(h,'buy','escA');await chip(h,staged?'yes':'no');
+   if(staged){
+    await exerciseStep(h,'buy','escN');await send('۳');await exerciseStep(h,'buy','escP');
+    await send('۲۰-۲۰-۲۰');check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='escP'&&!wd('buy').data.pay.ok),
+     'Non-100 percentages cannot authorize escrow');await chip(h,'eq');
+   }else{await exerciseStep(h,'buy','esc1');await chip(h,'!ok1')}
+   await exerciseStep(h,'buy','escC');
+   const n=staged?3:1;
+   for(let i=0;i<n;i++){
+    const before=await snapshot(page);await chip(h,'!ok');
+    check((await snapshot(page)).credits===before.credits,'Escrow stage requires explicit payment confirmation');
+    await act('confirm escrow stage '+(i+1),async()=>{await page.locator('#chatB [data-paygo]').last().click();await page.waitForTimeout(250)});
+    check(await page.evaluate(i=>wd('buy').data.escD===i+1,i),'Exactly one escrow stage advances');
+   }
+   await chip(h,'!done');await exerciseStep(h,'buy','ut');await chip(h,'!all');
+   const end=await page.evaluate(()=>({id:wd('buy').id,data:JSON.stringify(wd('buy').data),credits:S.tokens,done:wd('buy').done}));
+   check(end.done&&await page.evaluate(()=>wd('buy').data.ut.every(Boolean)&&wd('buy').data.ctr.finalized),
+    'Delivery independently completes after all selected escrow stages');
+   await act('reload delivered purchase',()=>page.reload({waitUntil:'domcontentloaded'}));
+   check(await page.evaluate(end=>wfOf(end.id).done&&JSON.stringify(wfOf(end.id).data)===end.data&&S.tokens===end.credits,end),
+    'Purchase terms, stages and delivery persist',['success','empty-data','cancel','resume']);
+  },(staged?purchaseRows:purchaseRows.filter(x=>!['escN','escP'].includes(x)).concat(['esc1'])).map(x=>'step:buy:'+x));
 
   for(const legacy of [{"flow":"invb","id":"prjs"},{"flow":"invb","id":"scn"},{"flow":"invb","id":"cap"},{"flow":"invb","id":"yld"},{"flow":"invb","id":"price"},{"flow":"invb","id":"pay"},{"flow":"invb","id":"trk"},{"flow":"invr","id":"props"},{"flow":"invr","id":"cap"},{"flow":"invr","id":"cmp"},{"flow":"invr","id":"fund"},{"flow":"invr","id":"pay"},{"flow":"invr","id":"end"}]){
    await test('PA-RETIRED-'+legacy.flow+'-'+legacy.id,async({page,check,act,send})=>{
@@ -572,6 +726,10 @@ async function snapshot(page){
       'Legacy request does not charge or create an operation');
    },['step:'+legacy.flow+':'+legacy.id]);
   }
+  // Contexts have independent localStorage and workflows. Bound parallelism
+  // keeps every assertion while avoiding a serial wait per isolated journey.
+  const workers=Math.max(1,Math.min(4,Number(process.env.QA_AUDIT_WORKERS)||4));
+  await Promise.all(Array.from({length:workers},async()=>{while(pending.length)await pending.shift()()}));
  }catch(error){
   report.tests.push({id:'PA-RB-HARNESS',result:'FAIL',surface:'browser-ui',covers,phases:[],assertions:[],trace:[],error:String(error.stack||error)});
   console.error(error);

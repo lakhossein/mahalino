@@ -672,9 +672,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-RENT-VISIT-CONTRACT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -703,9 +705,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-RENT-VISIT-CONTRACT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -734,9 +738,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-RENT-VISIT-CONTRACT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -765,9 +771,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-RENT-VISIT-CONTRACT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -797,9 +805,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-RENT-VISIT-CONTRACT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -828,9 +838,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-RENT-VISIT-CONTRACT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -859,9 +871,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-RENT-VISIT-CONTRACT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -890,9 +904,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-RENT-VISIT-CONTRACT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -921,9 +937,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-RENT-VISIT-CONTRACT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -953,9 +971,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-TERMINATION-SETTLEMENT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -985,9 +1005,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-TERMINATION-SETTLEMENT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -1017,9 +1039,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-TERMINATION-SETTLEMENT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -1049,9 +1073,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-TERMINATION-SETTLEMENT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -1081,9 +1107,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-TERMINATION-SETTLEMENT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -1113,9 +1141,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-TERMINATION-SETTLEMENT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "rent",
@@ -1145,9 +1175,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-TERMINATION-SETTLEMENT"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "buy",
@@ -1543,9 +1575,12 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PURCHASE-SINGLE",
+        "PA-PURCHASE-STAGED"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "buy",
@@ -1574,9 +1609,12 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PURCHASE-SINGLE",
+        "PA-PURCHASE-STAGED"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "buy",
@@ -1605,9 +1643,12 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PURCHASE-SINGLE",
+        "PA-PURCHASE-STAGED"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "buy",
@@ -1636,9 +1677,12 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PURCHASE-SINGLE",
+        "PA-PURCHASE-STAGED"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "buy",
@@ -1667,9 +1711,12 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PURCHASE-SINGLE",
+        "PA-PURCHASE-STAGED"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "buy",
@@ -1698,9 +1745,12 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PURCHASE-SINGLE",
+        "PA-PURCHASE-STAGED"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "buy",
@@ -1729,9 +1779,12 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PURCHASE-SINGLE",
+        "PA-PURCHASE-STAGED"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "buy",
@@ -1760,9 +1813,12 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PURCHASE-SINGLE",
+        "PA-PURCHASE-STAGED"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "buy",
@@ -1791,9 +1847,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PURCHASE-STAGED"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "buy",
@@ -1822,9 +1880,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PURCHASE-STAGED"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "buy",
@@ -1853,9 +1913,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PURCHASE-SINGLE"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "buy",
@@ -1884,9 +1946,12 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PURCHASE-SINGLE",
+        "PA-PURCHASE-STAGED"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "buy",
@@ -1915,9 +1980,12 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PURCHASE-SINGLE",
+        "PA-PURCHASE-STAGED"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "sell",
@@ -5007,7 +5075,7 @@
         "PA-STAY-BOOK-CHECKIN"
       ],
       "status": "unverified",
-      "reason": "Actual UI booking, explicit payment, per-step pause/reload/resume and persisted check-in regression added; CI pending."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "stay",
@@ -5040,7 +5108,7 @@
         "PA-STAY-BOOK-CHECKIN"
       ],
       "status": "unverified",
-      "reason": "Actual UI booking, explicit payment, per-step pause/reload/resume and persisted check-in regression added; CI pending."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "stay",
@@ -5069,9 +5137,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-STAY-BOOK-CHECKIN"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     },
     {
       "flow": "stay",
@@ -5100,9 +5170,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-STAY-BOOK-CHECKIN"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "UI journey with per-stage missing input and pause/reload/resume plus independently completed service added; current browser evidence required."
     }
   ],
   "scenarios": [

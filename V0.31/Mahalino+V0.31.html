@@ -19403,7 +19403,8 @@ E30.guide=(function(){
     if(saved.contract&&typeof E28!=='undefined'){E28.ctrKind=saved.contract.kind;E28.ctrDone=saved.contract.done}
     if(E30.discAPI.active())return E30.discAPI.resumePrompt();
     var work=saved.activeId&&(S.wfs||[]).filter(function(w){return w.id===saved.activeId})[0];
-    if(work&&work.done){CE.f=null;botC('کار قبلی به پایان رسیده است؛ وضعیت و اطلاعات ذخیره‌شدهٔ آن حفظ شده‌اند.',null);return true}
+    var pendingReview=CE.f==='stay'&&['rev','revt'].indexOf((SCRIPTS.stay[CE.i]||{}).id)>=0&&work&&work.data&&!work.data.reviewSubmitted;
+    if(work&&work.done&&!pendingReview){CE.f=null;botC('کار قبلی به پایان رسیده است؛ وضعیت و اطلاعات ذخیره‌شدهٔ آن حفظ شده‌اند.',null);return true}
     if(CE.f)ceStep();else botC('به کار قبلی برگشتید؛ اطلاعات گفت‌وگو حفظ شده است.',null);
     return true;
   }
