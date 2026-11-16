@@ -484,6 +484,53 @@ async function snapshot(page){
     (await snapshot(page)).credits===initial.credits,'Completed build persists with exact facts and no debit',['success','cancel','resume']);
   },['step:build:sup','step:build:ph']);
 
+  await test('PA-PROJECT-CONTRACTOR',async h=>{
+   const {page,check,send,act}=h;
+   await send(await page.evaluate(()=>E30.guide.actions.development.prompt));
+   check(await page.evaluate(()=>!S.wfs.some(w=>w.m==='mkt')),'Browsing sample projects creates no operational workflow');
+   await act('choose actual project as contractor',async()=>{await page.locator('#chatB [data-cba="e31ProjectBid"][data-i="0"]').last().click()});
+   const id=await page.evaluate(()=>wd('mkt').id);
+   for(const [step,value] of [['bid','۸ میلیارد تومان'],['adj','none']]){
+    await exerciseStep(h,'mkt',step);
+    await send('ورودی نامعتبر');
+    check(await page.evaluate(s=>SCRIPTS[CE.f]?.[CE.i]?.id===s,step),'Invalid '+step+' cannot advance');
+    await send(value);
+   }
+   await exerciseStep(h,'mkt','send');
+   const credits=(await snapshot(page)).credits;
+   await chip(h,'!b');
+   check(await page.locator('#chatB [data-paygo]').last().isVisible()&&
+    await page.evaluate(()=>!wd('mkt').data.bid&&S.tokens===500),'Bid requires explicit priced payment confirmation');
+   await act('confirm contractor payment',async()=>{await page.locator('#chatB [data-paygo]').last().click();await page.waitForTimeout(3500)});
+   check(await page.evaluate(id=>wfOf(id).data.confirmed&&wfOf(id).data.bid.amt===8e10,id),'Confirmed paid bid retains selected project and amount');
+   await exerciseStep(h,'mkt','st');await chip(h,'!nx');
+   await exerciseStep(h,'mkt','trk');
+   check((await page.locator('#chatB .msg.bot').last().textContent()).includes('ثبت نشده')&&await page.evaluate(()=>!S.wfs.some(w=>w.m==='build')),
+    'Tracking does not invent construction or progress');
+   await chip(h,'!end');
+   const end=await page.evaluate(id=>({done:wfOf(id).done,bid:JSON.stringify(wfOf(id).data.bid),credits:S.tokens}),id);
+   await act('reload completed contractor project',()=>page.reload({waitUntil:'domcontentloaded'}));
+   check(await page.evaluate(({id,bid})=>wfOf(id).done&&JSON.stringify(wfOf(id).data.bid)===bid,{id,bid:end.bid})&&end.credits===credits-20,
+    'Project completes and persists with exactly one bid charge',['success','empty-data','cancel','resume']);
+  },['bid','adj','send','st','trk'].map(x=>'step:mkt:'+x));
+
+  await test('PA-PROJECT-EMPLOYER',async h=>{
+   const {page,check,send,act}=h;
+   await send(await page.evaluate(()=>E30.guide.actions.development.prompt));
+   await act('choose actual project as employer',()=>page.locator('#chatB [data-cba="e31ProjectEmployer"][data-i="0"]').last().click());
+   await exerciseStep(h,'mkt','prj');
+   await send('پروژهٔ ناموجود');
+   check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='prj'&&!wd('mkt').data.chosen),'Unknown project never approves a contractor');
+   // Reopen the catalog and explicitly select the operation; no internal handler calls.
+   await send(await page.evaluate(()=>E30.guide.actions.development.prompt));
+   await act('select target employer project again',()=>page.locator('#chatB [data-cba="e31ProjectEmployer"][data-i="0"]').last().click());
+   const id=await page.evaluate(()=>wd('mkt').id);
+   await act('explicitly approve displayed contractor',()=>page.locator('#chatB [data-cba="e31ProjectChoose"]').last().click());
+   check(await page.evaluate(()=>wd('mkt').data.chosen!=null),'Actual displayed contractor approved internally');
+   await chip(h,'!nx');await chip(h,'!end');
+   check(await page.evaluate(id=>wfOf(id).done&&wfOf(id).data.chosen!=null,id),'Employer reaches independent completed project',['success','empty-data','cancel','resume']);
+  },['step:mkt:prj']);
+
   for(const legacy of [{"flow":"invb","id":"prjs"},{"flow":"invb","id":"scn"},{"flow":"invb","id":"cap"},{"flow":"invb","id":"yld"},{"flow":"invb","id":"price"},{"flow":"invb","id":"pay"},{"flow":"invb","id":"trk"},{"flow":"invr","id":"props"},{"flow":"invr","id":"cap"},{"flow":"invr","id":"cmp"},{"flow":"invr","id":"fund"},{"flow":"invr","id":"pay"},{"flow":"invr","id":"end"}]){
    await test('PA-RETIRED-'+legacy.flow+'-'+legacy.id,async({page,check,act,send})=>{
     const before=await snapshot(page);

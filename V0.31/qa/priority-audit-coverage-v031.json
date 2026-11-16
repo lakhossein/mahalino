@@ -4429,9 +4429,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PROJECT-EMPLOYER"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Real project selection, per-stage empty input and pause/reload/resume plus explicit payment and terminal result added; browser validation pending."
     },
     {
       "flow": "mkt",
@@ -4460,9 +4462,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PROJECT-CONTRACTOR"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Real project selection, per-stage empty input and pause/reload/resume plus explicit payment and terminal result added; browser validation pending."
     },
     {
       "flow": "mkt",
@@ -4491,9 +4495,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PROJECT-CONTRACTOR"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Real project selection, per-stage empty input and pause/reload/resume plus explicit payment and terminal result added; browser validation pending."
     },
     {
       "flow": "mkt",
@@ -4522,9 +4528,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PROJECT-CONTRACTOR"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Real project selection, per-stage empty input and pause/reload/resume plus explicit payment and terminal result added; browser validation pending."
     },
     {
       "flow": "mkt",
@@ -4553,9 +4561,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PROJECT-CONTRACTOR"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Real project selection, per-stage empty input and pause/reload/resume plus explicit payment and terminal result added; browser validation pending."
     },
     {
       "flow": "mkt",
@@ -4584,9 +4594,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-PROJECT-CONTRACTOR"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Real project selection, per-stage empty input and pause/reload/resume plus explicit payment and terminal result added; browser validation pending."
     },
     {
       "flow": "build",
@@ -4619,8 +4631,19 @@
       "evidence_ids": [
         "PA-BUILD-PROJECT-SCOPED"
       ],
-      "status": "unverified",
-      "reason": "Browser contract added for missing project, invalid supplier, pause/reload/resume at each service step and persisted project-scoped completion; execution pending."
+      "status": "automated",
+      "reason": "PA-BUILD-PROJECT-SCOPED passed in both 43722719332 and 43722715641. Current revision evidence remains mandatory.",
+      "last_review": {
+        "revision": "35b60c9139c076ba4a6ddd704947f76f4c551e8f",
+        "run_ids": [
+          43722719332,
+          43722715641
+        ],
+        "passing_test_ids": [
+          "PA-BUILD-PROJECT-SCOPED"
+        ],
+        "failed_test_ids": []
+      }
     },
     {
       "flow": "build",
@@ -4653,8 +4676,19 @@
       "evidence_ids": [
         "PA-BUILD-PROJECT-SCOPED"
       ],
-      "status": "unverified",
-      "reason": "Browser contract added for missing project, invalid supplier, pause/reload/resume at each service step and persisted project-scoped completion; execution pending."
+      "status": "automated",
+      "reason": "PA-BUILD-PROJECT-SCOPED passed in both 43722719332 and 43722715641. Current revision evidence remains mandatory.",
+      "last_review": {
+        "revision": "35b60c9139c076ba4a6ddd704947f76f4c551e8f",
+        "run_ids": [
+          43722719332,
+          43722715641
+        ],
+        "passing_test_ids": [
+          "PA-BUILD-PROJECT-SCOPED"
+        ],
+        "failed_test_ids": []
+      }
     },
     {
       "flow": "stay",
