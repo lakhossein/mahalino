@@ -725,11 +725,13 @@ async function snapshot(page){
    const load=card.locator('[data-cba="e30MapLoad"]');if(await load.count())await act('load real interactive map',async()=>{await load.click();await page.waitForTimeout(500)});
    check(await card.locator('.e30-chat-map-canvas').count()>0,'Map owns an actual canvas in chat');
    // Simulate unavailable tile transport, leaving application code untouched.
-   await page.route('**/*tile*',route=>route.abort());
+   let blockedTiles=0;
+   await page.route(/^https:\/\/[^/]*tile\.openstreetmap\.(?:de|fr|org)\//,route=>{blockedTiles++;return route.abort()});
    await send(await page.evaluate(()=>E30.guide.actions.map.prompt));
    const offline=page.locator('#chatB .e30-chat-map-card').last();
    await act('load map with unavailable tile transport',()=>offline.locator('[data-cba="e30MapLoad"]').click());
    await offline.locator('.mapnote').waitFor({state:'visible',timeout:15000});
+   check(blockedTiles>0,'Tile transport was actually interrupted by the browser route');
    check((await offline.locator('.mapnote').textContent()).includes('برخی قطعات نقشه بارگیری نشد')&&await offline.locator('.leaflet-marker-icon').count()>0,
     'Failed tile transport shows an honest warning and retains usable location markers',['empty-data']);
    await resumeDiscovery(h,fields);
