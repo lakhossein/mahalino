@@ -4432,8 +4432,19 @@
       "evidence_ids": [
         "PA-PROJECT-EMPLOYER"
       ],
-      "status": "unverified",
-      "reason": "Real project selection, per-stage empty input and pause/reload/resume plus explicit payment and terminal result added; browser validation pending."
+      "status": "automated",
+      "reason": "Mapped browser paths passed on 752b9ac in both runs 43811023457 and 43811018813. Current revision evidence remains mandatory.",
+      "last_review": {
+        "revision": "752b9ac95751823a0cf786855dd9ec6fb8033edc",
+        "run_ids": [
+          43811023457,
+          43811018813
+        ],
+        "passing_test_ids": [
+          "PA-PROJECT-EMPLOYER"
+        ],
+        "failed_test_ids": []
+      }
     },
     {
       "flow": "mkt",
@@ -4465,8 +4476,19 @@
       "evidence_ids": [
         "PA-PROJECT-CONTRACTOR"
       ],
-      "status": "unverified",
-      "reason": "Real project selection, per-stage empty input and pause/reload/resume plus explicit payment and terminal result added; browser validation pending."
+      "status": "automated",
+      "reason": "Mapped browser paths passed on 752b9ac in both runs 43811023457 and 43811018813. Current revision evidence remains mandatory.",
+      "last_review": {
+        "revision": "752b9ac95751823a0cf786855dd9ec6fb8033edc",
+        "run_ids": [
+          43811023457,
+          43811018813
+        ],
+        "passing_test_ids": [
+          "PA-PROJECT-CONTRACTOR"
+        ],
+        "failed_test_ids": []
+      }
     },
     {
       "flow": "mkt",
@@ -4498,8 +4520,19 @@
       "evidence_ids": [
         "PA-PROJECT-CONTRACTOR"
       ],
-      "status": "unverified",
-      "reason": "Real project selection, per-stage empty input and pause/reload/resume plus explicit payment and terminal result added; browser validation pending."
+      "status": "automated",
+      "reason": "Mapped browser paths passed on 752b9ac in both runs 43811023457 and 43811018813. Current revision evidence remains mandatory.",
+      "last_review": {
+        "revision": "752b9ac95751823a0cf786855dd9ec6fb8033edc",
+        "run_ids": [
+          43811023457,
+          43811018813
+        ],
+        "passing_test_ids": [
+          "PA-PROJECT-CONTRACTOR"
+        ],
+        "failed_test_ids": []
+      }
     },
     {
       "flow": "mkt",
@@ -4531,8 +4564,19 @@
       "evidence_ids": [
         "PA-PROJECT-CONTRACTOR"
       ],
-      "status": "unverified",
-      "reason": "Real project selection, per-stage empty input and pause/reload/resume plus explicit payment and terminal result added; browser validation pending."
+      "status": "automated",
+      "reason": "Mapped browser paths passed on 752b9ac in both runs 43811023457 and 43811018813. Current revision evidence remains mandatory.",
+      "last_review": {
+        "revision": "752b9ac95751823a0cf786855dd9ec6fb8033edc",
+        "run_ids": [
+          43811023457,
+          43811018813
+        ],
+        "passing_test_ids": [
+          "PA-PROJECT-CONTRACTOR"
+        ],
+        "failed_test_ids": []
+      }
     },
     {
       "flow": "mkt",
@@ -4564,8 +4608,19 @@
       "evidence_ids": [
         "PA-PROJECT-CONTRACTOR"
       ],
-      "status": "unverified",
-      "reason": "Real project selection, per-stage empty input and pause/reload/resume plus explicit payment and terminal result added; browser validation pending."
+      "status": "automated",
+      "reason": "Mapped browser paths passed on 752b9ac in both runs 43811023457 and 43811018813. Current revision evidence remains mandatory.",
+      "last_review": {
+        "revision": "752b9ac95751823a0cf786855dd9ec6fb8033edc",
+        "run_ids": [
+          43811023457,
+          43811018813
+        ],
+        "passing_test_ids": [
+          "PA-PROJECT-CONTRACTOR"
+        ],
+        "failed_test_ids": []
+      }
     },
     {
       "flow": "mkt",
@@ -4597,8 +4652,19 @@
       "evidence_ids": [
         "PA-PROJECT-CONTRACTOR"
       ],
-      "status": "unverified",
-      "reason": "Real project selection, per-stage empty input and pause/reload/resume plus explicit payment and terminal result added; browser validation pending."
+      "status": "automated",
+      "reason": "Mapped browser paths passed on 752b9ac in both runs 43811023457 and 43811018813. Current revision evidence remains mandatory.",
+      "last_review": {
+        "revision": "752b9ac95751823a0cf786855dd9ec6fb8033edc",
+        "run_ids": [
+          43811023457,
+          43811018813
+        ],
+        "passing_test_ids": [
+          "PA-PROJECT-CONTRACTOR"
+        ],
+        "failed_test_ids": []
+      }
     },
     {
       "flow": "build",
@@ -4937,9 +5003,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-STAY-BOOK-CHECKIN"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Actual UI booking, explicit payment, per-step pause/reload/resume and persisted check-in regression added; CI pending."
     },
     {
       "flow": "stay",
@@ -4968,9 +5036,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-STAY-BOOK-CHECKIN"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Actual UI booking, explicit payment, per-step pause/reload/resume and persisted check-in regression added; CI pending."
     },
     {
       "flow": "stay",

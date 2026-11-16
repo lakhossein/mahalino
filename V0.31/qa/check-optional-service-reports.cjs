@@ -50,3 +50,5 @@ for(const value of ['0','-1','6','1.5','abc']){c.RVS=4;assert.equal(rating.set({
 assert.equal(rating.set({},'5'),null);assert.equal(c.RVS,5);
 const missing=c.SCRIPTS.stay.find(s=>s.id==='list').q({city:'مشهد'});assert(missing.includes('موجود نیست'));assert(!missing.includes('تهران'));
 console.log('PASS stay inputs: invalid nights/ratings preserve prior values; absent destination has explicit empty message');
+
+assert.equal(typeof c.SCRIPTS.stay.find(s=>s.id==='book').acts.b.e30PaidDelegate,'function');

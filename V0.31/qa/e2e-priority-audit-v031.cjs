@@ -531,6 +531,25 @@ async function snapshot(page){
    check(await page.evaluate(id=>wfOf(id).done&&wfOf(id).data.chosen!=null,id),'Employer reaches independent completed project',['success','empty-data','cancel','resume']);
   },['step:mkt:prj']);
 
+  await test('PA-STAY-BOOK-CHECKIN',async h=>{
+   const {page,check,send,act}=h;await send(await page.evaluate(()=>E30.guide.actions.stay.prompt));
+   await send('تهران');await send('هفتهٔ بعد');await send('۲');
+   await act('select accommodation for booking',()=>page.locator('#chatB .msg.bot').last().locator('[data-cba="selS"]').first().click());
+   await chip(h,'!nx');await send('۳');
+   await exerciseStep(h,'stay','book');
+   const before=await snapshot(page);await chip(h,'!b');
+   check(await page.locator('#chatB [data-paygo]').last().isVisible()&&await page.evaluate(()=>!wd('stay').data.code),
+    'Booking presents explicit payment without inventing confirmation code',['empty-data']);
+   await act('confirm accommodation payment',async()=>{await page.locator('#chatB [data-paygo]').last().click();await page.waitForTimeout(2300)});
+   check(await page.evaluate(()=>!!wd('stay').data.code&&SCRIPTS[CE.f]?.[CE.i]?.id==='chk'),'Paid booking creates actual demo check-in code');
+   await exerciseStep(h,'stay','chk');await chip(h,'!c');
+   const end=await page.evaluate(()=>({id:wd('stay').id,code:wd('stay').data.code,checked:wd('stay').data.checked,tokens:S.tokens}));
+   check(end.checked&&end.tokens===before.credits-30,'Explicit check-in completes once with exactly one booking charge');
+   await act('reload booked accommodation',()=>page.reload({waitUntil:'domcontentloaded'}));
+   check(await page.evaluate(({id,code})=>wfOf(id).data.checked&&wfOf(id).data.code===code,end),
+    'Booking identity and check-in survive reload',['success','cancel','resume']);
+  },['step:stay:book','step:stay:chk']);
+
   for(const legacy of [{"flow":"invb","id":"prjs"},{"flow":"invb","id":"scn"},{"flow":"invb","id":"cap"},{"flow":"invb","id":"yld"},{"flow":"invb","id":"price"},{"flow":"invb","id":"pay"},{"flow":"invb","id":"trk"},{"flow":"invr","id":"props"},{"flow":"invr","id":"cap"},{"flow":"invr","id":"cmp"},{"flow":"invr","id":"fund"},{"flow":"invr","id":"pay"},{"flow":"invr","id":"end"}]){
    await test('PA-RETIRED-'+legacy.flow+'-'+legacy.id,async({page,check,act,send})=>{
     const before=await snapshot(page);

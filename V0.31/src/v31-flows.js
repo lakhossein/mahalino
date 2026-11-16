@@ -490,6 +490,7 @@ E30.flows=(function(){
         if(D.code){botC('این رزرو قبلاً ثبت شده است؛ پرداخت تکراری انجام نشد.',null);return}
         return book(D);
       };
+      booking.acts.b.e30PaidDelegate=book;
       checkin.q=function(D){return D.code?'کد ورود نمایشی: <b>'+esc(D.code)+'#</b> — ورود انجام شد؟':'رزرو تأییدشده‌ای برای نمایش کد ورود وجود ندارد.'};
       checkin.acts.c=function(D){if(!D.code){botC('بدون رزرو ثبت‌شده، ورود قابل ثبت نیست.',null);return}if(D.checked){botC('ورود قبلاً ثبت شده است.',null);return}return arrive(D)};
       review.set=function(D,v){if(!D.checked||!Number.isInteger(RVS)||RVS<1||RVS>5||!String(v).trim()||D.reviewSubmitted)return 'ERR';var result=writeReview(D,v);if(result!=='ERR'){D.reviewSubmitted=true;save()}return result};
