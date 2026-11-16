@@ -18549,10 +18549,14 @@ E30.ux=(function(){
         '<label>عمر بنا<input class="inp" id="e30-val-age" type="number" min="0" max="80" step="1" value="5"></label>'+
         '<button class="btn btn-sm btn-primary" data-cba="e30ValQuote">محاسبه و تأیید هزینه</button></div>',null);
     };
-    CBACT.e30ValQuote=function(){
-      var hid=(document.getElementById('e30-val-hood')||{}).value,
-        area=Number((document.getElementById('e30-val-area')||{}).value),
-        age=Number((document.getElementById('e30-val-age')||{}).value),
+    CBACT.e30ValQuote=function(el){
+      var quotes=document.querySelectorAll('#chatB [data-cba="e30ValQuote"]'),latest=quotes[quotes.length-1];
+      if(el&&latest&&el!==latest){toast('از فرم جدید تخمین ارزش در گفت‌وگو استفاده کنید');return false}
+      var form=latest&&latest.closest('.sect');
+      function field(id){return form&&form.querySelector('[id="'+id+'"]')||{}}
+      var hid=field('e30-val-hood').value,
+        area=Number(field('e30-val-area').value),
+        age=Number(field('e30-val-age').value),
         h=HOODS.filter(function(x){return x.id===hid})[0];
       if(!h||!Number.isInteger(area)||area<10||area>2000||!Number.isInteger(age)||age<0||age>80){
         toast('محله، متراژ ۱۰ تا ۲۰۰۰ و عمر بنا ۰ تا ۸۰ را به‌درستی وارد کنید');return false;

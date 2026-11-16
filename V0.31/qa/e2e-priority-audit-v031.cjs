@@ -755,18 +755,18 @@ async function snapshot(page){
   await test('PA-SCENARIO-VALUATION',async h=>{
    const {page,send,check,act}=h;await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
    const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
-   await explicitRequest(h,'valuation');await page.locator('#e30-val-area').fill('0');
+   await explicitRequest(h,'valuation');await page.locator('#e30-val-area').last().fill('0');
    await act('reject invalid valuation size',()=>page.locator('#chatB [data-cba="e30ValQuote"]').last().click());
    check(await page.evaluate(()=>S.tokens===500&&!S.paySession&&!S.library.some(x=>x.type==='valuation')),
     'Invalid valuation cannot quote, charge or save a report',['empty-data']);
-   await page.locator('#e30-val-area').fill('85');await page.locator('#e30-val-age').fill('10');
+   await page.locator('#e30-val-area').last().fill('85');await page.locator('#e30-val-age').last().fill('10');
    await act('request actual valuation price',()=>page.locator('#chatB [data-cba="e30ValQuote"]').last().click());
    check(await page.evaluate(()=>S.tokens===500&&S.paySession.state==='presented'&&S.paySession.cost===40),
     'Exact tariff is shown before any debit');
    await act('cancel valuation quote',()=>page.locator('#chatB [data-paycancel]').last().click());
    check(await page.evaluate(()=>S.tokens===500&&!S.paySession),'Cancelling a quote costs nothing',['cancel']);
    await send(await page.evaluate(()=>E30.guide.actions.valuation.prompt));
-   await page.locator('#e30-val-area').fill('85');await page.locator('#e30-val-age').fill('10');
+   await page.locator('#e30-val-area').last().fill('85');await page.locator('#e30-val-age').last().fill('10');
    await act('requote valuation',()=>page.locator('#chatB [data-cba="e30ValQuote"]').last().click());
    await act('explicitly pay for valuation',()=>page.locator('#chatB [data-paygo]').last().click());
    check(await page.evaluate(()=>S.tokens===460&&S.library.filter(x=>x.type==='valuation'&&x.artifact.area===85&&x.artifact.age===10&&x.artifact.estimate>0).length===1),

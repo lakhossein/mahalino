@@ -35,6 +35,12 @@ test('source inventory retains 125 rows, 25 scenarios, combined budget, persona 
 test('unverified inventory cannot pass without browser evidence',()=>{
  const r=validate(original,doc,null,revision);
  assert.equal(r.releaseApproved,false);
+ assert.equal(r.verifiedRows,0);
+ assert.ok(r.problems.some(x=>x.id==='evidence'&&x.message.includes('Missing browser evidence')));
+});
+test('an explicitly unmapped row cannot inherit coverage from other passing rows',()=>{
+ const f=fixture();f.manifest.steps[0].evidence_ids=[];
+ const r=result(f);assert.equal(r.releaseApproved,false);
  assert.ok(r.problems.some(x=>x.message.includes('No mapped browser evidence')));
 });
 test('automated label alone does not establish evidence',()=>{
