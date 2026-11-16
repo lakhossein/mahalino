@@ -67,3 +67,59 @@ integrations not present in this static artifact. A release needs separate
 integration tests once those services exist. Individual assertions that fail
 must be fixed in the product or in an objectively incorrect test expectation;
 do not change them merely to obtain a green check.
+
+## Independent priority audit coverage (§7/§8)
+
+`priority-audit-coverage-v031.json` enumerates all 125 current §7 rows and
+25 §8 scenarios. The merged rental budget retains both legacy IDs; the new
+rental persona and all 13 retired invb/invr rows are included. This supplements
+the historical 25-requirement `coverage-v031.json` and its existing checker.
+
+The inventory starts **unverified**. Source handler references and target
+transitions are contracts to verify, not claims of runtime coverage.
+The extended release gate intentionally fails until assertion-bearing UI
+evidence is mapped. Do not mark rows automated merely because older suites pass.
+
+Run the validator's isolated fixtures with:
+`node --test V0.31/qa/check-priority-audit.test.cjs`.
+These fixtures are never browser coverage and never go into the evidence report.
+
+Browser harnesses must write `$QA_RESULTS_DIR/priority-audit-evidence.json`:
+```json
+{
+  "schemaVersion": 1,
+  "revision": "<GITHUB_SHA or actual tested git HEAD>",
+  "tests": [{
+    "id": "<unique actual browser test ID>",
+    "result": "PASS",
+    "surface": "browser-ui",
+    "covers": ["scenario:rent"],
+    "phases": ["visible", "hidden", "composer-prefill", "composer-send", "success", "empty-data", "cancel", "resume"],
+    "assertions": [{"name": "<actual asserted behavior>", "pass": true}],
+    "trace": [{"state": "<observed state>", "action": "<actual UI input>", "next_state": "<observed next state>"}]
+  }]
+}
+```
+
+Each mapped test must pass, include passing assertions and observed transitions,
+and explicitly cover the row. Use `step:<flow>:<legacy_step_id>` for steps and
+`scenario:<scenario_id>` for scenarios. IDs are namespaced; test counts and
+the guide registry's historical test labels are not sufficient evidence.
+
+Required phases:
+- Optional needs: answer, skip, edit, service-terminal, reload.
+- Service/gate rows: success, empty-data, cancel, resume.
+- Retired rows: route-absent plus a documented retirement reason.
+- Scenarios: visible, hidden, composer-prefill, composer-send, success,
+  empty-data, cancel, resume.
+
+Assertions can span several browser tests mapped to the same row. Missing data
+may end in an explicit missing prerequisite or stated inability; it may not
+substitute for the successful path with suitable data. Clicking a prompt must
+only prefill the composer; send it explicitly before asserting handler effects.
+Reports from another revision, missing tests, duplicate evidence IDs, VM-only
+checks, failed assertions and incomplete traces all block approval.
+
+The checker writes `priority-audit-results.json` with per-row gaps, returns
+nonzero on any gap, and is included in `run-quality-gate.sh` after the existing
+§19.1 checker. Existing browser suites still run before the extended gate.

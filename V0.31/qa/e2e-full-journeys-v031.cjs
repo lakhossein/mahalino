@@ -300,6 +300,21 @@ async function drainDisc(page,final){
       }));
       const termCTA=page.locator('#chatB [data-cba="ctrCont"][data-v="trm"]').last();
       if(await termCTA.count())await termCTA.click();await sleep(page,160);
+      const unrelated=await page.evaluate(code=>{
+        const original=(S.wfs||[]).find(w=>w.m==='rent'&&w.data?.code===code),contract=S.contracts.find(c=>c.code===code);
+        const other=wfNew('rent');other.data=JSON.parse(JSON.stringify(original.data));
+        other.data.code='UNRELATED-TARGET';other.data.ctr.code='UNRELATED-TARGET';
+        const copy=JSON.parse(JSON.stringify(contract));copy.code='UNRELATED-TARGET';copy.wfId=other.id;
+        if(copy.doc)copy.doc.code='UNRELATED-TARGET';
+        S.contracts.unshift(copy);wfSet('rent',original.id);save();
+        return {code:copy.code,contract:JSON.stringify(copy),workflow:JSON.stringify(other.data)};
+      },registered.code);
+      await send(page,await page.evaluate(()=>E30.guide.actions.termination.prompt));
+      const choices=await page.locator('#chatB [data-cba="e31TermStart"]').count();
+      if(choices<2)throw Error('Termination did not present both explicit contract targets');
+      const beforeChoice=await page.evaluate(()=>S.contracts.map(c=>c.status));
+      if(!beforeChoice.every(s=>s==='signed_internal'))throw Error('Opening termination mutated a contract before target selection');
+      await page.locator('#chatB [data-cba="e31TermStart"][data-code="'+registered.code+'"]').last().click();await sleep(page,120);
       const termination=await page.evaluate(()=>({view:CURRENT,flow:CE.f,step:SCRIPTS[CE.f]?.[CE.i]?.id}));
       /* Finish the actual chat journey — a CTA alone does not prove a valid
          termination. Each confirmation belongs to a distinct browser click. */
@@ -336,14 +351,16 @@ async function drainDisc(page,final){
         contract:(S.contracts||[]).find(x=>x.code===wd('rent').data.code)?.status,
         balance:S.tokens
       }));
+      const unrelatedAfter=await page.evaluate(code=>({contract:JSON.stringify(S.contracts.find(c=>c.code===code)),workflow:JSON.stringify(S.wfs.find(w=>w.data?.code===code).data)}),unrelated.code);
       return {ok:chatForm&&pending.before===480&&pending.price===60&&pending.state==='presented'&&
         registered.balance===420&&registered.finalized===true&&registered.listing===0&&
         registered.contract==='signed_internal'&&registered.chat&&registered.termButton&&
         termination.view==='landing'&&termination.flow==='rent'&&termination.step==='termq'&&
         termSteps.map(x=>x.step).join(',')==='treason,tdate,tmin,totp,tai,tai,tpay,'&&
         settled.paid&&settled.done&&settled.contract==='terminated'&&settled.view==='landing'&&
-        settled.balance===420&&persisted.paid&&persisted.contract==='terminated'&&persisted.balance===420,
-        info:{parties,property,approved,pending,registered,termination,termSteps,settled,persisted}};
+        settled.balance===420&&persisted.paid&&persisted.contract==='terminated'&&persisted.balance===420&&
+        unrelated.contract===unrelatedAfter.contract&&unrelated.workflow===unrelatedAfter.workflow,
+        info:{parties,property,approved,pending,registered,termination,termSteps,settled,persisted,unrelatedUnchanged:unrelated.contract===unrelatedAfter.contract&&unrelated.workflow===unrelatedAfter.workflow}};
     });
 
     await run('H07','Actual in-app PDF print action produces print DOM and a valid Chromium PDF',async page=>{
@@ -612,6 +629,8 @@ async function drainDisc(page,final){
     await run('H16','Personalized investment goal and risk reach a saved report and tracked completed request',async page=>{
       await send(page,'حدود ۳۰ میلیارد تومان سرمایه دارم. می‌خوام یه ملک بخرم که اجاره ماهانه بده.');await drainDisc(page);
       const initialCapital=await page.evaluate(()=>wd('invp').data.cap);
+      // Personalization is now explicitly opt-in after the limited report.
+      if(await curStep(page)==='i_an')await choice(page,'!refine');
       if(initialCapital!==300000000000)throw Error('The stated 30B toman capital changed during handoff: '+initialCapital);
       // User-facing inputs are toman; saved historical financial values remain
       // rial. Replay the same 30B toman capital and request 10M toman income.

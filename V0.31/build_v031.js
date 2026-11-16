@@ -53,6 +53,14 @@ rep("var OLD_LS=['mahal','ino_','v18'].join('');",
 rep("var S=null,LSCHAIN=[LSKEY,OLD_LS,OLD_LS2,OLD_LS3],LSi;",
     "var S=null,LSCHAIN=[LSKEY,OLD_LS,OLD_LS4,OLD_LS5,OLD_LS2,OLD_LS3],LSi;");
 
+/* Direct contract entry has no discovery budget object yet. */
+rep("ctx.D.B.depB=dep;ctx.D.dur=c.terms.duration;",
+    "ctx.D.B=ctx.D.B||{};ctx.D.B.depB=dep;ctx.D.dur=c.terms.duration;");
+
+/* Delayed demo approval belongs to the workflow that submitted the bid. */
+rep("   setTimeout(function(){\n     var d2=wd('mkt');", "   var bidWfId=wd('mkt').id;\n   setTimeout(function(){\n     var d2=wfOf(bidWfId);if(!d2||d2.cancelled)return;");
+rep("botC(' کارفرما تأیید کرد — پروژه به شما واگذار شد.');", "botC('در شبیه‌سازی، کارفرما پیشنهاد پروژهٔ '+PRJ[d2.data.bid.prj].t+' را تأیید کرد؛ این واگذاری واقعی نیست.');");
+
 /* ═══ 3) state defaults for E30 collections ═══ */
 injectAfter("if(!S.profile)S.profile={confirmed:{},inferred:{},stale:{},log:[]};",
 `/* V0.31 state defaults */
@@ -205,6 +213,7 @@ retireBetween('VIEWS.invest=function(){','/* ═══ ۱۴) مارکت',
 
 /* Toman is the public currency; preserve historical canonical storage. */
 retireBetween('function parseMoneyFA(input){','function parseCountFA(input){',readSrc('v31-money.js')+'\n');
+rep("return {ok:true,value:Math.round(pr.value)};","if(!Number.isSafeInteger(pr.value))return {ok:false,msg:'عدد صحیح وارد کنید؛ مقدار اعشاری گرد نمی‌شود.'};return {ok:true,value:pr.value};");
 rep("function rial(v){return fa(v,0)+' ریال'}","function rial(v){return fa(Number(v)/10,Number(v)%10?1:0)+' تومان'}");
 rep("function rShort(v){v=+v||0;","function rShort(v){v=(+v||0)/10;");
 rep("if(st.set){done=st.set(D,v)}","if(st.set){done=(st.money||st.moneyRange)?moneyCanonical(function(){return st.set(D,v)}):st.set(D,v)}");
