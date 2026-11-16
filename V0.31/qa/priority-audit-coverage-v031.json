@@ -36,9 +36,11 @@
       },
       "expected_transition": "فقط تشخیص درخواست؛ بدون اطلاعات شخصی",
       "terminal_state": "Requested route selected without personal questionnaire; ambiguous request clarified.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-GATE-OPTIONAL-ENTRY"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Explicit UI entry, skip/edit or per-stage pause/reload/resume and terminal outcome mapped; browser execution pending."
     },
     {
       "flow": "gate",
@@ -68,9 +70,11 @@
       },
       "expected_transition": "فقط در فلو مرتبط و با زمینهٔ صریح رفت‌وآمد کاری",
       "terminal_state": "Requested route selected without personal questionnaire; ambiguous request clarified.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-GATE-OPTIONAL-ENTRY"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Explicit UI entry, skip/edit or per-stage pause/reload/resume and terminal outcome mapped; browser execution pending."
     },
     {
       "flow": "gate",
@@ -100,9 +104,11 @@
       },
       "expected_transition": "فقط در فلو مرتبط و با زمینهٔ صریح فرزند مدرسه‌رو",
       "terminal_state": "Requested route selected without personal questionnaire; ambiguous request clarified.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-GATE-OPTIONAL-ENTRY"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Explicit UI entry, skip/edit or per-stage pause/reload/resume and terminal outcome mapped; browser execution pending."
     },
     {
       "flow": "gate",
@@ -132,9 +138,11 @@
       },
       "expected_transition": "انتخاب خدمت یا ورود مستقیم",
       "terminal_state": "Requested route selected without personal questionnaire; ambiguous request clarified.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-GATE-OPTIONAL-ENTRY"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Explicit UI entry, skip/edit or per-stage pause/reload/resume and terminal outcome mapped; browser execution pending."
     },
     {
       "flow": "rent",
@@ -218,9 +226,12 @@
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه؛ مدرسه/کار فقط با زمینهٔ مرتبط و صریح",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-MATRIX-rent-imps-answer-edit",
+        "PA-MATRIX-rent-imps-skip"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Explicit UI entry, skip/edit or per-stage pause/reload/resume and terminal outcome mapped; browser execution pending."
     },
     {
       "flow": "rent",
@@ -1257,9 +1268,12 @@
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه؛ مدرسه/کار فقط با زمینهٔ مرتبط و صریح",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-MATRIX-buy-imps-answer-edit",
+        "PA-MATRIX-buy-imps-skip"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Explicit UI entry, skip/edit or per-stage pause/reload/resume and terminal outcome mapped; browser execution pending."
     },
     {
       "flow": "buy",
@@ -2014,9 +2028,11 @@
       },
       "expected_transition": "پیش‌نیاز فقط هنگام انتخاب همین خدمت؛ پایان و بازگشت مشخص",
       "terminal_state": "Selected service independently completes, returns honest empty result/missing prerequisite, or cancels without forced next operation.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-SERVICE-SELLER"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Explicit UI entry, skip/edit or per-stage pause/reload/resume and terminal outcome mapped; browser execution pending."
     },
     {
       "flow": "sell",
@@ -4466,9 +4482,11 @@
       },
       "expected_transition": "انتقال به پرامپت‌های پیشنهادی؛ قابل رد و اصلاح؛ بدون مسدودکردن نتیجه",
       "terminal_state": "Answer/skip/edit reaches selected-service result with confirmed fields preserved after reload.",
-      "evidence_ids": [],
+      "evidence_ids": [
+        "PA-MARKET-ROLE-CHOICE"
+      ],
       "status": "unverified",
-      "reason": "No assertion-bearing browser evidence mapped to this §7 row at the tested revision; historical suite PASS is not row coverage."
+      "reason": "Explicit UI entry, skip/edit or per-stage pause/reload/resume and terminal outcome mapped; browser execution pending."
     },
     {
       "flow": "mkt",
@@ -5210,9 +5228,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-rent"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "rent-budget",
@@ -5301,9 +5321,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-SPECS"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "rent-area",
@@ -5337,9 +5359,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-rent-area"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "sample",
@@ -5373,9 +5397,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-SAMPLE"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "buy",
@@ -5409,9 +5435,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-buy"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "sell",
@@ -5445,9 +5473,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-sell"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "invest",
@@ -5481,9 +5511,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-invest"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "landlord",
@@ -5517,9 +5549,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-landlord"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "neighborhood",
@@ -5553,9 +5587,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-neighborhood"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "compare",
@@ -5589,9 +5625,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-compare"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "map",
@@ -5625,9 +5663,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-MAP"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "valuation",
@@ -5661,9 +5701,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-VALUATION"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "contracts",
@@ -5697,9 +5739,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-contracts"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "contract-start",
@@ -5733,9 +5777,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-CONTRACT"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "termination",
@@ -5769,9 +5815,12 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-TERMINATION-EMPTY",
+        "PA-TERMINATION-SETTLEMENT"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "services",
@@ -5805,9 +5854,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-services"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "guaranteed",
@@ -5841,9 +5892,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-guaranteed"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "saved",
@@ -5877,9 +5930,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-saved"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "library",
@@ -5913,9 +5968,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-library"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "projects",
@@ -5949,9 +6006,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-projects"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "reminder",
@@ -5985,9 +6044,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-REMINDER"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "stay",
@@ -6021,9 +6082,12 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-STAY",
+        "PA-STAY-BOOK-CHECKIN"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "build",
@@ -6057,9 +6121,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-BUILD-PROJECT-SCOPED"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     },
     {
       "scenario_id": "development",
@@ -6093,9 +6159,11 @@
         "Reload or return from side service",
         "Resume same chat/workflow; assert stable facts, no duplicate operation and independent terminal result"
       ],
-      "test_ids": [],
+      "test_ids": [
+        "PA-SCENARIO-DEVELOPMENT"
+      ],
       "status": "unverified",
-      "reason": "No §8 complete browser path evidence mapped yet; registry action is a source reference, not execution proof."
+      "reason": "Current-revision UI request composition, explicit send, outcome, missing input, cancellation and reload/resume evidence mapped; browser execution pending."
     }
   ],
   "execution_review": {

@@ -88,6 +88,7 @@ async function snapshot(page){
    }
    try{
     await page.goto(base,{waitUntil:'domcontentloaded'});
+    if(rowCovers.some(x=>x.startsWith('scenario:')))check(await page.locator('#chatB .e31-guide').count()===0,'Guest has no authenticated actionable prompt suggestions',['hidden']);
     await page.evaluate(()=>doLogin('QA'));
     await page.waitForTimeout(150);
     await fn({page,check,act,send,prompt,result,confirmBudget});
@@ -218,7 +219,7 @@ async function snapshot(page){
    check(found.state.credits===baseline.credits&&found.state.requests===baseline.requests,'Skip and search do not bill or create operations');
   },['step:rent:who']);
 
-  const preferenceMatrix=[{"flow": "rent", "id": "beds", "slot": "rooms", "answer": "۱", "expected": 1, "edit": "۲", "edited": 2}, {"flow": "rent", "id": "m2", "slot": "m2", "answer": "۶۰", "expected": 60, "edit": "۷۰", "edited": 70}, {"flow": "rent", "id": "age", "slot": "prop_age", "answer": "تا ۱۰ سال", "expected": 10, "edit": "تا ۲۰ سال", "edited": 20}, {"flow": "rent", "id": "floor", "slot": "floor_preference", "answer": "طبقه ۱ تا ۵ الزامی است", "expected": {"min": 1, "max": 5, "level": "required"}, "edit": "طبقه ۱ تا ۱۰ الزامی است", "edited": {"min": 1, "max": 10, "level": "required"}}, {"flow": "buy", "id": "beds", "slot": "rooms", "answer": "۱", "expected": 1, "edit": "۲", "edited": 2}, {"flow": "buy", "id": "m2", "slot": "m2", "answer": "۶۰", "expected": 60, "edit": "۷۰", "edited": 70}, {"flow": "buy", "id": "age", "slot": "prop_age", "answer": "تا ۱۰ سال", "expected": 10, "edit": "تا ۲۰ سال", "edited": 20}, {"flow": "buy", "id": "floor", "slot": "floor_preference", "answer": "طبقه ۱ تا ۵ الزامی است", "expected": {"min": 1, "max": 5, "level": "required"}, "edit": "طبقه ۱ تا ۱۰ الزامی است", "edited": {"min": 1, "max": 10, "level": "required"}}, {"flow": "buy", "id": "budg", "slot": "buy_budget", "answer": "۱۰۰ میلیارد تومان", "expected": {"v": [1000000000000, 1000000000000]}, "edit": "۲۰۰ میلیارد تومان", "edited": {"v": [2000000000000, 2000000000000]}}, {"flow": "buy", "id": "ppm", "slot": "price_per_m2", "answer": "۱۰۰ میلیون تا ۹۰۰ میلیون تومان", "expected": {"v": [1000000000, 9000000000]}, "edit": "۵۰ میلیون تا ۹۰۰ میلیون تومان", "edited": {"v": [500000000, 9000000000]}}, {"flow": "sell", "id": "s_area", "slot": "prop_area", "answer": "۸۵", "expected": 85, "edit": "۹۰", "edited": 90}, {"flow": "sell", "id": "s_rooms", "slot": "prop_rooms", "answer": "۲", "expected": 2, "edit": "۳", "edited": 3}, {"flow": "sell", "id": "s_age", "slot": "prop_age", "answer": "تا ۱۰ سال", "expected": 10, "edit": "تا ۲۰ سال", "edited": 20}, {"flow": "sell", "id": "s_floor", "slot": "property_floor", "answer": "۲", "expected": 2, "edit": "۳", "edited": 3}, {"flow": "sell", "id": "s_hood", "slot": "hood", "answer": "نارمک", "expected": "h6", "edit": "سعادت‌آباد", "edited": "h1"}, {"flow": "sell", "id": "s_motiv", "slot": "sale_motivation", "answer": "مهاجرت", "expected": "مهاجرت", "edit": "تعویض ملک", "edited": "تعویض ملک"}, {"flow": "sell", "id": "s_urg", "slot": "sale_urgency", "answer": "عجله ندارم", "expected": "maxvalue", "edit": "فروش سریع", "edited": "fast"}, {"flow": "invp", "id": "i_obj", "slot": "invest_objective", "answer": "هدف درآمد اجاره", "expected": "rent_income", "edit": "حفظ ارزش", "edited": "inflation_hedge"}, {"flow": "invp", "id": "i_cap", "slot": "invest_capital", "answer": "۳۰ میلیارد تومان", "expected": {"v": [300000000000, 300000000000]}, "edit": "۴۰ میلیارد تومان", "edited": {"v": [400000000000, 400000000000]}}, {"flow": "invp", "id": "i_liq", "slot": "invest_liquidity", "answer": "نقدشوندگی بالا", "expected": "بالا", "edit": "قفل بلندمدت", "edited": "مهم نیست"}, {"flow": "invp", "id": "i_hor", "slot": "invest_horizon", "answer": "۵ سال", "expected": "میان‌مدت", "edit": "۱۰ سال", "edited": "بلندمدت"}, {"flow": "invp", "id": "i_risk", "slot": "invest_risk", "answer": "ریسک متوسط", "expected": "متوسط", "edit": "ریسک زیاد", "edited": "بالا"}, {"flow": "invp", "id": "i_asset", "slot": "invest_asset", "answer": "آپارتمان مسکونی", "expected": "residential", "edit": "زمین", "edited": "land"}, {"flow": "invp", "id": "i_fin", "slot": "invest_financing", "answer": "سرمایه شخصی", "expected": "cash", "edit": "بخشی وام", "edited": "mixed"}, {"flow": "invp", "id": "i_income", "slot": "invest_income", "answer": "۱۰ میلیون تومان", "expected": {"v": [100000000, 100000000]}, "edit": "۲۰ میلیون تومان", "edited": {"v": [200000000, 200000000]}}, {"flow": "invp", "id": "i_mgmt", "slot": "invest_management", "answer": "خودم", "expected": "self", "edit": "مدیر می‌گیرم", "edited": "delegate"}, {"flow": "invp", "id": "i_exit", "slot": "invest_exit", "answer": "فروش ملک", "expected": "sell", "edit": "نگهداری بلندمدت", "edited": "hold"}, {"flow": "invp", "id": "i_hood", "slot": "hood", "answer": "نارمک", "expected": "h6", "edit": "سعادت‌آباد", "edited": "h1"}, {"flow": "lndl", "id": "l_hood", "slot": "hood", "answer": "نارمک", "expected": "h6", "edit": "سعادت‌آباد", "edited": "h1"}, {"flow": "lndl", "id": "l_rules", "slot": "rental_rules", "answer": "حیوان خانگی پذیرفته نیست", "expected": ["حیوان خانگی پذیرفته نیست"], "edit": "ندارد", "edited": []}, {"flow": "lndl", "id": "l_stay_rules", "slot": "stay_rules", "answer": "سیگار ممنوع", "expected": ["سیگار ممنوع"], "edit": "ندارد", "edited": []}, {"flow": "rent", "id": "elev", "slot": "prefs", "field": "prefRules", "answer": "آسانسور الزامی است", "expected": {"elevator": "required"}, "edit": "آسانسور ترجیح دارد", "edited": {"elevator": "preferred"}}, {"flow": "rent", "id": "park", "slot": "prefs", "field": "prefRules", "answer": "پارکینگ الزامی است", "expected": {"parking": "required"}, "edit": "پارکینگ ترجیح دارد", "edited": {"parking": "preferred"}}, {"flow": "rent", "id": "extra", "slot": "prefs", "field": "prefRules", "answer": "بالکن الزامی است", "expected": {"balcony": "required"}, "edit": "بالکن ترجیح دارد", "edited": {"balcony": "preferred"}}, {"flow": "buy", "id": "feat", "slot": "prefs", "field": "prefRules", "answer": "انباری الزامی است", "expected": {"storage": "required"}, "edit": "انباری ترجیح دارد", "edited": {"storage": "preferred"}}];
+  const preferenceMatrix=[{"flow":"rent","id":"beds","slot":"rooms","answer":"۱","expected":1,"edit":"۲","edited":2},{"flow":"rent","id":"m2","slot":"m2","answer":"۶۰","expected":60,"edit":"۷۰","edited":70},{"flow":"rent","id":"age","slot":"prop_age","answer":"تا ۱۰ سال","expected":10,"edit":"تا ۲۰ سال","edited":20},{"flow":"rent","id":"floor","slot":"floor_preference","answer":"طبقه ۱ تا ۵ الزامی است","expected":{"min":1,"max":5,"level":"required"},"edit":"طبقه ۱ تا ۱۰ الزامی است","edited":{"min":1,"max":10,"level":"required"}},{"flow":"buy","id":"beds","slot":"rooms","answer":"۱","expected":1,"edit":"۲","edited":2},{"flow":"buy","id":"m2","slot":"m2","answer":"۶۰","expected":60,"edit":"۷۰","edited":70},{"flow":"buy","id":"age","slot":"prop_age","answer":"تا ۱۰ سال","expected":10,"edit":"تا ۲۰ سال","edited":20},{"flow":"buy","id":"floor","slot":"floor_preference","answer":"طبقه ۱ تا ۵ الزامی است","expected":{"min":1,"max":5,"level":"required"},"edit":"طبقه ۱ تا ۱۰ الزامی است","edited":{"min":1,"max":10,"level":"required"}},{"flow":"buy","id":"budg","slot":"buy_budget","answer":"۱۰۰ میلیارد تومان","expected":{"v":[1000000000000,1000000000000]},"edit":"۲۰۰ میلیارد تومان","edited":{"v":[2000000000000,2000000000000]}},{"flow":"buy","id":"ppm","slot":"price_per_m2","answer":"۱۰۰ میلیون تا ۹۰۰ میلیون تومان","expected":{"v":[1000000000,9000000000]},"edit":"۵۰ میلیون تا ۹۰۰ میلیون تومان","edited":{"v":[500000000,9000000000]}},{"flow":"sell","id":"s_area","slot":"prop_area","answer":"۸۵","expected":85,"edit":"۹۰","edited":90},{"flow":"sell","id":"s_rooms","slot":"prop_rooms","answer":"۲","expected":2,"edit":"۳","edited":3},{"flow":"sell","id":"s_age","slot":"prop_age","answer":"تا ۱۰ سال","expected":10,"edit":"تا ۲۰ سال","edited":20},{"flow":"sell","id":"s_floor","slot":"property_floor","answer":"۲","expected":2,"edit":"۳","edited":3},{"flow":"sell","id":"s_hood","slot":"hood","answer":"نارمک","expected":"h6","edit":"سعادت‌آباد","edited":"h1"},{"flow":"sell","id":"s_motiv","slot":"sale_motivation","answer":"مهاجرت","expected":"مهاجرت","edit":"تعویض ملک","edited":"تعویض ملک"},{"flow":"sell","id":"s_urg","slot":"sale_urgency","answer":"عجله ندارم","expected":"maxvalue","edit":"فروش سریع","edited":"fast"},{"flow":"invp","id":"i_obj","slot":"invest_objective","answer":"هدف درآمد اجاره","expected":"rent_income","edit":"حفظ ارزش","edited":"inflation_hedge"},{"flow":"invp","id":"i_cap","slot":"invest_capital","answer":"۳۰ میلیارد تومان","expected":{"v":[300000000000,300000000000]},"edit":"۴۰ میلیارد تومان","edited":{"v":[400000000000,400000000000]}},{"flow":"invp","id":"i_liq","slot":"invest_liquidity","answer":"نقدشوندگی بالا","expected":"بالا","edit":"قفل بلندمدت","edited":"مهم نیست"},{"flow":"invp","id":"i_hor","slot":"invest_horizon","answer":"۵ سال","expected":"میان‌مدت","edit":"۱۰ سال","edited":"بلندمدت"},{"flow":"invp","id":"i_risk","slot":"invest_risk","answer":"ریسک متوسط","expected":"متوسط","edit":"ریسک زیاد","edited":"بالا"},{"flow":"invp","id":"i_asset","slot":"invest_asset","answer":"آپارتمان مسکونی","expected":"residential","edit":"زمین","edited":"land"},{"flow":"invp","id":"i_fin","slot":"invest_financing","answer":"سرمایه شخصی","expected":"cash","edit":"بخشی وام","edited":"mixed"},{"flow":"invp","id":"i_income","slot":"invest_income","answer":"۱۰ میلیون تومان","expected":{"v":[100000000,100000000]},"edit":"۲۰ میلیون تومان","edited":{"v":[200000000,200000000]}},{"flow":"invp","id":"i_mgmt","slot":"invest_management","answer":"خودم","expected":"self","edit":"مدیر می‌گیرم","edited":"delegate"},{"flow":"invp","id":"i_exit","slot":"invest_exit","answer":"فروش ملک","expected":"sell","edit":"نگهداری بلندمدت","edited":"hold"},{"flow":"invp","id":"i_hood","slot":"hood","answer":"نارمک","expected":"h6","edit":"سعادت‌آباد","edited":"h1"},{"flow":"lndl","id":"l_hood","slot":"hood","answer":"نارمک","expected":"h6","edit":"سعادت‌آباد","edited":"h1"},{"flow":"lndl","id":"l_rules","slot":"rental_rules","answer":"حیوان خانگی پذیرفته نیست","expected":["حیوان خانگی پذیرفته نیست"],"edit":"ندارد","edited":[]},{"flow":"lndl","id":"l_stay_rules","slot":"stay_rules","answer":"سیگار ممنوع","expected":["سیگار ممنوع"],"edit":"ندارد","edited":[]},{"flow":"rent","id":"elev","slot":"prefs","field":"prefRules","answer":"آسانسور الزامی است","expected":{"elevator":"required"},"edit":"آسانسور ترجیح دارد","edited":{"elevator":"preferred"}},{"flow":"rent","id":"park","slot":"prefs","field":"prefRules","answer":"پارکینگ الزامی است","expected":{"parking":"required"},"edit":"پارکینگ ترجیح دارد","edited":{"parking":"preferred"}},{"flow":"rent","id":"extra","slot":"prefs","field":"prefRules","answer":"بالکن الزامی است","expected":{"balcony":"required"},"edit":"بالکن ترجیح دارد","edited":{"balcony":"preferred"}},{"flow":"buy","id":"feat","slot":"prefs","field":"prefRules","answer":"انباری الزامی است","expected":{"storage":"required"},"edit":"انباری ترجیح دارد","edited":{"storage":"preferred"}},{"flow":"rent","id":"imps","slot":"prefs","field":"prefRules","answer":"مترو الزامی است","expected":{"metro":"required"},"edit":"مترو ترجیح دارد","edited":{"metro":"preferred"}},{"flow":"buy","id":"imps","slot":"prefs","field":"prefRules","answer":"مترو الزامی است","expected":{"metro":"required"},"edit":"مترو ترجیح دارد","edited":{"metro":"preferred"}}];
   for(const spec of preferenceMatrix){
    for(const mode of ['answer-edit','skip'])await test('PA-MATRIX-'+spec.flow+'-'+spec.id+'-'+mode,
     async({page,check,act,send,prompt,result})=>{
@@ -349,10 +350,11 @@ async function snapshot(page){
    const b=h.page.locator('#chatB [data-cv="'+value+'"]').last();h.check(await b.isVisible(),'Actual action '+value+' is visible');
    await h.act('click service action '+value,async()=>{await b.click();await h.page.waitForTimeout(180)});
   }
-  const sellerRows=['s_own','s_docs','s_note','s_val','s_price','s_min','s_prep','s_inq','s_ctr','s_done'];
+  const sellerRows=['s_role','s_own','s_docs','s_note','s_val','s_price','s_min','s_prep','s_inq','s_ctr','s_done'];
   await test('PA-SERVICE-SELLER',async h=>{
    const {page,check,send}=h;await beginService(h,'sell');const seen=[];
-   const inputs={s_own:'inherited',s_docs:'no',s_note:'ok',s_area:'۸۵',s_hood:'نارمک',s_val:'ok',s_price:'۱۲ میلیارد تومان',s_min:'۱۱ میلیارد تومان'};
+   await chip(h,'!back');
+   const inputs={s_role:'owner',s_own:'inherited',s_docs:'no',s_note:'ok',s_area:'۸۵',s_hood:'نارمک',s_val:'ok',s_price:'۱۲ میلیارد تومان',s_min:'۱۱ میلیارد تومان'};
    for(let n=0;n<24;n++){
     const id=await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id);
     if(sellerRows.includes(id)){await exerciseStep(h,'sell',id);seen.push(id)}
@@ -461,7 +463,8 @@ async function snapshot(page){
   await test('PA-BUILD-PROJECT-SCOPED',async h=>{
    const {page,check,send,act}=h;
    const initial=await snapshot(page);
-   await send(await page.evaluate(()=>E30.guide.actions.build.prompt));
+   check(await page.evaluate(()=>!E30.guide.canSuggest('build')),'Missing project hides the build suggestion',['hidden']);
+   await explicitRequest(h,'build');
    check(await page.evaluate(()=>!S.wfs.some(w=>w.m==='build'))&&
     (await page.locator('#chatB .msg.bot').last().textContent()).includes('پروژه'),
     'Missing approved project produces prerequisite message without invented workflow',['empty-data']);
@@ -484,7 +487,7 @@ async function snapshot(page){
    await act('reload completed project build',()=>page.reload({waitUntil:'domcontentloaded'}));
    check(await page.evaluate(({id,data})=>wfOf(id).done&&JSON.stringify(wfOf(id).data)===data,completed)&&
     (await snapshot(page)).credits===initial.credits,'Completed build persists with exact facts and no debit',['success','cancel','resume']);
-  },['step:build:sup','step:build:ph']);
+  },['step:build:sup','step:build:ph','scenario:build']);
 
   await test('PA-PROJECT-CONTRACTOR',async h=>{
    const {page,check,send,act}=h;
@@ -557,12 +560,12 @@ async function snapshot(page){
    await send('۴');await exerciseStep(h,'stay','revt');
    await send('اقامت آزمایشی رضایت‌بخش بود');
    check(await page.evaluate(()=>wd('stay').data.reviewSubmitted&&S.reviews.length===1&&S.reviews[0].s===4&&
-    S.reviews[0].t==='اقامت آزمایشی رضایت‌بخش بود'&&S.reqs.filter(r=>r.kind==='نظر').length===1),
+    S.reviews[0].t==='اقامت آزمایشی رضایت‌بخش بود'&&S.reqs.filter(r=>r.type==='نظر').length===1),
     'Explicit review has exact text and rating and is recorded once');
    await act('reload completed review',()=>page.reload({waitUntil:'domcontentloaded'}));
    check(await page.evaluate(()=>wd('stay').data.reviewSubmitted&&S.reviews.length===1&&S.reviews[0].s===4&&S.tokens===470),
     'Completed booking and optional review persist with one charge',['success','empty-data','cancel','resume']);
-  },['step:stay:book','step:stay:chk','step:stay:rev','step:stay:revt']);
+  },['step:stay:book','step:stay:chk','step:stay:rev','step:stay:revt','scenario:stay']);
 
   async function registerContract(h,kind){
    const {page,act,check}=h;
@@ -598,6 +601,316 @@ async function snapshot(page){
    check(await page.evaluate(k=>wd(k).data.ctr.finalized&&S.contracts.some(c=>c.code===wd(k).data.code&&c.status==='signed_internal'),kind)&&
     (await snapshot(page)).credits===before.credits-60,'Internal contract is registered once after explicit payment');
   }
+
+
+  // A direct request may be typed even when context correctly hides its
+  // suggestion. Observe the inert composer separately from explicit sending.
+  async function explicitRequest(h,id){
+   const {page,check,act}=h,before=await snapshot(page);
+   const text=await page.evaluate(id=>E30.guide.actions[id].prompt,id);
+   await act('type explicit request '+id,()=>page.locator('#chatIn').fill(text));
+   const filled=await snapshot(page);
+   check(filled.userTurns===before.userTurns&&filled.credits===before.credits&&filled.requests===before.requests&&
+    JSON.stringify(filled.deposit)===JSON.stringify(before.deposit)&&JSON.stringify(filled.rent)===JSON.stringify(before.rent),
+    'Composing '+id+' never submits, changes preferences or performs an operation',['composer-prefill']);
+   await act('send explicit request '+id,async()=>{await page.locator('#chatSend').click();await page.waitForTimeout(180)});
+   check((await snapshot(page)).userTurns===before.userTurns+1,'Explicit '+id+' send records one user turn',['composer-send']);
+   check(await page.locator('#chatB .msg.bot').last().isVisible(),'Requested '+id+' result is visible inside chat',['visible']);
+  }
+  async function resumeDiscovery(h,fields){
+   const {page,act,send,check}=h;
+   await act('reload interrupted discovery',()=>page.reload({waitUntil:'domcontentloaded'}));
+   if(await page.evaluate(()=>E30.guide.canSuggest('resume-service')))
+    await send(await page.evaluate(()=>E30.guide.actions['resume-service'].prompt));
+   check(await page.evaluate(fields=>E30.discAPI.active()&&E30.discAPI.collector().wf==='rent'&&
+    JSON.stringify(E30.discAPI.ctx().fields)===fields,fields),
+    'Original rental discovery resumes with exactly its previous facts',['cancel','resume']);
+   await send(await page.evaluate(()=>E30.guide.actions.sample.prompt));
+   check(await page.locator('#chatB .e31-results .pcard').count()>0,'Resumed primary task still reaches usable actual listings');
+  }
+  for(const flow of ['rent','buy','sell','invest','landlord'])await test('PA-SCENARIO-'+flow,async h=>{
+   const {page,check,send,act}=h;
+   await explicitRequest(h,flow);
+   check(await page.evaluate(f=>E30.discAPI.active()&&E30.discAPI.collector().wf===f&&
+    !E30.discAPI.getF('work_loc')&&!E30.discAPI.getF('children'),flow),
+    'Discovery selects '+flow+' without school, work or invented household');
+   check(await page.evaluate(()=>E30.discAPI.collector().expecting==null),'Entry does not impose an unsolicited questionnaire',['empty-data']);
+   const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
+   await send(await page.evaluate(()=>E30.guide.actions.valuation.prompt));
+   check(await page.locator('#chatB #e30-val-area').isVisible()&&await page.evaluate(()=>!E30.discAPI.active()),
+    'Explicit side task opens a form without changing the main discovery');
+   await act('reload pending '+flow,()=>page.reload({waitUntil:'domcontentloaded'}));
+   await send(await page.evaluate(()=>E30.guide.actions['resume-service'].prompt));
+   check(await page.evaluate(({flow,fields})=>E30.discAPI.active()&&E30.discAPI.collector().wf===flow&&
+    JSON.stringify(E30.discAPI.ctx().fields)===fields,{flow,fields}),
+    'Abandoning the side form resumes exactly the selected discovery',['cancel','resume']);
+   if(flow==='rent'||flow==='buy'){
+    await send(await page.evaluate(()=>E30.guide.actions.sample.prompt));
+    check(await page.locator('#chatB .e31-results .pcard').count()>0,'Optional facts can remain unknown through successful search',['success']);
+   }else{
+    await send(await page.evaluate(()=>E30.guide.actions['start-service'].prompt));await send('درسته');
+    if(flow==='invest'){
+     await chip(h,'!save');
+     check(await page.evaluate(()=>wd('invp').done&&S.library.some(x=>x.type==='invest')),
+      'Explicit analysis completes and saves its actual sample artifact',['success']);
+    }else if(flow==='sell'){
+     await chip(h,'single');await send('۸۵');await send('نارمک');
+     check(await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='s_val'&&wd('sell').data.prop_area===85&&wd('sell').data.hood==='h6'),
+      'Selected pricing service reaches actual valuation with real prerequisites',['success']);
+    }else{
+     await chip(h,'price');await send('نارمک');await chip(h,'!end');
+     check(await page.evaluate(()=>CE.f===null&&!wd('lndl').data.registered),
+      'Price advice completes without forcing a listing',['success']);
+    }
+   }
+   check((await snapshot(page)).credits===500,'Discovery and free selected output do not charge');
+  },['scenario:'+flow]);
+
+  await test('PA-SCENARIO-SPECS',async h=>{
+   const {page,check,send,result}=h;await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   await explicitRequest(h,'rent-specs');await send('۶۰');
+   check(await page.evaluate(()=>E30.discAPI.getF('m2')===60),'Explicit neutral specs prompt stores only supplied size');
+   await send(await page.evaluate(()=>E30.guide.actions['need-rooms'].prompt));await send('۱');
+   check(await page.evaluate(()=>E30.discAPI.getF('rooms')===1),'Bedroom count is supplied separately');
+   const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
+   await send(await page.evaluate(()=>E30.guide.actions.valuation.prompt));await resumeDiscovery(h,fields);
+   const found=await result();
+   check(found.ids.length>0&&await page.evaluate(ids=>ids.every(id=>{const x=RLIST.find(x=>x.id===id);return x.m2>=60&&x.beds>=1}),found.ids),
+    'Requested size and rooms reach matching property cards',['success','empty-data']);
+  },['scenario:rent-specs']);
+
+  for(const id of ['neighborhood','compare','rent-area'])await test('PA-SCENARIO-'+id,async h=>{
+   const {page,check,send,act}=h;await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
+   await explicitRequest(h,id);
+   const last=page.locator('#chatB .msg.bot').last();
+   if(id==='rent-area'){
+    check(await last.locator('.e31-geo-unavailable').isVisible()&&await last.locator('.e31-price-row').count()===0&&
+     await page.evaluate(()=>!E30.guide.canSuggest('rent-area')),
+     'No verified adjacency means no invented nearby neighborhoods or unsolicited area suggestion',['empty-data']);
+    await send(await page.evaluate(()=>E30.guide.actions.compare.prompt));
+   }
+   const rows=page.locator('#chatB .e31-price-chart').last().locator('.e31-price-row');
+   check(await rows.count()>=2,'General comparison has actual comparable sample rows',['success']);
+   check(await rows.evaluateAll(xs=>xs.every(row=>{const h=HOODS.find(x=>x.n===row.dataset.hood);return h&&row.querySelector('b').textContent===rial(h.buyBase)})),
+    'Every plotted price matches the labeled actual dataset');
+   await send('محله نارمک را مقایسه کن');
+   check(await page.locator('#chatB .msg.bot').last().locator('.e31-price-row').count()===0&&
+    (await page.locator('#chatB .msg.bot').last().textContent()).includes('حداقل دو محله'),
+    'One named neighborhood receives honest missing-comparison fallback',['empty-data']);
+   await resumeDiscovery(h,fields);
+   check((await snapshot(page)).credits===500,'Comparison preserves free account balance');
+  },['scenario:'+id]);
+
+  await test('PA-SCENARIO-SAMPLE',async h=>{
+   const {page,check,send,prompt,confirmBudget,result}=h;await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   await explicitRequest(h,'sample');
+   check(await page.locator('#chatB .e31-results .pcard').count()>0,'Unconstrained sample has usable cards',['success']);
+   await prompt('rent-budget');await send('ودیعه تا ۱ تومان و اجاره ماهانه تا ۱ تومان');await confirmBudget(10,10);
+   const zero=await result();check(zero.ids.length===0&&zero.state.lastText.includes('آگهی منطبق پیدا نشد'),
+    'Impossible explicit caps produce honest empty response',['empty-data']);
+   await prompt('rent-budget');await send('ودیعه تا ۴ میلیارد تومان و اجاره ماهانه تا ۹۰ میلیون تومان');await confirmBudget(40e9,9e8);
+   const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
+   await send(await page.evaluate(()=>E30.guide.actions.valuation.prompt));await resumeDiscovery(h,fields);
+  },['scenario:sample']);
+
+  await test('PA-SCENARIO-MAP',async h=>{
+   const {page,send,check,act}=h;await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
+   await explicitRequest(h,'map');
+   const card=page.locator('#chatB .e30-chat-map-card').last();
+   check(await card.isVisible()&&(await card.textContent()).includes('نمونه'),'Real map is labeled as sample inside chat',['success']);
+   const load=card.locator('[data-cba="e30MapLoad"]');if(await load.count())await act('load real interactive map',async()=>{await load.click();await page.waitForTimeout(500)});
+   check(await card.locator('.e30-chat-map-canvas').count()>0,'Map owns an actual canvas in chat');
+   // Simulate unavailable tile transport, leaving application code untouched.
+   await page.route('**/*tile*',route=>route.abort());
+   await send(await page.evaluate(()=>E30.guide.actions.map.prompt));
+   check((await page.locator('#chatB .e30-chat-map-card').last().textContent()).length>0,
+    'Unavailable transport retains the labeled map card and its controls',['empty-data']);
+   await resumeDiscovery(h,fields);
+  },['scenario:map']);
+
+  for(const id of ['services','guaranteed'])await test('PA-SCENARIO-'+id,async h=>{
+   const {page,send,check,act}=h;await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields)),before=await snapshot(page);
+   await explicitRequest(h,id);
+   const selector=id==='services'?'e30SaveService':'e30SaveGRT';
+   await act('reject incomplete '+id,()=>page.locator('#chatB [data-cba="'+selector+'"]').last().click());
+   check((await snapshot(page)).requests===before.requests&&(await snapshot(page)).credits===before.credits,
+    'Incomplete '+id+' creates no request or charge',['empty-data']);
+   await act('supply real '+id+' prerequisites and explicitly save',async()=>{
+    if(id==='services'){
+     await page.locator('#e30-svc-type').selectOption({label:'بررسی تأسیسات'});
+     await page.locator('#e30-svc-detail').fill('بررسی فشار آب در ملک نارمک');
+    }else{
+     await page.locator('#e30-grt-address').fill('نارمک');await page.locator('#e30-grt-area').fill('۸۵'.replace('۸','8').replace('۵','5'));
+    }
+    await page.locator('#chatB [data-cba="'+selector+'"]').last().click();
+   });
+   check(await page.evaluate(cat=>S.reqs.filter(x=>x.cat===cat&&x.status==='در انتظار تکمیل').length===1,id==='services'?'svc':'grt')&&
+    (await snapshot(page)).credits===before.credits,'Exactly one explicit internal draft is stored without claiming final service',['success']);
+   await resumeDiscovery(h,fields);
+  },['scenario:'+id]);
+
+  await test('PA-SCENARIO-VALUATION',async h=>{
+   const {page,send,check,act}=h;await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
+   await explicitRequest(h,'valuation');await page.locator('#e30-val-area').fill('0');
+   await act('reject invalid valuation size',()=>page.locator('#chatB [data-cba="e30ValQuote"]').last().click());
+   check(await page.evaluate(()=>S.tokens===500&&!S.paySession&&!S.library.some(x=>x.type==='valuation')),
+    'Invalid valuation cannot quote, charge or save a report',['empty-data']);
+   await page.locator('#e30-val-area').fill('85');await page.locator('#e30-val-age').fill('10');
+   await act('request actual valuation price',()=>page.locator('#chatB [data-cba="e30ValQuote"]').last().click());
+   check(await page.evaluate(()=>S.tokens===500&&S.paySession.state==='presented'&&S.paySession.cost===40),
+    'Exact tariff is shown before any debit');
+   await act('cancel valuation quote',()=>page.locator('#chatB [data-paycancel]').last().click());
+   check(await page.evaluate(()=>S.tokens===500&&!S.paySession),'Cancelling a quote costs nothing',['cancel']);
+   await send(await page.evaluate(()=>E30.guide.actions.valuation.prompt));
+   await page.locator('#e30-val-area').fill('85');await page.locator('#e30-val-age').fill('10');
+   await act('requote valuation',()=>page.locator('#chatB [data-cba="e30ValQuote"]').last().click());
+   await act('explicitly pay for valuation',()=>page.locator('#chatB [data-paygo]').last().click());
+   check(await page.evaluate(()=>S.tokens===460&&S.library.filter(x=>x.type==='valuation'&&x.artifact.area===85&&x.artifact.age===10&&x.artifact.estimate>0).length===1),
+    'Confirmed valuation delivers the actual artifact with exact inputs',['success']);
+   await resumeDiscovery(h,fields);
+  },['scenario:valuation']);
+
+  for(const id of ['saved','library','projects','contracts'])await test('PA-SCENARIO-'+id,async h=>{
+   const {page,send,check,act}=h;await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
+   check(await page.evaluate(id=>id==='contracts'||!E30.guide.canSuggest(id),id),'Empty stored-item service is not recommended without data');
+   await explicitRequest(h,id);
+   check((await page.locator('#chatB .msg.bot').last().textContent()).includes('هنوز'),'Explicit empty inventory request is honest',['empty-data']);
+   await act('load existing independent inventory fixture',()=>page.evaluate(id=>{
+    if(id==='saved')S.savedListings=[{listingId:'r1',title:'ملک ذخیره آزمون',kind:'rent'}];
+    if(id==='library')S.library=[{id:'QA-LIB',title:'گزارش موجود آزمون',type:'valuation',artifact:{area:85}}];
+    if(id==='projects')S.projects=[{id:'QA-PROJECT',name:'پروژه موجود آزمون',chatIds:[]}];
+    if(id==='contracts')S.contracts=[{code:'QA-CONTRACT',title:'قرارداد موجود آزمون',kind:'rent',status:'signed_internal'}];
+    save();
+   },id));
+   const inventory=await page.evaluate(()=>JSON.stringify({saved:S.savedListings,library:S.library,projects:S.projects,contracts:S.contracts}));
+   await explicitRequest(h,id);
+   check((await page.locator('#chatB .msg.bot').last().textContent()).includes('آزمون'),'Summary displays actual stored fixture identity',['success']);
+   check(await page.evaluate(()=>JSON.stringify({saved:S.savedListings,library:S.library,projects:S.projects,contracts:S.contracts}))===inventory,
+    'Viewing inventory never creates or changes an item');
+   await resumeDiscovery(h,fields);
+  },['scenario:'+id]);
+
+  await test('PA-SCENARIO-CONTRACT',async h=>{
+   const {page,send,check,act}=h;await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
+   await explicitRequest(h,'contract-start');
+   check(await page.locator('#chatB [data-e28ctr]').isVisible()&&await page.evaluate(()=>S.contracts.length===0&&S.tokens===500),
+    'Direct entry opens exactly the real contract form without registration or debit',['empty-data']);
+   await registerContract(h,'rent');
+   check(await page.evaluate(()=>S.contracts.length===1&&S.tokens===440),'Explicit contract operation independently registers once',['success']);
+   await resumeDiscovery(h,fields);
+  },['scenario:contract-start']);
+
+  await test('PA-SCENARIO-TERMINATION-EMPTY',async h=>{
+   const {page,send,check}=h;await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
+   check(await page.evaluate(()=>!E30.guide.canSuggest('termination')),'No eligible agreement means no unsolicited termination');
+   await explicitRequest(h,'termination');
+   check((await page.locator('#chatB .msg.bot').last().textContent()).includes('قرارداد قابل ارجاعی ثبت نشده')&&
+    await page.locator('#chatB [data-cba="e31TermStart"]').count()===0,
+    'Empty termination neither selects a target nor invents a contract',['empty-data']);
+   await resumeDiscovery(h,fields);
+  },['scenario:termination']);
+
+  await test('PA-SCENARIO-REMINDER',async h=>{
+   const {page,send,check,act}=h;await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields)),before=await page.evaluate(()=>S.reminders.length);
+   await explicitRequest(h,'reminder');
+   check(await page.evaluate(n=>S.reminders.length===n+1&&S.reminders.at(-1)?.due>Date.now()||
+    S.reminders.length===n+1&&S.reminders[0]?.due>Date.now(),before),
+    'Explicitly sent future reminder is actually stored once',['success']);
+   const reminders=await page.evaluate(()=>JSON.stringify(S.reminders));
+   await act('compose and discard unsent reminder',async()=>{await page.locator('#chatIn').fill('یادم بنداز');await page.locator('#chatIn').fill('')});
+   check(await page.evaluate(()=>JSON.stringify(S.reminders))===reminders,'Unsent incomplete reminder creates no event',['empty-data','cancel']);
+   await resumeDiscovery(h,fields);
+   check(await page.evaluate(()=>JSON.stringify(S.reminders))===reminders,'Reminder identity persists through reload');
+  },['scenario:reminder']);
+
+  await test('PA-SCENARIO-STAY',async h=>{
+   const {page,send,check}=h;await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
+   await explicitRequest(h,'stay');
+   check(await page.evaluate(()=>CE.f==='stay'&&SCRIPTS[CE.f][CE.i].id==='city'&&!wd('stay').data.city),
+    'Requested accommodation has no invented destination',['empty-data']);
+   await exerciseStep(h,'stay','city');await send('تهران');await send('هفتهٔ بعد');await send('۲');
+   check(await page.locator('#chatB .msg.bot').last().locator('.pcard').count()>0,'Actual accommodation search returns matching sample cards',['success']);
+   await send(await page.evaluate(()=>E30.guide.actions['resume-service'].prompt));
+   await resumeDiscovery(h,fields);
+  },['scenario:stay']);
+
+  await test('PA-SCENARIO-DEVELOPMENT',async h=>{
+   const {page,send,check,act}=h;await send(await page.evaluate(()=>E30.guide.actions.rent.prompt));
+   const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
+   await explicitRequest(h,'development');
+   check(await page.locator('#chatB .e31-project-catalog .ccard').count()>0&&
+    await page.evaluate(()=>!S.wfs.some(w=>w.m==='mkt')),'Browsing actual projects imposes no role or project workflow',['success','skip']);
+   await act('select employer operation on an actual project',()=>page.locator('#chatB [data-cba="e31ProjectEmployer"][data-i="1"]').last().click());
+   await act('explicitly approve selected contractor',()=>page.locator('#chatB [data-cba="e31ProjectChoose"]').last().click());
+   await chip(h,'!nx');await chip(h,'!end');
+   check(await page.evaluate(()=>wd('mkt').done&&wd('mkt').data.chosen.prj===1),'Selected employer workflow completes on the actual selected project');
+   await resumeDiscovery(h,fields);
+   const projects=await page.evaluate(()=>{const p=PRJ;PRJ=[];return p});
+   await explicitRequest(h,'development');
+   check((await page.locator('#chatB .msg.bot').last().textContent()).includes('در دسترس نیست')&&
+    await page.locator('#chatB .msg.bot').last().locator('.ccard').count()===0,
+    'Unavailable project dataset gives an honest empty result',['empty-data']);
+   await page.evaluate(p=>{PRJ=p},projects);
+  },['scenario:development']);
+
+
+  await test('PA-GATE-OPTIONAL-ENTRY',async h=>{
+   const {page,check,send,act}=h;
+   check(await page.evaluate(()=>SCRIPTS.gate.map(x=>x.id).join(',')==='hello,menu'),
+    'Entry registry contains request detection and menu, with no work or school questions');
+   await act('empty entry submission',async()=>{await page.locator('#chatIn').fill(' ');await page.locator('#chatSend').click()});
+   check(await page.evaluate(()=>!E30.discAPI.active()&&!E30.discAPI.getF('work_loc')&&!E30.discAPI.getF('children')),
+    'Empty entry creates no personal facts or collector',['empty-data']);
+   await send('یه خونه برام پیدا کن.');
+   check((await page.locator('#chatB .msg.bot').last().textContent()).includes('خرید خانه است یا رهن و اجاره'),
+    'Ambiguous entry asks only transaction type');
+   await h.prompt('rent');
+   await send('من مجردم و فرزند ندارم و محل کار ثابت ندارم');
+   const fields=await page.evaluate(()=>JSON.stringify(E30.discAPI.ctx().fields));
+   check(!(await page.locator('#chatB .msg.bot').last().textContent()).includes('مدرسهٔ فرزندانتان')&&
+    await page.evaluate(()=>!E30.discAPI.getF('work_loc')),
+    'Single, childless user without fixed work is never asked gate school or work');
+   await send(await page.evaluate(()=>E30.guide.actions.valuation.prompt));await resumeDiscovery(h,fields);
+   // Explicit menu button belongs to a completed independent service.
+   await send(await page.evaluate(()=>E30.guide.actions.invest.prompt));
+   await send(await page.evaluate(()=>E30.guide.actions['start-service'].prompt));await send('درسته');await chip(h,'!save');
+   await chip(h,'!menu');
+   check(await page.evaluate(()=>CE.f==='gate'&&SCRIPTS.gate[CE.i].id==='menu'),
+    'Main-menu navigation returns to request choices without the retired gate questionnaire');
+   await chip(h,'F:buy');
+   await send(await page.evaluate(()=>E30.guide.actions.sample.prompt));
+   check(await page.locator('#chatB .e31-results .pcard').count()>0,'Both entry and menu reach independently usable service results',['success','cancel','resume']);
+  },['step:gate:hello','step:gate:work','step:gate:school','step:gate:menu']);
+
+  await test('PA-MARKET-ROLE-CHOICE',async h=>{
+   const {page,send,check,act}=h;
+   await explicitRequest(h,'development');
+   check(await page.evaluate(()=>!S.wfs.some(w=>w.m==='mkt')),'Browsing skips role with no invented project',['skip']);
+   await act('choose actual contractor operation',()=>page.locator('#chatB [data-cba="e31ProjectBid"][data-i="0"]').last().click());
+   const contractor=await page.evaluate(()=>({id:wd('mkt').id,data:JSON.stringify(wd('mkt').data)}));
+   check(await page.evaluate(()=>wd('mkt').data.role==='con'),'Explicit contractor operation records role',['answer']);
+   await send(await page.evaluate(()=>E30.guide.actions.development.prompt));
+   await act('explicitly choose employer role on another project',()=>page.locator('#chatB [data-cba="e31ProjectEmployer"][data-i="1"]').last().click());
+   check(await page.evaluate(c=>wd('mkt').data.role==='emp'&&wd('mkt').id!==c.id&&JSON.stringify(wfOf(c.id).data)===c.data,contractor),
+    'Changing selected role creates the correct independent operation and preserves prior bid',['edit']);
+   await act('approve only selected employer contractor',()=>page.locator('#chatB [data-cba="e31ProjectChoose"]').last().click());
+   await chip(h,'!nx');await chip(h,'!end');
+   const id=await page.evaluate(()=>wd('mkt').id);
+   check(await page.evaluate(id=>wfOf(id).done&&wfOf(id).data.chosen.prj===1,id),
+    'Role selection proceeds through the completed selected service',['service-terminal']);
+   await act('reload explicit role choices',()=>page.reload({waitUntil:'domcontentloaded'}));
+   check(await page.evaluate(({id,contractor})=>wfOf(id).done&&JSON.stringify(wfOf(contractor.id).data)===contractor.data,{id,contractor}),
+    'Both role-specific operations survive reload independently',['reload']);
+  },['step:mkt:role']);
 
   const rentalRows=['hoods','mk','list','day','time','visit','vform','vadd','ctr0'];
   await test('PA-RENT-VISIT-CONTRACT',async h=>{
@@ -663,7 +976,7 @@ async function snapshot(page){
    await act('reload settled agreement',()=>page.reload({waitUntil:'domcontentloaded'}));
    check(await page.evaluate(()=>S.contracts[0].status==='terminated'&&S.tokens===500),
     'Settlement state persists without invented monetary transfer',['success','empty-data','cancel','resume']);
-  },terminationRows.map(x=>'step:rent:'+x));
+  },terminationRows.map(x=>'step:rent:'+x).concat(['scenario:termination']));
 
   const purchaseRows=['hoods','mk','liq','list','lgsc','lg','buy_ctr','escA','escN','escP','escC','ut'];
   for(const staged of [false,true])await test('PA-PURCHASE-'+(staged?'STAGED':'SINGLE'),async h=>{
@@ -691,8 +1004,11 @@ async function snapshot(page){
    const n=staged?3:1;
    for(let i=0;i<n;i++){
     const before=await snapshot(page);await chip(h,'!ok');
-    check((await snapshot(page)).credits===before.credits,'Escrow stage requires explicit payment confirmation');
-    await act('confirm escrow stage '+(i+1),async()=>{await page.locator('#chatB [data-paygo]').last().click();await page.waitForTimeout(250)});
+    if(i===0){
+     check((await snapshot(page)).credits===before.credits,'First escrow stage requires explicit tariff confirmation');
+     await act('confirm escrow service tariff',async()=>{await page.locator('#chatB [data-paygo]').last().click();await page.waitForTimeout(250)});
+     check((await snapshot(page)).credits===before.credits-150,'Escrow tariff is charged exactly once');
+    }else check((await snapshot(page)).credits===before.credits,'Later explicit stage releases do not duplicate the service tariff');
     check(await page.evaluate(i=>wd('buy').data.escD===i+1,i),'Exactly one escrow stage advances');
    }
    await chip(h,'!done');await exerciseStep(h,'buy','ut');await chip(h,'!all');
@@ -735,6 +1051,7 @@ async function snapshot(page){
   console.error(error);
  }finally{write();if(browser)await browser.close()}
  const failed=report.tests.filter(x=>x.result!=='PASS');
+ for(const entry of failed)console.error('AUDIT FAILURE '+JSON.stringify({id:entry.id,error:entry.error,lastTrace:entry.trace.at(-1),failedAssertions:entry.assertions.filter(a=>!a.pass)}));
  console.log('PRIORITY AUDIT: '+(report.tests.length-failed.length)+' passed, '+failed.length+' failed');
  if(failed.length)process.exitCode=1;
 })().catch(error=>{console.error(error);process.exitCode=2});

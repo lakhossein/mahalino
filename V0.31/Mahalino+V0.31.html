@@ -17965,7 +17965,7 @@ E30.flows=(function(){
       var stayStep=function(id){return SCRIPTS.stay.find(function(s){return s.id===id})};
       stayStep('ngt').set=function(D,v){var n=Number(pd(String(v)));if(!Number.isInteger(n)||n<1||n>90)return 'ERR';D.nights=n;return null};
       stayStep('ngt').err='تعداد شب را بین ۱ تا ۹۰ وارد کنید.';
-      stayStep('rev').set=function(D,v){var n=Number(pd(String(v)));if(!Number.isInteger(n)||n<1||n>5)return 'ERR';RVS=n;return null};
+      stayStep('rev').set=function(D,v){var n=Number(pd(String(v)));if(!Number.isInteger(n)||n<1||n>5)return 'ERR';RVS=n;D.reviewRating=n;save();return null};
       stayStep('rev').err='امتیاز را از ۱ تا ۵ وارد کنید.';
       var originalStayQuestion=stayStep('list').q;
       stayStep('list').q=function(D){return stayList(D.city).length?originalStayQuestion(D):'برای شهر '+esc(D.city||'')+' اقامتگاه نمونه‌ای موجود نیست. شهری دیگر یا «همهٔ شهرها» را صریحاً انتخاب کنید؛ مقصد شما خودکار تغییر نکرده است.'};
@@ -18024,7 +18024,7 @@ E30.flows=(function(){
       booking.acts.b.e30PaidDelegate=book;
       checkin.q=function(D){return D.code?'کد ورود نمایشی: <b>'+esc(D.code)+'#</b> — ورود انجام شد؟':'رزرو تأییدشده‌ای برای نمایش کد ورود وجود ندارد.'};
       checkin.acts.c=function(D){if(!D.code){botC('بدون رزرو ثبت‌شده، ورود قابل ثبت نیست.',null);return}if(D.checked){botC('ورود قبلاً ثبت شده است.',null);return}return arrive(D)};
-      review.set=function(D,v){if(!D.checked||!Number.isInteger(RVS)||RVS<1||RVS>5||!String(v).trim()||D.reviewSubmitted)return 'ERR';var result=writeReview(D,v);if(result!=='ERR'){D.reviewSubmitted=true;save()}return result};
+      review.set=function(D,v){var rating=Number.isInteger(D.reviewRating)?D.reviewRating:RVS;if(!D.checked||!Number.isInteger(rating)||rating<1||rating>5||!String(v).trim()||D.reviewSubmitted)return 'ERR';RVS=rating;var result=writeReview(D,v);if(result!=='ERR'){D.reviewSubmitted=true;save()}return result};
     }
 
     if(!SCRIPTS.buy.some(function(s){return s.id==='buy_ctr'})){

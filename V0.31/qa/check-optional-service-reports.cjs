@@ -52,3 +52,14 @@ const missing=c.SCRIPTS.stay.find(s=>s.id==='list').q({city:'مشهد'});assert(
 console.log('PASS stay inputs: invalid nights/ratings preserve prior values; absent destination has explicit empty message');
 
 assert.equal(typeof c.SCRIPTS.stay.find(s=>s.id==='book').acts.b.e30PaidDelegate,'function');
+
+const draft={checked:true};
+assert.equal(rating.set(draft,'4'),null);
+assert.equal(draft.reviewRating,4);
+c.RVS=0;c.S.reviews=[];c.addReq=()=>{};c.fa=String;
+const review=c.SCRIPTS.stay.find(s=>s.id==='revt');
+assert.equal(review.set(draft,'نظر پس از بازخوانی'),null);
+assert.equal(c.S.reviews.length,1);assert.equal(c.S.reviews[0].s,4);
+assert.equal(draft.reviewSubmitted,true);
+assert.equal(review.set(draft,'تکرار'),'ERR');assert.equal(c.S.reviews.length,1);
+console.log('PASS review rating persists in workflow data and submission stays idempotent after reload');
