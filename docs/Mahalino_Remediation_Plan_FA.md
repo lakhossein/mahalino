@@ -6,7 +6,7 @@
 
 اصلاحات در محدودهٔ prototype فعال ۰.۳۲، قراردادهای صریح runtime و gateهای Chromium انجام شده‌اند. runtime نسخه‌های تاریخی حفظ شده است؛ فقط dependency بازتولیدپذیر و metadata غیرمحصولی از Git خارج و hash gateهای مربوط دوباره تثبیت شدند. تصمیم مالک برای reset: فقط نسخهٔ جاری. هیچ merge به main یا انتشار عمومی انجام نشده است.
 
-آخرین کد این جمع‌بندی: `5b6f86ca49bd8f4ac1d8364d0557db427bde3d9b`. هر چهار workflow این کد موفق شدند؛ gate نسخهٔ ۰.۳۲ صفر شکست داشت و publish در PR برابر skipped بود. ۱۰۱ تست Node و ۱۷ تست Python در بررسی محلی موفق‌اند. از موفقیت این تست‌ها، پوشش سطر/شاخهٔ ۱۰۰٪ یا رفع همهٔ باگ‌های احتمالی استنتاج نمی‌شود.
+آخرین کد این جمع‌بندی: `5a01c6fe4e26ff363cf1e364bd5906ab6671c010`. نتیجهٔ اجرای CI همین کد از لینک‌های ثابت پایین این بخش قابل بررسی است؛ وضعیت هر run از نتیجهٔ نهایی همان اجرا خوانده می‌شود. ۱۰۱ تست Node و ۱۷ تست Python در بررسی محلی موفق‌اند. از موفقیت این تست‌ها، پوشش سطر/شاخهٔ ۱۰۰٪ یا رفع همهٔ باگ‌های احتمالی استنتاج نمی‌شود.
 
 ## تعیین تکلیف ۲۴ مورد
 
@@ -49,10 +49,10 @@
 
 شواهد CI کد نهایی:
 
-- [انتشار و هر سه gate وابسته](https://github.com/lakhossein/mahalino/actions/runs/44082277615): success؛ job انتشار عمومی در PR skipped.
-- [gate مستقل ۰.۳۲](https://github.com/lakhossein/mahalino/actions/runs/44082277412): success؛ صفر suite شکست‌خورده.
-- [gate مستقل ۰.۳۱](https://github.com/lakhossein/mahalino/actions/runs/44082277482): success.
-- [gate مستقل ۰.۳۰](https://github.com/lakhossein/mahalino/actions/runs/44082277523): success.
+- [انتشار و هر سه gate وابسته](https://github.com/lakhossein/mahalino/actions/runs/44084713308)؛ شامل job قرارداد و هر سه gate؛ انتشار عمومی در PR اجرا نمی‌شود.
+- [gate مستقل ۰.۳۲](https://github.com/lakhossein/mahalino/actions/runs/44084713238)؛ شامل تمام suiteهای اجباری و coverage gate.
+- [gate مستقل ۰.۳۱](https://github.com/lakhossein/mahalino/actions/runs/44084713368).
+- [gate مستقل ۰.۳۰](https://github.com/lakhossein/mahalino/actions/runs/44084713335).
 - [probe منفی بدون انتشار](https://github.com/lakhossein/mahalino/actions/runs/44076079722): overall عمداً failure؛ gate ۰.۳۲ عمداً fail، publish skipped و assert-blocked success.
 
 این جمع‌بندی فقط مستنداتِ کد تأییدشدهٔ بالا را به‌روز می‌کند؛ SHA کامیت خود گزارش از تاریخچهٔ فایل قابل استخراج است.
