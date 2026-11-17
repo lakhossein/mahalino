@@ -380,7 +380,7 @@ function svcLoadCatalog(){
   SVC_CATALOG.loading=true;SVC_CATALOG.error='';
   return svcPost(cfg.catalogEndpoint,{})
     .then(function(j){if(!j||j.ok===false)throw new Error('catalog');SVCS=svcNormalizeCatalog(j);SVC_CATALOG.loaded=true;SVC_CATALOG.failed=false;return SVCS})
-    .catch(function(e){SVC_CATALOG.error='دریافت فهرست خدمات ممکن نشد؛ دوباره تلاش کنید.';SVC_CATALOG.failed=true;throw e})
+    .catch(function(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sample-data.js:383',e,'caught');SVC_CATALOG.error='دریافت فهرست خدمات ممکن نشد؛ دوباره تلاش کنید.';SVC_CATALOG.failed=true;throw e})
     .finally(function(){SVC_CATALOG.loading=false});
 }
 
@@ -444,7 +444,7 @@ function svcPost(url,body){
   return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctrl?ctrl.signal:undefined})
     .then(function(r){return r.json()})
     .then(function(j){if(timer)clearTimeout(timer);return j})
-    .catch(function(e){if(timer)clearTimeout(timer);throw e});
+    .catch(function(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sample-data.js:447',e,'caught');if(timer)clearTimeout(timer);throw e});
 }
 function svcQuote(ci,ii,qty,details){
   var it=svcItem(ci,ii),cfg=svcCfg();
@@ -519,7 +519,7 @@ function svcPayOrder(ci,ii,form,q,opts){
     svcTimelinePush(o,r.status||'submitted',r.demo?'وضعیت نمایشی':'ثبت در ارائه‌دهنده');
     svcAudit(o,'submit',{providerOrderId:o.providerOrderId,demo:!!r.demo});
     svcReqSync(o);save();return o;
-  }).catch(function(){
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sample-data.js:522',null,'caught');
     svcTimelinePush(o,'submit_failed','پرداخت انجام شد اما ثبت سفارش ناموفق بود؛ می‌توانید دوباره تلاش کنید.');
     svcAudit(o,'submit_failed',{});
     svcReqSync(o);save();return o;
@@ -529,7 +529,7 @@ function fmtSvcMeta(o){
   return (o.date?faDate(o.date):'—')+' • '+esc(o.slot||'—')+' • '+esc(o.address||'—');
 }
 function faDate(iso){
-  try{return new Date(iso).toLocaleDateString('fa-IR',{year:'numeric',month:'long',day:'numeric'})}catch(e){return iso}
+  try{return new Date(iso).toLocaleDateString('fa-IR',{year:'numeric',month:'long',day:'numeric'})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sample-data.js:532',e,'caught');return iso}
 }
 
 var PTOPICS=[{k:'intro',ic:'',t:'معرفی پروژه'},{k:'roads',ic:'',t:'راه‌های ارتباطی'},{k:'studies',ic:'',t:'مطالعات فنی'},{k:'timeline',ic:'',t:'مراحل و زمان‌بندی'},{k:'finance',ic:'',t:'مالی و پرداخت'},{k:'docs',ic:'',t:'مجوزها و اسناد'}];

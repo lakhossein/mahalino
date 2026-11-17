@@ -40,7 +40,7 @@ E29.bus=(function(){
     on:function(e,fn){(map[e]=map[e]||[]).push(fn)},
     emit:function(e,p){
       var l=map[e]||[],i;
-      for(i=0;i<l.length;i++){try{l[i](p)}catch(err){console.error('E29 bus',e,err)}}
+      for(i=0;i<l.length;i++){try{l[i](p)}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:43',err,'caught');console.error('E29 bus',e,err)}}
     }
   };
 })();
@@ -58,7 +58,7 @@ E29.PRICING={
 };
 /* hook existing COSTS so new services share one config */
 try{COSTS.hood_detail=40;COSTS.hood_compare=40;COSTS.contract_draft=60;COSTS.term_ai=80;COSTS.valuation=40;
-    COSTL.hood_detail='تحلیل جامع محله';COSTL.hood_compare='مقایسهٔ محله‌ها';COSTL.contract_draft='پیش‌نویس قرارداد';COSTL.term_ai='تحلیل هوشمند اسناد فسخ';COSTL.valuation='تخمین ارزش ملک'}catch(e){}
+    COSTL.hood_detail='تحلیل جامع محله';COSTL.hood_compare='مقایسهٔ محله‌ها';COSTL.contract_draft='پیش‌نویس قرارداد';COSTL.term_ai='تحلیل هوشمند اسناد فسخ';COSTL.valuation='تخمین ارزش ملک'}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:61',e,'caught');}
 
 /* ── in-flight transaction guard ── */
 E29._inflight={};
@@ -104,7 +104,7 @@ E29.pay={
     E29.bus.emit('token.deduct',{txn:txn,cost:cost,svc:key,desc:pend.desc});
     if(balLow())E29.bus.emit('wallet.low',{balance:S.tokens});
     usrC('تأیید پرداخت '+fa(cost,0)+' کلید');
-    try{pend.cb(txn)}catch(e){E29.pay.refund(txn,key,cost,'خطا در اجرا');console.error(e)}
+    try{pend.cb(txn)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:107',e,'caught');E29.pay.refund(txn,key,cost,'خطا در اجرا');console.error(e)}
   },
   cancel:function(key){
     if(E29._pending&&E29._pending.key===key)E29._pending=null;
@@ -126,17 +126,18 @@ function balLow(){return (S.tokens||0)<30}
 
 /* ── LLM adapter (off by default; no fabrication — spec §4.5) ── */
 E29.llm={
-  endpoint:null,
-  enabled:false,
+  endpoint:null,enabled:false,timeoutMs:10000,
   configure:function(url){this.endpoint=url;this.enabled=!!url},
   complete:function(history,done){
     if(!this.enabled||!this.endpoint||typeof fetch!=='function'){done(null);return}
-    try{
-      fetch(this.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history})})
-        .then(function(r){return r.json()})
-        .then(function(j){done(j&&j.text||null)})
-        .catch(function(){done(null)});
-    }catch(e){done(null)}
+    var controller=typeof AbortController==='function'?new AbortController():null;
+    var settled=false,timer;
+    function finish(value){if(settled)return;settled=true;clearTimeout(timer);done(value)}
+    timer=setTimeout(function(){if(controller)controller.abort();finish(null)},this.timeoutMs);
+    try{Promise.resolve(fetch(this.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history}),signal:controller?controller.signal:undefined}))
+      .then(function(r){if(!r.ok)throw Error('http');return r.json()})
+      .then(function(j){finish(j&&typeof j.text==='string'?j.text:null)},function(){finish(null)})
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:140',e,'caught');finish(null)}
   }
 };
 
@@ -152,7 +153,7 @@ E29.chatRef=function(){
 try{
   CBACT.e29payGo=function(el){E29.pay.go(el.getAttribute('data-key'))};
   CBACT.e29payCancel=function(el){E29.pay.cancel(el.getAttribute('data-key'))};
-}catch(e){}
+}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:156',e,'caught');}
 
 /* ── AI document analysis for terminated contracts (term_ai, spec §6.3) ── */
 E29.termAI=function(code){

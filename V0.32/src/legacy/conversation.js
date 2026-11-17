@@ -1,7 +1,7 @@
 /* ═══ ۸) چت ═══ */
 var HIST=Array.isArray(S.liveHistory)?S.liveHistory.slice():[];
 var CE={f:null,i:0,li:0,hist:[]};
-function cePush(){try{CE.hist.push({i:CE.i,li:CE.li})}catch(e){}if(CE.hist.length>40){CE.hist=CE.hist.slice(-40)}}
+function cePush(){try{CE.hist.push({i:CE.i,li:CE.li})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:4',e,'caught');}if(CE.hist.length>40){CE.hist=CE.hist.slice(-40)}}
 function ceBack(){if(!(CE.f&&CE.hist.length))return;var h=CE.hist.pop();CE.i=h.i;CE.li=h.li;HIST.push({r:'user',h:'&#8617; \u0628\u0627\u0632\u06af\u0634\u062a'});cr();ceStep()}
 function cr(){
   var last=-1,i;
@@ -156,13 +156,13 @@ function CHIP5(){return [['۱','1'],['۲','2'],['۳','3'],['۴','4'],['۵','5']]
 function ceEnd(){
   var f=CE.f;CE.f=null;
   var backBtn=null;
-  try{if(f&&MODBY[f]){backBtn=['ادامه در فلو (قدم‌به‌قدم)','F:step:'+f]}}catch(e){}
+  try{if(f&&MODBY[f]){backBtn=['ادامه در فلو (قدم‌به‌قدم)','F:step:'+f]}}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:159',e,'caught');}
   var chips=[['منوی اصلی','!menu'],['درخواست‌های من','F:reqs']];
   if(backBtn){chips.unshift(backBtn)}
   botC('<b>فلوی '+((f&&MODBY[f])?MODBY[f].t:'گفت‌وگو')+' تکمیل شد و در داشبورد ثبت گردید.</b>',chips);
 }
-function ceNumSet(k,v){try{var m=CE.f;var pm=document.querySelector('[data-pm]');var mod=(pm&&pm.getAttribute('data-pm'))||m||'rent';var D=wd(mod==='rent'?'rent':'buy').data;if(mod==='rent'){defP(D)}else{if(!D.PR)D.PR={age:[0,30],m2:[45,120],ppm:[1800000000,5500000000],beds:2,floorR:[1,10]}}var n=+pd(String(v||'').replace(/[^0-9]/g,''));if(k==='bedsNum'){if(v===''||v==null){D.P.bedsNum='';save();renderCurrent();return}if(n>=1&&n<=5){D.P.bedsNum=n;D.P.beds=0;save();renderCurrent()}else{toast('تعداد خواب باید ۱ تا ۵ باشد')}return}if(k==='floorNum'){if(v===''||v==null){D.P.floorNum='';save();renderCurrent();return}if(n>=0&&n<=30){D.P.floorNum=n;D.P.floor='any';save();renderCurrent()}else{toast('شماره طبقه باید ۰ تا ۳۰ باشد')}return}}catch(e){}}
-function ceImpSet(k,v){try{var m=CE.f;if(!m)return;var D=wd(m).data;if(!D.P)D.P={metro:3,school:3,work:3,saf:3,amn:3,quiet:3,extra:[],PXH:{}};D.P[k]=v;save();renderCurrent()}catch(e){}}
+function ceNumSet(k,v){try{var m=CE.f;var pm=document.querySelector('[data-pm]');var mod=(pm&&pm.getAttribute('data-pm'))||m||'rent';var D=wd(mod==='rent'?'rent':'buy').data;if(mod==='rent'){defP(D)}else{if(!D.PR)D.PR={age:[0,30],m2:[45,120],ppm:[1800000000,5500000000],beds:2,floorR:[1,10]}}var n=+pd(String(v||'').replace(/[^0-9]/g,''));if(k==='bedsNum'){if(v===''||v==null){D.P.bedsNum='';save();renderCurrent();return}if(n>=1&&n<=5){D.P.bedsNum=n;D.P.beds=0;save();renderCurrent()}else{toast('تعداد خواب باید ۱ تا ۵ باشد')}return}if(k==='floorNum'){if(v===''||v==null){D.P.floorNum='';save();renderCurrent();return}if(n>=0&&n<=30){D.P.floorNum=n;D.P.floor='any';save();renderCurrent()}else{toast('شماره طبقه باید ۰ تا ۳۰ باشد')}return}}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:164',e,'caught');}}
+function ceImpSet(k,v){try{var m=CE.f;if(!m)return;var D=wd(m).data;if(!D.P)D.P={metro:3,school:3,work:3,saf:3,amn:3,quiet:3,extra:[],PXH:{}};D.P[k]=v;save();renderCurrent()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:165',e,'caught');}}
 function ceSmart(t){t=String(t||'');var has=function(){var a=arguments,i;for(i=0;i<a.length;i++){if(t.indexOf(a[i])>=0)return true}return false};if(has('تضمینی')){go('grt');CE.f=null;botC('اجارهٔ تضمینی در صفحهٔ اختصاصی خودش قدم‌به‌قدم پیش می‌رود؛ بازش کردم.',null);return true}if(has('اجاره','رهن')||((!CE.f||CE.f==='rent')&&has('بازدید'))){botC('فلوی اجاره را شروع می‌کنم.',null);ceStart('rent');return true}if(has('خرید','مبایعه')){botC('فلوی خرید را شروع می‌کنم.',null);ceStart('buy');return true}if(has('قرارداد','کد رهگیری')){S.ui.atab='contracts';save();go('profile');CE.f=null;botC('قراردادها در تنظیمات حساب باز شد.',null);return true}if(has('رزرو','اقامت','سفر')){botC('فلوی اقامت را شروع می‌کنم.',null);ceStart('stay');return true}if(has('پروژه')){go('mkt');CE.f=null;botC('بخش پروژه‌ها را باز کردم.',null);return true}if(has('ساخت','مصالح')){go('build');CE.f=null;botC('بخش ساخت را باز کردم.',null);return true}if(has('خدمات','تعمیر','نظافت')){go('svc');CE.f=null;botC('بخش خدمات ملک را باز کردم.',null);return true}if(has('خواب')){var m2=t.match(/[0-9]+/);if(m2&&CE.f){var nb=+pd(m2[0]);if(nb>=1&&nb<=5){var DD=wd(CE.f).data;DD.beds=nb;botC('تعداد خواب ثبت شد.',null);cePush();CE.i++;ceStep();return true}}botC('تعداد خواب را با عدد مشخص کنید (1 تا 5).',null);return true}if(has('منو','داشبورد')){ceVal('!menu');CE.f=null;return true}return false}
 
 function ceVal(v){
@@ -202,7 +202,7 @@ function ceVal(v){
     var pm=parseMoneyFA(v0);
     if(!pm.ok){
       var p27=null;
-      try{p27=E27.budgParse(v0)}catch(e27x){}
+      try{p27=E27.budgParse(v0)}catch(e27x){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:205',e27x,'caught');}
       if(p27&&p27.ok){v=v0;note=null}
       else{botC(pm.msg);return}
     }else{v=String(pm.value);note=pm.note}
@@ -223,7 +223,7 @@ function ceVal(v){
   if(st.set){done=(st.money||st.moneyRange)?moneyCanonical(function(){return st.set(D,v)}):st.set(D,v)}
   else if(st.key){D[st.key]=v}
   if(done==='ERR'){botC(st.err||('این مقدار در بازهٔ مجاز نیست. '+(st.hint||'یک مقدار معتبر وارد کنید.')));return}
-  try{ctxFromStep(CE.f,st,D)}catch(e){}
+  try{ctxFromStep(CE.f,st,D)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:226',e,'caught');}
   if(note){botC(note)}
   if(st.until){
     if(done==='DONE'){cePush();CE.i++;save();renderCurrent();ceStep()}

@@ -497,7 +497,7 @@ function baHTML(){
   var stage=st.stage||1;
   try{ /* preload هر دو تصویر برای کشش بی‌وقفه */
     ['assets/img/emptying-before.jpg','assets/img/emptying-after.jpg'].forEach(function(u){var i2=new Image();i2.src=u});
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/workflow-engine.js:500',e,'caught');}
   return '<div class="ba27">'+
   '<div class="ba27-steps">'+
   '<div class="ba27-step '+(stage===1?'on':'done')+'">۱) روز ورود</div>'+

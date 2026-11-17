@@ -7,7 +7,7 @@ E30.ux=(function(){
     try{
       if(kind==='rent'){var x=findL(id);if(x)return x}
       else{var b=findB(id);if(b)return b}
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:10',e,'caught');}
     return null;
   }
   function externalListingURL(x){
@@ -15,7 +15,7 @@ E30.ux=(function(){
        Never fabricate one from a source name or image seed. */
     var src=x&&(x.originalUrl||x.url||x.sourceUrl);
     if(typeof src!=='string')return null;
-    try{var url=new URL(src,location.href);return /^https?:$/.test(url.protocol)?url.href:null}catch(e){return null}
+    try{var url=new URL(src,location.href);return /^https?:$/.test(url.protocol)?url.href:null}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:18',e,'caught');return null}
   }
   function upsert(kind,id){
     var st=store(),i;
@@ -162,14 +162,14 @@ E30.ux=(function(){
       var file=document.getElementById('e30-pdf-file')?.files[0],status=document.getElementById('e30-pdf-status');
       if(!status)return;
       if(!file||!file.size||!/\.pdf$/i.test(file.name)){status.textContent='یک فایل PDF معتبر انتخاب کنید.';return}
-      var magic=new Uint8Array(await file.slice(0,5).arrayBuffer());
-      if(String.fromCharCode.apply(null,magic)!=='%PDF-'){status.textContent='محتوای فایل PDF معتبر نیست.';return}
       try{
+        var magic=new Uint8Array(await file.slice(0,5).arrayBuffer());
+        if(String.fromCharCode.apply(null,magic)!=='%PDF-'){status.textContent='محتوای فایل PDF معتبر نیست.';return}
         if(navigator.canShare&&navigator.canShare({files:[file]})){
           await navigator.share({files:[file],title:'سند قرارداد محلینو'});
           status.textContent='فایل برای اشتراک ارسال شد.';
         }else{status.textContent='اشتراک مستقیم در این مرورگر پشتیبانی نمی‌شود؛ همین فایل PDF را در پیام‌رسان یا ایمیل پیوست کنید.';}
-      }catch(err){status.textContent=err.name==='AbortError'?'اشتراک لغو شد؛ می‌توانید دوباره تلاش کنید.':'ارسال انجام نشد؛ دوباره تلاش کنید یا فایل را به پیام پیوست کنید.';}
+      }catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:172',err,'caught');status.textContent=err&&err.name==='AbortError'?'اشتراک لغو شد؛ می‌توانید دوباره تلاش کنید.':'ارسال انجام نشد؛ دوباره تلاش کنید یا فایل را به پیام پیوست کنید.';}
     };
     ACT.e30shWhole=function(){usrC('اشتراک‌گذاری کل گفت‌وگو');E29.share.dialog('conversation',null)};
     /* Device-local hashes never transfer the snapshot to a different browser.
@@ -242,9 +242,9 @@ E30.ux=(function(){
   /* ── 3) Projects: add the ACTIVE conversation without archiving (§13) ── */
   function liveChatInfo(){
     var ref=E30.chatRef(),id=ref&&ref.chatId,title=ref&&ref.chatTitle;
-    try{if(!id&&typeof E22!=='undefined'&&E22.restoredId)id=E22.restoredId}catch(e){}
-    try{if(typeof E22!=='undefined'&&E22.titleFromHist)title=E22.titleFromHist()}catch(e){}
-    if(!title){try{title=(HIST&&HIST.length)?('گفت‌وگو — '+String(HIST[0].h).replace(/<[^>]*>/g,' ').slice(0,30)):('گفت‌وگوی جاری')}catch(e){title='گفت‌وگوی جاری'}}
+    try{if(!id&&typeof E22!=='undefined'&&E22.restoredId)id=E22.restoredId}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:245',e,'caught');}
+    try{if(typeof E22!=='undefined'&&E22.titleFromHist)title=E22.titleFromHist()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:246',e,'caught');}
+    if(!title){try{title=(HIST&&HIST.length)?('گفت‌وگو — '+String(HIST[0].h).replace(/<[^>]*>/g,' ').slice(0,30)):('گفت‌وگوی جاری')}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:247',e,'caught');title='گفت‌وگوی جاری'}}
     return {id:id||'__live__',title:title,live:!(S.chats||[]).some(function(c){return c.id===id})};
   }
   function addLive(pid){
@@ -516,11 +516,12 @@ E30.ux=(function(){
 
   /* ── init ── */
   E30.uxInit=function(){
-    try{mountLibraryPatch()}catch(e){console.error('E30 lib patch',e)}
-    try{mountSharePatch()}catch(e){console.error('E30 share patch',e)}
-    try{mountProjectPatch()}catch(e){console.error('E30 prj patch',e)}
-    try{mountReminderPatch()}catch(e){console.error('E30 rem patch',e)}
-    try{mountValuation()}catch(e){console.error('E30 valuation',e)}
+    if(E30._uxInstalled)return;E30._uxInstalled=true;
+    try{mountLibraryPatch()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:520',e,'caught');console.error('E30 lib patch',e)}
+    try{mountSharePatch()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:521',e,'caught');console.error('E30 share patch',e)}
+    try{mountProjectPatch()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:522',e,'caught');console.error('E30 prj patch',e)}
+    try{mountReminderPatch()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:523',e,'caught');console.error('E30 rem patch',e)}
+    try{mountValuation()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:524',e,'caught');console.error('E30 valuation',e)}
   };
   E30.savedStore=store;
   return {upsert:upsert,remove:remove,store:store,addLive:addLive,liveChatInfo:liveChatInfo,remDupe:remDupe};

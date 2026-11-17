@@ -40,7 +40,7 @@ E21.docIcon=function(ext){
   if(ext==='csv')return 'CSV';
   return 'TXT';
 };
-E21.iso=function(d){try{return d.toISOString().slice(0,10)}catch(e){return null}};
+E21.iso=function(d){try{return d.toISOString().slice(0,10)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:43',e,'caught');return null}};
 /* ترتیب مهم: «پس‌فردا» پیش از «فردا» آزموده می‌شود */
 E21.dateFromText=function(nt){
   if(/امروز/.test(nt))return E21.iso(new Date());
@@ -122,7 +122,7 @@ E21.renderTray=function(surface){
   }).join('');
   prev.innerHTML=h;
   prev.hidden=!tray.length;
-  try{a11yify(prev)}catch(e){}
+  try{a11yify(prev)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:125',e,'caught');}
 };
 E21.trayErr=function(surface,msg){
   var tray=E21.trays[surface];
@@ -141,7 +141,7 @@ E21.trayErr=function(surface,msg){
 };
 E21.addFiles=function(surface,list,prefix){
   var arr=[],i;
-  try{arr=Array.prototype.slice.call(list)}catch(e){return}
+  try{arr=Array.prototype.slice.call(list)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:144',e,'caught');return}
   if(!arr.length)return;
   for(i=0;i<arr.length;i++){
     (function(f){
@@ -188,14 +188,14 @@ CBACT.attRm=function(el){
   var i;
   for(i=0;i<tray.length;i++){
     if(tray[i].id===id){
-      if(tray[i].url){try{URL.revokeObjectURL(tray[i].url)}catch(e){}}
+      if(tray[i].url){try{URL.revokeObjectURL(tray[i].url)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:191',e,'caught');}}
       tray.splice(i,1);break;
     }
   }
   E21.renderTray(s);
 };
 E21.revokeAll=function(){
-  E21.urls.forEach(function(u){try{URL.revokeObjectURL(u)}catch(e){}});
+  E21.urls.forEach(function(u){try{URL.revokeObjectURL(u)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:198',e,'caught');}});
   E21.urls=[];
   E21.trays={chat:[],fch:[],dash:[]};
   E21.pending={chat:null,fch:null,dash:null};
@@ -214,7 +214,7 @@ function attInit(surface){
   E21.renderTray(surface); /* سینیِ پابرجا در عنصر تازه‌ساخت بازیابی می‌شود */
   if(cwr.getAttribute('data-att-ready')==='1')return;
   cwr.setAttribute('data-att-ready','1');
-  btn.addEventListener('click',function(){try{file.click()}catch(e){}});
+  btn.addEventListener('click',function(){try{file.click()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:217',e,'caught');}});
   file.addEventListener('change',function(){E21.addFiles(surface,file.files);file.value=''});
   ['dragenter','dragover'].forEach(function(ev){
     cwr.addEventListener(ev,function(e){e.preventDefault();cwr.classList.add('dropzone')});
@@ -300,7 +300,7 @@ E21.appendAttGrid=function(atts){
 };
 E21.scheduleAttReact=function(atts){
   setTimeout(function(){
-    try{E21.attReact(atts)}catch(e){}
+    try{E21.attReact(atts)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:303',e,'caught');}
   },780);
 };
 E21.vphotoIx=function(D){
@@ -308,7 +308,7 @@ E21.vphotoIx=function(D){
     defVlist(D);
     var i;
     for(i=0;i<D.vlist.length;i++){if(String(D.vlist[i].t).indexOf('عکس از ایرادها')>=0)return i}
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:311',e,'caught');}
   return -1;
 };
 /* یک بلاک واکنش برای «هر پیام» (نه هر فایل) — فقط رفتار صادقانه */
@@ -407,7 +407,7 @@ E21.csvPreview=function(it){
     };
     fr.onerror=function(){botC('خواندن فایل «'+esc(it.name)+'» ممکن نشد.'+rcNote(E21.SESSION_NOTE),null)};
     fr.readAsText(it.file,'utf-8');
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:410',e,'caught');}
 };
 
 /* ─── لغزندهٔ مبلغ (S-CMP-01) — کمکی است؛ تایپ و چیپ‌ها مسیر اصلی می‌مانند ───
@@ -562,7 +562,7 @@ E21.scSummary=function(){
   var rows=[],fields=E21.SUMFIELD[mod]||[];
   fields.forEach(function(f){
     var v='';
-    try{v=f[2](D)||''}catch(e){}
+    try{v=f[2](D)||''}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:565',e,'caught');}
     rows.push({l:f[0],v:v,j:v?f[1]:null});
   });
   if(!rows.length)rows=[{l:'وضعیت',v:'هنوز داده‌ای ثبت نشده'}];
@@ -591,7 +591,7 @@ E21.maybeAssist=function(){
       else if(CE.f==='invr')cur=(key==='invr.cap')?D.cap:(key==='invr.fund'?D.amt:null);
       else if(CE.f==='invb')cur=(key==='invb.cap')?D.cap:(key==='invb.price'?((+D.payAmt)||null):null);
       else if(CE.f==='mkt')cur=D.bidAmt;
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:594',e,'caught');}
     add+=slSlider(key,{min:cfg.min,max:cfg.max,value:cur});
   }
   if(key==='rent.visit')add+=E21.visitConfirmHTML();
@@ -602,7 +602,7 @@ E21.maybeAssist=function(){
 var _ceStep=ceStep;
 ceStep=function(){
   _ceStep();
-  try{E21.maybeAssist()}catch(e){}
+  try{E21.maybeAssist()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:605',e,'caught');}
 };
 
 /* ─── نرمال‌سازی واژه‌های انگلیسی رایج (S-CTX-04) ───
@@ -665,7 +665,7 @@ E21.chipExact=function(st,nt){
   try{
     var mc=matchChipText(nt,st.chips?st.chips(wd(CE.f).data):null);
     return !!(mc&&mc.exact);
-  }catch(e){return false}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:668',e,'caught');return false}
 };
 E21.stepParseOk=function(st,nt){
   if(st.money)return parseMoneyFA(nt).ok;
@@ -832,7 +832,7 @@ E21.grtNext=function(){
     rcProg(WSTEPS.grt,0)+
     rcNote('پس از بازگشت به دستیار، وضعیت پروندهٔ شما را همین‌جا نشان می‌دهم.'),null);
   setTimeout(function(){
-    try{go('grt');toast('پیش‌پر از گفت‌وگو در فرم ملک اعمال می‌شود')}catch(e){}
+    try{go('grt');toast('پیش‌پر از گفت‌وگو در فرم ملک اعمال می‌شود')}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:835',e,'caught');}
   },500);
 };
 E21.grtHandoff=function(){
@@ -908,7 +908,7 @@ E21.svcNext=function(){
   setTimeout(function(){
     try{
       ACT.svcOpen({getAttribute:function(k){return k==='data-c'?String(v2.ci):(k==='data-i'?String(v2.ii):null)}});
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:911',e,'caught');}
   },350);
 };
 CBACT.attSvcDate=function(el){if(E21.svc){E21.svc.date=el.getAttribute('data-v')||E21.iso(new Date(Date.now()+864e5));E21.svcNext()}};
@@ -1047,7 +1047,7 @@ E21.maybeResume=function(){
     bits+='فلو «'+esc(MODBY[CE.f]?MODBY[CE.f].t:CE.f)+'» در گام '+fa(Math.min(CE.i+1,n),0)+' از '+fa(n,0)+' زنده است. ';
     chips.push(['↩ ادامهٔ فلو','!re']);
   }
-  try{g=grtCur()}catch(e){}
+  try{g=grtCur()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1050',e,'caught');}
   if(g){
     bits+='پروندهٔ اجارهٔ تضمینی شما: «'+esc(grtStatusText(g))+'». ';
     chips.push(['پروندهٔ اجارهٔ تضمینی','F:grt']);
@@ -1065,17 +1065,17 @@ go=function(v){
   _go(v);
   try{
     if(CE.f&&CE.f!=='gate'&&v!=='landing'&&v!=='auth')E21.resumeAsk=true;
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1068',e,'caught');}
 };
 var _toggleF=toggleF;
 toggleF=function(v,skipGate){
   _toggleF(v,skipGate);
-  try{if(v)E21.maybeResume()}catch(e){}
+  try{if(v)E21.maybeResume()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1073',e,'caught');}
 };
 var _vLanding=VIEWS.landing;
 VIEWS.landing=function(){
   _vLanding();
-  try{E21.maybeResume()}catch(e){}
+  try{E21.maybeResume()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1078',e,'caught');}
 };
 
 /* ─── پیچاندن ceVal: پیشوندهای جدید !re و !back (S-CTX-01) + مسیر چیپ‌های متنی بی‌فلو ─── */
@@ -1116,7 +1116,7 @@ RINT.scOOS=function(q){
     if(CE.f&&SCRIPTS[CE.f])chips.push(['↩ ادامهٔ فلو','!re']);
     else chips.push(['توزیع آگهی‌ها','توزیع آگهی‌ها'],['جمع‌بندی من','جمع‌بندی من']);
     if(chips.length)E21.appendLastChips(chips);
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1119',e,'caught');}
 };
 
 /* ─── پیچاندن ceSend: پیش‌پردازش زمینه + بازگرداندن متن اصلی کاربر به تاریخچه ─── */
@@ -1249,12 +1249,12 @@ ceSend=function(t0){
   var nt=E21.enNorm(tt);
   if(nt!==tt){
     _ceSend(nt);
-    try{E21.restoreUserText(nt,tt)}catch(e){}
-    try{E21.postSend()}catch(e){}
+    try{E21.restoreUserText(nt,tt)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1252',e,'caught');}
+    try{E21.postSend()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1253',e,'caught');}
     return;
   }
   _ceSend(t);
-  try{E21.postSend()}catch(e){}
+  try{E21.postSend()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1257',e,'caught');}
 };
 CBACT.attAns=function(){
   var t=E21.clr;
@@ -1310,6 +1310,6 @@ document.addEventListener('keydown',function(e){
 });
 
 /* ─── شروع: نمایشگر تصویر آماده باشد ─── */
-try{E21.ensureViewer()}catch(e){}
+try{E21.ensureViewer()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1313',e,'caught');}
 /* ═══ پایان بخش Agent E ═══ */
 

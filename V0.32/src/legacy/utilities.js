@@ -4,8 +4,8 @@ function $(s){return document.querySelector(s)}
 function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
 function fa(n,d){if(d===undefined)d=0;n=Number(n);if(isNaN(n))n=0;return n.toLocaleString('fa-IR',{maximumFractionDigits:d})}
 function rial(v){return fa(Number(v)/10,Number(v)%10?1:0)+' تومان'}
-function dt(t){try{return new Date(t).toLocaleDateString('fa-IR',{month:'long',day:'numeric'})}catch(e){return ''}}
-function fd(t){try{return new Date(t).toLocaleDateString('fa-IR',{year:'numeric',month:'long',day:'numeric'})}catch(e){return ''}}
+function dt(t){try{return new Date(t).toLocaleDateString('fa-IR',{month:'long',day:'numeric'})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:7',e,'caught');return ''}}
+function fd(t){try{return new Date(t).toLocaleDateString('fa-IR',{year:'numeric',month:'long',day:'numeric'})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:8',e,'caught');return ''}}
 function dateFa(v){if(!v)return '—';var n=(typeof v==='number')?v:Date.parse(v);return isNaN(n)?String(v):fd(n)}
 function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
 function qesc(t){return esc(t).replace(/"/g,'&quot;')}
@@ -150,19 +150,29 @@ function a11yify(root){
 var MODAL_PREV=null;
 function openModal(html,cb){
   var r=$('#modal-root');
-  MODAL_PREV=document.activeElement;
+  if(!r.classList.contains('on')||!r.contains(document.activeElement))MODAL_PREV=document.activeElement;
   r.innerHTML='<div class="modal">'+html+'</div>';
   r.classList.add('on');
   r.onclick=function(e){if(e.target===r)closeModal()};
   a11yify(r);
+  r.removeAttribute('role');r.removeAttribute('aria-modal');
   var m=r.querySelector('.modal');
-  if(m){m.setAttribute('tabindex','-1');setTimeout(function(){try{m.focus()}catch(e){}},20)}
+  if(m){m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');var title=m.querySelector('h1,h2,h3');if(title){title.id='mahalino-modal-title';m.setAttribute('aria-labelledby',title.id)}else{m.setAttribute('aria-label','پنجرهٔ محلینو')}m.setAttribute('tabindex','-1');setTimeout(function(){try{m.focus()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:160',e,'caught');}},20)}
+  r.onkeydown=function(e){
+    if(e.key==='Escape'){e.preventDefault();closeModal();return}
+    if(e.key!=='Tab'||!m)return;
+    var nodes=Array.prototype.filter.call(m.querySelectorAll('button,a[href],input,select,textarea,[tabindex]'),function(n){return !n.disabled&&n.tabIndex>=0&&n.getClientRects().length});
+    if(!nodes.length){e.preventDefault();m.focus();return}
+    var first=nodes[0],last=nodes[nodes.length-1],active=document.activeElement;
+    if(e.shiftKey&&(active===first||active===m)){e.preventDefault();last.focus()}
+    else if(!e.shiftKey&&(active===last||active===m)){e.preventDefault();first.focus()}
+  };
   if(cb)cb();
 }
 function closeModal(){
   var r=$('#modal-root');
-  r.classList.remove('on');r.innerHTML='';
-  if(MODAL_PREV&&MODAL_PREV.focus){try{MODAL_PREV.focus()}catch(e){}}
+  r.classList.remove('on');r.onkeydown=null;r.innerHTML='';
+  if(MODAL_PREV&&MODAL_PREV.focus){try{MODAL_PREV.focus()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:175',e,'caught');}}
   MODAL_PREV=null;
 }
 /* 2) state */
@@ -173,12 +183,57 @@ var OLD_LS4=['mahal','ino_','v29'].join('');
 var OLD_LS5=['mahal','ino_','v18'].join('');
 var OLD_LS2=['mahal','ino_','v16'].join('');
 var OLD_LS3=['khan','yar','_v15'].join('');
+// Container validation is intentionally separate from domain/business validation.
+function stateObject(v){return !!v&&typeof v==='object'&&!Array.isArray(v)}
 var S=null,LSCHAIN=[LSKEY,PREVIOUS_LS,OLD_LS,OLD_LS4,OLD_LS5,OLD_LS2,OLD_LS3],LSi;
+var stateRecovery=[],stateSource=null,stateRaw=null;
 for(LSi=0;LSi<LSCHAIN.length;LSi++){
-  try{S=JSON.parse(localStorage.getItem(LSCHAIN[LSi]))}catch(e){S=null}
-  if(S&&typeof S==='object')break;
+  var candidateRaw=null;
+  try{
+    candidateRaw=localStorage.getItem(LSCHAIN[LSi]);
+    if(candidateRaw===null)continue;
+    S=JSON.parse(candidateRaw);
+    if(stateObject(S)){stateSource=LSCHAIN[LSi];stateRaw=candidateRaw;break}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:197',e,'caught');S=null}
+  if(candidateRaw!==null)stateRecovery.push({key:LSCHAIN[LSi],raw:candidateRaw});
+  S=null;
 }
-if(!S||typeof S!=='object'){S={}}
+if(!stateObject(S)){S={}}
+var stateRepaired=false;
+function stateField(obj,key,valid,fallback){
+  if(!valid(obj[key])){
+    if(obj[key]!==undefined)stateRepaired=true;
+    obj[key]=fallback;
+  }
+}
+function stateArrays(obj,keys){keys.split(' ').forEach(function(k){stateField(obj,k,Array.isArray,[])})}
+function stateRecord(obj,key,fallback){stateField(obj,key,stateObject,fallback||{})}
+['reminders','liveHistory'].forEach(function(k){if(S[k]!==undefined)stateArrays(S,k)});
+stateArrays(S,'wlog log reqs wfs contracts reviews nprj svcOrders svcAudit grt grtAudit notifs library projects shares savedListings chats');
+['tokens','wallet'].forEach(function(k){stateField(S,k,function(v){return typeof v==='number'&&isFinite(v)&&v>=0},0)});
+stateField(S,'welcomed',function(v){return typeof v==='boolean'},false);
+stateField(S,'pending',function(v){return v===null||typeof v==='string'},null);
+['auth','sub','paySession','grtReserve'].forEach(function(k){stateField(S,k,function(v){return v===null||stateObject(v)},null)});
+stateRecord(S,'prof',{work:null,school:null,workLL:null,schoolLL:null});
+stateRecord(S,'active');stateRecord(S,'prefs');
+stateRecord(S,'ui',{tab:'b',dcat:'rent',yh:24,crng:12,nrng:12,atab:'overview'});
+stateRecord(S,'profile');
+['confirmed','inferred','stale'].forEach(function(k){stateRecord(S.profile,k)});
+stateArrays(S.profile,'log');
+function stateContext(ctx){stateRecord(ctx,'fields');stateArrays(ctx,'log')}
+stateRecord(S,'ctx30');stateContext(S.ctx30);
+['ctx30ByChat','ctx30Collectors','scratch'].forEach(function(k){if(S[k]!==undefined)stateRecord(S,k)});
+if(S.ctx30ByChat)Object.keys(S.ctx30ByChat).forEach(function(k){stateRecord(S.ctx30ByChat,k);stateContext(S.ctx30ByChat[k])});
+if(S.ctx30ActiveKey!==undefined)stateField(S,'ctx30ActiveKey',function(v){return typeof v==='string'},'');
+if(S.flow!==undefined)stateRecord(S,'flow');
+['log','wfs','chats','contracts'].forEach(function(k){
+  var rows=S[k].filter(stateObject);
+  if(rows.length!==S[k].length){S[k]=rows;stateRepaired=true}
+});
+S.wfs.forEach(function(w){stateRecord(w,'data')});
+S.chats.forEach(function(c){if(c.hist!==undefined)stateArrays(c,'hist')});
+if(stateRepaired&&stateSource)stateRecovery.push({key:stateSource,raw:stateRaw});
+if(stateRecovery.length)console.warn('Stored state required recovery; raw data will be preserved before saving.');
 function ph(seed,w,h,fb){var hu=hseed(seed)||seedimg(seed);if(hu)return '<div class="ph"><div class="fb">'+fb+'</div><img src="'+hu+'" alt="" loading="lazy" onerror="this.remove()"></div>';return '<div class="ph"><div class="fb">'+fb+'</div><img src="https://picsum.photos/seed/'+seed+'/'+w+'/'+h+'" alt="" loading="lazy" onerror="this.remove()"></div>'}
 if(S.auth===undefined){S.auth=null}
 if(S.tokens===undefined){S.tokens=0}
@@ -197,7 +252,7 @@ if(S.flow){
     if(!S.wfs.length){
       for(i=0;i<mods.length;i++){
         m=mods[i];f=S.flow[m];
-        if(!f||typeof f!=='object'){continue}
+        if(!stateObject(f)){continue}
         w={id:'WF-'+m+'-legacy',m:m,num:(function(){var k=0,j;for(j=0;j<S.wfs.length;j++){if(S.wfs[j].m===m)k++}return k+1})(),step:f.step||1,data:f.data||{},done:!!f.done,cancelled:false,createdAt:Date.now(),updatedAt:Date.now()};
         S.wfs.push(w);S.active[m]=w.id;
       }
@@ -230,5 +285,41 @@ if(!S.profile)S.profile={confirmed:{},inferred:{},stale:{},log:[]};
 if(!S.paySession)S.paySession=null;
 if(!S.savedListings)S.savedListings=[];
 if(!S.ctx30)S.ctx30={fields:{},log:[]};
-function save(){try{localStorage.setItem(LSKEY,JSON.stringify(S))}catch(e){console.error('save failed',e);if(window.E24)E24.toastErr('ذخیره‌سازی محلی ناموفق بود؛ تغییرات تا بازنشانی صفحه در همین نشست اعمال است.')}}
-
+/* @mahalino:v32-state-codec-js */
+MahalinoStateCodec.attach(S);
+var stateLastRaw=null,stateConflict=false;
+try{stateLastRaw=localStorage.getItem(LSKEY)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:289',e,'caught');stateConflict=true}
+if(window.addEventListener)window.addEventListener('storage',function(e){
+  if(e.key===LSKEY&&e.newValue!==stateLastRaw){stateConflict=true;if(window.E24)E24.toastErr('داده‌ها در پنجرهٔ دیگری تغییر کرد؛ پیش از ادامه صفحه را بازنشانی کنید.')}
+});
+var stateWriterReady=true;
+if(typeof navigator!=='undefined'&&navigator.locks&&navigator.locks.request){
+  stateWriterReady=false;
+  navigator.locks.request(LSKEY+'-writer',{ifAvailable:true},function(lock){
+    if(!lock)return;
+    try{if(localStorage.getItem(LSKEY)!==stateLastRaw){stateConflict=true;return}}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:298',e,'caught');stateConflict=true;return}
+    stateWriterReady=true;
+    // Boot may have deferred a durable refund until writer ownership was known.
+    if(window.E30&&E30.pay&&S.paySession&&S.paySession.paidFlag)E30.pay.recover();
+    return new Promise(function(){}); // browser releases ownership when the tab closes
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:303',null,'caught');stateWriterReady=true;if(window.E30&&E30.pay&&S.paySession&&S.paySession.paidFlag)E30.pay.recover()});
+}
+function save(){
+  if(window.__mahalinoResetPending)return false;
+  if(!stateWriterReady){if(window.E24)E24.toastErr('این پنجره امکان ذخیره ندارد؛ پنجرهٔ دیگر محلینو را ببندید و این صفحه را بازنشانی کنید.');return false}
+  try{
+    if(stateConflict||localStorage.getItem(LSKEY)!==stateLastRaw){
+      stateConflict=true;
+      if(window.E24)E24.toastErr('ذخیره انجام نشد؛ داده‌ها در پنجرهٔ دیگری تغییر کرده است. صفحه را بازنشانی کنید.');
+      return false;
+    }
+    var encoded=MahalinoStateCodec.encode(S);
+    if(stateRecovery.length){localStorage.setItem(LSKEY+'_recovery',JSON.stringify(stateRecovery));stateRecovery=[]}
+    if(encoded!==stateLastRaw){localStorage.setItem(LSKEY,encoded);stateLastRaw=encoded}
+    return true;
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:318',e,'caught');
+    console.error('local persistence failed');
+    if(window.E24)E24.toastErr('ذخیره‌سازی محلی ناموفق بود؛ تغییرات تا بازنشانی صفحه در همین نشست اعمال است.');
+    return false;
+  }
+}

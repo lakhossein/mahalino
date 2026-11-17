@@ -3052,7 +3052,14 @@ body.authed.widemain .ch-main{width:100%;max-width:1280px;min-width:0;margin-inl
 <div id="modal-root" role="dialog" aria-modal="true" aria-label="پنجره"></div>
 
 <script>
-window.onerror=function(m,s,l){var e=document.getElementById('errbar');if(e){e.style.display='block';e.textContent='خطای اسکریپت: '+m+' — خط '+l;}return false;};
+var MahalinoDiagnostics=(function(){
+  var events=[];
+  function record(code,error,kind){var cause;try{cause=error&&error.name}catch(ignore){cause='Unknown'};var known=['Error','TypeError','RangeError','SyntaxError','ReferenceError','AbortError','QuotaExceededError','SecurityError','NetworkError'];events.push({code:code,at:Date.now(),cause:known.indexOf(cause)>=0?cause:'Unknown',kind:kind||'fault'});if(events.length>50)events.shift()}
+  function report(code,error){record(code,error,'fault');var e=document.getElementById('errbar');if(e){e.style.display='block';e.textContent='خطای برنامه ('+code+')؛ صفحه را بازنشانی کنید.'}}
+  if(window.addEventListener)window.addEventListener('unhandledrejection',function(e){report('promise.unhandled',e.reason)});
+  return {report:report,record:record,events:events};
+})();
+window.onerror=function(m,s,l,c,error){MahalinoDiagnostics.report('script.error',error);return false;};
 </script>
 <script src="./assets/leaflet/leaflet.js"></script>
 <script>
@@ -3061,8 +3068,8 @@ function $(s){return document.querySelector(s)}
 function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
 function fa(n,d){if(d===undefined)d=0;n=Number(n);if(isNaN(n))n=0;return n.toLocaleString('fa-IR',{maximumFractionDigits:d})}
 function rial(v){return fa(Number(v)/10,Number(v)%10?1:0)+' تومان'}
-function dt(t){try{return new Date(t).toLocaleDateString('fa-IR',{month:'long',day:'numeric'})}catch(e){return ''}}
-function fd(t){try{return new Date(t).toLocaleDateString('fa-IR',{year:'numeric',month:'long',day:'numeric'})}catch(e){return ''}}
+function dt(t){try{return new Date(t).toLocaleDateString('fa-IR',{month:'long',day:'numeric'})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:7',e,'caught');return ''}}
+function fd(t){try{return new Date(t).toLocaleDateString('fa-IR',{year:'numeric',month:'long',day:'numeric'})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:8',e,'caught');return ''}}
 function dateFa(v){if(!v)return '—';var n=(typeof v==='number')?v:Date.parse(v);return isNaN(n)?String(v):fd(n)}
 function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
 function qesc(t){return esc(t).replace(/"/g,'&quot;')}
@@ -3282,19 +3289,29 @@ function a11yify(root){
 var MODAL_PREV=null;
 function openModal(html,cb){
   var r=$('#modal-root');
-  MODAL_PREV=document.activeElement;
+  if(!r.classList.contains('on')||!r.contains(document.activeElement))MODAL_PREV=document.activeElement;
   r.innerHTML='<div class="modal">'+html+'</div>';
   r.classList.add('on');
   r.onclick=function(e){if(e.target===r)closeModal()};
   a11yify(r);
+  r.removeAttribute('role');r.removeAttribute('aria-modal');
   var m=r.querySelector('.modal');
-  if(m){m.setAttribute('tabindex','-1');setTimeout(function(){try{m.focus()}catch(e){}},20)}
+  if(m){m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');var title=m.querySelector('h1,h2,h3');if(title){title.id='mahalino-modal-title';m.setAttribute('aria-labelledby',title.id)}else{m.setAttribute('aria-label','پنجرهٔ محلینو')}m.setAttribute('tabindex','-1');setTimeout(function(){try{m.focus()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:160',e,'caught');}},20)}
+  r.onkeydown=function(e){
+    if(e.key==='Escape'){e.preventDefault();closeModal();return}
+    if(e.key!=='Tab'||!m)return;
+    var nodes=Array.prototype.filter.call(m.querySelectorAll('button,a[href],input,select,textarea,[tabindex]'),function(n){return !n.disabled&&n.tabIndex>=0&&n.getClientRects().length});
+    if(!nodes.length){e.preventDefault();m.focus();return}
+    var first=nodes[0],last=nodes[nodes.length-1],active=document.activeElement;
+    if(e.shiftKey&&(active===first||active===m)){e.preventDefault();last.focus()}
+    else if(!e.shiftKey&&(active===last||active===m)){e.preventDefault();first.focus()}
+  };
   if(cb)cb();
 }
 function closeModal(){
   var r=$('#modal-root');
-  r.classList.remove('on');r.innerHTML='';
-  if(MODAL_PREV&&MODAL_PREV.focus){try{MODAL_PREV.focus()}catch(e){}}
+  r.classList.remove('on');r.onkeydown=null;r.innerHTML='';
+  if(MODAL_PREV&&MODAL_PREV.focus){try{MODAL_PREV.focus()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:175',e,'caught');}}
   MODAL_PREV=null;
 }
 /* 2) state */
@@ -3305,12 +3322,57 @@ var OLD_LS4=['mahal','ino_','v29'].join('');
 var OLD_LS5=['mahal','ino_','v18'].join('');
 var OLD_LS2=['mahal','ino_','v16'].join('');
 var OLD_LS3=['khan','yar','_v15'].join('');
+// Container validation is intentionally separate from domain/business validation.
+function stateObject(v){return !!v&&typeof v==='object'&&!Array.isArray(v)}
 var S=null,LSCHAIN=[LSKEY,PREVIOUS_LS,OLD_LS,OLD_LS4,OLD_LS5,OLD_LS2,OLD_LS3],LSi;
+var stateRecovery=[],stateSource=null,stateRaw=null;
 for(LSi=0;LSi<LSCHAIN.length;LSi++){
-  try{S=JSON.parse(localStorage.getItem(LSCHAIN[LSi]))}catch(e){S=null}
-  if(S&&typeof S==='object')break;
+  var candidateRaw=null;
+  try{
+    candidateRaw=localStorage.getItem(LSCHAIN[LSi]);
+    if(candidateRaw===null)continue;
+    S=JSON.parse(candidateRaw);
+    if(stateObject(S)){stateSource=LSCHAIN[LSi];stateRaw=candidateRaw;break}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:197',e,'caught');S=null}
+  if(candidateRaw!==null)stateRecovery.push({key:LSCHAIN[LSi],raw:candidateRaw});
+  S=null;
 }
-if(!S||typeof S!=='object'){S={}}
+if(!stateObject(S)){S={}}
+var stateRepaired=false;
+function stateField(obj,key,valid,fallback){
+  if(!valid(obj[key])){
+    if(obj[key]!==undefined)stateRepaired=true;
+    obj[key]=fallback;
+  }
+}
+function stateArrays(obj,keys){keys.split(' ').forEach(function(k){stateField(obj,k,Array.isArray,[])})}
+function stateRecord(obj,key,fallback){stateField(obj,key,stateObject,fallback||{})}
+['reminders','liveHistory'].forEach(function(k){if(S[k]!==undefined)stateArrays(S,k)});
+stateArrays(S,'wlog log reqs wfs contracts reviews nprj svcOrders svcAudit grt grtAudit notifs library projects shares savedListings chats');
+['tokens','wallet'].forEach(function(k){stateField(S,k,function(v){return typeof v==='number'&&isFinite(v)&&v>=0},0)});
+stateField(S,'welcomed',function(v){return typeof v==='boolean'},false);
+stateField(S,'pending',function(v){return v===null||typeof v==='string'},null);
+['auth','sub','paySession','grtReserve'].forEach(function(k){stateField(S,k,function(v){return v===null||stateObject(v)},null)});
+stateRecord(S,'prof',{work:null,school:null,workLL:null,schoolLL:null});
+stateRecord(S,'active');stateRecord(S,'prefs');
+stateRecord(S,'ui',{tab:'b',dcat:'rent',yh:24,crng:12,nrng:12,atab:'overview'});
+stateRecord(S,'profile');
+['confirmed','inferred','stale'].forEach(function(k){stateRecord(S.profile,k)});
+stateArrays(S.profile,'log');
+function stateContext(ctx){stateRecord(ctx,'fields');stateArrays(ctx,'log')}
+stateRecord(S,'ctx30');stateContext(S.ctx30);
+['ctx30ByChat','ctx30Collectors','scratch'].forEach(function(k){if(S[k]!==undefined)stateRecord(S,k)});
+if(S.ctx30ByChat)Object.keys(S.ctx30ByChat).forEach(function(k){stateRecord(S.ctx30ByChat,k);stateContext(S.ctx30ByChat[k])});
+if(S.ctx30ActiveKey!==undefined)stateField(S,'ctx30ActiveKey',function(v){return typeof v==='string'},'');
+if(S.flow!==undefined)stateRecord(S,'flow');
+['log','wfs','chats','contracts'].forEach(function(k){
+  var rows=S[k].filter(stateObject);
+  if(rows.length!==S[k].length){S[k]=rows;stateRepaired=true}
+});
+S.wfs.forEach(function(w){stateRecord(w,'data')});
+S.chats.forEach(function(c){if(c.hist!==undefined)stateArrays(c,'hist')});
+if(stateRepaired&&stateSource)stateRecovery.push({key:stateSource,raw:stateRaw});
+if(stateRecovery.length)console.warn('Stored state required recovery; raw data will be preserved before saving.');
 function ph(seed,w,h,fb){var hu=hseed(seed)||seedimg(seed);if(hu)return '<div class="ph"><div class="fb">'+fb+'</div><img src="'+hu+'" alt="" loading="lazy" onerror="this.remove()"></div>';return '<div class="ph"><div class="fb">'+fb+'</div><img src="https://picsum.photos/seed/'+seed+'/'+w+'/'+h+'" alt="" loading="lazy" onerror="this.remove()"></div>'}
 if(S.auth===undefined){S.auth=null}
 if(S.tokens===undefined){S.tokens=0}
@@ -3329,7 +3391,7 @@ if(S.flow){
     if(!S.wfs.length){
       for(i=0;i<mods.length;i++){
         m=mods[i];f=S.flow[m];
-        if(!f||typeof f!=='object'){continue}
+        if(!stateObject(f)){continue}
         w={id:'WF-'+m+'-legacy',m:m,num:(function(){var k=0,j;for(j=0;j<S.wfs.length;j++){if(S.wfs[j].m===m)k++}return k+1})(),step:f.step||1,data:f.data||{},done:!!f.done,cancelled:false,createdAt:Date.now(),updatedAt:Date.now()};
         S.wfs.push(w);S.active[m]=w.id;
       }
@@ -3362,8 +3424,82 @@ if(!S.profile)S.profile={confirmed:{},inferred:{},stale:{},log:[]};
 if(!S.paySession)S.paySession=null;
 if(!S.savedListings)S.savedListings=[];
 if(!S.ctx30)S.ctx30={fields:{},log:[]};
-function save(){try{localStorage.setItem(LSKEY,JSON.stringify(S))}catch(e){console.error('save failed',e);if(window.E24)E24.toastErr('ذخیره‌سازی محلی ناموفق بود؛ تغییرات تا بازنشانی صفحه در همین نشست اعمال است.')}}
+/* Owned chat archives: serialization can be reused until a tracked mutation.
+   Adopt incoming records so a caller retaining a raw reference cannot bypass
+   invalidation. Other state fields keep native serialization semantics. */
+var MahalinoStateCodec=(function(){
+  var states=new WeakMap();
+  function install(state){
+    var dirty=true,encoded=null,raw=state.chats;
+    if(!Array.isArray(raw))throw new TypeError('Invalid chats container');
+    var proxies=new WeakMap(),targets=new WeakMap();
+    function adopt(value,seen){
+      if(!value||typeof value!=='object')return value;
+      if(targets.has(value))return targets.get(value);
+      seen=seen||new WeakMap();if(seen.has(value))return seen.get(value);
+      var clone=Array.isArray(value)?[]:{};seen.set(value,clone);
+      Object.keys(value).forEach(function(k){Object.defineProperty(clone,k,{value:adopt(value[k],seen),enumerable:true,writable:true,configurable:true})});
+      return clone;
+    }
+    function wrap(value){
+      if(!value||typeof value!=='object')return value;
+      if(proxies.has(value))return proxies.get(value);
+      var proxy=new Proxy(value,{
+        get:function(target,key){return wrap(Reflect.get(target,key))},
+        set:function(target,key,value){dirty=true;return Reflect.set(target,key,adopt(value))},
+        deleteProperty:function(target,key){dirty=true;return Reflect.deleteProperty(target,key)},
+        defineProperty:function(target,key,descriptor){dirty=true;if('value' in descriptor)descriptor.value=adopt(descriptor.value);return Reflect.defineProperty(target,key,descriptor)}
+      });proxies.set(value,proxy);targets.set(proxy,value);return proxy;
+    }
+    // Initial data came from the loader and has no external aliases yet.
+    Object.defineProperty(state,'chats',{enumerable:true,configurable:true,get:function(){return wrap(raw)},set:function(value){if(!Array.isArray(value))throw new TypeError('Invalid chats container');raw=adopt(value);dirty=true}});
+    return {encode:function(){
+      if(dirty){encoded=JSON.stringify(raw);dirty=false}
+      var body=JSON.stringify(state,function(key,value){return this===state&&key==='chats'?undefined:value});
+      return (body==='{}'?'{':body.slice(0,-1)+',')+'"chats":'+encoded+'}';
+    }};
+  }
+  function attach(state){if(!states.has(state))states.set(state,install(state));return state}
+  return {attach:attach,encode:function(state){attach(state);return states.get(state).encode()}};
+})();
 
+MahalinoStateCodec.attach(S);
+var stateLastRaw=null,stateConflict=false;
+try{stateLastRaw=localStorage.getItem(LSKEY)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:289',e,'caught');stateConflict=true}
+if(window.addEventListener)window.addEventListener('storage',function(e){
+  if(e.key===LSKEY&&e.newValue!==stateLastRaw){stateConflict=true;if(window.E24)E24.toastErr('داده‌ها در پنجرهٔ دیگری تغییر کرد؛ پیش از ادامه صفحه را بازنشانی کنید.')}
+});
+var stateWriterReady=true;
+if(typeof navigator!=='undefined'&&navigator.locks&&navigator.locks.request){
+  stateWriterReady=false;
+  navigator.locks.request(LSKEY+'-writer',{ifAvailable:true},function(lock){
+    if(!lock)return;
+    try{if(localStorage.getItem(LSKEY)!==stateLastRaw){stateConflict=true;return}}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:298',e,'caught');stateConflict=true;return}
+    stateWriterReady=true;
+    // Boot may have deferred a durable refund until writer ownership was known.
+    if(window.E30&&E30.pay&&S.paySession&&S.paySession.paidFlag)E30.pay.recover();
+    return new Promise(function(){}); // browser releases ownership when the tab closes
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:303',null,'caught');stateWriterReady=true;if(window.E30&&E30.pay&&S.paySession&&S.paySession.paidFlag)E30.pay.recover()});
+}
+function save(){
+  if(window.__mahalinoResetPending)return false;
+  if(!stateWriterReady){if(window.E24)E24.toastErr('این پنجره امکان ذخیره ندارد؛ پنجرهٔ دیگر محلینو را ببندید و این صفحه را بازنشانی کنید.');return false}
+  try{
+    if(stateConflict||localStorage.getItem(LSKEY)!==stateLastRaw){
+      stateConflict=true;
+      if(window.E24)E24.toastErr('ذخیره انجام نشد؛ داده‌ها در پنجرهٔ دیگری تغییر کرده است. صفحه را بازنشانی کنید.');
+      return false;
+    }
+    var encoded=MahalinoStateCodec.encode(S);
+    if(stateRecovery.length){localStorage.setItem(LSKEY+'_recovery',JSON.stringify(stateRecovery));stateRecovery=[]}
+    if(encoded!==stateLastRaw){localStorage.setItem(LSKEY,encoded);stateLastRaw=encoded}
+    return true;
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:318',e,'caught');
+    console.error('local persistence failed');
+    if(window.E24)E24.toastErr('ذخیره‌سازی محلی ناموفق بود؛ تغییرات تا بازنشانی صفحه در همین نشست اعمال است.');
+    return false;
+  }
+}
 /* ═══ ۲.۵) نمونه‌های فلو — چند گردش کار هم‌زمان ═══ */
 function wfOf(id){var i;if(!id){return null}for(i=0;i<S.wfs.length;i++){if(S.wfs[i].id===id)return S.wfs[i]}return null}
 function wfAll(m){var out=[],i,w;for(i=0;i<S.wfs.length;i++){w=S.wfs[i];if(w.m===m)out.push(w)}return out}
@@ -3416,7 +3552,7 @@ function wfData(m){var w=wf(m);return w?w.data:null}
 function wfRebind(m){
   if(CE.f&&CE.f===m){
     CE.i=0;CE.li=0;CE.hist=[];
-    if(FCHAT.open){try{ceStep()}catch(e){}}
+    if(FCHAT.open){try{ceStep()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/workflows.js:53',e,'caught');}}
   }
 }
 function resumeChips(cls){
@@ -3466,7 +3602,7 @@ function spend(key,cat,desc){
   }
   S.tokens-=c;var _txn='TXN-'+Date.now().toString(36)+Math.floor(Math.random()*999);
 S.log.unshift({t:Date.now(),d:desc,c:-c,cat:cat,id:_txn,svc:key});save();renderTok();
-if(window.E29){try{E29.bus.emit('token.deduct',{txn:_txn,cost:c,svc:key,desc:desc});if((S.tokens||0)<30)E29.bus.emit('wallet.low',{balance:S.tokens})}catch(e){}}
+if(window.E29){try{E29.bus.emit('token.deduct',{txn:_txn,cost:c,svc:key,desc:desc});if((S.tokens||0)<30)E29.bus.emit('wallet.low',{balance:S.tokens})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/wallet-charts.js:22',e,'caught');}}
   toast('−'+fa(c,0)+' کلید — '+desc);return true;
 }
 function earn(n,cat,desc){S.tokens+=n;S.log.unshift({t:Date.now(),d:desc,c:n,cat:cat});save();renderTok();toast('+'+fa(n,0)+' کلید — '+desc)}
@@ -3926,7 +4062,7 @@ function svcLoadCatalog(){
   SVC_CATALOG.loading=true;SVC_CATALOG.error='';
   return svcPost(cfg.catalogEndpoint,{})
     .then(function(j){if(!j||j.ok===false)throw new Error('catalog');SVCS=svcNormalizeCatalog(j);SVC_CATALOG.loaded=true;SVC_CATALOG.failed=false;return SVCS})
-    .catch(function(e){SVC_CATALOG.error='دریافت فهرست خدمات ممکن نشد؛ دوباره تلاش کنید.';SVC_CATALOG.failed=true;throw e})
+    .catch(function(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sample-data.js:383',e,'caught');SVC_CATALOG.error='دریافت فهرست خدمات ممکن نشد؛ دوباره تلاش کنید.';SVC_CATALOG.failed=true;throw e})
     .finally(function(){SVC_CATALOG.loading=false});
 }
 
@@ -3990,7 +4126,7 @@ function svcPost(url,body){
   return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctrl?ctrl.signal:undefined})
     .then(function(r){return r.json()})
     .then(function(j){if(timer)clearTimeout(timer);return j})
-    .catch(function(e){if(timer)clearTimeout(timer);throw e});
+    .catch(function(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sample-data.js:447',e,'caught');if(timer)clearTimeout(timer);throw e});
 }
 function svcQuote(ci,ii,qty,details){
   var it=svcItem(ci,ii),cfg=svcCfg();
@@ -4065,7 +4201,7 @@ function svcPayOrder(ci,ii,form,q,opts){
     svcTimelinePush(o,r.status||'submitted',r.demo?'وضعیت نمایشی':'ثبت در ارائه‌دهنده');
     svcAudit(o,'submit',{providerOrderId:o.providerOrderId,demo:!!r.demo});
     svcReqSync(o);save();return o;
-  }).catch(function(){
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sample-data.js:522',null,'caught');
     svcTimelinePush(o,'submit_failed','پرداخت انجام شد اما ثبت سفارش ناموفق بود؛ می‌توانید دوباره تلاش کنید.');
     svcAudit(o,'submit_failed',{});
     svcReqSync(o);save();return o;
@@ -4075,7 +4211,7 @@ function fmtSvcMeta(o){
   return (o.date?faDate(o.date):'—')+' • '+esc(o.slot||'—')+' • '+esc(o.address||'—');
 }
 function faDate(iso){
-  try{return new Date(iso).toLocaleDateString('fa-IR',{year:'numeric',month:'long',day:'numeric'})}catch(e){return iso}
+  try{return new Date(iso).toLocaleDateString('fa-IR',{year:'numeric',month:'long',day:'numeric'})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sample-data.js:532',e,'caught');return iso}
 }
 
 var PTOPICS=[{k:'intro',ic:'',t:'معرفی پروژه'},{k:'roads',ic:'',t:'راه‌های ارتباطی'},{k:'studies',ic:'',t:'مطالعات فنی'},{k:'timeline',ic:'',t:'مراحل و زمان‌بندی'},{k:'finance',ic:'',t:'مالی و پرداخت'},{k:'docs',ic:'',t:'مجوزها و اسناد'}];
@@ -4580,7 +4716,7 @@ function baHTML(){
   var stage=st.stage||1;
   try{ /* preload هر دو تصویر برای کشش بی‌وقفه */
     ['assets/img/emptying-before.jpg','assets/img/emptying-after.jpg'].forEach(function(u){var i2=new Image();i2.src=u});
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/workflow-engine.js:500',e,'caught');}
   return '<div class="ba27">'+
   '<div class="ba27-steps">'+
   '<div class="ba27-step '+(stage===1?'on':'done')+'">۱) روز ورود</div>'+
@@ -4791,7 +4927,7 @@ E27.groupOf=function(ts){
     if(diff<7)return '۷ روز گذشته';
     if(diff<30)return '۳۰ روز گذشته';
     return 'قدیمی‌تر';
-  }catch(e){return ''}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/navigation.js:52',e,'caught');return ''}
 };
 E27.sessRow=function(s){
   var pinLab=s.pinned?'برداشتن سنجاق':'سنجاق کردن';
@@ -4830,7 +4966,7 @@ E27.sessListHTML=function(){
   return h;
 };
 function renderSidebar(){
-  if(window.E29&&E29.shell){try{E29.shell.renderSidebar();return}catch(e){console.error('E29 sidebar',e)}}
+  if(window.E29&&E29.shell){try{E29.shell.renderSidebar();return}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/navigation.js:91',e,'caught');console.error('E29 sidebar',e)}}
   var el=document.getElementById('side'),app=document.getElementById('appwrap');
   if(!el){return}
   if(!S.auth){
@@ -4888,7 +5024,7 @@ function renderCurrent(){
 /* ═══ ۸) چت ═══ */
 var HIST=Array.isArray(S.liveHistory)?S.liveHistory.slice():[];
 var CE={f:null,i:0,li:0,hist:[]};
-function cePush(){try{CE.hist.push({i:CE.i,li:CE.li})}catch(e){}if(CE.hist.length>40){CE.hist=CE.hist.slice(-40)}}
+function cePush(){try{CE.hist.push({i:CE.i,li:CE.li})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:4',e,'caught');}if(CE.hist.length>40){CE.hist=CE.hist.slice(-40)}}
 function ceBack(){if(!(CE.f&&CE.hist.length))return;var h=CE.hist.pop();CE.i=h.i;CE.li=h.li;HIST.push({r:'user',h:'&#8617; \u0628\u0627\u0632\u06af\u0634\u062a'});cr();ceStep()}
 function cr(){
   var last=-1,i;
@@ -5043,13 +5179,13 @@ function CHIP5(){return [['۱','1'],['۲','2'],['۳','3'],['۴','4'],['۵','5']]
 function ceEnd(){
   var f=CE.f;CE.f=null;
   var backBtn=null;
-  try{if(f&&MODBY[f]){backBtn=['ادامه در فلو (قدم‌به‌قدم)','F:step:'+f]}}catch(e){}
+  try{if(f&&MODBY[f]){backBtn=['ادامه در فلو (قدم‌به‌قدم)','F:step:'+f]}}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:159',e,'caught');}
   var chips=[['منوی اصلی','!menu'],['درخواست‌های من','F:reqs']];
   if(backBtn){chips.unshift(backBtn)}
   botC('<b>فلوی '+((f&&MODBY[f])?MODBY[f].t:'گفت‌وگو')+' تکمیل شد و در داشبورد ثبت گردید.</b>',chips);
 }
-function ceNumSet(k,v){try{var m=CE.f;var pm=document.querySelector('[data-pm]');var mod=(pm&&pm.getAttribute('data-pm'))||m||'rent';var D=wd(mod==='rent'?'rent':'buy').data;if(mod==='rent'){defP(D)}else{if(!D.PR)D.PR={age:[0,30],m2:[45,120],ppm:[1800000000,5500000000],beds:2,floorR:[1,10]}}var n=+pd(String(v||'').replace(/[^0-9]/g,''));if(k==='bedsNum'){if(v===''||v==null){D.P.bedsNum='';save();renderCurrent();return}if(n>=1&&n<=5){D.P.bedsNum=n;D.P.beds=0;save();renderCurrent()}else{toast('تعداد خواب باید ۱ تا ۵ باشد')}return}if(k==='floorNum'){if(v===''||v==null){D.P.floorNum='';save();renderCurrent();return}if(n>=0&&n<=30){D.P.floorNum=n;D.P.floor='any';save();renderCurrent()}else{toast('شماره طبقه باید ۰ تا ۳۰ باشد')}return}}catch(e){}}
-function ceImpSet(k,v){try{var m=CE.f;if(!m)return;var D=wd(m).data;if(!D.P)D.P={metro:3,school:3,work:3,saf:3,amn:3,quiet:3,extra:[],PXH:{}};D.P[k]=v;save();renderCurrent()}catch(e){}}
+function ceNumSet(k,v){try{var m=CE.f;var pm=document.querySelector('[data-pm]');var mod=(pm&&pm.getAttribute('data-pm'))||m||'rent';var D=wd(mod==='rent'?'rent':'buy').data;if(mod==='rent'){defP(D)}else{if(!D.PR)D.PR={age:[0,30],m2:[45,120],ppm:[1800000000,5500000000],beds:2,floorR:[1,10]}}var n=+pd(String(v||'').replace(/[^0-9]/g,''));if(k==='bedsNum'){if(v===''||v==null){D.P.bedsNum='';save();renderCurrent();return}if(n>=1&&n<=5){D.P.bedsNum=n;D.P.beds=0;save();renderCurrent()}else{toast('تعداد خواب باید ۱ تا ۵ باشد')}return}if(k==='floorNum'){if(v===''||v==null){D.P.floorNum='';save();renderCurrent();return}if(n>=0&&n<=30){D.P.floorNum=n;D.P.floor='any';save();renderCurrent()}else{toast('شماره طبقه باید ۰ تا ۳۰ باشد')}return}}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:164',e,'caught');}}
+function ceImpSet(k,v){try{var m=CE.f;if(!m)return;var D=wd(m).data;if(!D.P)D.P={metro:3,school:3,work:3,saf:3,amn:3,quiet:3,extra:[],PXH:{}};D.P[k]=v;save();renderCurrent()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:165',e,'caught');}}
 function ceSmart(t){t=String(t||'');var has=function(){var a=arguments,i;for(i=0;i<a.length;i++){if(t.indexOf(a[i])>=0)return true}return false};if(has('تضمینی')){go('grt');CE.f=null;botC('اجارهٔ تضمینی در صفحهٔ اختصاصی خودش قدم‌به‌قدم پیش می‌رود؛ بازش کردم.',null);return true}if(has('اجاره','رهن')||((!CE.f||CE.f==='rent')&&has('بازدید'))){botC('فلوی اجاره را شروع می‌کنم.',null);ceStart('rent');return true}if(has('خرید','مبایعه')){botC('فلوی خرید را شروع می‌کنم.',null);ceStart('buy');return true}if(has('قرارداد','کد رهگیری')){S.ui.atab='contracts';save();go('profile');CE.f=null;botC('قراردادها در تنظیمات حساب باز شد.',null);return true}if(has('رزرو','اقامت','سفر')){botC('فلوی اقامت را شروع می‌کنم.',null);ceStart('stay');return true}if(has('پروژه')){go('mkt');CE.f=null;botC('بخش پروژه‌ها را باز کردم.',null);return true}if(has('ساخت','مصالح')){go('build');CE.f=null;botC('بخش ساخت را باز کردم.',null);return true}if(has('خدمات','تعمیر','نظافت')){go('svc');CE.f=null;botC('بخش خدمات ملک را باز کردم.',null);return true}if(has('خواب')){var m2=t.match(/[0-9]+/);if(m2&&CE.f){var nb=+pd(m2[0]);if(nb>=1&&nb<=5){var DD=wd(CE.f).data;DD.beds=nb;botC('تعداد خواب ثبت شد.',null);cePush();CE.i++;ceStep();return true}}botC('تعداد خواب را با عدد مشخص کنید (1 تا 5).',null);return true}if(has('منو','داشبورد')){ceVal('!menu');CE.f=null;return true}return false}
 
 function ceVal(v){
@@ -5089,7 +5225,7 @@ function ceVal(v){
     var pm=parseMoneyFA(v0);
     if(!pm.ok){
       var p27=null;
-      try{p27=E27.budgParse(v0)}catch(e27x){}
+      try{p27=E27.budgParse(v0)}catch(e27x){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:205',e27x,'caught');}
       if(p27&&p27.ok){v=v0;note=null}
       else{botC(pm.msg);return}
     }else{v=String(pm.value);note=pm.note}
@@ -5110,7 +5246,7 @@ function ceVal(v){
   if(st.set){done=(st.money||st.moneyRange)?moneyCanonical(function(){return st.set(D,v)}):st.set(D,v)}
   else if(st.key){D[st.key]=v}
   if(done==='ERR'){botC(st.err||('این مقدار در بازهٔ مجاز نیست. '+(st.hint||'یک مقدار معتبر وارد کنید.')));return}
-  try{ctxFromStep(CE.f,st,D)}catch(e){}
+  try{ctxFromStep(CE.f,st,D)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:226',e,'caught');}
   if(note){botC(note)}
   if(st.until){
     if(done==='DONE'){cePush();CE.i++;save();renderCurrent();ceStep()}
@@ -5884,7 +6020,7 @@ function ctxFromStep(f,st,D){
       if(D.hood)CTX.hood=D.hood;
       if(D.PR&&D.PR.beds)CTX.beds=D.PR.beds;
     }else if(f==='stay'&&D&&D.city){CTX.city=D.city}
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/legacy-discovery.js:16',e,'caught');}
 }
 /* ── نمایش‌سازها ── */
 function rShort(v){v=(+v||0)/10;if(v>=1e9)return fa(v/1e9,1)+' میلیارد';if(v>=1e6)return fa(v/1e6,0)+' میلیون';return fa(v,0)}
@@ -5976,7 +6112,7 @@ function hoodChipsAct(prefix){return HOODS.slice(0,6).map(function(h){return {l:
 function rThink(label,fn){
   HIST.push({r:'bot',h:'<span class="typing"><span class="dots"><i></i><i></i><i></i></span>'+esc(label)+'</span>',proc:true});
   cr();
-  setTimeout(function(){HIST=HIST.filter(function(m){return !m.proc});try{fn()}catch(e){botC('در ساختن پاسخ مشکلی پیش آمد؛ دوباره تلاش کنید.')}},700);
+  setTimeout(function(){HIST=HIST.filter(function(m){return !m.proc});try{fn()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/legacy-discovery.js:108',e,'caught');botC('در ساختن پاسخ مشکلی پیش آمد؛ دوباره تلاش کنید.')}},700);
 }
 /* ── موتور نیت ── */
 var RINT={};
@@ -6453,7 +6589,7 @@ function lkPostalAddress(code){
     return fetch(cfg.postalEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({postalCode:code})})
       .then(function(r){return r.json()})
       .then(function(j){if(!j||j.ok===false||!j.address)return {ok:false,why:'notfound'};return {ok:true,addr:j.address,approx:!!j.approximate}})
-      .catch(function(){return {ok:false,why:'unavailable'}});
+      .catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:85',null,'caught');return {ok:false,why:'unavailable'}});
   }
   return fetch('https://photon.komoot.io/api/?q='+encodeURIComponent(code)+'&limit=3')
     .then(function(r){return r.json()})
@@ -6467,7 +6603,7 @@ function lkPostalAddress(code){
         .then(function(r){return r.json()})
         .then(function(a){if(a&&a[0])return {ok:true,addr:a[0].display_name,approx:false};return {ok:false,why:'notfound'}});
     })
-    .catch(function(){return {ok:false,why:'unavailable'}});
+    .catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:99',null,'caught');return {ok:false,why:'unavailable'}});
 }
 function lkIdentityName(nid){
   var v=String(nid||'').replace(/\D/g,'');
@@ -6483,7 +6619,7 @@ function lkIdentityName(nid){
       if(!j||j.ok===false||!j.firstName&&!j.lastName)return {ok:false,why:'notfound'};
       return {ok:true,name:[j.firstName||'',j.lastName||''].join(' ').trim()};
     })
-    .catch(function(){if(timer)clearTimeout(timer);return {ok:false,why:'unavailable'}});
+    .catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:115',null,'caught');if(timer)clearTimeout(timer);return {ok:false,why:'unavailable'}});
 }
 function lookupIdentity(id,role,approved){
   var D=wd(conKind()).data,c=conInit(D,conKind());
@@ -6645,7 +6781,7 @@ function printContract(snap){
   document.body.classList.add('doc-printing');
   var done=function(){document.body.classList.remove('doc-printing');root.innerHTML='';document.title=oldTitle;window.removeEventListener('afterprint',done)};
   window.addEventListener('afterprint',done);
-  setTimeout(function(){try{window.print()}catch(e){}setTimeout(done,1200)},90);
+  setTimeout(function(){try{window.print()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:277',e,'caught');}setTimeout(done,1200)},90);
 }
 function conFinalize(D,kind){
   if(D.signed)return true;
@@ -6665,7 +6801,7 @@ if(window.E29){try{
     tokenCost:COSTS.contract_draft||0,txnId:window.__v29conTxn||null});
   window.__v29conTxn=null;
   E29.bus.emit('contract.status',{title:'قرارداد ثبت شد',msg:title+' — '+c.code,code:c.code,status:'signed',libId:_lit?_lit.id:null});
-}catch(e){console.error('E29 contract save',e)}}
+}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:297',e,'caught');console.error('E29 contract save',e)}}
   if(D.grtId){var _ge=grtOf(D.grtId);if(_ge){_ge.contractCode=c.code;_ge.contractWf=wfId;_ge.rentWf=wfId;grtLog(_ge,'اجاره‌نامهٔ مستأجر امضا شد — '+c.code);_ge.updatedAt=Date.now()}}
   save();toast('قرارداد داخلی ثبت شد — '+c.code);
   if(CURRENT==='rent'||CURRENT==='buy'||CURRENT==='dash')renderCurrent();
@@ -7375,10 +7511,10 @@ function svcDefaultAddress(){
     var r=wd('rent').data;if(r&&r.listing){var x=findL(r.listing);return x.t+'، '+findH(x.hood).n}
     var b=wd('buy').data;if(b&&b.blist){var y=findB(b.blist);return y.t+'، '+findH(y.hood).n}
     var p=getPlaces()[0];if(p)return p.label;
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/property-services.js:7',e,'caught');}
   return '';
 }
-function svcDefaultDate(){try{return new Date(Date.now()+86400000).toISOString().slice(0,10)}catch(e){return ''}}
+function svcDefaultDate(){try{return new Date(Date.now()+86400000).toISOString().slice(0,10)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/property-services.js:10',e,'caught');return ''}}
 function svcOrderFormHTML(ci,ii){
   var c=SVCS[ci],it=c?c.items[ii]:null;if(!c||!it)return '';
   var active=svcActiveOf(ci,ii);
@@ -7459,7 +7595,7 @@ function printServiceReceipt(o){
   var old=document.title;document.title='رسید-'+o.id;document.body.classList.add('doc-printing');
   var done=function(){document.body.classList.remove('doc-printing');root.innerHTML='';document.title=old;window.removeEventListener('afterprint',done)};
   window.addEventListener('afterprint',done);
-  setTimeout(function(){try{window.print()}catch(e){}setTimeout(done,1200)},90);
+  setTimeout(function(){try{window.print()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/property-services.js:91',e,'caught');}setTimeout(done,1200)},90);
 }
 VIEWS.svc=function(){
   var el=document.getElementById('v-svc');
@@ -7468,7 +7604,7 @@ VIEWS.svc=function(){
   var list=orders.filter(function(o){if(f==='active')return ['done','cancelled','refunded','rejected','failed'].indexOf(o.status)<0;if(f==='done')return o.status==='done';return true});
   var h='<div class="wtop"><div><h2>خدمات ملک</h2><p>سفارش، پرداخت و پیگیری خدمات خانه در محلینو</p></div><div class="head-actions"><button class="btn btn-sm" data-act="fcb">دستیار</button></div></div>';
   var cfg=svcCfg();
-  if(cfg.catalogEndpoint&&!SVC_CATALOG.loaded&&!SVC_CATALOG.loading&&!SVC_CATALOG.failed){svcLoadCatalog().then(function(){if(CURRENT==='svc')renderCurrent()}).catch(function(){if(CURRENT==='svc')renderCurrent()})}
+  if(cfg.catalogEndpoint&&!SVC_CATALOG.loaded&&!SVC_CATALOG.loading&&!SVC_CATALOG.failed){svcLoadCatalog().then(function(){if(CURRENT==='svc')renderCurrent()}).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/property-services.js:100',null,'caught');if(CURRENT==='svc')renderCurrent()})}
   if(svcIsDemo())h+='<div class="integration-note">در این نسخه سفارش‌ها به‌صورت نمایشی ثبت می‌شوند و به ارائه‌دهندهٔ واقعی ارسال نمی‌شوند.</div>';
   if(cfg.catalogEndpoint&&!SVC_CATALOG.loaded){h+='<div class="card tight"><div class="ct">دریافت خدمات</div><p class="note">'+(SVC_CATALOG.error||'در حال دریافت فهرست خدمات...')+'</p>'+(SVC_CATALOG.failed?'<button class="btn btn-sm" data-act="svcReload">تلاش دوباره</button>':'')+'</div>';}
   else h+='<div class="grid g2" style="margin-top:14px">'+SVCS.map(function(c,ci){
@@ -7515,10 +7651,10 @@ function mkMap(elId,center,zoom){
   var el=document.getElementById(elId);
   if(!el)return null;
   if(!window.L){mapFallback(el,'کتابخانهٔ نقشه بارگذاری نشد.',elId!=='lfm2');return null}
-  if(MAPS[elId]){try{MAPS[elId].remove()}catch(e){}delete MAPS[elId]}
+  if(MAPS[elId]){try{MAPS[elId].remove()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:23',e,'caught');}delete MAPS[elId]}
   el.innerHTML='';el.style.position='relative';
   var m=L.map(el,{zoomControl:true,attributionControl:true,scrollWheelZoom:true}).setView(center,zoom);
-  try{m.attributionControl.setPrefix(false)}catch(e){}
+  try{m.attributionControl.setPrefix(false)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:26',e,'caught');}
   var loaded=0,failed=0,notified=false,pi=0,tl=null;
   function warn(){
     if(notified||!document.body.contains(el))return;
@@ -7529,7 +7665,7 @@ function mkMap(elId,center,zoom){
     el.appendChild(n);
   }
   function addTiles(){
-    if(tl){try{m.removeLayer(tl)}catch(e){}}
+    if(tl){try{m.removeLayer(tl)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:37',e,'caught');}}
     var p=MAP_TILE.providers[pi];
     tl=L.tileLayer(p.u,{maxZoom:MAP_TILE.maxZoom,attribution:p.a,crossOrigin:true}).addTo(m);
     tl.on('tileload',function(){loaded++});
@@ -7542,8 +7678,8 @@ function mkMap(elId,center,zoom){
   addTiles();
   setTimeout(function(){if(loaded===0&&failed>0)warn()},9000);
   MAPS[elId]=m;
-  setTimeout(function(){try{m.invalidateSize()}catch(e){}},80);
-  setTimeout(function(){try{m.invalidateSize()}catch(e){}},450);
+  setTimeout(function(){try{m.invalidateSize()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:50',e,'caught');}},80);
+  setTimeout(function(){try{m.invalidateSize()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:51',e,'caught');}},450);
   return m;
 }
 function jll(i){return [((i%3)-1)*0.004,(Math.floor(i/3)%3-1)*0.004]}
@@ -7603,7 +7739,7 @@ function openMapModal(ll,title,sub,hoodId,placeId){
         var pl=placeLL(p);if(!pl)return;
         L.marker(pl,{zIndexOffset:1000,icon:pinIcon(p.kind==='family'?'family':(p.kind==='work'?'work':(p.kind==='school'?'school':'place')),p.label)}).addTo(m).bindPopup('<b>'+esc(p.label)+'</b><br>'+placeKindLabel(p.kind));
       });
-      setTimeout(function(){try{m.invalidateSize()}catch(e){}},260);
+      setTimeout(function(){try{m.invalidateSize()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:111',e,'caught');}},260);
     }
   });
 }
@@ -7630,7 +7766,7 @@ function openPickMap(title,cb){
       if(!m)return;
       var mk=null;
       m.on('click',function(e){
-        if(mk){try{mk.remove()}catch(e2){}}
+        if(mk){try{mk.remove()}catch(e2){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:138',e2,'caught');}}
         mk=L.marker(e.latlng,{icon:pinIcon('pick',title)}).addTo(m);
         PM.ll=[e.latlng.lat,e.latlng.lng];
         if(b){b.disabled=false}
@@ -7870,7 +8006,7 @@ ACT.flowInChat=function(el){
   var m=el.getAttribute('data-m');
   if(m&&MODBY[m]){
     toggleF(true,true);
-    setTimeout(function(){try{ceStart(m)}catch(e){}},60);
+    setTimeout(function(){try{ceStart(m)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:42',e,'caught');}},60);
     toast('ادامهٔ «'+MODBY[m].t+'» در دستیار');
   }else{toggleF(true)}
 };
@@ -7884,7 +8020,7 @@ ACT.svcs=function(){go('svc')};
 ACT.svcOpen=function(el){openModal(svcOrderFormHTML(+el.getAttribute('data-c'),+el.getAttribute('data-i')))};
 ACT.svcReqOpen=function(el){openSvcOrderDetail(el.getAttribute('data-id'))};
 ACT.svcFilter=function(el){S.ui.svcf=el.getAttribute('data-f');save();renderCurrent()};
-ACT.svcReload=function(){SVC_CATALOG.failed=false;SVC_CATALOG.loaded=false;SVC_CATALOG.error='';svcLoadCatalog().then(function(){if(CURRENT==='svc')renderCurrent()}).catch(function(){if(CURRENT==='svc')renderCurrent()})};
+ACT.svcReload=function(){SVC_CATALOG.failed=false;SVC_CATALOG.loaded=false;SVC_CATALOG.error='';svcLoadCatalog().then(function(){if(CURRENT==='svc')renderCurrent()}).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:56',null,'caught');if(CURRENT==='svc')renderCurrent()})};
 ACT.svcQuote=function(el){
   var ci=+el.getAttribute('data-c'),ii=+el.getAttribute('data-i'),it=svcItem(ci,ii),form=svcReadForm();
   if(!it||!form)return;
@@ -7894,7 +8030,7 @@ ACT.svcQuote=function(el){
     if(!q)throw new Error('quote');
     SVC_Q={ci:ci,ii:ii,form:form,q:q};
     if(box)box.innerHTML=svcQuoteHTML(q,true);
-  }).catch(function(){if(box)box.innerHTML='<div class="alert al-bad">دریافت قیمت ممکن نشد؛ دوباره تلاش کنید.</div>'});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:66',null,'caught');if(box)box.innerHTML='<div class="alert al-bad">دریافت قیمت ممکن نشد؛ دوباره تلاش کنید.</div>'});
 };
 ACT.svcPay=function(el){
   var ci=+el.getAttribute('data-c'),ii=+el.getAttribute('data-i');
@@ -7912,7 +8048,7 @@ ACT.svcPay=function(el){
     openSvcOrderDetail(o.id);
     if(o.status==='submit_failed')toast('پرداخت انجام شد اما ثبت سفارش ناموفق بود؛ امکان تلاش دوباره یا بازپرداخت وجود دارد.');
     else toast('سفارش ثبت شد — '+o.id);
-  }).catch(function(){if(btn){btn.disabled=false;btn.textContent='پرداخت و ثبت سفارش'}svcError('پرداخت انجام نشد؛ دوباره تلاش کنید')});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:84',null,'caught');if(btn){btn.disabled=false;btn.textContent='پرداخت و ثبت سفارش'}svcError('پرداخت انجام نشد؛ دوباره تلاش کنید')});
 };
 ACT.svcGoWallet=function(){closeModal();S.ui.atab='wallet';save();go('profile')};
 ACT.svcSync=function(el){
@@ -7923,7 +8059,7 @@ ACT.svcSync=function(el){
     if(r.status&&r.status!==o.status){svcTimelinePush(o,r.status,r.note||'');svcAudit(o,'status',{demo:!!r.demo});svcReqSync(o);save()}
     else{o.updatedAt=Date.now();save()}
     if(CURRENT==='svc')renderCurrent();openSvcOrderDetail(o.id);
-  }).catch(function(){svcError('به‌روزرسانی وضعیت ممکن نشد؛ دوباره تلاش کنید')});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:95',null,'caught');svcError('به‌روزرسانی وضعیت ممکن نشد؛ دوباره تلاش کنید')});
 };
 ACT.svcCancel=function(el){
   var o=svcOrderById(el.getAttribute('data-id'));if(!o)return;
@@ -7932,7 +8068,7 @@ ACT.svcCancel=function(el){
     svcTimelinePush(o,'cancelled','لغو درخواست توسط کاربر');
     svcRefundOrder(o,'بازپرداخت کامل پس از لغو');
     svcReqSync(o);save();if(CURRENT==='svc')renderCurrent();openSvcOrderDetail(o.id);toast('سفارش لغو و مبلغ به کیف پول بازگشت');
-  }).catch(function(){svcError('لغو سفارش ممکن نشد؛ دوباره تلاش کنید')});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:104',null,'caught');svcError('لغو سفارش ممکن نشد؛ دوباره تلاش کنید')});
 };
 ACT.svcRetry=function(el){
   var o=svcOrderById(el.getAttribute('data-id'));if(!o||o.status!=='submit_failed')return;
@@ -7940,7 +8076,7 @@ ACT.svcRetry=function(el){
     if(r.priceChanged&&r.amount&&r.amount!==o.amount){svcRefundOrder(o,'تغییر قیمت پیش از ثبت');svcTimelinePush(o,'price_changed','قیمت تغییر کرد؛ مبلغ بازپرداخت شد');}
     else{o.providerOrderId=r.providerOrderId||'';o.demo=!!r.demo;svcTimelinePush(o,r.status||'submitted',r.demo?'وضعیت نمایشی':'ثبت در ارائه‌دهنده');svcAudit(o,'retry',{demo:!!r.demo})}
     svcReqSync(o);save();if(CURRENT==='svc')renderCurrent();openSvcOrderDetail(o.id);toast('نتیجهٔ ثبت سفارش به‌روزرسانی شد');
-  }).catch(function(){svcError('ثبت سفارش هنوز ناموفق است؛ بعداً دوباره تلاش کنید')});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:112',null,'caught');svcError('ثبت سفارش هنوز ناموفق است؛ بعداً دوباره تلاش کنید')});
 };
 ACT.svcRefund=function(el){
   var o=svcOrderById(el.getAttribute('data-id'));if(!o)return;
@@ -8168,7 +8304,7 @@ ACT.pickWork=function(){openPickMap('محل کار',function(ll){upsertPlace('wo
 ACT.pickSchool=function(){openPickMap('مدرسه',function(ll){upsertPlace('school','مدرسه',ll,null,2);MT.p=true;placeRefresh();toast('مدرسه ثبت شد')})};
 ACT.placeAdd=function(){openPlaceModal(null)};
 ACT.placeEdit=function(el){var id=el.getAttribute('data-id'),ps=getPlaces(),i;for(i=0;i<ps.length;i++){if(ps[i].id===id){openPlaceModal(ps[i]);return}}};
-ACT.placeDel=function(el){removePlace(el.getAttribute('data-id'));try{closeModal()}catch(e){}placeRefresh();toast('مکان حذف شد')};
+ACT.placeDel=function(el){removePlace(el.getAttribute('data-id'));try{closeModal()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:340',e,'caught');}placeRefresh();toast('مکان حذف شد')};
 ACT.placeFocus=function(el){var id=el.getAttribute('data-id'),ps=getPlaces(),p=null,i;for(i=0;i<ps.length;i++){if(ps[i].id===id){p=ps[i];break}}if(!p)return;var ll=placeLL(p);if(!ll){toast('موقعیت این مکان ثبت نشده است');return}openMapModal(ll,p.label,placeKindLabel(p.kind)+(p.hood?' · '+findH(p.hood).n:'')+' · این مکان با یک منبع داده روی نقشه نمایش داده می‌شود.',p.hood||null,p.id)};
 ACT.placePick=function(){var p=readPlaceForm();closeModal();openPickMap('مکان مهم',function(ll){p.ll=ll;p.hood='';openPlaceModal(p)})};
 ACT.placeSearch=function(){
@@ -8186,7 +8322,7 @@ ACT.placeSearch=function(){
         return '<button class="place-result" data-act="placeUse" data-i="'+i+'"><b>'+esc(x.name||x.display_name.split(',')[0])+'</b><small>'+esc(x.display_name)+'</small></button>';
       }).join(''):'<div class="note">نتیجه‌ای پیدا نشد. عبارت دیگری یا انتخاب روی نقشه را امتحان کنید.</div>';
     })
-    .catch(function(){if(box)box.innerHTML='<div class="note">جستجوی بیرونی در دسترس نیست؛ از انتخاب محله یا نقطه روی نقشه استفاده کنید.</div>'});
+    .catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:358',null,'caught');if(box)box.innerHTML='<div class="note">جستجوی بیرونی در دسترس نیست؛ از انتخاب محله یا نقطه روی نقشه استفاده کنید.</div>'});
 };
 ACT.placeUse=function(el){
   var i=+el.getAttribute('data-i'),x=PLACE_SEARCH[i],p=PLACE_TMP||readPlaceForm();
@@ -9005,40 +9141,27 @@ ACT.pname=function(){
   save();if(CURRENT==='profile')renderCurrent();else renderTok();toast('ذخیره شد');
 };
 ACT.logout=function(){S.auth=null;save();APH=0;toggleF(false);go('landing');toast('خروج')};
-/* V0.27 — بازنشانی واقعی با تأیید و گزارش صادقانه */
+/* V0.32 — بازنشانی مستقل نسخهٔ جاری */
 ACT.reset=function(){
-  openModal('<h3>بازنشانی کامل داده‌ها</h3>'+
-  '<p class="note">همهٔ داده‌های محلینو در این مرورگر حذف می‌شود:</p>'+
-  '<ul style="font-size:12.5px;line-height:2;color:var(--ink2);margin:6px 0 10px;padding-inline-start:18px">'+
-  '<li>گفت‌وگوها و تاریخچهٔ چت</li><li>درخواست‌ها، فلوها و قراردادها</li><li>آگهی‌های نشان‌شده و یادآورها</li>'+
-  '<li>موجودی شبیه‌سازی‌شدهٔ کیف پول و کلیدها</li><li>تنظیمات، حساب کاربری و حالت نمایش</li></ul>'+
-  '<p class="note">داده‌های سایت‌های دیگر دست‌نخورده می‌ماند. این کار بازگردانی ندارد.</p>'+
-  '<div class="fs-actions" style="margin-top:12px"><button class="btn btn-danger" data-act="resetOk">حذف کامل و شروع از نو</button><button class="btn" data-act="closeModal">انصراف</button></div>');
+  openModal('<h3>بازنشانی داده‌های نسخهٔ ۰.۳۲</h3>'+
+  '<p class="note">گفت‌وگوها، درخواست‌ها، قراردادها، ذخیره‌ها، یادآورها، موجودی نمایشی و تنظیمات نسخهٔ ۰.۳۲ پاک می‌شود. داده‌های نسخه‌های قبلی و سایت‌های دیگر حفظ می‌شود. این کار بازگردانی ندارد.</p>'+
+  '<div class="fs-actions" style="margin-top:12px"><button class="btn btn-danger" data-act="resetOk">حذف داده‌های نسخهٔ ۰.۳۲</button><button class="btn" data-act="closeModal">انصراف</button></div>');
 };
 ACT.resetOk=function(){
+  if(typeof stateWriterReady==='boolean'&&!stateWriterReady){toast('بازنشانی انجام نشد؛ پنجرهٔ دیگر محلینو را ببندید و این صفحه را بازنشانی کنید.');return}
   var errs=[];
-  function tryIt(fn,label){try{fn()}catch(e){errs.push(label+': '+(e&&e.message?e.message:e))}}
-  tryIt(function(){
-    var kill=[],i,k;
-    for(i=0;i<localStorage.length;i++){k=localStorage.key(i);if(k&&(k.indexOf('mahalino')===0||k.indexOf('khanyar')===0))kill.push(k)}
-    kill.forEach(function(k2){localStorage.removeItem(k2)});
-  },'localStorage');
-  tryIt(function(){
-    var kill=[],i,k;
-    for(i=0;i<sessionStorage.length;i++){k=sessionStorage.key(i);if(k&&(k.indexOf('mahalino')===0||k.indexOf('khanyar')===0))kill.push(k)}
-    kill.forEach(function(k2){sessionStorage.removeItem(k2)});
-  },'sessionStorage');
-  tryIt(function(){
-    if(window.indexedDB&&indexedDB.deleteDatabase){indexedDB.deleteDatabase('mahalino');indexedDB.deleteDatabase('mahalino-plus');indexedDB.deleteDatabase('khanyar')}
-  },'indexedDB');
-  tryIt(function(){
-    HIST=[];CE.f=null;CE.i=0;CE.li=0;CE.hist=[];E22.restoredId=null;E27.sq='';
-    try{ctxReset()}catch(e2){}
-  },'memory');
+  function tryIt(fn,label){try{fn()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:1186',e,'caught');errs.push(label)}}
+  // An explicit empty state prevents migration from importing V0.31 again.
+  try{localStorage.setItem(LSKEY,'{}')}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:1188',e,'caught');toast('بازنشانی انجام نشد؛ ذخیره‌سازی محلی در دسترس نیست.');return}
+  window.__mahalinoResetPending=true;
+  tryIt(function(){localStorage.removeItem(LSKEY+'_recovery')},'localStorage');
+  tryIt(function(){sessionStorage.removeItem(LSKEY);sessionStorage.removeItem(LSKEY+'_recovery')},'sessionStorage');
+  // Shared IndexedDB databases and unversioned preferences belong to no single
+  // release. Do not delete them as part of this version-only action.
   closeModal();
-  if(errs.length){toast('بازنشانی ناقص شد: '+errs[0]);return}
-  toast('همهٔ داده‌ها پاک شد — شروع از نو…');
-  setTimeout(function(){location.reload()},700);
+  if(errs.length){toast('بازنشانی ناقص شد؛ صفحه را بازنشانی کنید و دوباره تلاش کنید.');return}
+  toast('داده‌های نسخهٔ ۰.۳۲ پاک شد — شروع از نو…');
+  location.reload();
 };
 /* CJM handlers removed in V0.9 */
 
@@ -9608,7 +9731,7 @@ function grtHandlePhoto(inp){
     w=Math.max(1,Math.round(w*r));h=Math.max(1,Math.round(h*r));
     var cv=document.createElement('canvas');cv.width=w;cv.height=h;
     var data='';
-    try{cv.getContext('2d').drawImage(img,0,0,w,h);data=cv.toDataURL('image/jpeg',0.6)}catch(err){data=''}
+    try{cv.getContext('2d').drawImage(img,0,0,w,h);data=cv.toDataURL('image/jpeg',0.6)}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:567',err,'caught');data=''}
     URL.revokeObjectURL(url);
     if(!data||data.length>200000){toast('تصویر بسیار بزرگ است؛ کوچک‌تر کنید');return}
     it.photos=it.photos||[];it.photos.push({at:Date.now(),d:data});
@@ -9846,7 +9969,7 @@ ACT.grtReqGo=function(el){
   if(box)box.innerHTML='<span class="note">در حال دریافت برآورد...</span>';
   svcQuote(it.svc[0],it.svc[1],1,{address:e.prop.addr}).then(function(q){
     r.quote=q;r.ci=it.svc[0];r.ii=it.svc[1];grgSave(e);renderCurrent();
-  }).catch(function(){if(box)box.innerHTML='<span class="note">برآورد ممکن نشد</span>';toast('دریافت برآورد ممکن نشد')});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:805',null,'caught');if(box)box.innerHTML='<span class="note">برآورد ممکن نشد</span>';toast('دریافت برآورد ممکن نشد')});
 };
 ACT.grtExec=function(el){
   var e=grtCur();if(!e)return;
@@ -9950,44 +10073,44 @@ document.addEventListener('click',function(e){
   if(el){
     var lab=(el.textContent||'').replace(/^\s+|\s+$/g,'');
     usrC(lab);
-    try{ceVal(moneyChip(el))}catch(err){console.error('ceVal',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
+    try{ceVal(moneyChip(el))}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:909',err,'caught');console.error('ceVal',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
     return;
   }
   el=t.closest('[data-cq]');
   if(el){
-    try{ceSend(el.getAttribute('data-cq'))}catch(err){console.error('ceSend',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
+    try{ceSend(el.getAttribute('data-cq'))}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:914',err,'caught');console.error('ceSend',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
     return;
   }
   el=t.closest('[data-cf]');
   if(el){
     usrC((el.textContent||'').replace(/^\s+|\s+$/g,''));
-    try{ceStart(el.getAttribute('data-cf'))}catch(err){console.error('ceStart',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
+    try{ceStart(el.getAttribute('data-cf'))}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:920',err,'caught');console.error('ceStart',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
     return;
   }
   el=t.closest('[data-cba]');
   if(el){
     var f2=CBACT[el.getAttribute('data-cba')];
-    if(f2){try{f2(el)}catch(err){console.error('CBACT['+el.getAttribute('data-cba')+']',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}}
+    if(f2){try{f2(el)}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:926',err,'caught');console.error('CBACT['+el.getAttribute('data-cba')+']',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}}
     return;
   }
   el=t.closest('[data-w]');
   if(el){
-    try{wizardNav(el.getAttribute('data-m'),el.getAttribute('data-w'))}catch(err){console.error('wizardNav',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
+    try{wizardNav(el.getAttribute('data-m'),el.getAttribute('data-w'))}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:931',err,'caught');console.error('wizardNav',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
     return;
   }
   el=t.closest('[data-jump]');
   if(el){
-    try{jumpTo(el.getAttribute('data-m'),+el.getAttribute('data-jump'))}catch(err){console.error('jumpTo',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
+    try{jumpTo(el.getAttribute('data-m'),+el.getAttribute('data-jump'))}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:936',err,'caught');console.error('jumpTo',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
     return;
   }
   el=t.closest('[data-act]');
   if(el){
     var f=ACT[el.getAttribute('data-act')];
-    if(f){try{f(el,e)}catch(err){console.error('ACT['+el.getAttribute('data-act')+']',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}}
+    if(f){try{f(el,e)}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:942',err,'caught');console.error('ACT['+el.getAttribute('data-act')+']',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}}
     return;
   }
   el=t.closest('[data-view]');
-  if(el){try{go(el.getAttribute('data-view'))}catch(err){console.error('go',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}}
+  if(el){try{go(el.getAttribute('data-view'))}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:946',err,'caught');console.error('go',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}}
 });
 document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('[data-imp]'):null;if(b){ceImpSet(b.getAttribute('data-imp'),+b.getAttribute('data-v'));return}});
 document.addEventListener('change',function(e){var n=e.target&&e.target.closest?e.target.closest('[data-pt-num]'):null;if(n){ceNumSet(n.getAttribute('data-pt-num'),n.value);return}});
@@ -10055,7 +10178,7 @@ document.addEventListener('input',function(e){
         n2=Math.max(mn2,Math.min(mx2,n2));
         rg2.value=n2;
         var ev;
-        try{ev=new Event('input');rg2.dispatchEvent(ev)}catch(e2){}
+        try{ev=new Event('input');rg2.dispatchEvent(ev)}catch(e2){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1014',e2,'caught');}
       }
     }
     return;
@@ -10227,7 +10350,7 @@ function grtCheckReserve(){
       if(!j||j.ok===false)throw new Error('reserve');
       S.grtReserve={status:'ok',amount:+j.availableRials||0,checkedAt:Date.now(),src:'api'};save();return S.grtReserve;
     })
-    .catch(function(){S.grtReserve={status:'error',amount:0,checkedAt:Date.now(),src:'api'};save();return S.grtReserve});
+    .catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1186',null,'caught');S.grtReserve={status:'error',amount:0,checkedAt:Date.now(),src:'api'};save();return S.grtReserve});
 }
 function grtOfferOf(e){
   var mkt=grtMarketRent(e),exp=+e.exp.rent||0;
@@ -10311,7 +10434,7 @@ function grtPollSettle(e,n){
   fetch(cfg.settlementEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enrollment:e.id,cycle:n})})
     .then(function(r){return r.json()})
     .then(function(j){if(j&&j.ok!==false&&j.status==='settled')grtSettleCycle(e,n,{src:'api'})})
-    .catch(function(){});
+    .catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1270',null,'caught');});
 }
 function grtSettleCycle(e,n,info){
   var c=grtCycle(e,n);
@@ -10401,7 +10524,7 @@ function grtFetchLeads(e){
       var added=0;
       arr.forEach(function(x){var l=grtLeadNormalize(x);if(l.name||l.mobile){e.tenant.apps.unshift(l);added++}});
       grgSave(e);return {ok:true,added:added};
-    }).catch(function(){return {ok:false,why:'error'}});
+    }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1360',null,'caught');return {ok:false,why:'error'}});
 }
 function grtAppScore(e,a){
   var rent=e.offer?e.offer.rent:(+e.exp.rent||0),rows=[];
@@ -10597,7 +10720,7 @@ function printDoc(html,title){
   document.body.classList.add('doc-printing');
   var done=function(){document.body.classList.remove('doc-printing');root.innerHTML='';document.title=oldTitle;window.removeEventListener('afterprint',done)};
   window.addEventListener('afterprint',done);
-  setTimeout(function(){try{window.print()}catch(e){}setTimeout(done,1200)},90);
+  setTimeout(function(){try{window.print()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1556',e,'caught');}setTimeout(done,1200)},90);
 }
 
 /* ─── درخواست‌های تعمیراتی (اتصال به معماری سفارش خدمات) ─── */
@@ -10661,7 +10784,7 @@ function grtFundOrder(e,r,payer){
   return svcSubmitToProvider(o).then(function(res){
     svcTimelinePush(o,res.status||'submitted',res.demo?'وضعیت نمایشی':'ثبت در ارائه‌دهنده');
     svcReqSync(o);save();return o;
-  }).catch(function(){svcTimelinePush(o,'submit_failed','پرداخت انجام شد اما ثبت سفارش ناموفق بود');svcReqSync(o);save();return o});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1620',null,'caught');svcTimelinePush(o,'submit_failed','پرداخت انجام شد اما ثبت سفارش ناموفق بود');svcReqSync(o);save();return o});
 }
 function grtSyncReqs(e){
   var ids={};
@@ -10674,7 +10797,7 @@ function grtSyncReqs(e){
       ids[o.id].status=svcStatusMeta(res.status).l;ids[o.id].svcStatus=res.status;
       if(res.status==='done'&&o.payment==='grt-fund'){ids[o.id].note='انجام شد — از محل خدمات شامل'}
       return 1;
-    }).catch(function(){return 0});
+    }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1633',null,'caught');return 0});
   })).then(function(a){var n=a.reduce(function(x,y){return x+y},0);grgSave(e);return n});
 }
 
@@ -10770,7 +10893,7 @@ E21.docIcon=function(ext){
   if(ext==='csv')return 'CSV';
   return 'TXT';
 };
-E21.iso=function(d){try{return d.toISOString().slice(0,10)}catch(e){return null}};
+E21.iso=function(d){try{return d.toISOString().slice(0,10)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:43',e,'caught');return null}};
 /* ترتیب مهم: «پس‌فردا» پیش از «فردا» آزموده می‌شود */
 E21.dateFromText=function(nt){
   if(/امروز/.test(nt))return E21.iso(new Date());
@@ -10852,7 +10975,7 @@ E21.renderTray=function(surface){
   }).join('');
   prev.innerHTML=h;
   prev.hidden=!tray.length;
-  try{a11yify(prev)}catch(e){}
+  try{a11yify(prev)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:125',e,'caught');}
 };
 E21.trayErr=function(surface,msg){
   var tray=E21.trays[surface];
@@ -10871,7 +10994,7 @@ E21.trayErr=function(surface,msg){
 };
 E21.addFiles=function(surface,list,prefix){
   var arr=[],i;
-  try{arr=Array.prototype.slice.call(list)}catch(e){return}
+  try{arr=Array.prototype.slice.call(list)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:144',e,'caught');return}
   if(!arr.length)return;
   for(i=0;i<arr.length;i++){
     (function(f){
@@ -10918,14 +11041,14 @@ CBACT.attRm=function(el){
   var i;
   for(i=0;i<tray.length;i++){
     if(tray[i].id===id){
-      if(tray[i].url){try{URL.revokeObjectURL(tray[i].url)}catch(e){}}
+      if(tray[i].url){try{URL.revokeObjectURL(tray[i].url)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:191',e,'caught');}}
       tray.splice(i,1);break;
     }
   }
   E21.renderTray(s);
 };
 E21.revokeAll=function(){
-  E21.urls.forEach(function(u){try{URL.revokeObjectURL(u)}catch(e){}});
+  E21.urls.forEach(function(u){try{URL.revokeObjectURL(u)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:198',e,'caught');}});
   E21.urls=[];
   E21.trays={chat:[],fch:[],dash:[]};
   E21.pending={chat:null,fch:null,dash:null};
@@ -10944,7 +11067,7 @@ function attInit(surface){
   E21.renderTray(surface); /* سینیِ پابرجا در عنصر تازه‌ساخت بازیابی می‌شود */
   if(cwr.getAttribute('data-att-ready')==='1')return;
   cwr.setAttribute('data-att-ready','1');
-  btn.addEventListener('click',function(){try{file.click()}catch(e){}});
+  btn.addEventListener('click',function(){try{file.click()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:217',e,'caught');}});
   file.addEventListener('change',function(){E21.addFiles(surface,file.files);file.value=''});
   ['dragenter','dragover'].forEach(function(ev){
     cwr.addEventListener(ev,function(e){e.preventDefault();cwr.classList.add('dropzone')});
@@ -11030,7 +11153,7 @@ E21.appendAttGrid=function(atts){
 };
 E21.scheduleAttReact=function(atts){
   setTimeout(function(){
-    try{E21.attReact(atts)}catch(e){}
+    try{E21.attReact(atts)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:303',e,'caught');}
   },780);
 };
 E21.vphotoIx=function(D){
@@ -11038,7 +11161,7 @@ E21.vphotoIx=function(D){
     defVlist(D);
     var i;
     for(i=0;i<D.vlist.length;i++){if(String(D.vlist[i].t).indexOf('عکس از ایرادها')>=0)return i}
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:311',e,'caught');}
   return -1;
 };
 /* یک بلاک واکنش برای «هر پیام» (نه هر فایل) — فقط رفتار صادقانه */
@@ -11137,7 +11260,7 @@ E21.csvPreview=function(it){
     };
     fr.onerror=function(){botC('خواندن فایل «'+esc(it.name)+'» ممکن نشد.'+rcNote(E21.SESSION_NOTE),null)};
     fr.readAsText(it.file,'utf-8');
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:410',e,'caught');}
 };
 
 /* ─── لغزندهٔ مبلغ (S-CMP-01) — کمکی است؛ تایپ و چیپ‌ها مسیر اصلی می‌مانند ───
@@ -11292,7 +11415,7 @@ E21.scSummary=function(){
   var rows=[],fields=E21.SUMFIELD[mod]||[];
   fields.forEach(function(f){
     var v='';
-    try{v=f[2](D)||''}catch(e){}
+    try{v=f[2](D)||''}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:565',e,'caught');}
     rows.push({l:f[0],v:v,j:v?f[1]:null});
   });
   if(!rows.length)rows=[{l:'وضعیت',v:'هنوز داده‌ای ثبت نشده'}];
@@ -11321,7 +11444,7 @@ E21.maybeAssist=function(){
       else if(CE.f==='invr')cur=(key==='invr.cap')?D.cap:(key==='invr.fund'?D.amt:null);
       else if(CE.f==='invb')cur=(key==='invb.cap')?D.cap:(key==='invb.price'?((+D.payAmt)||null):null);
       else if(CE.f==='mkt')cur=D.bidAmt;
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:594',e,'caught');}
     add+=slSlider(key,{min:cfg.min,max:cfg.max,value:cur});
   }
   if(key==='rent.visit')add+=E21.visitConfirmHTML();
@@ -11332,7 +11455,7 @@ E21.maybeAssist=function(){
 var _ceStep=ceStep;
 ceStep=function(){
   _ceStep();
-  try{E21.maybeAssist()}catch(e){}
+  try{E21.maybeAssist()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:605',e,'caught');}
 };
 
 /* ─── نرمال‌سازی واژه‌های انگلیسی رایج (S-CTX-04) ───
@@ -11395,7 +11518,7 @@ E21.chipExact=function(st,nt){
   try{
     var mc=matchChipText(nt,st.chips?st.chips(wd(CE.f).data):null);
     return !!(mc&&mc.exact);
-  }catch(e){return false}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:668',e,'caught');return false}
 };
 E21.stepParseOk=function(st,nt){
   if(st.money)return parseMoneyFA(nt).ok;
@@ -11562,7 +11685,7 @@ E21.grtNext=function(){
     rcProg(WSTEPS.grt,0)+
     rcNote('پس از بازگشت به دستیار، وضعیت پروندهٔ شما را همین‌جا نشان می‌دهم.'),null);
   setTimeout(function(){
-    try{go('grt');toast('پیش‌پر از گفت‌وگو در فرم ملک اعمال می‌شود')}catch(e){}
+    try{go('grt');toast('پیش‌پر از گفت‌وگو در فرم ملک اعمال می‌شود')}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:835',e,'caught');}
   },500);
 };
 E21.grtHandoff=function(){
@@ -11638,7 +11761,7 @@ E21.svcNext=function(){
   setTimeout(function(){
     try{
       ACT.svcOpen({getAttribute:function(k){return k==='data-c'?String(v2.ci):(k==='data-i'?String(v2.ii):null)}});
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:911',e,'caught');}
   },350);
 };
 CBACT.attSvcDate=function(el){if(E21.svc){E21.svc.date=el.getAttribute('data-v')||E21.iso(new Date(Date.now()+864e5));E21.svcNext()}};
@@ -11777,7 +11900,7 @@ E21.maybeResume=function(){
     bits+='فلو «'+esc(MODBY[CE.f]?MODBY[CE.f].t:CE.f)+'» در گام '+fa(Math.min(CE.i+1,n),0)+' از '+fa(n,0)+' زنده است. ';
     chips.push(['↩ ادامهٔ فلو','!re']);
   }
-  try{g=grtCur()}catch(e){}
+  try{g=grtCur()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1050',e,'caught');}
   if(g){
     bits+='پروندهٔ اجارهٔ تضمینی شما: «'+esc(grtStatusText(g))+'». ';
     chips.push(['پروندهٔ اجارهٔ تضمینی','F:grt']);
@@ -11795,17 +11918,17 @@ go=function(v){
   _go(v);
   try{
     if(CE.f&&CE.f!=='gate'&&v!=='landing'&&v!=='auth')E21.resumeAsk=true;
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1068',e,'caught');}
 };
 var _toggleF=toggleF;
 toggleF=function(v,skipGate){
   _toggleF(v,skipGate);
-  try{if(v)E21.maybeResume()}catch(e){}
+  try{if(v)E21.maybeResume()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1073',e,'caught');}
 };
 var _vLanding=VIEWS.landing;
 VIEWS.landing=function(){
   _vLanding();
-  try{E21.maybeResume()}catch(e){}
+  try{E21.maybeResume()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1078',e,'caught');}
 };
 
 /* ─── پیچاندن ceVal: پیشوندهای جدید !re و !back (S-CTX-01) + مسیر چیپ‌های متنی بی‌فلو ─── */
@@ -11846,7 +11969,7 @@ RINT.scOOS=function(q){
     if(CE.f&&SCRIPTS[CE.f])chips.push(['↩ ادامهٔ فلو','!re']);
     else chips.push(['توزیع آگهی‌ها','توزیع آگهی‌ها'],['جمع‌بندی من','جمع‌بندی من']);
     if(chips.length)E21.appendLastChips(chips);
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1119',e,'caught');}
 };
 
 /* ─── پیچاندن ceSend: پیش‌پردازش زمینه + بازگرداندن متن اصلی کاربر به تاریخچه ─── */
@@ -11979,12 +12102,12 @@ ceSend=function(t0){
   var nt=E21.enNorm(tt);
   if(nt!==tt){
     _ceSend(nt);
-    try{E21.restoreUserText(nt,tt)}catch(e){}
-    try{E21.postSend()}catch(e){}
+    try{E21.restoreUserText(nt,tt)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1252',e,'caught');}
+    try{E21.postSend()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1253',e,'caught');}
     return;
   }
   _ceSend(t);
-  try{E21.postSend()}catch(e){}
+  try{E21.postSend()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1257',e,'caught');}
 };
 CBACT.attAns=function(){
   var t=E21.clr;
@@ -12040,7 +12163,7 @@ document.addEventListener('keydown',function(e){
 });
 
 /* ─── شروع: نمایشگر تصویر آماده باشد ─── */
-try{E21.ensureViewer()}catch(e){}
+try{E21.ensureViewer()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1313',e,'caught');}
 /* ═══ پایان بخش Agent E ═══ */
 
 /* ═══ ۲۱.۱۰) موتور UX نسخهٔ ۰.۲۲ — حالت تاریک، تاریخچهٔ گفت‌وگو، بازخورد کامپوزر، مدیریت فوکوس (E22) ═══
@@ -12079,7 +12202,7 @@ E22.applyTheme=function(){
   try{
     if(E22.isDark())document.documentElement.setAttribute('data-theme','dark');
     else document.documentElement.removeAttribute('data-theme');
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:37',e,'caught');}
   E22.syncThemeControls();
 };
 E22.syncThemeControls=function(){
@@ -12119,7 +12242,7 @@ ACT.themeSet=function(el){
 E22.afterSidebar=function(){};
 ACT.sideFold=function(){
   document.body.classList.toggle('sidefold');
-  try{localStorage.setItem('mahalino_sidefold',document.body.classList.contains('sidefold')?'1':'0')}catch(e){}
+  try{localStorage.setItem('mahalino_sidefold',document.body.classList.contains('sidefold')?'1':'0')}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:77',e,'caught');}
   renderSidebar();
 };
 
@@ -12189,7 +12312,7 @@ E22.rel=function(ts){
     if(diff===1)return 'دیروز';
     if(diff<7)return fa(diff,0)+' روز پیش';
     return fd(ts);
-  }catch(e){return ''}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:147',e,'caught');return ''}
 };
 E22.sessHTML=function(){
   if(!S.chats||!S.chats.length)return '';
@@ -12298,16 +12421,16 @@ ACT.sessDelOk=function(el){
 /* W2: بایگانی پیش از گفت‌وگوی جدید — ACT.chatNew الان پیچِ E21 است؛ این پیچ روی آن سوار می‌شود */
 var _oChatNew22=ACT.chatNew;
 ACT.chatNew=function(){
-  try{E22.collect()}catch(e){}
+  try{E22.collect()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:256',e,'caught');}
   _oChatNew22();
-  try{renderSidebar()}catch(e){} /* بایگانی تازه باید بی‌درنگ در سایدبار دیده شود */
+  try{renderSidebar()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:258',e,'caught');} /* بایگانی تازه باید بی‌درنگ در سایدبار دیده شود */
 };
 
 /* W1/W2: تزریق پس از رندر سایدبار */
 var _oRenderSidebar22=renderSidebar;
 renderSidebar=function(){
   _oRenderSidebar22();
-  try{E22.afterSidebar()}catch(e){}
+  try{E22.afterSidebar()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:265',e,'caught');}
 };
 
 /* W1: ردیف «حالت نمایش» در تب تنظیمات حساب */
@@ -12331,8 +12454,8 @@ E22.busy=function(n){
     var cwr=document.getElementById(sf+'Cwr');
     if(!cwr)return;
     cwr.classList.toggle('sendbusy',on);
-    var btn=cwr.querySelector('.cwr-send');if(btn){try{btn.disabled=on}catch(e){}}
-    var ta=cwr.querySelector('.cwr-in');if(ta){try{ta.readOnly=on}catch(e){}}
+    var btn=cwr.querySelector('.cwr-send');if(btn){try{btn.disabled=on}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:289',e,'caught');}}
+    var ta=cwr.querySelector('.cwr-in');if(ta){try{ta.readOnly=on}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:290',e,'caught');}}
   });
 };
 var _oOpenModal22=openModal;
@@ -12348,7 +12471,7 @@ closeModal=function(){
   try{
     /* W4: اگر برنامه (MODAL_PREV) فوکوس را برنگردانده باشد، تور ایمنی ما برمی‌گرداند */
     if(E22.lastFocus&&document.contains(E22.lastFocus)&&document.activeElement===document.body)E22.lastFocus.focus();
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:306',e,'caught');}
   E22.lastFocus=null;
 };
 
@@ -12361,7 +12484,7 @@ ceSendWithAtt=function(text,surface){
   try{
     var ta=document.getElementById(sf+'In');
     if(ta&&document.contains(ta)&&!E22.busyCount)ta.focus();
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:319',e,'caught');}
 };
 
 /* ─── راه‌اندازی اولیه: مقدارهای اولیهٔ پایدار + اعمال تم ذخیره‌شده (قبل از boot) ─── */
@@ -12638,7 +12761,7 @@ ceSend=function(t0){
       if(E23.checklist(nn,tt))return;
       if(E23.afford(nn,nt,tt))return;
       if(E23.duel(nn,nt,tt))return;
-    }catch(e){/* خطا: متن به زنجیرهٔ اصلی سپرده می‌شود */}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/scenario-dispatch.js:268',e,'caught');/* خطا: متن به زنجیرهٔ اصلی سپرده می‌شود */}
   }
   return _ceSend23(t);
 };
@@ -12665,16 +12788,16 @@ ceVal=function(v){
         return;
       }
     }
-  }catch(e){/* خطا: به زنجیرهٔ اصلی سپرده می‌شود */}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/scenario-dispatch.js:295',e,'caught');/* خطا: به زنجیرهٔ اصلی سپرده می‌شود */}
   return _ceVal23(v);
 };
 /* ═══ پایان بخش E23 ═══ */
 
 /* ═══ E24 — اعتمادپذیری (V0.24): توست خطای نرخ‌محدود، گارد خطای سراسری، گاردهای وضعیت ═══ */
 var E24={t:0};
-E24.toastErr=function(m){var n=Date.now();if(n-E24.t<15000)return;E24.t=n;try{toast(m)}catch(e){}};
-try{window.addEventListener('error',function(e){try{console.error('runtime:',e&&e.message);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}catch(x){}})}catch(e){};
-try{S.ui=S.ui||{};if(!S.chats)S.chats=[];}catch(e){};
+E24.toastErr=function(m){var n=Date.now();if(n-E24.t<15000)return;E24.t=n;try{toast(m)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:3',e,'caught');}};
+try{window.addEventListener('error',function(e){try{console.error('runtime:',e&&e.message);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}catch(x){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:4',x,'caught');}})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:4',e,'caught');};
+try{S.ui=S.ui||{};if(!S.chats)S.chats=[];}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:5',e,'caught');};
 /* ═══ پایان E24 ═══ */
 
 /* ═══ E25 — توسعهٔ محصول (V0.25): F1 کمیسیون، F2 دفتر یادآور، F3 افزایش اجاره، F4 سرمایه‌گذاری، F5 خلاصهٔ مشاور ═══
@@ -12691,14 +12814,14 @@ var E25={temp:null,commAwait:null};
 E25.rem={stage:null,title:null,due:null,amt:null}; /* مینی‌فلو افزودن یادآور — فقط نشست جاری */
 
 /* گارد پایداری — عین الگوی E24؛ کلید تازه نیست، فیلد تازه روی S موجود است */
-try{if(!S.reminders)S.reminders=[]}catch(e){}
+try{if(!S.reminders)S.reminders=[]}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:22',e,'caught');}
 
 /* ─── ابزارهای مشترک ─── */
 E25.usr=function(raw){if(!E21.chipUsr)usrC(raw)}; /* نمایش پیام کاربر — الگوی E23.usr */
 E25.DAY=864e5;
 /* تفاضل روزِ تقویمی — هم‌ساز با E21.iso (تاریخ‌ها به شکل UTC ذخیره می‌شوند)؛ بدون خطای منطقهٔ زمانی */
 E25.mid=function(iso){var m=String(iso==null?'':iso).match(/^(\d{4})-(\d{2})-(\d{2})/);return m?Date.UTC(+m[1],+m[2]-1,+m[3]):null};
-E25.todayIso=function(){try{return new Date().toISOString().slice(0,10)}catch(e){return null}};
+E25.todayIso=function(){try{return new Date().toISOString().slice(0,10)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:29',e,'caught');return null}};
 E25.daysLeft=function(iso){
   var a=E25.mid(iso),b=E25.mid(E25.todayIso());
   if(a===null||b===null)return null;
@@ -12721,7 +12844,7 @@ E25.sorted=function(){
   return a;
 };
 E25.busyElsewhere=function(){return !!((E21.svc&&E21.svc.await)||(E21.grt&&E21.grt.await))}; /* مینی‌جریان‌های E21 اولویت دارند */
-E25.profileDirty=function(){try{if(CURRENT==='profile')renderCurrent()}catch(e){}};
+E25.profileDirty=function(){try{if(CURRENT==='profile')renderCurrent()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:52',e,'caught');}};
 E25.findRem=function(id){var i,a=S.reminders||[];for(i=0;i<a.length;i++){if(a[i].id===id)return a[i]}return null};
 
 /* ═══ F1) محاسبهٔ کمیسیون — برچسب مدل: «تعرفهٔ رایج بازار» (رسمی نیست) ═══
@@ -13053,7 +13176,7 @@ ceSend=function(t0){
         if(E25.brief(nn,tt))return;      /* F5 */
       }
     }
-  }catch(e){/* خطا: متن به زنجیرهٔ اصلی سپرده می‌شود — الگوی E23 */}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:384',e,'caught');/* خطا: متن به زنجیرهٔ اصلی سپرده می‌شود — الگوی E23 */}
   return _ceSend25(t);
 };
 /* ═══ پایان بخش E25 ═══ */
@@ -13061,7 +13184,7 @@ ceSend=function(t0){
 /* ═══ ۲۱.۸) بلوغ محصول (E26) — تلهٔ فوکوس، ترمیم داده، سقف یادآور ═══
    فوکوس‌تلهٔ مودال (M1): */
 var E26={t:0};
-E26.toastErr=function(m){var n=Date.now();if(n-E26.t<15000)return;E26.t=n;try{toast(m)}catch(e){}};
+E26.toastErr=function(m){var n=Date.now();if(n-E26.t<15000)return;E26.t=n;try{toast(m)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:4',e,'caught');}};
 E26.trapKey=function(e){
   if(e.key!=='Tab')return;
   var m=document.querySelector('#modal-root.on');
@@ -13069,10 +13192,10 @@ E26.trapKey=function(e){
   var f=m.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])');
   if(!f.length)return;
   var first=f[0],last=f[f.length-1],cur=document.activeElement;
-  if(e.shiftKey&&(cur===first||(cur&&!m.contains(cur)))){e.preventDefault();try{last.focus()}catch(x){}}
-  else if(!e.shiftKey&&(cur===last||!cur||!m.contains(cur))){e.preventDefault();try{first.focus()}catch(x){}}
+  if(e.shiftKey&&(cur===first||(cur&&!m.contains(cur)))){e.preventDefault();try{last.focus()}catch(x){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:12',x,'caught');}}
+  else if(!e.shiftKey&&(cur===last||!cur||!m.contains(cur))){e.preventDefault();try{first.focus()}catch(x){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:13',x,'caught');}}
 };
-try{document.addEventListener('keydown',E26.trapKey)}catch(e){}
+try{document.addEventListener('keydown',E26.trapKey)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:15',e,'caught');}
 /* ترمیم شکل داده (M2): */
 try{
   ['chats','reminders','wfs','reqs','contracts','grt'].forEach(function(k){
@@ -13081,7 +13204,7 @@ try{
   if(!S.chats)S.chats=[];
   if(!S.reminders)S.reminders=[];
   S.v=26;
-}catch(e){}
+}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:24',e,'caught');}
 /* سقف یادآور ۵۰ (M2): */
 E25&&(E25.remCap=function(){
   try{
@@ -13091,9 +13214,9 @@ E25&&(E25.remCap=function(){
       S.reminders.splice(iDone>=0?iDone:0,1);
       E26.toastErr('سقف ۵۰ یادآور پر بود؛ قدیمی‌ترین حذف شد.');
     }
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:34',e,'caught');}
 });
-try{E25&&E25.remCap&&E25.remCap()}catch(e){}
+try{E25&&E25.remCap&&E25.remCap()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:36',e,'caught');}
 /* ═══ ۲۱.۱۲) موتور V0.27 (E27) — بازار هوشمند، بودجهٔ آزاد، کیف پول، جزئیات کارت ═══ */
 
 /* ── بودجهٔ آزاد: تحلیل زبان طبیعی + مقادیر مؤثر ── */
@@ -13280,7 +13403,7 @@ try{
       if(CE.f==='rent'&&SCRIPTS.rent[CE.i]&&SCRIPTS.rent[CE.i].id==='tai')ceStep();
     }
   });
-}catch(e){}
+}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:223',e,'caught');}
 
 /* ── کیف پول: شارژ در گفت‌وگو با درگاه نمایشی + استقلال از کلید ── */
 E27.wf=null;
@@ -13407,7 +13530,7 @@ ceSend=function(t){
   if(String(t)==='!back'){_oCeSend27(t);return}
   try{
     if(E27.wf&&E27.wfHandle(t))return;
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:350',e,'caught');}
   _oCeSend27(t);
 };
 
@@ -13444,7 +13567,7 @@ CBACT.mCopy=function(el){
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt);
     else{var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
     toast('پیام کپی شد');
-  }catch(e){toast('کپی ممکن نشد')}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:34',e,'caught');toast('کپی ممکن نشد')}
 };
 CBACT.mEdit=function(el){
   var ix=+el.getAttribute('data-ix'),m=HIST[ix];
@@ -13507,7 +13630,7 @@ E28.applyTermination=function(code){
   c.status='terminated';
   if(c.doc)c.doc.status='terminated';
   c.terminatedAt=Date.now();
-  try{addReq('rent','فسخ','فسخ قرارداد '+code,'کامل شد','وضعیت: فسخ‌شده')}catch(e){}
+  try{addReq('rent','فسخ','فسخ قرارداد '+code,'کامل شد','وضعیت: فسخ‌شده')}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:97',e,'caught');}
   return true;
 };
 E28.ctrBubble=function(){
@@ -13547,7 +13670,7 @@ conKind=function(){return (CURRENT==='landing'&&E28.ctrKind)?E28.ctrKind:_oConKi
 ['cback','lookupId','lookupPostal','cpartySave','cpropSave','capprove','cfinalize'].forEach(function(k){
   var o=ACT[k];
   if(typeof o!=='function')return;
-  ACT[k]=function(el){o(el);setTimeout(function(){try{E28.ctrRefresh()}catch(e){}},30)};
+  ACT[k]=function(el){o(el);setTimeout(function(){try{E28.ctrRefresh()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:137',e,'caught');}},30)};
 });
 CBACT.ctrCont=function(el){
   var v=el.getAttribute('data-v');
@@ -13654,7 +13777,7 @@ E28.remCap=function(){
       S.reminders.splice(iDone>=0?iDone:0,1);
       toast('سقف ۵۰ یادآور پر بود؛ قدیمی‌ترین حذف شد.');
     }
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:244',e,'caught');}
 };
 E28.remAuto=function(nn,raw){
   if(!E21.noFlow())return false;
@@ -13734,7 +13857,7 @@ E28.remTick=function(){
         if(window.Notification&&Notification.permission==='granted'){
           new Notification('یادآور محلینو',{body:r.title});
         }
-      }catch(e){}
+      }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:324',e,'caught');}
       var nx=E28.remNext(r);
       if(nx){
         a.unshift({id:'RM-'+Date.now().toString(36)+Math.floor(Math.random()*99),title:r.title,desc:r.desc||'',due:nx,
@@ -13749,7 +13872,7 @@ E28.askNotify=function(){
     if(window.Notification&&Notification.permission==='default'){
       Notification.requestPermission();
     }
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:339',e,'caught');}
 };
 E28.remListHTML=function(){
   E28.remNorm();
@@ -13881,11 +14004,11 @@ E28.route=function(nn,raw){
 var _oPpm28=ppmTick;
 ppmTick=function(){
   _oPpm28();
-  try{E28.remTick()}catch(e){}
+  try{E28.remTick()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:471',e,'caught');}
 };
 
 E28.init=function(){
-  try{E28.remNorm()}catch(e){}
+  try{E28.remNorm()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:475',e,'caught');}
   var cin=document.getElementById('chatIn');
   document.addEventListener('input',function(e){
     var t=e.target;
@@ -13901,8 +14024,8 @@ E28.init=function(){
 var _oCeSend28=ceSend;
 ceSend=function(t){
   if(String(t)==='!back'){_oCeSend28(t);return}
-  try{if(E28.route(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){}
-  try{if(E28.remAuto(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){}
+  try{if(E28.route(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:491',e,'caught');}
+  try{if(E28.remAuto(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:492',e,'caught');}
   _oCeSend28(t);
 };
 
@@ -13948,7 +14071,7 @@ E29.bus=(function(){
     on:function(e,fn){(map[e]=map[e]||[]).push(fn)},
     emit:function(e,p){
       var l=map[e]||[],i;
-      for(i=0;i<l.length;i++){try{l[i](p)}catch(err){console.error('E29 bus',e,err)}}
+      for(i=0;i<l.length;i++){try{l[i](p)}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:43',err,'caught');console.error('E29 bus',e,err)}}
     }
   };
 })();
@@ -13966,7 +14089,7 @@ E29.PRICING={
 };
 /* hook existing COSTS so new services share one config */
 try{COSTS.hood_detail=40;COSTS.hood_compare=40;COSTS.contract_draft=60;COSTS.term_ai=80;COSTS.valuation=40;
-    COSTL.hood_detail='تحلیل جامع محله';COSTL.hood_compare='مقایسهٔ محله‌ها';COSTL.contract_draft='پیش‌نویس قرارداد';COSTL.term_ai='تحلیل هوشمند اسناد فسخ';COSTL.valuation='تخمین ارزش ملک'}catch(e){}
+    COSTL.hood_detail='تحلیل جامع محله';COSTL.hood_compare='مقایسهٔ محله‌ها';COSTL.contract_draft='پیش‌نویس قرارداد';COSTL.term_ai='تحلیل هوشمند اسناد فسخ';COSTL.valuation='تخمین ارزش ملک'}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:61',e,'caught');}
 
 /* ── in-flight transaction guard ── */
 E29._inflight={};
@@ -14012,7 +14135,7 @@ E29.pay={
     E29.bus.emit('token.deduct',{txn:txn,cost:cost,svc:key,desc:pend.desc});
     if(balLow())E29.bus.emit('wallet.low',{balance:S.tokens});
     usrC('تأیید پرداخت '+fa(cost,0)+' کلید');
-    try{pend.cb(txn)}catch(e){E29.pay.refund(txn,key,cost,'خطا در اجرا');console.error(e)}
+    try{pend.cb(txn)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:107',e,'caught');E29.pay.refund(txn,key,cost,'خطا در اجرا');console.error(e)}
   },
   cancel:function(key){
     if(E29._pending&&E29._pending.key===key)E29._pending=null;
@@ -14034,17 +14157,18 @@ function balLow(){return (S.tokens||0)<30}
 
 /* ── LLM adapter (off by default; no fabrication — spec §4.5) ── */
 E29.llm={
-  endpoint:null,
-  enabled:false,
+  endpoint:null,enabled:false,timeoutMs:10000,
   configure:function(url){this.endpoint=url;this.enabled=!!url},
   complete:function(history,done){
     if(!this.enabled||!this.endpoint||typeof fetch!=='function'){done(null);return}
-    try{
-      fetch(this.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history})})
-        .then(function(r){return r.json()})
-        .then(function(j){done(j&&j.text||null)})
-        .catch(function(){done(null)});
-    }catch(e){done(null)}
+    var controller=typeof AbortController==='function'?new AbortController():null;
+    var settled=false,timer;
+    function finish(value){if(settled)return;settled=true;clearTimeout(timer);done(value)}
+    timer=setTimeout(function(){if(controller)controller.abort();finish(null)},this.timeoutMs);
+    try{Promise.resolve(fetch(this.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history}),signal:controller?controller.signal:undefined}))
+      .then(function(r){if(!r.ok)throw Error('http');return r.json()})
+      .then(function(j){finish(j&&typeof j.text==='string'?j.text:null)},function(){finish(null)})
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:140',e,'caught');finish(null)}
   }
 };
 
@@ -14060,7 +14184,7 @@ E29.chatRef=function(){
 try{
   CBACT.e29payGo=function(el){E29.pay.go(el.getAttribute('data-key'))};
   CBACT.e29payCancel=function(el){E29.pay.cancel(el.getAttribute('data-key'))};
-}catch(e){}
+}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:156',e,'caught');}
 
 /* ── AI document analysis for terminated contracts (term_ai, spec §6.3) ── */
 E29.termAI=function(code){
@@ -14129,7 +14253,7 @@ E29.notifs=(function(){
     E29.shell.refreshBadges();
     if(prefs().inApp&&!inQuiet()){toast('🔔 '+n.title)}
     if(prefs().browser&&!inQuiet()&&typeof Notification!=='undefined'&&Notification.permission==='granted'){
-      try{new Notification('محلینو — '+n.title,{body:n.msg})}catch(e){}
+      try{new Notification('محلینو — '+n.title,{body:n.msg})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/notifications.js:41',e,'caught');}
     }
     return n;
   }
@@ -14490,7 +14614,7 @@ E29.lib=(function(){
     DOC_SNAP=snap||null;
     var content=snap?contractDocHTML(snap,false):('<div class="e29-detail">'+reportDetail(it)+'</div>');
     openModal('<h3>'+(snap?'سند قرارداد':'گزارش')+'</h3><div class="doc-actions"><button class="btn btn-sm btn-primary" data-act="cprint">دریافت PDF (چاپ مرورگر)</button><button class="btn btn-sm" data-act="closeModal">بستن</button></div><div class="doc-preview" style="max-height:62vh">'+content+'</div>');
-    if(print)setTimeout(function(){try{ACT.cprint()}catch(e){}},300);
+    if(print)setTimeout(function(){try{ACT.cprint()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/library.js:263',e,'caught');}},300);
   }
 
   /* ── ACT handlers ── */
@@ -15092,7 +15216,7 @@ E29.intel=(function(){
         ceJump('hoods');
         return;
       }
-    }catch(e){console.error('E29 handoff',e)}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/intel.js:319',e,'caught');console.error('E29 handoff',e)}
     if(wf==='contract')botC('برای تنظیم قرارداد، «قرارداد» را از منوی سرویس‌ها انتخاب کنید؛ نقش و نوع سند را ثبت کردم.',null);
   }
 
@@ -15204,6 +15328,26 @@ E29.intel=(function(){
    standalone HTML export for sending the artifact to others. This is documented
    in the dialog itself and in SHARING-AND-PRIVACY-SPEC-V0.29.md (spec §12.7). */
 E29.share=(function(){
+  // Snapshots are read-only data, including when local storage was edited.
+  E29.safeSharedHTML=function(html){
+    var template=document.createElement('template');template.innerHTML=String(html||'');
+    var allowed='DIV SPAN P BR HR H1 H2 H3 H4 H5 H6 B STRONG I EM U S SMALL BLOCKQUOTE PRE CODE UL OL LI TABLE THEAD TBODY TFOOT TR TD TH CAPTION COLGROUP COL A IMG FIGURE FIGCAPTION SECTION ARTICLE HEADER FOOTER SVG G PATH RECT CIRCLE ELLIPSE LINE POLYLINE POLYGON TEXT TSPAN DEFS CLIPPATH';
+    function clean(parent){
+      Array.prototype.slice.call(parent.children||[]).forEach(function(el){
+        if(allowed.split(' ').indexOf(el.tagName.toUpperCase())<0){el.remove();return}
+        Array.prototype.slice.call(el.attributes).forEach(function(attr){
+          var name=attr.name.toLowerCase(),value=attr.value.replace(/[\x00-\x20]/g,'');
+          if(name.indexOf('on')===0||name.indexOf('data-')===0||name==='srcdoc'||name==='is'||name==='formaction'||name==='xlink:href'||name==='srcset'){el.removeAttribute(attr.name);return}
+          if((name==='href'||name==='src')&&!((name==='src')&&/^data:image\/(?:png|jpeg|gif|webp);base64,[a-z0-9+/=]+$/i.test(value))&&(!/^(https?:|mailto:|tel:|#|[^:]*$)/i.test(value)||/^data:/i.test(value))){el.removeAttribute(attr.name)}
+          if(name==='style'&&/url|expression|@import|behavior|binding|\\/i.test(attr.value))el.removeAttribute(attr.name);
+        });
+        if(el.tagName.toUpperCase()==='A'){el.setAttribute('rel','noopener noreferrer');el.removeAttribute('target')}
+        clean(el);
+      });
+    }
+    clean(template.content);return template.innerHTML;
+  };
+
   function store(){if(!S.shares)S.shares=[];return S.shares}
   function byToken(tok){var st=store(),i;for(i=0;i<st.length;i++){if(st[i].token===tok)return st[i]}return null}
   function valid(sh){return sh&&!sh.revoked&&(!sh.expiresAt||sh.expiresAt>Date.now())}
@@ -15290,7 +15434,7 @@ E29.share=(function(){
       '.msg .bub{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;font-size:14px}',
       '.msg.user .bub{background:#f0fdfa;border-color:#cceee9}',
       '.msg.bot .bub .qr{display:none}.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;margin:0 auto}'].join('');
-    document.body.innerHTML='<style>'+css+'</style><div style="max-width:680px;margin:0 auto 18px;padding:10px 14px;background:#0f766e;color:#fff;border-radius:12px;font-weight:700">محلینو — محتوای اشتراک‌گذاری‌شده (فقط‌خواندنی)</div>'+inner;
+    document.body.innerHTML='<style>'+css+'</style><div style="max-width:680px;margin:0 auto 18px;padding:10px 14px;background:#0f766e;color:#fff;border-radius:12px;font-weight:700">محلینو — محتوای اشتراک‌گذاری‌شده (فقط‌خواندنی)</div>'+E29.safeSharedHTML(inner);
   }
 
   /* ── dialog ── */
@@ -15327,17 +15471,18 @@ E29.share=(function(){
       '<button data-act="closeModal">بستن</button></div>'+
       '<div style="font-size:11px;color:var(--muted);margin-top:8px">مدیریت و باطل‌کردن لینک‌ها: کتابخانه → بخش اشتراک‌ها. انقضا: ۳۰ روز.</div>');
   };
-  ACT.e29shCopy=function(){
+  ACT.e29shCopy=async function(){
     var inp=document.getElementById('e29-shurl');
     if(!inp)return;
-    try{inp.select();document.execCommand('copy')}catch(e){}
-    if(navigator.clipboard)navigator.clipboard.writeText(inp.value).catch(function(){});
-    toast('لینک کپی شد');
+    var copied=false;
+    try{if(navigator.clipboard&&typeof navigator.clipboard.writeText==='function'){await navigator.clipboard.writeText(inp.value);copied=true}}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:154',e,'caught');}
+    if(!copied){try{inp.select();copied=document.execCommand('copy')===true}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:155',e,'caught');}}
+    toast(copied?'لینک کپی شد':'کپی انجام نشد؛ لینک را انتخاب و دستی کپی کنید.');
   };
   ACT.e29shExport=function(el){
     var sh=store().filter(function(x){return x.id===el.getAttribute('data-sh')})[0];
     if(!sh)return;
-    var html='<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><title>'+esc(sh.title)+' — محلینو</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'+snapshotInner(sh)+'</body></html>';
+    var html='<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><title>'+esc(sh.title)+' — محلینو</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'+E29.safeSharedHTML(snapshotInner(sh))+'</body></html>';
     var blob=new Blob([html],{type:'text/html;charset=utf-8'});
     var a=document.createElement('a');
     a.href=URL.createObjectURL(blob);
@@ -15371,7 +15516,7 @@ E29.share=(function(){
     var sh=store().filter(function(x){return x.id===el.getAttribute('data-sh')})[0];
     if(!sh)return;
     if(navigator.share){
-      navigator.share({title:sh.title,url:shareURL(sh)}).catch(function(){});
+      navigator.share({title:sh.title,url:shareURL(sh)}).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:195',null,'caught');});
     }else{toast('اشتراک سیستمی در این مرورگر پشتیبانی نمی‌شود — لینک را کپی کنید')}
   };
 
@@ -15392,8 +15537,8 @@ E29.share=(function(){
   ACT.e29shCopy2=function(el){
     var sh=store().filter(function(x){return x.id===el.getAttribute('data-sh')})[0];if(!sh)return;
     var url=shareURL(sh);
-    if(navigator.clipboard)navigator.clipboard.writeText(url).catch(function(){});
-    try{var i=document.createElement('input');i.value=url;document.body.appendChild(i);i.select();document.execCommand('copy');i.remove()}catch(e){}
+    if(navigator.clipboard)navigator.clipboard.writeText(url).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:216',null,'caught');});
+    try{var i=document.createElement('input');i.value=url;document.body.appendChild(i);i.select();document.execCommand('copy');i.remove()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:217',e,'caught');}
     toast('لینک کپی شد');
   };
   ACT.e29shUpd=function(el){if(updateSnapshot(el.getAttribute('data-sh')))toast('اسنپ‌شات به‌روزرسانی شد');manage()};
@@ -15577,7 +15722,7 @@ E29.shell=(function(){
     a11yify(el);
   }
   function renderSidebarOnly(){
-    try{renderSidebar()}catch(e){}
+    try{renderSidebar()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:171',e,'caught');}
   }
   ACT.e29focusSearch=function(){
     var body=document.body;
@@ -15631,17 +15776,17 @@ E29.shell=(function(){
 
   /* ── init ── */
   E29.init=function(){
-    try{E22.applyTheme&&E22.applyTheme()}catch(e){}
-    try{addShareButton()}catch(e){}
+    try{E22.applyTheme&&E22.applyTheme()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:225',e,'caught');}
+    try{addShareButton()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:226',e,'caught');}
     /* wrap ceSend: intel route first (above E28 layers) */
     try{
       var curSend=ceSend;
       ceSend=function(t){
         if(String(t)==='!back'){curSend(t);return}
-        try{if(E29.intelAPI.route(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){console.error('E29 intel',e)}
+        try{if(E29.intelAPI.route(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:232',e,'caught');console.error('E29 intel',e)}
         curSend(t);
       };
-    }catch(e){console.error('E29 wrap ceSend',e)}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:235',e,'caught');console.error('E29 wrap ceSend',e)}
     /* ceVal hook: milestone saving after step advance */
     try{
       var curVal=ceVal;
@@ -15652,10 +15797,10 @@ E29.shell=(function(){
             var d=wd(CE.f);
             if(d&&!d.done)E29.intelAPI.maybeMilestone(CE.f,CE.i+1,d.data);
           }
-        }catch(e){}
+        }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:246',e,'caught');}
         return r;
       };
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:249',e,'caught');}
     /* reminder due → notification hook (wraps E28.remTick) */
     try{
       var curTick=ppmTick;
@@ -15669,13 +15814,13 @@ E29.shell=(function(){
               E29.notifsAPI.push({cat:'reminder',etype:'reminder.due',title:'یادآور: '+r.title,msg:'زمان انجام رسیده است.',action:{kind:'reminders'},dedupKey:'rem-'+r.id+'-'+new Date().toDateString()});
             }
           });
-        }catch(e){}
+        }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:263',e,'caught');}
       };
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:265',e,'caught');}
     /* conversation share button */
     try{
       ACT.e29shMsg=function(el){E29.share.dialog('conversation',null,{msgIx:+el.getAttribute('data-ix')})};
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:269',e,'caught');}
     /* wrap E28.applyTermination: offer AI analysis after a successful termination */
     try{
       if(E28&&E28.applyTermination){
@@ -15690,13 +15835,13 @@ E29.shell=(function(){
               botC('قرارداد فسخ شد — در صورت تمایل، تحلیل هوشمند اسناد فسخ (استخراج الزامات تسویه) موجود است.'+
                 '<div class="qr"><button data-cba="e29termAI" data-code="'+qesc(code)+'">تحلیل هوشمند اسناد</button><button data-cba="e29termLater">فعلاً نه</button></div>',null);
             }
-          }catch(e){}
+          }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:284',e,'caught');}
           return r;
         };
       }
-    }catch(e){}
-    try{checkHash()}catch(e){}
-    try{E29.notifsAPI.unread()}catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:288',e,'caught');}
+    try{checkHash()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:289',e,'caught');}
+    try{E29.notifsAPI.unread()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:290',e,'caught');}
   };
   window.addEventListener('hashchange',checkHash);
 
@@ -15744,7 +15889,7 @@ E30.PRICING={
   escrow      :{cost:150,label:'تسویهٔ امانی',              desc:'آزادسازی مرحله‌ای از حساب امانی',              cx:'high',  refund:'failed_only'}
 };
 /* keep legacy COSTS/COSTL mirrors in sync so unpatched legacy code agrees */
-try{Object.keys(E30.PRICING).forEach(function(k){COSTS[k]=E30.PRICING[k].cost;if(E30.PRICING[k].label)COSTL[k]=E30.PRICING[k].label})}catch(e){}
+try{Object.keys(E30.PRICING).forEach(function(k){COSTS[k]=E30.PRICING[k].cost;if(E30.PRICING[k].label)COSTL[k]=E30.PRICING[k].label})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-core.js:40',e,'caught');}
 E30.price=function(key){var p=E30.PRICING[key];return p?p.cost:(COSTS[key]!==undefined?COSTS[key]:0)};
 E30.label=function(key){var p=E30.PRICING[key];return p?p.label:(COSTL[key]||key)};
 
@@ -15754,7 +15899,7 @@ E30._lock=0;
 E30.pay=(function(){
   var STATES=['idle','selected','priced','presented','awaiting_confirm','confirmed','validating','processing','paid','executing','completed','declined','insufficient','failed','refunded'];
   function sess(){if(!S.paySession)S.paySession=null;return S.paySession}
-  function set(st){var s=sess();if(s){s.state=st;s.ts=Date.now();save()}}
+  function set(st){var s=sess();if(s){s.state=st;s.ts=Date.now();return save()}return false}
   function clear(){S.paySession=null;save()}
   function validService(key){return Object.prototype.hasOwnProperty.call(E30.PRICING,key)&&
     Number.isFinite(E30.PRICING[key].cost)&&E30.PRICING[key].cost>0}
@@ -15771,7 +15916,7 @@ E30.pay=(function(){
         }
       }
       if(dead)cr();
-    }catch(e){console.error('E30 invalidate',e)}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:21',e,'caught');console.error('E30 invalidate',e)}
   }
 
   /* where does the card go? chat bubble when chat is the visible surface, else modal */
@@ -15838,14 +15983,14 @@ E30.pay=(function(){
     return true;
   }
   function invalidateIfNeeded(prev){
-    try{invalidateOthers(prev.payId)}catch(e){}
+    try{invalidateOthers(prev.payId)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:88',e,'caught');}
   }
 
   function show(s,h,kind){
     invalidateOthers(s.payId);
     if(target()==='chat'&&!kind){botC(h,null)}
     else{openModal(h)}
-    try{E29.bus.emit('pay.presented',{payId:s.payId,key:s.key,cost:s.cost,state:s.state})}catch(e){}
+    try{E29.bus.emit('pay.presented',{payId:s.payId,key:s.key,cost:s.cost,state:s.state})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:95',e,'caught');}
   }
 
   /* ── explicit confirm → validating → processing → paid → executing → completed ── */
@@ -15857,7 +16002,7 @@ E30.pay=(function(){
       if(s.state==='completed'){toast('این پرداخت قبلاً انجام شده است');return false}
       toast('این کارت تأیید معتبر نیست');return false;
     }
-    set('validating');
+    if(!set('validating')){toast('پرداخت انجام نشد؛ ذخیره‌سازی در دسترس نیست.');return false}
     /* A reload serializes the session but cannot serialize its callback. Check
        BEFORE any mutation; the previously presented card is now obsolete. */
     if(typeof s._cb!=='function'||!validService(s.key)||s.cost!==E30.price(s.key)){
@@ -15866,7 +16011,7 @@ E30.pay=(function(){
       return false;
     }
     if((S.tokens||0)<s.cost){set('insufficient');toast('موجودی در فاصلهٔ تأیید تغییر کرد — لطفاً دوباره تلاش کنید');begin({key:s.key,title:s.title,desc:s.desc,ctx:s.ctx,onConfirm:s._cb});return false}
-    set('processing');
+    if(!set('processing')){toast('پرداخت انجام نشد؛ ذخیره‌سازی در دسترس نیست.');return false}
     var btns=document.querySelectorAll('[data-paygo="'+payId+'"]');
     Array.prototype.forEach.call(btns,function(b){b.disabled=true;b.textContent='در حال پردازش…'});
     /* Mutate idempotency flag, transaction record and balance as ONE persisted
@@ -15876,19 +16021,20 @@ E30.pay=(function(){
     s.txnId=txn;s.paidFlag=true;
     S.tokens-=s.cost;
     S.log.unshift({t:Date.now(),d:(s.title)+(s.ctx?' — '+s.ctx:''),c:-s.cost,cat:'bana',id:txn,svc:s.key,payId:s.payId});
-    save();renderTok();
-    try{E29.bus.emit('token.deduct',{txn:txn,cost:s.cost,svc:s.key,desc:s.title,payId:s.payId})}catch(e){}
-    if((S.tokens||0)<30){try{E29.bus.emit('wallet.low',{balance:S.tokens})}catch(e){}}
+    if(!save()){S.tokens+=s.cost;S.log.shift();s.paidFlag=false;delete s.txnId;s.state='failed';renderTok();toast('پرداخت ثبت نشد؛ خدمت اجرا نشد.');return false}
+    renderTok();
+    try{E29.bus.emit('token.deduct',{txn:txn,cost:s.cost,svc:s.key,desc:s.title,payId:s.payId})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:128',e,'caught');}
+    if((S.tokens||0)<30){try{E29.bus.emit('wallet.low',{balance:S.tokens})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:129',e,'caught');}}
     set('paid');
     usrC('پرداخت '+fa(s.cost,0)+' کلید برای «'+s.title+'»');
     set('executing');
     function finish(ok,err){
       /* The only definitive post-payment states are completed with an actual
          successful callback, or refunded with a matching credit-journal entry. */
-      if(ok){s.executed=true;set('completed');S.paySession=s;save()}
+      if(ok){s.executed=true;s.state='completed';S.paySession=s;if(!save()){toast('خدمت اجرا شد اما ثبت نتیجه ناموفق بود؛ پیش از تلاش دوباره وضعیت را بررسی کنید.');return false}}
       else{
         if(err)console.error('E30 pay exec',err);
-        refund(txn,s.key,s.cost,'خطا در اجرای سرویس',s.payId);
+        if(refund(txn,s.key,s.cost,'خطا در اجرای سرویس',s.payId)===false){s.state='failed';toast('بازپرداخت ثبت نشد؛ پیش از ادامه ذخیره‌سازی را بررسی کنید.');return false}
         s.refunded=true;
         set('refunded');
         botC('پرداخت انجام شد اما اجرای سرویس با خطا مواجه شد — <b>'+fa(s.cost,0)+' کلید بازگشت داده شد</b>. می‌توانید دوباره تلاش کنید.',null);
@@ -15902,7 +16048,7 @@ E30.pay=(function(){
           function(err){return finish(false,err)});
       }
       return finish(result!==false,null);
-    }catch(e){return finish(false,e)}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:153',e,'caught');return finish(false,e)}
   }
 
   /* ── decline (explicit cancel or backdrop/ESC close while presented) ── */
@@ -15921,9 +16067,10 @@ E30.pay=(function(){
     if(payId&&(S.log||[]).some(function(x){return x.payId===payId&&x.refund}))return false;
     S.tokens+=cost;
     S.log.unshift({t:Date.now(),d:'بازگشت کلید — '+(reason||''),c:cost,cat:'bana',id:txn,svc:key,payId:payId||null,refund:true});
-    var current=sess();if(current&&payId===current.payId)current.refunded=true;
-    save();renderTok();
-    try{E29.bus.emit('token.refund',{txn:txn,cost:cost,reason:reason})}catch(e){}
+    var current=sess(),wasRefunded=current&&current.refunded;if(current&&payId===current.payId)current.refunded=true;
+    if(!save()){S.tokens-=cost;S.log.shift();if(current&&payId===current.payId)current.refunded=wasRefunded;toast('بازپرداخت ذخیره نشد؛ دوباره تلاش کنید.');return false}
+    renderTok();
+    try{E29.bus.emit('token.refund',{txn:txn,cost:cost,reason:reason})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:175',e,'caught');}
     toast('+'+fa(cost,0)+' کلید بازگشت داده شد');
   }
 
@@ -15938,9 +16085,9 @@ E30.pay=(function(){
            (!s.txnId||x.id===s.txnId)})&&
          !(S.log||[]).some(function(x){return x.refund&&x.payId===s.payId})){
         var txn=E30.uid('TXN-R');
-        refund(txn,s.key,s.cost,'بازیابی پس از وقفه',s.payId);
+        if(refund(txn,s.key,s.cost,'بازیابی پس از وقفه',s.payId)===false)return false;
         s.refunded=true;save();
-        try{E29.notifsAPI.push({cat:'financial',etype:'pay.recovered',title:'پرداخت ناتمام بازگشت داده شد',msg:fa(s.cost,0)+' کلید بابت «'+s.title+'» بازگشت داده شد — سرویس اجرا نشده بود.',action:{kind:'wallet'},dedupKey:'rec-'+s.payId})}catch(e){}
+        try{E29.notifsAPI.push({cat:'financial',etype:'pay.recovered',title:'پرداخت ناتمام بازگشت داده شد',msg:fa(s.cost,0)+' کلید بابت «'+s.title+'» بازگشت داده شد — سرویس اجرا نشده بود.',action:{kind:'wallet'},dedupKey:'rec-'+s.payId})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:192',e,'caught');}
       }
     }
     clear();
@@ -16013,7 +16160,7 @@ E30.disc=(function(){
     return S.ctx30;
   }
   function persist(){
-    try{if(S.ctx30ByChat)S.ctx30ByChat[contextKey()]=S.ctx30;save()}catch(e){}
+    try{if(S.ctx30ByChat)S.ctx30ByChat[contextKey()]=S.ctx30;save()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:33',e,'caught');}
   }
   function useChat(id){
     saveCollector();
@@ -16090,7 +16237,7 @@ E30.disc=(function(){
         if(opts.inferred){if(S.profile.confirmed[id]===undefined)S.profile.inferred[id]=v}
         else S.profile.confirmed[id]=v;
       }
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:110',e,'caught');}
     persist();
   }
   function getF(id){var f=ctx().fields[id];return f?f.v:null}
@@ -16594,14 +16741,14 @@ E30.disc=(function(){
       if(!S.ctx30Collectors)S.ctx30Collectors={};
       S.ctx30Collectors[contextKey()]=Object.assign({},COL);
       persist();
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:614',e,'caught');}
   }
   function resume(){
     try{
       var saved=S.ctx30Collectors&&S.ctx30Collectors[contextKey()];
       if(saved&&saved.active&&saved.wf){COL=Object.assign({},saved);COL.optional=true}
       else COL={active:false,wf:null,fix:null,confirming:null,turns:0};
-    }catch(e){COL={active:false,wf:null,fix:null,confirming:null,turns:0}}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:621',e,'caught');COL={active:false,wf:null,fix:null,confirming:null,turns:0}}
     return COL.active;
   }
   function active(){return COL.active}
@@ -16684,7 +16831,7 @@ E30.disc=(function(){
     if(id==='persona')return {student:'دانشجو',couple:'زوج',young:'جوان',family:'خانواده'}[v]||String(v);
     if(id==='prop_age_range')return fa(v[0],0)+' تا '+fa(v[1],0)+' سال';
     if(typeof v==='boolean')return v?'بله':'خیر';
-    if(id==='work_loc'||id==='uni_loc'||id==='hood'){try{return findH(v).n}catch(e){return String(v)}}
+    if(id==='work_loc'||id==='uni_loc'||id==='hood'){try{return findH(v).n}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:704',e,'caught');return String(v)}}
     if(id==='prefs')return (v||[]).map(function(x){return ({parking:'پارکینگ',elevator:'آسانسور',balcony:'بالکن',quiet:'سکوت',metro:'مترو',storage:'انباری'})[x]||x}).join('، ');
     if(id==='prefRules'){
       var marks={required:'الزامی',preferred:'ترجیحی',irrelevant:'بی‌اهمیت',forbidden:'نامطلوب'};
@@ -16838,7 +16985,7 @@ E30.disc=(function(){
     botC(tone.q+q+(a.why?'<div class="note" style="margin-top:4px">'+esc(a.why)+'</div>':''),null);
     COL.expecting=top.id;
     saveCollector();
-    try{a11yify($('#v-landing')||document.body)}catch(e){}
+    try{a11yify($('#v-landing')||document.body)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:858',e,'caught');}
   }
   function financialPending(){
     return COL.wf==='rent'&&!COL.finConfirmed&&!!getF('budget_dep')&&!!getF('budget_rent');
@@ -17267,7 +17414,7 @@ E30.disc=(function(){
     });
     h+='</div>';
     botC(h,null);
-    try{a11yify($('#v-landing')||document.body)}catch(e){}
+    try{a11yify($('#v-landing')||document.body)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:1287',e,'caught');}
   }
   CBACT.e30fix=function(el){
     var slot=el.getAttribute('data-slot');
@@ -17342,7 +17489,7 @@ E30.disc=(function(){
           else ceJump('hoods');
         }
         else ceJump('imps');
-        try{E30.flowsAPI.syncStage()}catch(e){}
+        try{E30.flowsAPI.syncStage()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:1362',e,'caught');}
         return true;
       }
       if(wf==='buy'){
@@ -17433,7 +17580,7 @@ E30.disc=(function(){
         ceJump('l_role');
         return true;
       }
-    }catch(e){console.error('E30 handoff',e)}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:1453',e,'caught');console.error('E30 handoff',e)}
     return true;
   }
   function isFav(x){return (getF('prefs')||[]).indexOf(x)>=0}
@@ -17602,7 +17749,7 @@ E30.flows=(function(){
       var target=(CE.i>=sc.length)?sc.length:(CE.i+1);
       if(w.step!==target){w.step=target;save()}
       if(w.m===undefined)w.m=CE.f;
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-flows.js:73',e,'caught');}
   }
 
   /* ── slider locking (§2.5): a committed slider freezes; edit only via بازگشت/اصلاح ── */
@@ -17626,7 +17773,7 @@ E30.flows=(function(){
           if(D&&D._slid&&D._slid[slot])lockOne(s,false);
         });
       });
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-flows.js:97',e,'caught');}
   }
   function lockOne(s,hard){
     if(s.getAttribute('data-locked')==='1')return;
@@ -17677,7 +17824,7 @@ E30.flows=(function(){
     if(internal)return 'registered_internal';
     try{var buyer=wd('buy').data,bc=buyer&&buyer.ctr;
       if(D.sellerContractDraft&&bc&&bc.draftCode===D.sellerContractDraft&&bc.step>1)return 'draft';
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-flows.js:148',e,'caught');}
     if(c&&c.step>1)return 'draft';
     return D.deal?'agreement':'listing';
   }
@@ -18066,7 +18213,7 @@ E30.flows=(function(){
     WSTEPS.invp=INVP.map(function(s){return s.id});
     WSTEPS.lndl=LNDL.map(function(s){return s.id});
     /* registry note for honest provenance labels (srcBadge rule) */
-    try{window.__E30FLOWS={sell:SELL.length,invp:INVP.length,lndl:LNDL.length}}catch(e){}
+    try{window.__E30FLOWS={sell:SELL.length,invp:INVP.length,lndl:LNDL.length}}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-flows.js:537',e,'caught');}
   }
 
   E30.flowsAPI={rentPass:rentPass,buyPass:buyPass,blPassBase:blPassBase,syncStage:syncStage,
@@ -18087,7 +18234,7 @@ E30.ux=(function(){
     try{
       if(kind==='rent'){var x=findL(id);if(x)return x}
       else{var b=findB(id);if(b)return b}
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:10',e,'caught');}
     return null;
   }
   function externalListingURL(x){
@@ -18095,7 +18242,7 @@ E30.ux=(function(){
        Never fabricate one from a source name or image seed. */
     var src=x&&(x.originalUrl||x.url||x.sourceUrl);
     if(typeof src!=='string')return null;
-    try{var url=new URL(src,location.href);return /^https?:$/.test(url.protocol)?url.href:null}catch(e){return null}
+    try{var url=new URL(src,location.href);return /^https?:$/.test(url.protocol)?url.href:null}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:18',e,'caught');return null}
   }
   function upsert(kind,id){
     var st=store(),i;
@@ -18242,14 +18389,14 @@ E30.ux=(function(){
       var file=document.getElementById('e30-pdf-file')?.files[0],status=document.getElementById('e30-pdf-status');
       if(!status)return;
       if(!file||!file.size||!/\.pdf$/i.test(file.name)){status.textContent='یک فایل PDF معتبر انتخاب کنید.';return}
-      var magic=new Uint8Array(await file.slice(0,5).arrayBuffer());
-      if(String.fromCharCode.apply(null,magic)!=='%PDF-'){status.textContent='محتوای فایل PDF معتبر نیست.';return}
       try{
+        var magic=new Uint8Array(await file.slice(0,5).arrayBuffer());
+        if(String.fromCharCode.apply(null,magic)!=='%PDF-'){status.textContent='محتوای فایل PDF معتبر نیست.';return}
         if(navigator.canShare&&navigator.canShare({files:[file]})){
           await navigator.share({files:[file],title:'سند قرارداد محلینو'});
           status.textContent='فایل برای اشتراک ارسال شد.';
         }else{status.textContent='اشتراک مستقیم در این مرورگر پشتیبانی نمی‌شود؛ همین فایل PDF را در پیام‌رسان یا ایمیل پیوست کنید.';}
-      }catch(err){status.textContent=err.name==='AbortError'?'اشتراک لغو شد؛ می‌توانید دوباره تلاش کنید.':'ارسال انجام نشد؛ دوباره تلاش کنید یا فایل را به پیام پیوست کنید.';}
+      }catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:172',err,'caught');status.textContent=err&&err.name==='AbortError'?'اشتراک لغو شد؛ می‌توانید دوباره تلاش کنید.':'ارسال انجام نشد؛ دوباره تلاش کنید یا فایل را به پیام پیوست کنید.';}
     };
     ACT.e30shWhole=function(){usrC('اشتراک‌گذاری کل گفت‌وگو');E29.share.dialog('conversation',null)};
     /* Device-local hashes never transfer the snapshot to a different browser.
@@ -18322,9 +18469,9 @@ E30.ux=(function(){
   /* ── 3) Projects: add the ACTIVE conversation without archiving (§13) ── */
   function liveChatInfo(){
     var ref=E30.chatRef(),id=ref&&ref.chatId,title=ref&&ref.chatTitle;
-    try{if(!id&&typeof E22!=='undefined'&&E22.restoredId)id=E22.restoredId}catch(e){}
-    try{if(typeof E22!=='undefined'&&E22.titleFromHist)title=E22.titleFromHist()}catch(e){}
-    if(!title){try{title=(HIST&&HIST.length)?('گفت‌وگو — '+String(HIST[0].h).replace(/<[^>]*>/g,' ').slice(0,30)):('گفت‌وگوی جاری')}catch(e){title='گفت‌وگوی جاری'}}
+    try{if(!id&&typeof E22!=='undefined'&&E22.restoredId)id=E22.restoredId}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:245',e,'caught');}
+    try{if(typeof E22!=='undefined'&&E22.titleFromHist)title=E22.titleFromHist()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:246',e,'caught');}
+    if(!title){try{title=(HIST&&HIST.length)?('گفت‌وگو — '+String(HIST[0].h).replace(/<[^>]*>/g,' ').slice(0,30)):('گفت‌وگوی جاری')}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:247',e,'caught');title='گفت‌وگوی جاری'}}
     return {id:id||'__live__',title:title,live:!(S.chats||[]).some(function(c){return c.id===id})};
   }
   function addLive(pid){
@@ -18596,11 +18743,12 @@ E30.ux=(function(){
 
   /* ── init ── */
   E30.uxInit=function(){
-    try{mountLibraryPatch()}catch(e){console.error('E30 lib patch',e)}
-    try{mountSharePatch()}catch(e){console.error('E30 share patch',e)}
-    try{mountProjectPatch()}catch(e){console.error('E30 prj patch',e)}
-    try{mountReminderPatch()}catch(e){console.error('E30 rem patch',e)}
-    try{mountValuation()}catch(e){console.error('E30 valuation',e)}
+    if(E30._uxInstalled)return;E30._uxInstalled=true;
+    try{mountLibraryPatch()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:520',e,'caught');console.error('E30 lib patch',e)}
+    try{mountSharePatch()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:521',e,'caught');console.error('E30 share patch',e)}
+    try{mountProjectPatch()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:522',e,'caught');console.error('E30 prj patch',e)}
+    try{mountReminderPatch()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:523',e,'caught');console.error('E30 rem patch',e)}
+    try{mountValuation()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:524',e,'caught');console.error('E30 valuation',e)}
   };
   E30.savedStore=store;
   return {upsert:upsert,remove:remove,store:store,addLive:addLive,liveChatInfo:liveChatInfo,remDupe:remDupe};
@@ -18636,7 +18784,7 @@ E30.landing=(function(){
   function splIco(n,sz){
     return '<svg width="'+(sz||20)+'" height="'+(sz||20)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none">'+(SPLICO[n]||'')+'</svg>';
   }
-  function priceOf(k){try{return E30.PRICING[k]?E30.PRICING[k].cost:null}catch(e){return null}}
+  function priceOf(k){try{return E30.PRICING[k]?E30.PRICING[k].cost:null}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-landing.js:30',e,'caught');return null}}
 
   var SERVICES=[
     {ic:'home',t:'کمک اجاره',b:'پیدا کردن خانهٔ متناسب با بودجه و شرایط زندگی شما',get:'فهرست محله‌های همخوان، آگهی‌های منطبق، مقایسه و هماهنگی بازدید',req:'ودیعه و اجارهٔ ماهانه، محله یا محل کار/تحصیل، تعداد خواب',price:null},
@@ -18834,7 +18982,7 @@ E30.landing=(function(){
       el=t.closest('[data-splq]');
       if(el){ask(el.getAttribute('data-splq'));return}
       el=t.closest('[data-view]');
-      if(el){try{go(el.getAttribute('data-view'))}catch(e2){}}
+      if(el){try{go(el.getAttribute('data-view'))}catch(e2){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-landing.js:228',e2,'caught');}}
     });
     var inp=document.getElementById('spl-q'),send=document.getElementById('spl-send');
     if(send)send.addEventListener('click',function(){ask(inp?inp.value:'')});
@@ -19320,7 +19468,7 @@ E30.guide=(function(){
   }
   function setNode(n){
     var s=state();s.node=n;s.seq=(s.seq||0)+1;
-    try{save()}catch(e){}
+    try{save()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-guidance.js:205',e,'caught');}
   }
   function showList(arr,heading,empty,fmt){
     if(!arr||!arr.length){botC(empty,null);return}
@@ -19687,7 +19835,7 @@ E30.autoAnswer=function(f){
       s_area:function(){var v=G('prop_area');if(v==null)v=G('m2');return v!=null?String(v):null},
       s_rooms:function(){var v=G('prop_rooms')||G('rooms');return v!=null?String(v):null},
       s_age:function(){var v=G('prop_age');return v!=null?String(v):null},
-      s_hood:function(){var h=G('hood');try{return h?findH(h).n:null}catch(e){return null}},
+      s_hood:function(){var h=G('hood');try{return h?findH(h).n:null}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:35',e,'caught');return null}},
       s_motiv:function(){var v=G('sale_motivation');return typeof v==='string'&&v?v:null},
       s_urg:function(){var v=G('sale_urgency');return v==='fast'?'fast':(v==='maxvalue'?'maxvalue':null)},
       s_price:function(){var v=G('expected_price');return v&&v.v?String(v.v[0]):null},
@@ -19697,10 +19845,10 @@ E30.autoAnswer=function(f){
       i_obj:function(){var v=G('invest_objective');return v||null},
       i_cap:function(){var v=G('invest_capital');return v&&v.v?String(v.v[1]):null},
       i_hor:function(){var v=G('invest_horizon');return v==='کوتاه‌مدت'?'۲–۳ سال':(v==='میان‌مدت'?'۵ سال':(v==='بلندمدت'?'۱۰ سال+':null))},
-      i_hood:function(){var h=G('hood');try{return h?findH(h).n:null}catch(e){return null}}
+      i_hood:function(){var h=G('hood');try{return h?findH(h).n:null}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:45',e,'caught');return null}}
     }
   }[f];
-  if(map&&map[id]){try{return map[id]()}catch(e){return null}}
+  if(map&&map[id]){try{return map[id]()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:48',e,'caught');return null}}
   return null;
 };
 E30.autoRun=function(){
@@ -19708,7 +19856,7 @@ E30.autoRun=function(){
      answer. Do not immediately auto-skip that very step from the old profile. */
   if(E30._manualEdit&&E30._manualEdit.f===CE.f&&E30._manualEdit.i===CE.i){
     E30._manualEdit=null;
-    try{E30.flowsAPI.syncStage()}catch(e){}
+    try{E30.flowsAPI.syncStage()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:56',e,'caught');}
     return;
   }
   var guard=0;
@@ -19735,12 +19883,12 @@ E30.autoRun=function(){
     var done=null;
     /* autoAnswer returns already normalized stored values, including prices
        whose steps do not use the generic st.money parser. */
-    try{done=st.set?moneyCanonical(function(){return st.set(wd(CE.f).data,val)}):null}catch(e){break}
+    try{done=st.set?moneyCanonical(function(){return st.set(wd(CE.f).data,val)}):null}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:83',e,'caught');break}
     if(done==='ERR')break;
     botC('✓ همین را از حرف‌های قبلی‌تان داشتم — دوباره نمی‌پرسم.');
     CE.i++;CE.li=0;save();
   }
-  try{E30.flowsAPI.syncStage()}catch(e){}
+  try{E30.flowsAPI.syncStage()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:88',e,'caught');}
 };
 
 /* render-time payment-card honesty: never show a dead confirm button as live */
@@ -19783,14 +19931,15 @@ E30.payVisual=function(){
 };
 
 E30.init=function(){
+  if(E30._installed)return;E30._installed=true;
   /* 1) workflow registry: sell / invest / landlord + FRC + WSTEPS */
-  try{E30.flowsAPI.install()}catch(e){console.error('E30 install',e)}
+  try{E30.flowsAPI.install()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:133',e,'caught');console.error('E30 install',e)}
 
   /* 2) boot recovery for interrupted payments (§11.7 reload-variant) */
-  try{E30.pay.recover()}catch(e){console.error('E30 recover',e)}
+  try{E30.pay.recover()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:136',e,'caught');console.error('E30 recover',e)}
 
   /* Restore an interrupted slot-collector before the next user turn. */
-  try{E30.discAPI.resume()}catch(e){console.error('E30 discovery resume',e)}
+  try{E30.discAPI.resume()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:139',e,'caught');console.error('E30 discovery resume',e)}
 
   /* Contract payment is asynchronous: the V0.28 click wrapper refreshes the
      form while the 60-Bana confirmation is merely presented, before it has
@@ -19816,7 +19965,7 @@ E30.init=function(){
       }
       return done;
     };
-  }catch(e){console.error('E30 signed-contract refresh',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:165',e,'caught');console.error('E30 signed-contract refresh',e)}
 
   /* 3) discovery engine routes free-form openings FIRST (outermost ceSend wrap) */
   try{
@@ -19831,10 +19980,10 @@ E30.init=function(){
         E30.chatMap({hood:hoodFromText(mapQuery)});
         return;
       }
-      try{if(E30.discAPI.route(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){console.error('E30 disc',e)}
+      try{if(E30.discAPI.route(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:180',e,'caught');console.error('E30 disc',e)}
       curSend(t);
     };
-  }catch(e){console.error('E30 wrap ceSend',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:183',e,'caught');console.error('E30 wrap ceSend',e)}
 
   /* 3a) Interactive map belongs to the conversation.  Leaflet's tiles are
          fetched only after an explicit click, and the card remains useful
@@ -19875,7 +20024,7 @@ E30.init=function(){
       if(mode==='stay'&&listing){selected=SLIST.filter(function(x){return x.id===listing})[0];if(selected){ll=selected.ll;zoom=13}}
       else if(hid&&HOODS.some(function(h){return h.id===hid})){ll=findH(hid).ll;zoom=13}
       if(canvas.id&&MAPS[canvas.id]){
-        try{MAPS[canvas.id].remove()}catch(e){}
+        try{MAPS[canvas.id].remove()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:224',e,'caught');}
         delete MAPS[canvas.id];
       }
       canvas.id='e30-chat-map-'+(++mapSeq30);
@@ -19916,7 +20065,7 @@ E30.init=function(){
       }
       canvas.setAttribute('data-e30-map-loaded','true');
       el.textContent='بارگذاری دوبارهٔ نقشه';
-      setTimeout(function(){try{m.invalidateSize()}catch(e){}},80);
+      setTimeout(function(){try{m.invalidateSize()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:265',e,'caught');}},80);
     };
     CBACT.e30MapInfo=function(el){
       var stayId=el.getAttribute('data-stay'),hid=el.getAttribute('data-h');
@@ -19931,7 +20080,7 @@ E30.init=function(){
         if(step.acts&&typeof step.acts.map==='function')step.acts.map=function(){return E30.chatMap({mode:mode})};
       });
     });
-  }catch(e){console.error('E30 chat map',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:280',e,'caught');console.error('E30 chat map',e)}
 
   /* 3a) Revisiting a previously committed money step creates an editable revision.
      Historical slider controls remain locked by lockSliders() after ceStep renders
@@ -19953,19 +20102,19 @@ E30.init=function(){
             }
           }
         }
-      }catch(e){console.error('E30 back revision',e)}
+      }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:302',e,'caught');console.error('E30 back revision',e)}
       return _ceBack30();
     };
-  }catch(e){console.error('E30 wrap ceBack',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:305',e,'caught');console.error('E30 wrap ceBack',e)}
 
   /* 3b) auto-advance known steps whenever the script is about to render one */
   try{
     var _ceStep=ceStep;
     ceStep=function(){
-      try{E30.autoRun()}catch(e){console.error('E30 autoRun',e)}
+      try{E30.autoRun()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:311',e,'caught');console.error('E30 autoRun',e)}
       _ceStep();
     };
-  }catch(e){console.error('E30 wrap ceStep',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:314',e,'caught');console.error('E30 wrap ceStep',e)}
 
   /* 4) Back is a real, editable navigation action. The historical bot slider
      remains locked, but a freshly rendered slider at the revisited step is
@@ -19987,9 +20136,9 @@ E30.init=function(){
         }
       }
       _ceBack();
-      try{E30.flowsAPI.syncStage()}catch(e){}
+      try{E30.flowsAPI.syncStage()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:336',e,'caught');}
     };
-  }catch(e){console.error('E30 back navigation',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:338',e,'caught');console.error('E30 back navigation',e)}
 
   /* 5) stage sync after every value commit (§2.4) + slider commit marker (§2.5) */
   try{
@@ -20002,18 +20151,18 @@ E30.init=function(){
       }
       var pre=CE.f?CE.i:-1;
       var r=curVal(v,raw);
-      try{E30.flowsAPI.syncStage()}catch(e){}
+      try{E30.flowsAPI.syncStage()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:351',e,'caught');}
       try{
         if(CE.f&&E30._slidPending&&pre!==CE.i){
           var D=wd(CE.f).data;
           if(!D._slid)D._slid={};
           D._slid[E30._slidPending]=true;
         }
-      }catch(e){}
+      }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:358',e,'caught');}
       E30._slidPending=null;
       return r;
     };
-  }catch(e){console.error('E30 wrap ceVal',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:362',e,'caught');console.error('E30 wrap ceVal',e)}
 
   /* 5) slider commit with lock guard (§2.5): lock after commit, edit via explicit بازگشت */
   try{
@@ -20030,7 +20179,7 @@ E30.init=function(){
       usrC('تأیید مقدار لغزنده: '+rial(v));
       ceVal(String(v)+((SCRIPTS[CE.f]||[])[CE.i]&&SCRIPTS[CE.f][CE.i].money?' ریال':''));
     };
-  }catch(e){console.error('E30 slSet',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:379',e,'caught');console.error('E30 slSet',e)}
 
   /* 6) cr() post-render pass: lock committed sliders + pay-card states */
   try{
@@ -20040,14 +20189,14 @@ E30.init=function(){
          before their containers are detached. Standalone legacy maps survive. */
       try{Object.keys(MAPS||{}).forEach(function(id){
         if(id.indexOf('e30-chat-map-')!==0)return;
-        try{MAPS[id].remove()}catch(e){}
+        try{MAPS[id].remove()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:389',e,'caught');}
         delete MAPS[id];
-      })}catch(e){}
+      })}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:391',e,'caught');}
       _cr();
-      try{E30.flowsAPI.lockSliders()}catch(e){}
-      try{E30.payVisual()}catch(e){}
+      try{E30.flowsAPI.lockSliders()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:393',e,'caught');}
+      try{E30.payVisual()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:394',e,'caught');}
     };
-  }catch(e){console.error('E30 wrap cr',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:396',e,'caught');console.error('E30 wrap cr',e)}
 
   /* 7) Route EVERY legacy paid action through the same explicit confirmation
         and transaction FSM as new services. A legacy spend() is never permitted
@@ -20098,7 +20247,7 @@ E30.init=function(){
         try{
           spend=function(key,cat,desc){throw {e30SpendTrap:trap,key:key,cat:cat,desc:desc}};
           result=fn.apply(self,args);
-        }catch(e){
+        }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:447',e,'caught');
           if(e&&e.e30SpendTrap===trap)quote=e;
           else throw e;
         }finally{spend=prev}
@@ -20126,26 +20275,25 @@ E30.init=function(){
       wrapped._e30PayGuard=true;
       return wrapped;
     }
-    function paidSource(fn){
-      try{var action=fn.e30PaidDelegate||fn;return /\b(?:spend|doRentVisit)\s*\(/.test(Function.prototype.toString.call(action))}catch(e){return false}
-    }
+    var paidRegistry={"ACT.rdet": true, "ACT.bdet": true, "ACT.rvisit": true, "ACT.blegal": true, "ACT.besc": true, "ACT.pbidok": true, "ACT.sbook": true, "CBACT.detL": true, "CBACT.detB": true, "SCRIPTS.rent.visit.go": true, "SCRIPTS.buy.lg.lg": true, "SCRIPTS.mkt.send.b": true, "SCRIPTS.stay.book.b": true};
+    E30.paidActionRegistry=Object.keys(paidRegistry);
     var legacyGuarded=[];
     [[ACT,'ACT'],[CBACT,'CBACT']].forEach(function(pair){
       var group=pair[0];
       Object.keys(group||{}).forEach(function(k){
-        if(paidSource(group[k])){group[k]=guardPaidAction(group[k]);legacyGuarded.push(pair[1]+'.'+k)}
+        if(paidRegistry[pair[1]+'.'+k]){group[k]=guardPaidAction(group[k]);legacyGuarded.push(pair[1]+'.'+k)}
       });
     });
     Object.keys(SCRIPTS||{}).forEach(function(k){
       (SCRIPTS[k]||[]).forEach(function(step){
         if(!step||!step.acts)return;
         Object.keys(step.acts).forEach(function(a){
-          if(paidSource(step.acts[a])){step.acts[a]=guardPaidAction(step.acts[a]);legacyGuarded.push('SCRIPTS.'+k+'.'+(step.id||'?')+'.'+a)}
+          if(paidRegistry['SCRIPTS.'+k+'.'+(step.id||'?')+'.'+a]){step.acts[a]=guardPaidAction(step.acts[a]);legacyGuarded.push('SCRIPTS.'+k+'.'+(step.id||'?')+'.'+a)}
         });
       });
     });
     E30.legacyPayGuarded=legacyGuarded;
-  }catch(e){console.error('E30 legacy payment guards',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:493',e,'caught');console.error('E30 legacy payment guards',e)}
 
   /* 7b) composer-lock leak fix: the E22 openModal wrapper counts EVERY open; a modal
          replacing an open modal leaks a count and locks the composer forever.
@@ -20162,7 +20310,7 @@ E30.init=function(){
       }
       return _openModal30(html,cb);
     };
-  }catch(e){console.error('E30 openModal wrap',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:510',e,'caught');console.error('E30 openModal wrap',e)}
 
   /* 7c) chip-value typing: matchChipText matched labels only — typing a raw chip
          value («ok») on an action-only step dead-ended. Accept exact values too. */
@@ -20178,7 +20326,7 @@ E30.init=function(){
       }
       return null;
     };
-  }catch(e){console.error('E30 mct wrap',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:526',e,'caught');console.error('E30 mct wrap',e)}
 
   /* 7e) Keep service entry routes in the chat canvas. A few legacy ceSmart
          shortcuts still redirected to independent pages and cleared the chat
@@ -20249,7 +20397,7 @@ E30.init=function(){
       return _smart30(t);
     };
     CBACT.e30StartRent=function(){return inChatFlow('rent','اجاره و قرارداد')};
-  }catch(e){console.error('E30 chat-first service routes',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:597',e,'caught');console.error('E30 chat-first service routes',e)}
 
   /* 7d) Honest termination guidance. Without a document parser/backend it is
          misleading to sell "AI document analysis". Show a FREE checklist in
@@ -20291,16 +20439,16 @@ E30.init=function(){
       return E29.termAI(code);
     };
     CBACT.e29termLater=function(){usrC('فعلاً نه');botC('هر وقت خواستید چک‌لیست رایگان پیگیری فسخ را از همین گفتگو باز کنید.',null)};
-  }catch(e){console.error('E30 termination guidance',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:639',e,'caught');console.error('E30 termination guidance',e)}
 
   /* 8) landing/splash route + view (public, pre-auth allowed) */
-  try{E30.landingInit()}catch(e){console.error('E30 landing',e)}
+  try{E30.landingInit()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:642',e,'caught');console.error('E30 landing',e)}
 
   /* 9) UX patches: saved listings, share independence, projects, reminders */
-  try{E30.uxInit()}catch(e){console.error('E30 ux',e)}
-  try{E30.uiTidyInit()}catch(e){console.error('E30 guided UI',e)}
-  try{E30.guide.install()}catch(e){console.error('E31 deterministic guide',e)}
-  try{E30.turns.install()}catch(e){console.error('E31 chat turns',e)}
+  try{E30.uxInit()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:645',e,'caught');console.error('E30 ux',e)}
+  try{E30.uiTidyInit()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:646',e,'caught');console.error('E30 guided UI',e)}
+  try{E30.guide.install()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:647',e,'caught');console.error('E31 deterministic guide',e)}
+  try{E30.turns.install()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:648',e,'caught');console.error('E31 chat turns',e)}
 
   /* 9b) A burst of toasts used to cover the fixed chat composer. Deduplicate
          near-identical events and bound the simultaneous visible stack. */
@@ -20315,22 +20463,22 @@ E30.init=function(){
       if(root){while(root.children.length>=3)root.removeChild(root.firstElementChild)}
       return _toast30(msg);
     };
-  }catch(e){console.error('E30 toast guard',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:663',e,'caught');console.error('E30 toast guard',e)}
 
   /* 10) persona fix regression hook (§2.7): disc engine reclassifies on every turn —
          make the deterministic engine's saved persona follow the dynamic one */
   try{
     E29.intelAPI.personaOf=function(){return E30.discAPI.personaOf('rent')};
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:669',e,'caught');}
 };
 
 /* ═══ ۲۲) راه‌اندازی ═══ */
 (function(){
   try{
-    try{if(localStorage.getItem('mahalino_sidefold')==='1')document.body.classList.add('sidefold')}catch(e){}
-    try{E28.init()}catch(e){}
-    try{E29.init()}catch(e){console.error('E29 init',e)}
-    try{E30.init()}catch(e){console.error('E30 init',e)}
+    try{if(localStorage.getItem('mahalino_sidefold')==='1')document.body.classList.add('sidefold')}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/boot.js:4',e,'caught');}
+    try{E28.init()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/boot.js:5',e,'caught');MahalinoDiagnostics.report('boot.E28')}
+    try{E29.init()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/boot.js:6',e,'caught');console.error('E29 init',e)}
+    try{E30.init()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/boot.js:7',e,'caught');console.error('E30 init',e)}
     renderSidebar();renderTok();
     var mbt=document.querySelector('.menubtn');if(mbt){mbt.innerHTML=ico('menu',20)}
     if(S.auth){
@@ -20340,7 +20488,7 @@ E30.init=function(){
     }else{
       go('splash');
     }
-  }catch(e){
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/boot.js:17',e,'caught');
     var eb=document.getElementById('errbar');
     if(eb){eb.style.display='block';eb.textContent='خطای راه‌اندازی: '+(e&&e.message?e.message:e)}
     var lv=document.querySelector('.view.on');

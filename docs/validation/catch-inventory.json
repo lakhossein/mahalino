@@ -1,0 +1,1710 @@
+[
+  {
+    "file": "src/legacy/actions.js",
+    "line": 42,
+    "code": "legacy/actions.js:42",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 56,
+    "code": "legacy/actions.js:56",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 66,
+    "code": "legacy/actions.js:66",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 84,
+    "code": "legacy/actions.js:84",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 95,
+    "code": "legacy/actions.js:95",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 104,
+    "code": "legacy/actions.js:104",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 112,
+    "code": "legacy/actions.js:112",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 340,
+    "code": "legacy/actions.js:340",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 358,
+    "code": "legacy/actions.js:358",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 1186,
+    "code": "legacy/actions.js:1186",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 1188,
+    "code": "legacy/actions.js:1188",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/boot.js",
+    "line": 4,
+    "code": "legacy/boot.js:4",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/boot.js",
+    "line": 5,
+    "code": "legacy/boot.js:5",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/boot.js",
+    "line": 6,
+    "code": "legacy/boot.js:6",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/boot.js",
+    "line": 7,
+    "code": "legacy/boot.js:7",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/boot.js",
+    "line": 17,
+    "code": "legacy/boot.js:17",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 37,
+    "code": "legacy/chat-history.js:37",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 77,
+    "code": "legacy/chat-history.js:77",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 147,
+    "code": "legacy/chat-history.js:147",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 256,
+    "code": "legacy/chat-history.js:256",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 258,
+    "code": "legacy/chat-history.js:258",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 265,
+    "code": "legacy/chat-history.js:265",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 289,
+    "code": "legacy/chat-history.js:289",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 290,
+    "code": "legacy/chat-history.js:290",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 306,
+    "code": "legacy/chat-history.js:306",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 319,
+    "code": "legacy/chat-history.js:319",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 34,
+    "code": "legacy/chat-ux.js:34",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 97,
+    "code": "legacy/chat-ux.js:97",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 137,
+    "code": "legacy/chat-ux.js:137",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 244,
+    "code": "legacy/chat-ux.js:244",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 324,
+    "code": "legacy/chat-ux.js:324",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 339,
+    "code": "legacy/chat-ux.js:339",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 471,
+    "code": "legacy/chat-ux.js:471",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 475,
+    "code": "legacy/chat-ux.js:475",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 491,
+    "code": "legacy/chat-ux.js:491",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 492,
+    "code": "legacy/chat-ux.js:492",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/contracts.js",
+    "line": 85,
+    "code": "legacy/contracts.js:85",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/contracts.js",
+    "line": 99,
+    "code": "legacy/contracts.js:99",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/contracts.js",
+    "line": 115,
+    "code": "legacy/contracts.js:115",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/contracts.js",
+    "line": 277,
+    "code": "legacy/contracts.js:277",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/contracts.js",
+    "line": 297,
+    "code": "legacy/contracts.js:297",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/conversation.js",
+    "line": 4,
+    "code": "legacy/conversation.js:4",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/conversation.js",
+    "line": 159,
+    "code": "legacy/conversation.js:159",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/conversation.js",
+    "line": 164,
+    "code": "legacy/conversation.js:164",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/conversation.js",
+    "line": 165,
+    "code": "legacy/conversation.js:165",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/conversation.js",
+    "line": 205,
+    "code": "legacy/conversation.js:205",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/conversation.js",
+    "line": 226,
+    "code": "legacy/conversation.js:226",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/core.js",
+    "line": 43,
+    "code": "legacy/core.js:43",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/core.js",
+    "line": 61,
+    "code": "legacy/core.js:61",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/core.js",
+    "line": 107,
+    "code": "legacy/core.js:107",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/core.js",
+    "line": 140,
+    "code": "legacy/core.js:140",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/core.js",
+    "line": 156,
+    "code": "legacy/core.js:156",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 567,
+    "code": "legacy/guaranteed-rental.js:567",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 805,
+    "code": "legacy/guaranteed-rental.js:805",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 909,
+    "code": "legacy/guaranteed-rental.js:909",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 914,
+    "code": "legacy/guaranteed-rental.js:914",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 920,
+    "code": "legacy/guaranteed-rental.js:920",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 926,
+    "code": "legacy/guaranteed-rental.js:926",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 931,
+    "code": "legacy/guaranteed-rental.js:931",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 936,
+    "code": "legacy/guaranteed-rental.js:936",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 942,
+    "code": "legacy/guaranteed-rental.js:942",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 946,
+    "code": "legacy/guaranteed-rental.js:946",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 1014,
+    "code": "legacy/guaranteed-rental.js:1014",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 1186,
+    "code": "legacy/guaranteed-rental.js:1186",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 1270,
+    "code": "legacy/guaranteed-rental.js:1270",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 1360,
+    "code": "legacy/guaranteed-rental.js:1360",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 1556,
+    "code": "legacy/guaranteed-rental.js:1556",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 1620,
+    "code": "legacy/guaranteed-rental.js:1620",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 1633,
+    "code": "legacy/guaranteed-rental.js:1633",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/intel.js",
+    "line": 319,
+    "code": "legacy/intel.js:319",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/legacy-discovery.js",
+    "line": 16,
+    "code": "legacy/legacy-discovery.js:16",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/legacy-discovery.js",
+    "line": 108,
+    "code": "legacy/legacy-discovery.js:108",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/library.js",
+    "line": 263,
+    "code": "legacy/library.js:263",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/maps-account.js",
+    "line": 23,
+    "code": "legacy/maps-account.js:23",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/maps-account.js",
+    "line": 26,
+    "code": "legacy/maps-account.js:26",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/maps-account.js",
+    "line": 37,
+    "code": "legacy/maps-account.js:37",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/maps-account.js",
+    "line": 50,
+    "code": "legacy/maps-account.js:50",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/maps-account.js",
+    "line": 51,
+    "code": "legacy/maps-account.js:51",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/maps-account.js",
+    "line": 111,
+    "code": "legacy/maps-account.js:111",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/maps-account.js",
+    "line": 138,
+    "code": "legacy/maps-account.js:138",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 4,
+    "code": "legacy/market-ux.js:4",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 12,
+    "code": "legacy/market-ux.js:12",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 13,
+    "code": "legacy/market-ux.js:13",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 15,
+    "code": "legacy/market-ux.js:15",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 24,
+    "code": "legacy/market-ux.js:24",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 34,
+    "code": "legacy/market-ux.js:34",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 36,
+    "code": "legacy/market-ux.js:36",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 223,
+    "code": "legacy/market-ux.js:223",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 350,
+    "code": "legacy/market-ux.js:350",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/navigation.js",
+    "line": 52,
+    "code": "legacy/navigation.js:52",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/navigation.js",
+    "line": 91,
+    "code": "legacy/navigation.js:91",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/notifications.js",
+    "line": 41,
+    "code": "legacy/notifications.js:41",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/property-services.js",
+    "line": 7,
+    "code": "legacy/property-services.js:7",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/property-services.js",
+    "line": 10,
+    "code": "legacy/property-services.js:10",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/property-services.js",
+    "line": 91,
+    "code": "legacy/property-services.js:91",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/property-services.js",
+    "line": 100,
+    "code": "legacy/property-services.js:100",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 43,
+    "code": "legacy/rich-conversation.js:43",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 125,
+    "code": "legacy/rich-conversation.js:125",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 144,
+    "code": "legacy/rich-conversation.js:144",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 191,
+    "code": "legacy/rich-conversation.js:191",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 198,
+    "code": "legacy/rich-conversation.js:198",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 217,
+    "code": "legacy/rich-conversation.js:217",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 303,
+    "code": "legacy/rich-conversation.js:303",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 311,
+    "code": "legacy/rich-conversation.js:311",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 410,
+    "code": "legacy/rich-conversation.js:410",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 565,
+    "code": "legacy/rich-conversation.js:565",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 594,
+    "code": "legacy/rich-conversation.js:594",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 605,
+    "code": "legacy/rich-conversation.js:605",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 668,
+    "code": "legacy/rich-conversation.js:668",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 835,
+    "code": "legacy/rich-conversation.js:835",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 911,
+    "code": "legacy/rich-conversation.js:911",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1050,
+    "code": "legacy/rich-conversation.js:1050",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1068,
+    "code": "legacy/rich-conversation.js:1068",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1073,
+    "code": "legacy/rich-conversation.js:1073",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1078,
+    "code": "legacy/rich-conversation.js:1078",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1119,
+    "code": "legacy/rich-conversation.js:1119",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1252,
+    "code": "legacy/rich-conversation.js:1252",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1253,
+    "code": "legacy/rich-conversation.js:1253",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1257,
+    "code": "legacy/rich-conversation.js:1257",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1313,
+    "code": "legacy/rich-conversation.js:1313",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/sample-data.js",
+    "line": 383,
+    "code": "legacy/sample-data.js:383",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/sample-data.js",
+    "line": 447,
+    "code": "legacy/sample-data.js:447",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/sample-data.js",
+    "line": 522,
+    "code": "legacy/sample-data.js:522",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/sample-data.js",
+    "line": 532,
+    "code": "legacy/sample-data.js:532",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/scenario-dispatch.js",
+    "line": 268,
+    "code": "legacy/scenario-dispatch.js:268",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/scenario-dispatch.js",
+    "line": 295,
+    "code": "legacy/scenario-dispatch.js:295",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/sharing.js",
+    "line": 154,
+    "code": "legacy/sharing.js:154",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/sharing.js",
+    "line": 155,
+    "code": "legacy/sharing.js:155",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/sharing.js",
+    "line": 195,
+    "code": "legacy/sharing.js:195",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/sharing.js",
+    "line": 216,
+    "code": "legacy/sharing.js:216",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/sharing.js",
+    "line": 217,
+    "code": "legacy/sharing.js:217",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 171,
+    "code": "legacy/shell.js:171",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 225,
+    "code": "legacy/shell.js:225",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 226,
+    "code": "legacy/shell.js:226",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 232,
+    "code": "legacy/shell.js:232",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 235,
+    "code": "legacy/shell.js:235",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 246,
+    "code": "legacy/shell.js:246",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 249,
+    "code": "legacy/shell.js:249",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 263,
+    "code": "legacy/shell.js:263",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 265,
+    "code": "legacy/shell.js:265",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 269,
+    "code": "legacy/shell.js:269",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 284,
+    "code": "legacy/shell.js:284",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 288,
+    "code": "legacy/shell.js:288",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 289,
+    "code": "legacy/shell.js:289",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 290,
+    "code": "legacy/shell.js:290",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 3,
+    "code": "legacy/trust-productivity.js:3",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 4,
+    "code": "legacy/trust-productivity.js:4",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 4,
+    "code": "legacy/trust-productivity.js:4",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 5,
+    "code": "legacy/trust-productivity.js:5",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 22,
+    "code": "legacy/trust-productivity.js:22",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 29,
+    "code": "legacy/trust-productivity.js:29",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 52,
+    "code": "legacy/trust-productivity.js:52",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 384,
+    "code": "legacy/trust-productivity.js:384",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 7,
+    "code": "legacy/utilities.js:7",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 8,
+    "code": "legacy/utilities.js:8",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 160,
+    "code": "legacy/utilities.js:160",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 175,
+    "code": "legacy/utilities.js:175",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 197,
+    "code": "legacy/utilities.js:197",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 289,
+    "code": "legacy/utilities.js:289",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 298,
+    "code": "legacy/utilities.js:298",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 303,
+    "code": "legacy/utilities.js:303",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 318,
+    "code": "legacy/utilities.js:318",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/wallet-charts.js",
+    "line": 22,
+    "code": "legacy/wallet-charts.js:22",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/workflow-engine.js",
+    "line": 500,
+    "code": "legacy/workflow-engine.js:500",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/legacy/workflows.js",
+    "line": 53,
+    "code": "legacy/workflows.js:53",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-core.js",
+    "line": 40,
+    "code": "v32-core.js:40",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-flows.js",
+    "line": 73,
+    "code": "v32-flows.js:73",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-flows.js",
+    "line": 97,
+    "code": "v32-flows.js:97",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-flows.js",
+    "line": 148,
+    "code": "v32-flows.js:148",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-flows.js",
+    "line": 537,
+    "code": "v32-flows.js:537",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-guidance.js",
+    "line": 205,
+    "code": "v32-guidance.js:205",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 33,
+    "code": "v32-intel.js:33",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 110,
+    "code": "v32-intel.js:110",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 614,
+    "code": "v32-intel.js:614",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 621,
+    "code": "v32-intel.js:621",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 704,
+    "code": "v32-intel.js:704",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 858,
+    "code": "v32-intel.js:858",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 1287,
+    "code": "v32-intel.js:1287",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 1362,
+    "code": "v32-intel.js:1362",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 1453,
+    "code": "v32-intel.js:1453",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-landing.js",
+    "line": 30,
+    "code": "v32-landing.js:30",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-landing.js",
+    "line": 228,
+    "code": "v32-landing.js:228",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 21,
+    "code": "v32-payment.js:21",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 88,
+    "code": "v32-payment.js:88",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 95,
+    "code": "v32-payment.js:95",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 128,
+    "code": "v32-payment.js:128",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 129,
+    "code": "v32-payment.js:129",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 153,
+    "code": "v32-payment.js:153",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 175,
+    "code": "v32-payment.js:175",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 192,
+    "code": "v32-payment.js:192",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 35,
+    "code": "v32-shell.js:35",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 45,
+    "code": "v32-shell.js:45",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 48,
+    "code": "v32-shell.js:48",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 56,
+    "code": "v32-shell.js:56",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 83,
+    "code": "v32-shell.js:83",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 88,
+    "code": "v32-shell.js:88",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 133,
+    "code": "v32-shell.js:133",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 136,
+    "code": "v32-shell.js:136",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 139,
+    "code": "v32-shell.js:139",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 165,
+    "code": "v32-shell.js:165",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 180,
+    "code": "v32-shell.js:180",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 183,
+    "code": "v32-shell.js:183",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 224,
+    "code": "v32-shell.js:224",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 265,
+    "code": "v32-shell.js:265",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 280,
+    "code": "v32-shell.js:280",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 302,
+    "code": "v32-shell.js:302",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 305,
+    "code": "v32-shell.js:305",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 311,
+    "code": "v32-shell.js:311",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 314,
+    "code": "v32-shell.js:314",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 336,
+    "code": "v32-shell.js:336",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 338,
+    "code": "v32-shell.js:338",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 351,
+    "code": "v32-shell.js:351",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 358,
+    "code": "v32-shell.js:358",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 362,
+    "code": "v32-shell.js:362",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 379,
+    "code": "v32-shell.js:379",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 389,
+    "code": "v32-shell.js:389",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 391,
+    "code": "v32-shell.js:391",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 393,
+    "code": "v32-shell.js:393",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 394,
+    "code": "v32-shell.js:394",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 396,
+    "code": "v32-shell.js:396",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 447,
+    "code": "v32-shell.js:447",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 493,
+    "code": "v32-shell.js:493",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 510,
+    "code": "v32-shell.js:510",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 526,
+    "code": "v32-shell.js:526",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 597,
+    "code": "v32-shell.js:597",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 639,
+    "code": "v32-shell.js:639",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 642,
+    "code": "v32-shell.js:642",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 645,
+    "code": "v32-shell.js:645",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 646,
+    "code": "v32-shell.js:646",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 647,
+    "code": "v32-shell.js:647",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 648,
+    "code": "v32-shell.js:648",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 663,
+    "code": "v32-shell.js:663",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 669,
+    "code": "v32-shell.js:669",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 10,
+    "code": "v32-ux.js:10",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 18,
+    "code": "v32-ux.js:18",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 172,
+    "code": "v32-ux.js:172",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 245,
+    "code": "v32-ux.js:245",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 246,
+    "code": "v32-ux.js:246",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 247,
+    "code": "v32-ux.js:247",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 520,
+    "code": "v32-ux.js:520",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 521,
+    "code": "v32-ux.js:521",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 522,
+    "code": "v32-ux.js:522",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 523,
+    "code": "v32-ux.js:523",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 524,
+    "code": "v32-ux.js:524",
+    "handling": "diagnostic-caught",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  }
+]

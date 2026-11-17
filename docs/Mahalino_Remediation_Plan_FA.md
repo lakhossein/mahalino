@@ -1,0 +1,226 @@
+# وضعیت نهایی رسیدگی به ممیزی محلینو
+
+تاریخ: ۱۷ نوامبر ۲۰۲۶. مبنای ممیزی: `ba0591ec114898e87813fbf06898823bdb17a6b3`. شاخهٔ اجرا: `fix/m01-v032-publication-gate`؛ PR شمارهٔ ۹. این بخش، جمع‌بندی جاری است؛ بخش‌های بعدی سوابق اجرا هستند و وضعیت «در انتظار» در آن سوابق مربوط به زمان ثبت آنهاست.
+
+## محدودهٔ نتیجه
+
+اصلاحات در محدودهٔ prototype فعال ۰.۳۲، قراردادهای صریح runtime و gateهای Chromium انجام شده‌اند. runtime نسخه‌های تاریخی حفظ شده است؛ فقط dependency بازتولیدپذیر و metadata غیرمحصولی از Git خارج و hash gateهای مربوط دوباره تثبیت شدند. تصمیم مالک برای reset: فقط نسخهٔ جاری. هیچ merge به main یا انتشار عمومی انجام نشده است.
+
+آخرین کد این جمع‌بندی: `5a01c6fe4e26ff363cf1e364bd5906ab6671c010`. نتیجهٔ اجرای CI همین کد از لینک‌های ثابت پایین این بخش قابل بررسی است؛ وضعیت هر run از نتیجهٔ نهایی همان اجرا خوانده می‌شود. ۱۰۱ تست Node و ۱۷ تست Python در بررسی محلی موفق‌اند. از موفقیت این تست‌ها، پوشش سطر/شاخهٔ ۱۰۰٪ یا رفع همهٔ باگ‌های احتمالی استنتاج نمی‌شود.
+
+## تعیین تکلیف ۲۴ مورد
+
+| ID | نتیجه در محدودهٔ تعریف‌شده | شاهد اصلی و مرز ادعا |
+|---|---|---|
+| M-01 | fixed | انتشار وابسته به هر سه gate و تست قرارداد؛ PR بدون deploy؛ probe واقعی runner: gate ۰.۳۲ failure، publish skipped، assert-blocked success؛ PR آزمایشی ۱۰ بسته و merge نشد |
+| M-02 | fixed | ریشهٔ غیرobject/آرایه رد می‌شود؛ fallback و backup خام پیش از overwrite؛ تست loader واقعی و reload |
+| M-03 | fixed در schema containerهای فعلی | انواع مجموعه‌ها، objectهای state/profile/context و balances کنترل می‌شوند؛ دادهٔ سالم/unknown حفظ؛ ادعای schema همهٔ فیلدهای افزونه‌های آینده نیست |
+| M-04 | fixed طبق تصمیم مالک | reset نسخه‌ای؛ state خالی مانع migration دوباره؛ حفظ predecessor و shared DB؛ شکست storage و stale save کنترل می‌شوند |
+| M-05 | fixed در پرداخت نمایشی | callback فقط پس از ثبت debit؛ rollback debit/refund ناموفق؛ پیام شکست ثبت نتیجه؛ تضمین exactly-once سرویس backend خارجی ادعا نمی‌شود |
+| M-06 | fixed در مرورگر هدف دارای Web Locks قابل‌استفاده | یک writer؛ تب دوم save/reset ندارد؛ storage-event و snapshot check؛ fallback بدون Web Locks تضمین اتمی race دقیق ندارد |
+| M-07 | fixed | موفقیت فقط پس از Clipboard API یا execCommand=true؛ denial و unavailable با پیام صادقانه |
+| M-08 | fixed | slice/arrayBuffer/share در try؛ rejection از جمله null وضعیت قابل مشاهده دارد |
+| M-09 | fixed در مودال عمومی | role/name، trap دوسویه، Escape، focus return حتی پس از replacement؛ تست Chromium |
+| M-10 | fixed | registry صریح ۱۳ action؛ تشخیص از متن تابع حذف؛ registry و guarded actions برابرند |
+| M-11 | fixed در قرارداد نصب | init/uxInit idempotent؛ مالکیت و ترتیب wrapperها مستند؛ هویت handler در نصب تکراری ثابت |
+| M-12 | fixed در مرزبندی و قرارداد وابستگی | payment و state-codec مستقل؛ owner/import/export/write/loadOrder برای ۵۲ slot با parser/scope ثبت و دقیقاً تست؛ namespace سازگاری عمدی باقی است |
+| M-13 | fixed در مشاهده‌پذیری | ۲۴۴ محل catch با کد ثابت و cause-enum؛ caught غیرمسدودکننده در برابر fault لازم؛ سقف ۵۰ رخداد و حذف متن exception/کاربر از diagnostics؛ Promise/script/boot نیز پوشش دارند |
+| M-14 | fixed در هزینهٔ تکراری آرشیو | cache آرشیو owned و invalidation همهٔ mutationها؛ سایر فیلدها تازه و durable؛ benchmark ۱۰۰/۱۰۰۰/۱۰۰۰۰ و cold/steady؛ ذخیرهٔ سرد و setItem همگام باقی‌اند |
+| M-15 | fixed | readiness پس از bind، PID زنده و hash واقعی HTTP؛ occupied port و پاسخ 200 اشتباه تست می‌شوند |
+| M-16 | fixed در سیاست آزمون | baselineهای ثابت/hash، برابری خارج از بلوک‌های مصوب و رفتار متناظر؛ هیچ assertion صرفاً برای عبور از CI حذف نشده |
+| M-17 | fixed | source قابل ساخت برای ۰.۳۰–۰.۳۲، builder/README و manifest دقیق ZIP |
+| M-18 | fixed | node_modules از index خارج؛ npm ci از lockfile؛ تاریخچه بازنویسی نشده |
+| M-19 | fixed در سیاست archive | snapshotهای تاریخی و QA نسخه‌ای عمداً باقی؛ source فعال/QA مشترک ابزارها مشخص؛ تست عدم تغییر runtime تاریخی؛ ادعای حذف همهٔ تکرارهای تاریخی نیست |
+| M-20 | fixed در دو sink اشتراک ممیزی‌شده | sanitizer مشترک display/export؛ allowlist، حذف event/action/active SVG و scheme اجرایی؛ قالب معتبر حفظ؛ ادعای ممیزی تمام innerHTMLها نیست |
+| M-21 | fixed | staging/verify، manifest ZIP/assets، backup و rollback replace؛ missing/exclusion/نسخه ناقص/failure میانی تست؛ atomicity قطع برق ادعا نمی‌شود |
+| M-22 | fixed در adapter اختیاری | غیرفعال؛ timeout/abort/status/schema/callback-once؛ هیچ AI به هدایت افزوده نشده |
+| M-23 | fixed | README ریشه و نسخه: release فعال، build/QA، هر سه gate، coverage و reset |
+| M-24 | fixed | metadata سیستم عامل از index خارج؛ hygiene gate مانع بازگشت؛ hashهای تاریخی حفظ و دوباره تثبیت شده‌اند |
+
+## شواهد و محدودیت‌های قابل پیگیری
+
+- `qa/check-state-recovery.test.cjs`، `check-persistence-payments.test.cjs`، `check-state-codec.test.cjs` و `check-interaction-recovery.test.cjs`: مسیرهای داده و خطا؛ مجموعه‌های مرورگری جدید همان قراردادهای اصلی را روی app واقعی نیز کنترل می‌کنند.
+- `qa/check-runtime-contracts.test.cjs` و `runtime-contracts.cjs`: مالکیت/وابستگی و privacy diagnostics؛ ابزار parser از toolchain QA با نسخهٔ pinned می‌آید و dependency محصول نیست.
+- `scripts/tests/`: قرارداد workflow، بسته‌بندی، هویت سرور و عدم تغییر runtime تاریخی.
+- `docs/Mahalino_Runtime_Contracts_FA.md`: مالکیت، wrapper order، concurrency و archive policy.
+- `docs/validation/`: dependency/catch inventory و benchmark میزبان؛ اندازه‌گیری مرورگر در artifact هر اجرای QA با نام state-performance.json ذخیره می‌شود.
+
+در یک اجرای ثبت‌شدهٔ Chromium با viewport موبایل و CPU چهار برابر کندتر، برای آرشیو ۱۰هزارپیامی، p95 ذخیره پیش از cache حدود ۶۵٫۸ ms و پس از cache حدود ۳۲٫۶ ms بود؛ p50 از ۴۶٫۹ به ۲۸٫۰ ms رسید. ذخیرهٔ سرد پس از cache حدود ۵۴٫۴ ms و یک long task داشت. این اعداد تضمین همهٔ دستگاه‌ها نیستند؛ benchmark قبل ۱۲ و بعد ۳۰ نمونه ثبت کرده و cold را جدا گزارش می‌کند. شواهد، کاهش هزینهٔ تکراری آرشیو ثابت را نشان می‌دهد؛ تغییر خود آرشیو، نوشتن کل state و ذخیرهٔ سرد هنوز هزینه دارند. پروفایل‌گیری روی گوشی فیزیکی و تضمین race اتمی در مرورگر فاقد Web Locks خارج از اعتبارسنجی انجام‌شده‌اند.
+
+شواهد CI کد نهایی:
+
+- [انتشار و هر سه gate وابسته](https://github.com/lakhossein/mahalino/actions/runs/44084713308)؛ شامل job قرارداد و هر سه gate؛ انتشار عمومی در PR اجرا نمی‌شود.
+- [gate مستقل ۰.۳۲](https://github.com/lakhossein/mahalino/actions/runs/44084713238)؛ شامل تمام suiteهای اجباری و coverage gate.
+- [gate مستقل ۰.۳۱](https://github.com/lakhossein/mahalino/actions/runs/44084713368).
+- [gate مستقل ۰.۳۰](https://github.com/lakhossein/mahalino/actions/runs/44084713335).
+- [probe منفی بدون انتشار](https://github.com/lakhossein/mahalino/actions/runs/44076079722): overall عمداً failure؛ gate ۰.۳۲ عمداً fail، publish skipped و assert-blocked success.
+
+این جمع‌بندی فقط مستنداتِ کد تأییدشدهٔ بالا را به‌روز می‌کند؛ SHA کامیت خود گزارش از تاریخچهٔ فایل قابل استخراج است.
+
+---
+
+# سوابق برنامه‌ریزی و اجرای اصلاحات
+
+# برنامهٔ اجرای اصلاحات ممیزی محلینو
+
+تاریخ: ۱۷ نوامبر ۲۰۲۶ — مبنا: `ba0591ec114898e87813fbf06898823bdb17a6b3`
+
+منبع: `Mahalino_Repository_Debug_Refactor_Audit_FA.md`، شامل ۲۴ مورد. HEAD دریافت‌شدهٔ main دقیقاً با SHA گزارش یکسان بود. این سند برنامهٔ اصلاح است و جایگزین شواهد و محدودیت‌های گزارش ممیزی نیست.
+
+## قرارداد اجرا
+
+- هر گام یک تغییر مستقل و قابل بازبینی است: بازخوانی شاهد در HEAD هدف، بازتولید/تست شکست، اصلاح محدود، تست موفق، ثبت commit و نتیجهٔ CI؛ سپس گام بعد.
+- اجرا در چند نوبت و روی شاخهٔ مستقل پیش رفته است؛ وضعیت تازه در انتهای همین سند ثبت می‌شود. main مستقیماً تغییر نمی‌کند و انتشار عمومی انجام نمی‌شود.
+- نسخهٔ فعال ۰.۳۲، ظاهر، متن‌ها، فلوها و هدایت rule-based حفظ می‌شوند. تغییر رفتار عمدی در reset یا همزمانی باید قرارداد مشخص داشته باشد.
+- موارد ریسک ابتدا بازتولید می‌شوند. نبود بازتولید، دلیل اجرای اصلاح فرضی یا بستن مورد نیست؛ وضعیت open با توضیح محدودیت باقی می‌ماند.
+- نسخه‌های تاریخی baseline هستند؛ حذف assertion برابری متنی، آرشیو یا dependency ثبت‌شده بدون جایگزین و بررسی سازگاری مجاز نیست.
+- وضعیت‌ها همان قرارداد ممیزی‌اند: open / reproduced / confirmed-static / needs-decision / fixed / rejected-with-evidence. «fixed» با توضیح دقیق سطح اعتبارسنجی همراه می‌شود؛ پایان یک گام نیازمند شواهد مختص همان مورد است.
+
+## ترتیب و معیار پایان
+
+| گام | موارد و وضعیت آغاز | کار مشخص | وابستگی / معیار پایان |
+|---|---|---|---|
+| ۱ — محافظت انتشار | M-01: confirmed-static | افزودن gate نسخهٔ فعال به dependencies انتشار؛ پوشش تغییر تمام workflowها؛ اعتبارسنجی PR بدون deploy؛ تست قرارداد انتشار | اولویت نخست؛ هر سه gate و تست قرارداد باید prerequisite باشند؛ failed/cancelled/skipped gate نباید مسیر انتشار را باز کند؛ تأیید CI واقعی جدا از تست ساختار ثبت شود |
+| ۲ — سلامت state | M-02: reproduced، M-03: confirmed-static | fixture انواع ریشه و فیلدها؛ loader/migration معتبر و تکرارپذیر؛ حفظ دادهٔ معتبر و fallback نسخهٔ قبل | پس از گام ۱؛ آرایه/null/عدد/رشته و log/wfs/chats/contracts/tokens/wallet خراب پوشش داده شوند؛ reload بدون اتلاف خاموش داده |
+| ۳ — قرارداد reset | M-04: needs-decision | مشخص‌کردن reset نسخه‌ای یا سراسری و متن UI؛ سپس پیاده‌سازی دامنه و انتظار نتیجهٔ IndexedDB | تصمیم محصول پیش‌نیاز اصلاح است؛ پیشنهاد برای بررسی: reset نسخهٔ جاری با اقدام جدا برای حذف همهٔ نسخه‌ها؛ تا تأیید، این پیشنهاد اجرا نشود؛ تست v31/v32/unrelated و خطای DB |
+| ۴ — دوام پرداخت | M-05: open | تزریق خطای quota/ممانعت storage برای debit و refund؛ تعریف نتیجهٔ save و ترتیب callback/journal | گام ۲؛ تست قبل/بعد reload و عدم اعلام تکمیل خدمت هنگام شکست ثبت ضروری؛ پول همچنان نمایشی |
+| ۵ — همزمانی | M-06: needs-decision | بازتولید دو تب A→B؛ انتخاب قرارداد تشخیص conflict و جلوگیری از overwrite بی‌خبر، سپس اصلاح | گام‌های ۲ و ۴؛ پیشنهاد: تشخیص revision و نمایش تعارض پیش از بازنویسی، بدون merge خودکار دادهٔ پرداخت؛ تأیید قرارداد و آزمون دو context مرورگر لازم |
+| ۶ — خطاهای تعامل | M-07، M-08: confirmed-static؛ M-09: open | انتظار نتیجهٔ clipboard و fallback؛ قراردادن خواندن PDF در مسیر مدیریت خطا؛ بازتولید قرارداد focus مودال عمومی و اصلاح همان مسیر | مستقل پس از گام ۱؛ permission denied/API unavailable، PDF read rejection، Tab/Shift+Tab/Escape/بازگشت focus و accessible name؛ بدون unhandled rejection |
+| ۷ — قابلیت اعتماد QA | M-15: confirmed-static؛ M-16: needs-decision | کنترل PID/هویت محتوای سرور و URL؛ تعریف baseline ثابت تاریخی و characterization رفتار برای ری‌فکتور | پیش از گام معماری؛ پورت اشغال/HTTP 200 اشتباه باید fail شوند؛ assertion فعلی تا وجود جایگزین معتبر حفظ شود؛ تست رفتار هم ارز بدون شل‌کردن قرارداد محصول |
+| ۸ — مرزها و پرداخت صریح | M-10، M-11، M-12: confirmed-static | فهرست actionهای پولی/غیرپولی، نقشهٔ ترتیب نصب و مالکیت handler؛ جایگزینی regex متن تابع با metadata؛ سپس جداسازی تدریجی API/state | گام‌های ۲،۴،۵،۷؛ قبل/بعد همهٔ dispatchها یکسان؛ init تکراری بی‌اثر؛ baseline فلوها/آثار مالی حفظ شود؛ هر استخراج یک commit جدا، بدون تبدیل یکبارهٔ همهٔ scopeها |
+| ۹ — خطا و کارایی | M-13: confirmed-static؛ M-14: open | طبقه‌بندی catchها، ثبت خطای init/Promise بدون دادهٔ شخصی؛ اندازه‌گیری storage/save و تعامل برای ۱۰۰/۱۰۰۰/۱۰۰۰۰ پیام؛ اصلاح فقط بر اساس داده | گام ۸ برای مرزهای پایدار؛ failure injection و log قابل ردیابی؛ p50/p95/حجم/long task ثبت و بودجهٔ بهبود پیش از تغییر تعیین شود؛ کندی قطعی فرض نشود |
+| ۱۰ — ورودی HTML اشتراک | M-20: open | trace منبع تا sink، payload مصنوعی بی‌خطر و URL scheme در نمایش/export؛ sanitization در مرز ورودی در صورت تأیید | پیش از تغییر مرز rendering در گام ۸ trace اولیه تهیه شود؛ اصلاح مستقل می‌تواند جلو بیفتد؛ formatting معتبر حفظ، handler ناخواسته اجرا نشود؛ ادعای XSS از راه دور بدون شاهد نشود |
+| ۱۱ — بسته‌بندی | M-17: needs-decision؛ M-21: confirmed-static | تعیین runtime-only یا source قابل ساخت؛ manifest/آزمون ZIP؛ fixture asset مفقود/exclusion/نسخه ناقص؛ ساخت در staging و جایگزینی پس از موفقیت | تصمیم قرارداد بسته پیش‌نیاز M-17؛ خروجی قبلی در failure میانی سالم بماند؛ هر ۳۲ نسخه، index و منابع runtime بررسی شوند؛ standalone checkout سالم فعلی دوباره مسئله فرض نشود |
+| ۱۲ — بهداشت و مستندات | M-18، M-19، M-24: needs-decision؛ M-23: confirmed-static | ثبت مرز آرشیو و فعال و سیاست dependencies؛ سپس حذف انتخابی node_modules/metadata از tracked؛ مشترک‌سازی QA فقط با parity؛ README ریشه به ۰.۳۲ و دستورات واقعی متصل شود | سیاست نگهداری پیش از حذف؛ npm ci/build/QA و runtime تاریخی مقایسه شود؛ تاریخچه بازنویسی نشود؛ به‌روزرسانی README می‌تواند مستقل جلو بیفتد |
+| ۱۳ — adapter قدیمی | M-22: needs-decision | تعیین نگهداری غیرفعال یا حذف رسمی؛ در صورت نگهداری، تست اختیاری timeout/status/schema | بدون فعال‌کردن LLM یا تغییر هدایت؛ baseline rule-based ثابت؛ کم‌اولویت‌تر از موارد داده/انتشار |
+
+گام‌ها واحدهای تحویل‌اند، نه تخمین یکسان زمان. گام‌های ۸، ۹ و ۱۲ به چند PR کوچک تقسیم می‌شوند. هیچ درصد پیشرفتی از تعداد تست‌ها یا بسته‌شدن یک مورد استخراج نمی‌شود.
+
+## گام ۱ — تغییر انجام‌شده
+
+شاخه: `fix/m01-v032-publication-gate`
+
+- `.github/workflows/pages.yml`: job قابل فراخوانی `quality-v032` اضافه شد و `publish.needs` هر سه نسخه و `workflow-contract` را الزام می‌کند.
+- triggerهای push روی main و PR به main همهٔ workflowها و آزمون‌های scripts را پوشش می‌دهند. `workflow_dispatch` حفظ شده است.
+- در PR هر سه gate و قرارداد اجرا می‌شوند؛ job انتشار با شرط event حذف می‌شود. شرط status جایگزین نشده است؛ در push/manual وابستگی ناموفق تحت شرط ضمنی success() مانع انتشار است.
+- دسترسی write مربوط به Pages و id-token فقط به job انتشار منتقل شد؛ اعتبارسنجی PR با contents:read انجام می‌شود.
+- workflow مستقل ۰.۳۲ نیز تغییر pages.yml را در push و PR می‌بیند. اجرای مستقل و reusable ممکن است روی یک PR هر دو دیده شوند؛ این استقلال عمداً حفظ شده است.
+- `scripts/tests/test_pages_workflow.py`: هشت آزمون قرارداد YAML با PyYAML نسخهٔ ثابت، در خود زنجیرهٔ انتشار اجرا می‌شود. این آزمون‌ها شبیه‌ساز GitHub Actions نیستند.
+
+### شواهد محلی
+
+| بررسی | پیش از اصلاح workflow | پس از اصلاح |
+|---|---|---|
+| هشت آزمون قرارداد انتشار | شکست: نبود dependency ۰.۳۲، نبود triggerها و اعتبارسنجی PR، تنظیمات دسترسی قبلی | ۸ پاس، صفر شکست |
+| تست‌های Node مربوط به priority audit، assembler و build CLI | مبنای گزارش ۱۹ پاس | ۱۹ پاس، صفر شکست/skip |
+| `node V0.32/qa/check-refactor-parity.cjs` | مبنای گزارش موفق | موفق؛ artifact parity و انتخاب state قبلی/فعلی |
+| `node V0.32/build_v032.js --check` | مبنای گزارش موفق | موفق؛ ساخت بازتولیدپذیر |
+| `python3 scripts/build_previews.py --check` | مبنای گزارش ۳۲ نسخه | هر ۳۲ HTML و ZIP تأیید شد |
+| `git diff --check` | — | موفق |
+
+### وضعیت و حدود تأیید
+
+M-01: **fixed در پیکربندی؛ تأیید نهایی رفتار runner هنوز باقی است**. هیچ کد محصول یا artifact نسخه‌ها تغییر نکرده است. آزمون مرورگری تازهٔ محلی اجرا نشده؛ تست‌ها و build بالا جایگزین gate کامل مرورگر نیستند.
+
+برای بستن کامل تأیید انتشار، نتیجهٔ PR باید هر سه reusable gate و workflow-contract را نشان دهد و publish در PR skipped باشد. آزمون شکست عمدی gate باید روی شاخه/مخزن آزمایشی و بدون محیط Pages انجام شود؛ در این نوبت چنین اجرای منفی واقعی انجام نشده است. در اجرای push/manual پس از ادغام، هر سه gate باید موفق شوند تا publish شروع شود. merge یا deploy عمومی جزو این نوبت نیست.
+
+شناسهٔ commit پیاده‌سازی از تاریخچهٔ همین فایل و شاخه قابل استخراج است؛ نتیجهٔ CI و شناسهٔ دقیق در گزارش تحویل ثبت می‌شود تا ارجاع خودبه‌خود به commit درون خودش نیاز نباشد.
+
+## نقطهٔ شروع نوبت بعد
+
+گام ۲، فقط M-02 و M-03: ابتدا fixtureهای state خراب و fallback؛ سپس loader/schema با حفظ دادهٔ سالم؛ آزمون اختصاصی و gate کامل ۰.۳۲. تصمیم reset در گام ۳ هنوز گرفته نشده و نباید در گام ۲ به‌طور ضمنی تغییر کند.
+
+## گام ۲ — اعتبارسنجی و بازیابی state (M-02 / M-03)
+
+وضعیت M-02 و M-03: **fixed در پیاده‌سازی؛ نتیجهٔ gate مرورگری این commit باید جدا بررسی شود**.
+
+- loader فقط object غیرآرایه را می‌پذیرد؛ JSON خراب، null، آرایه، رشته، عدد و boolean به candidate بعدی می‌روند. state معتبر نسخهٔ جاری همچنان بر نسخهٔ قبلی اولویت دارد و هیچ کلید نسخهٔ قبلی نوشته نمی‌شود.
+- schema نوع containerهای persisted را مشخص می‌کند: آرایه‌های log/wlog/reqs/wfs/contracts/chats و مجموعه‌های خدمات/کتابخانه/پروژه/اشتراک؛ objectهای active/prof/ui/prefs/profile/ctx30؛ profile و contextهای ذخیره‌شده هم در سطح fields/log اعتبارسنجی می‌شوند. pending رشته یا null است؛ auth/sub/paySession/grtReserve object یا null؛ tokens/wallet عدد متناهی و نامنفی‌اند. رشتهٔ عددی هم به‌عنوان نوع نادرست بازیابی می‌شود، نه تبدیل حدسی.
+- فیلدهای سالم، ناشناخته و سطرهای object معتبر حفظ می‌شوند. ردیف غیرobject در log/wfs/chats/contracts از نسخهٔ عملیاتی کنار گذاشته می‌شود؛ data گردش کار و hist موجود در چت نیز container معتبر می‌گیرند. اعتبارسنجی معنایی همهٔ فیلدهای داخلی قرارداد/پرداخت یا هر افزونهٔ آینده ادعا نمی‌شود.
+- قبل از اولین save بعد از recovery، ورودی خام و نام کلیدهای مربوط در `mahalino_v32_recovery` ثبت می‌شود. boot چیزی نمی‌نویسد. شکست ثبت backup مانع بازنویسی state اصلی است. backup شامل دادهٔ محلی کاربر است، صرفاً روی همان origin نگه داشته می‌شود و به log فرستاده نمی‌شود؛ حداکثر یک snapshot بازیابی نگه داشته می‌شود و رخداد بازیابی جدید می‌تواند جای آن را بگیرد.
+- دادهٔ خراب در console با هشدار بدون محتوای شخصی اعلام می‌شود. API نتیجهٔ save و ترتیب callback پرداخت تغییر نکرده‌اند؛ M-05 همچنان کار مستقل گام ۴ است. دامنهٔ reset تغییر نکرده؛ M-04 همچنان نیازمند تصمیم است.
+- baseline متنی state قبلی به fixture ثابت با کنترل SHA-256 منتقل شد. برابری تمام HTML خارج از همین بلوک همچنان اجباری است و ۴۲ تست رفتار loader جایگزین برابری متنی آن بلوک شدند؛ هیچ gate موجود حذف نشده است. این مجوز عمومی تغییر state در آینده نیست؛ تغییر schema باید fixture رفتاری متناظر داشته باشد.
+
+شواهد: تست‌های اولیهٔ recovery روی loader قبلی شکست خوردند (۳۹ تست آن مرحله). پس از اصلاح و افزودن تست‌های تکمیلی، ۴۲ تست recovery + ۱۹ تست Node موجود پاس‌اند. ۸ آزمون workflow گام قبل نیز پاس‌اند. reproducible build، parity خارج از بلوک state و کنترل‌های ایستای فلوها موفق‌اند. اجرای کامل gate محلی در مرحلهٔ مرورگر به علت نبود executable متوقف شد؛ دانلود نسخهٔ pinned Chromium نیز ZIP نامعتبر برگرداند، بنابراین سبز بودن مرورگری محلی ادعا نمی‌شود. CI گام ۱ روی commit `133cec9` برای هر چهار workflow موفق بوده است.
+
+گام بعدی برنامه، M-04 است: تعیین قرارداد reset نسخه‌ای یا سراسری؛ در این گام تصمیمی به‌جای مالک محصول گرفته نشد.
+
+## ادامهٔ اجرا — M-04، M-07، M-08 و M-23
+
+تصمیم صریح مالک برای M-04: «فقط نسخهٔ جاری». پیاده‌سازی:
+
+- reset یک state خالی `{}` در کلید ۰.۳۲ ثبت می‌کند تا loader دوباره دادهٔ ۰.۳۱ را وارد نکند؛ snapshot بازیابی و دو کلید نشست اختصاصی ۰.۳۲ پاک می‌شوند. نسخه‌های قبلی، کلیدهای unrelated و تنظیمات/IndexedDB مشترک دست‌نخورده می‌مانند.
+- حذف پایگاه‌های مشترک از مسیر reset نسخه‌ای حذف شد؛ دیگر درخواست deleteDatabase بی‌انتظار صادر نمی‌شود. شکست نوشتن state خالی مانع ادامه است؛ شکست پاک‌سازی فرعی به‌صراحت «ناقص» گزارش می‌شود. پس از ثبت reset، save از نوشتن state قدیمی تا reload جلوگیری می‌کند.
+- M-07: handler کپی، نتیجهٔ Clipboard API را await می‌کند؛ در نبود API/رد مجوز، execCommand فقط با نتیجهٔ true موفق محسوب می‌شود؛ در شکست هر دو، روش دستی با پیام شکست پیشنهاد می‌شود.
+- M-08: خواندن slice/arrayBuffer و بررسی magic PDF داخل try قرار گرفت تا rejection خواندن نیز وضعیت خطای قابل مشاهده داشته باشد.
+- M-23: README ریشه نسخهٔ فعال، مسیر منبع، build/QA، هر سه gate انتشار و تفاوت audit coverage با line coverage را معرفی می‌کند؛ README ۰.۳۲ قرارداد reset و استثناهای parity را توضیح می‌دهد.
+
+شواهد: ۱۵ تست تعامل روی بلوک‌های اصلیِ ثابت اجرا شدند: ۹ شکست و ۶ موفق. روی پیاده‌سازی جدید: ۱۵ موفق. همراه با تست‌های قبلی: ۷۶ تست Node موفق. سه سناریوی Chromium جدید نیز در gate اجباری اضافه شده‌اند: reset با reload و حفظ ۰.۳۱، رد مجوز clipboard، و PDF read rejection بدون pageerror. نتیجهٔ این سناریوهای جدید باید از CI همین commit تأیید شود؛ اجرای مرورگری محلی به‌علت محدودیت نصب Chromium ادعا نمی‌شود.
+
+برای حفظ parity، دقیقاً سه بلوک handler با baseline ثابت و کنترل SHA-256 مجاز به تغییر شدند؛ برابری تمام بقیهٔ HTML همچنان اجباری است. snapshot این بلوک‌ها در fixtures/approved-interaction-baselines.json است. fixtureها کد اجرایی محصول نیستند.
+
+وضعیت M-04/M-07/M-08: **fixed در کد، تأیید مرورگری commit جدید در انتظار CI**. M-23: **fixed در مستندات**. CI commit گام دوم `ccd5d9c` برای هر چهار workflow موفق است.
+
+M-05، M-06، M-09، M-15 و سایر موارد با این تغییر حل‌شده محسوب نمی‌شوند. کار بعدی: بازتولید failure ذخیره‌سازی در debit/refund (M-05)، سپس تصمیم قرارداد همزمانی M-06؛ بررسی مودال و هویت سرور QA نیز مستقل باقی است. main ادغام و انتشار عمومی انجام نشده است.
+
+## وضعیت اجرای گستردهٔ اصلاحات
+
+CI کامیت `f04b1f5` در هر چهار workflow موفق شد؛ سناریوهای مرورگری reset/clipboard/PDF نیز در gate موفق حضور داشتند. اصلاحات بعدی روی همان شاخه انجام می‌شوند و merge/deploy خودکار نشده‌اند.
+
+| مورد | وضعیت دقیق این مرحله | شاهد / محدودیت |
+|---|---|---|
+| M-05 | fixed در مسیر پرداخت ۰.۳۲ | save نتیجهٔ boolean؛ جلوگیری از callback در شکست ثبت debit؛ rollback حافظه در debit/refund ناموفق؛ ثبت نتیجهٔ ناموفق صادقانه؛ ۶ تست persistence/payment، شامل failure injection و idempotency |
+| M-06 | محافظت پیاده‌شده؛ محدودیت fallback باقی | Web Locks مالک نویسندهٔ یک‌تب تا پایان عمر تب؛ save/reset تب دوم مسدود؛ snapshot/storage-event برای stale writer؛ در مرورگر فاقد Web Locks، race دقیق همزمان هنوز تضمین اتمی ندارد |
+| M-09 | fixed در مودال عمومی | role/name، focus trap دوسویه، Escape، بازگشت focus؛ سناریوی Chromium اجباری جدید |
+| M-10 | fixed | ۱۳ مسیر پولی در registry صریح؛ حذف Function.toString از تشخیص؛ مقایسهٔ registry با guardهای نصب‌شده در تست Chromium |
+| M-11 | اصلاح نصب + قرارداد wrapperها | init و uxInit idempotent؛ نقشهٔ ترتیب و مالکیت در Runtime_Contracts؛ تست هویت handler پیش/پس از init تکراری؛ wrapperهای لازم تاریخی حذف نشده‌اند |
+| M-12 | open؛ پیشرفت معماری، حل کامل ادعا نمی‌شود | payment به فایل مستقل با slot جدا منتقل شد؛ API/مالکیت و inventory وابستگی ۵۱ ماژول ثبت و تست می‌شود؛ shared global scope هنوز وجود دارد |
+| M-13 | open؛ زیرساخت گزارش تکمیل، ممیزی معنایی همهٔ catchها باقی | unhandledrejection + خطای script + E28 boot؛ code/time محدود و بدون دادهٔ شخصی؛ inventory تمام catchها؛ ردیف‌های fallback-or-review هنوز نیازمند بررسی زمینه‌اند |
+| M-14 | open؛ اندازه‌گیری و کاهش نوشتن تکراری | ۱۰ save بدون تغییر، صفر setItem؛ benchmark مصنوعی ۱۰۰/۱۰۰۰/۱۰۰۰۰ پیام و p50/p95 در docs/validation/state-benchmark.json؛ stringify همچنان همگام و اندازه‌گیری دستگاه موبایل/long task واقعی انجام نشده |
+| M-15 | fixed | readiness فقط پس از bind موفق سرور خود QA؛ کنترل زنده‌بودن PID؛ تطبیق hash محتوای HTTP با artifact؛ تست پورت اشغال و HTTP 200 اشتباه |
+| M-16 | fixed در سیاست آزمون این اصلاحات | baselineهای قبلی با hash حفظ؛ فقط بلوک‌های مصوب + رفتار متناظر مجاز به اختلاف‌اند؛ بقیهٔ HTML همچنان برابر؛ assertion صرفاً برای سبزکردن CI حذف نشد |
+| M-17 | fixed | قرارداد rebuildable-source برای ۰.۳۰/۰.۳۱/۰.۳۲؛ entry سازنده/README همراه؛ manifest و تست محتویات ZIP |
+| M-18 | fixed | ۵۰۷ فایل node_modules از index خارج شدند؛ npm ci از lockfile ورودی QA است؛ تاریخچه بازنویسی نشد |
+| M-19 | مرز نگهداری تعیین شد؛ تکثیر تاریخی عمداً حفظ | snapshot تاریخی در برابر source فعال و QA مشترک جدید تفکیک شد؛ تست مستقل عدم تغییر runtime تاریخی؛ مشترک‌سازی همهٔ QA قدیمی انجام نشد چون baselineهای نسخه‌ای‌اند |
+| M-20 | اصلاح دو sink اشتراک، تست مرورگری لازم | sanitizer مشترک display/export با allowlist تگ، حذف handler/action/active SVG و scheme اجرایی؛ قالب bold/table حفظ می‌شود؛ این اصلاح ادعای ممیزی همهٔ innerHTMLها نیست |
+| M-21 | fixed | staging + verify پیش از replace، backup/rollback rename؛ تست asset مفقود، نسخه ناقص، exclusion، شکست میانی و manifest ZIP؛ crash/power-loss atomicity ادعا نمی‌شود |
+| M-22 | fixed در adapter اختیاری | غیرفعال باقی؛ timeout/abort، HTTP status، JSON/schema و callback یک‌بار؛ ۶ تست بدون فعال‌کردن AI |
+| M-24 | fixed | ۱۷۳ desktop.ini از index خارج؛ تست جلوگیری از برگشت metadata/dependency؛ hash درخت‌های تاریخی پس از همین حذف‌های غیرruntime دوباره تثبیت شد |
+
+شواهد محلی این مرحله: ۹۱ تست Node، ۱۷ تست Python، parity محدود به بلوک‌های مصوب، build بازتولیدپذیر و هر ۳۲ بسته موفق‌اند. تست‌های Chromium جدید هم در gate اجباری ثبت‌اند؛ نتیجهٔ CI commit این مرحله باید جدا خوانده شود. به‌دلیل مشکل نصب Chromium، اجرای مرورگری محلی ادعا نمی‌شود.
+
+در failure پایدار پس از اجرای callback، تراکنش مشترک میان side effect خارجی و localStorage وجود ندارد؛ پیام عدم ثبت نتیجه نمایش داده می‌شود. در این prototype callbackها عمدتاً محلی‌اند؛ تضمین exactly-once برای سرویس backend واقعی در این اصلاح تعریف نشده است.
+
+منابع ادامه: Mahalino_Runtime_Contracts_FA.md، docs/validation/runtime-dependencies.json و catch-inventory.json. M-12/M-13/M-14 و تضمین کامل fallback قدیمی M-06 نباید صرفاً با سبزشدن CI بسته شوند. این بخش عمداً وضعیت جزئی را روشن نگه می‌دارد، نه ادعای اتمام همهٔ بدهی‌های معماری.
+
+## تکمیل قراردادهای معماری، خطا و اعتبارسنجی انتشار
+
+- M-01: probe واقعی runner روی شاخهٔ مستقل و PR آزمایشی شمارهٔ ۱۰ اجرا شد؛ gate ساختگی ۰.۳۲ عمداً failure، job publish برابر skipped و assert-blocked برابر success شد (run 44076079722). هیچ action انتشار، environment یا دسترسی write در probe نبود و PR بدون merge بسته شد. این probe رفتار runner را تأیید می‌کند؛ ساختار workflow واقعی جدا با تست قرارداد و gateهای واقعی کنترل می‌شود.
+- اجرای a0566c0: تمام gateهای مرورگری نسخه‌های ۰.۳۰، ۰.۳۱ و ۰.۳۲ موفق بودند. job workflow-contract به دلیل نبود کامیت مبنا در shallow checkout شکست خورد؛ fetch-depth:0 اضافه شد و تست بررسی وجود تاریخچه حفظ شد. بنابراین نتیجهٔ نهایی workflow انتشار همان commit سبز اعلام نمی‌شود.
+- M-12: inventory سادهٔ regex به قرارداد مبتنی بر parser و scope ارتقا یافت. تمام exports، imports با مالک صریح، writes و ترتیب include برای هر ۵۱ slot استخراج می‌شود؛ تست دقیق با قرارداد بازبینی‌شده تطبیق می‌دهد و وابستگی تازهٔ ثبت‌نشده را رد می‌کند. ماژول پرداخت مستقل و API storage صریح‌اند. namespace سراسری سازگاری حفظ شده، اما وابستگی‌ها دیگر به‌صورت نامشخص و بدون gate باقی نیستند؛ تبدیل کل سامانه به ES modules جزو ادعای این اصلاح نیست.
+- M-13: تمام ۲۴۴ محل catch شناسایی‌شده با رخداد non-blocking ثبت می‌شوند؛ kind=caught برای fallback مدیریت‌شده و kind=fault برای خطای لازم/بدون handler. رخداد شامل شناسهٔ فایل/محل، زمان و نوع خطا از enum محدود است؛ message/reason/stack/دادهٔ کاربر ثبت نمی‌شود. خطاهای لازم boot/Promise/script همچنان پیام قابل مشاهده دارند. برای حفظ UX، هر fallback اختیاری به alert تبدیل نشده است. fixture دقیق همهٔ محل‌های درج و hash آن حفظ و تست می‌شود.
+- M-14: علاوه بر benchmark میزبان، تست Chromium با viewport موبایل، CPU throttling چهاربرابری، ۱۰۰/۱۰۰۰/۱۰۰۰۰ پیام، p50/p95 و long-task در gate اجباری اضافه شد؛ state-performance.json در artifact QA ذخیره می‌شود. این اندازه‌گیری شبیه‌ساز است، نه دستگاه فیزیکی. stringify همگام هنوز برقرار است؛ نتیجهٔ اندازه‌گیری باید مبنای بهینه‌سازی بیشتر باشد.
+
+تست‌های محلی پس از این تکمیل: ۹۴ تست Node و ۱۷ تست Python، parity و build موفق‌اند. CI commit بعدی باید دوباره بررسی شود. M-12 و M-13 در محدودهٔ «قرارداد/مرزبندی و مشاهده‌پذیری خطا» تکمیل شده‌اند؛ حذف namespace سراسری برای سازگاری و تغییر همهٔ fallbackهای قدیمی به خطای مسدودکننده انجام نشده و لازم فرض نمی‌شود. M-14 تا خواندن نتیجهٔ benchmark مرورگر و تعیین اقدام بر مبنای داده، باز می‌ماند؛ سازگاری race اتمی در مرورگر فاقد Web Locks نیز محدودیت مستند است.
+
+## M-14 — نتیجهٔ اندازه‌گیری و اصلاح بر مبنای شاهد
+
+روی commit `bc06a42` هر چهار workflow موفق شدند، job انتشار در PR skipped بود و gate ۰.۳۲ صفر شکست داشت. سناریوهای writer تب دوم، idempotent init، registry ۱۳ action، مودال، sanitizer و failure پرداخت نیز موفق بودند.
+
+اندازه‌گیری Chromium با viewport موبایل و CPU چهار برابر کندتر، پیش از cache آرشیو:
+
+| پیام | حجم بایت | p50 ذخیره (ms) | p95 ذخیره (ms) | long task |
+|---|---:|---:|---:|---:|
+| ۱۰۰ | ۱۹٬۹۵۹ | ۰٫۲ | ۱٫۰ | ۰ |
+| ۱۰۰۰ | ۱۹۴٬۵۵۹ | ۴٫۷ | ۶٫۶ | ۰ |
+| ۱۰۰۰۰ | ۱٬۹۴۹٬۵۵۹ | ۴۶٫۹ | ۶۵٫۸ | ۱ (۶۵ ms) |
+
+بر این اساس، M-14 صرفاً «ریسک نامؤکد» اعلام نشد و اصلاح واقعی انجام شد: ماژول state-codec، مالکیت دادهٔ آرشیو chats را در اختیار دارد؛ تغییر nested field، push/splice/reorder/delete و defineProperty cache را invalidate می‌کند. رکورد ورودی adopt می‌شود تا alias خام بیرونی نتواند cache را بی‌خبر تغییر دهد. JSON آرشیو بدون تغییر دوباره ساخته نمی‌شود؛ سایر stateها از مسیر JSON معمول عبور می‌کنند. ذخیره هنوز synchronous و durable است؛ قرارداد پرداخت به وعدهٔ ذخیرهٔ async تبدیل نشده است. قالب JSON داده برای reload/نسخهٔ قبلی همان object/array باقی می‌ماند.
+
+سریال‌سازی سرد و تغییر خود آرشیو همچنان می‌تواند هزینه داشته باشد؛ cache صرفاً هزینهٔ تکراری آرشیو ثابت را از ذخیره‌های سایر فلوها حذف می‌کند. benchmark جدید، coldMs را جدا و p50/p95 را با ۳۰ نمونه ثبت می‌کند. حالت هر dataset مانند state تازه‌بارگذاری‌شده است؛ نتیجهٔ CI بعد از این اصلاح باید به‌طور مستقل خوانده شود. ۵ تست codec شامل invalidation، مالکیت alias، rebind state، حفظ identity رکوردهای فیلترشده و رد cache کهنه در دادهٔ cyclic اضافه شد؛ مجموع تست‌های Node اکنون ۹۹ است.
+
+قرارداد وابستگی‌ها پس از افزودن codec شامل ۵۲ slot است. همهٔ نسخه‌های تاریخی همچنان بدون تغییر runtime هستند؛ CI بعدی دوباره همان gateها را اجرا می‌کند. محدودیت اندازه‌گیری روی دستگاه فیزیکی و مرورگر بدون Web Locks همچنان از ادعای اعتبارسنجی خارج است.
+
+دو حالت مرزی نهایی نیز پوشش داده شد: rejection خواندن PDF با مقدار null دیگر در خود catch خطا تولید نمی‌کند؛ جایگزینی یک مودال با مودال دیگر، focus بازگشت را به دکمهٔ حذف‌شدهٔ مودال قبلی منتقل نمی‌کند و trigger اصلی حفظ می‌شود. مجموعهٔ محلی نهایی شامل ۱۰۰ تست Node موفق است؛ تست مرورگر focus بازگشت در حالت جایگزینی هم در gate وجود دارد.
+
+مسیر API قفلِ موجود ولی غیرقابل‌استفاده (برای نمونه SecurityError در origin محدود) نیز با تست failure injection پوشش داده شد؛ این حالت از fallback مقایسهٔ snapshot استفاده می‌کند و ذخیرهٔ standalone را صرفاً به‌علت ردشدن API قفل غیرفعال نمی‌کند. رد مالکیت به دلیل writer فعال دیگر همچنان read-only است.

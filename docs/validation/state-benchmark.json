@@ -1,0 +1,27 @@
+{
+  "environment": "Node v24.22.1",
+  "scope": "synthetic host serialize+Map-like storage; no mobile/network/UI claims",
+  "rows": [
+    {
+      "messages": 100,
+      "bytes": 19918,
+      "p50Ms": 0.017966999999998734,
+      "p95Ms": 0.19334199999999413,
+      "writesForTenUnchangedSaves": 0
+    },
+    {
+      "messages": 1000,
+      "bytes": 194518,
+      "p50Ms": 0.11664500000000544,
+      "p95Ms": 0.8617790000000127,
+      "writesForTenUnchangedSaves": 0
+    },
+    {
+      "messages": 10000,
+      "bytes": 1949518,
+      "p50Ms": 0.7536560000000065,
+      "p95Ms": 3.419473999999994,
+      "writesForTenUnchangedSaves": 0
+    }
+  ]
+}

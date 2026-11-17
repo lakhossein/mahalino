@@ -1,0 +1,1710 @@
+[
+  {
+    "file": "legacy/actions.js",
+    "line": 42,
+    "code": "legacy/actions.js:42",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:42',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/actions.js",
+    "line": 56,
+    "code": "legacy/actions.js:56",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:56',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/actions.js",
+    "line": 66,
+    "code": "legacy/actions.js:66",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:66',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/actions.js",
+    "line": 84,
+    "code": "legacy/actions.js:84",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:84',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/actions.js",
+    "line": 95,
+    "code": "legacy/actions.js:95",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:95',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/actions.js",
+    "line": 104,
+    "code": "legacy/actions.js:104",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:104',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/actions.js",
+    "line": 112,
+    "code": "legacy/actions.js:112",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:112',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/actions.js",
+    "line": 340,
+    "code": "legacy/actions.js:340",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:340',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/actions.js",
+    "line": 358,
+    "code": "legacy/actions.js:358",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:358',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/actions.js",
+    "line": 1186,
+    "code": "legacy/actions.js:1186",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:1186',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/actions.js",
+    "line": 1188,
+    "code": "legacy/actions.js:1188",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:1188',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/boot.js",
+    "line": 4,
+    "code": "legacy/boot.js:4",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/boot.js:4',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/boot.js",
+    "line": 5,
+    "code": "legacy/boot.js:5",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/boot.js:5',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/boot.js",
+    "line": 6,
+    "code": "legacy/boot.js:6",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/boot.js:6',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/boot.js",
+    "line": 7,
+    "code": "legacy/boot.js:7",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/boot.js:7',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/boot.js",
+    "line": 17,
+    "code": "legacy/boot.js:17",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/boot.js:17',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-history.js",
+    "line": 37,
+    "code": "legacy/chat-history.js:37",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:37',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-history.js",
+    "line": 77,
+    "code": "legacy/chat-history.js:77",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:77',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-history.js",
+    "line": 147,
+    "code": "legacy/chat-history.js:147",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:147',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-history.js",
+    "line": 256,
+    "code": "legacy/chat-history.js:256",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:256',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-history.js",
+    "line": 258,
+    "code": "legacy/chat-history.js:258",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:258',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-history.js",
+    "line": 265,
+    "code": "legacy/chat-history.js:265",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:265',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-history.js",
+    "line": 289,
+    "code": "legacy/chat-history.js:289",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:289',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-history.js",
+    "line": 290,
+    "code": "legacy/chat-history.js:290",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:290',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-history.js",
+    "line": 306,
+    "code": "legacy/chat-history.js:306",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:306',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-history.js",
+    "line": 319,
+    "code": "legacy/chat-history.js:319",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:319',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-ux.js",
+    "line": 34,
+    "code": "legacy/chat-ux.js:34",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:34',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-ux.js",
+    "line": 97,
+    "code": "legacy/chat-ux.js:97",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:97',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-ux.js",
+    "line": 137,
+    "code": "legacy/chat-ux.js:137",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:137',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-ux.js",
+    "line": 244,
+    "code": "legacy/chat-ux.js:244",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:244',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-ux.js",
+    "line": 324,
+    "code": "legacy/chat-ux.js:324",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:324',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-ux.js",
+    "line": 339,
+    "code": "legacy/chat-ux.js:339",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:339',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-ux.js",
+    "line": 471,
+    "code": "legacy/chat-ux.js:471",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:471',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-ux.js",
+    "line": 475,
+    "code": "legacy/chat-ux.js:475",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:475',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-ux.js",
+    "line": 491,
+    "code": "legacy/chat-ux.js:491",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:491',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/chat-ux.js",
+    "line": 492,
+    "code": "legacy/chat-ux.js:492",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:492',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/contracts.js",
+    "line": 85,
+    "code": "legacy/contracts.js:85",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:85',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/contracts.js",
+    "line": 99,
+    "code": "legacy/contracts.js:99",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:99',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/contracts.js",
+    "line": 115,
+    "code": "legacy/contracts.js:115",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:115',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/contracts.js",
+    "line": 277,
+    "code": "legacy/contracts.js:277",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:277',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/contracts.js",
+    "line": 297,
+    "code": "legacy/contracts.js:297",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:297',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/conversation.js",
+    "line": 4,
+    "code": "legacy/conversation.js:4",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:4',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/conversation.js",
+    "line": 159,
+    "code": "legacy/conversation.js:159",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:159',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/conversation.js",
+    "line": 164,
+    "code": "legacy/conversation.js:164",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:164',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/conversation.js",
+    "line": 165,
+    "code": "legacy/conversation.js:165",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:165',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/conversation.js",
+    "line": 205,
+    "code": "legacy/conversation.js:205",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:205',e27x,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/conversation.js",
+    "line": 226,
+    "code": "legacy/conversation.js:226",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:226',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/core.js",
+    "line": 43,
+    "code": "legacy/core.js:43",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:43',err,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/core.js",
+    "line": 61,
+    "code": "legacy/core.js:61",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:61',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/core.js",
+    "line": 107,
+    "code": "legacy/core.js:107",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:107',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/core.js",
+    "line": 140,
+    "code": "legacy/core.js:140",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:140',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/core.js",
+    "line": 156,
+    "code": "legacy/core.js:156",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/core.js:156',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 567,
+    "code": "legacy/guaranteed-rental.js:567",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:567',err,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 805,
+    "code": "legacy/guaranteed-rental.js:805",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:805',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 909,
+    "code": "legacy/guaranteed-rental.js:909",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:909',err,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 914,
+    "code": "legacy/guaranteed-rental.js:914",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:914',err,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 920,
+    "code": "legacy/guaranteed-rental.js:920",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:920',err,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 926,
+    "code": "legacy/guaranteed-rental.js:926",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:926',err,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 931,
+    "code": "legacy/guaranteed-rental.js:931",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:931',err,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 936,
+    "code": "legacy/guaranteed-rental.js:936",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:936',err,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 942,
+    "code": "legacy/guaranteed-rental.js:942",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:942',err,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 946,
+    "code": "legacy/guaranteed-rental.js:946",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:946',err,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 1014,
+    "code": "legacy/guaranteed-rental.js:1014",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1014',e2,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 1186,
+    "code": "legacy/guaranteed-rental.js:1186",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1186',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 1270,
+    "code": "legacy/guaranteed-rental.js:1270",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1270',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 1360,
+    "code": "legacy/guaranteed-rental.js:1360",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1360',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 1556,
+    "code": "legacy/guaranteed-rental.js:1556",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1556',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 1620,
+    "code": "legacy/guaranteed-rental.js:1620",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1620',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/guaranteed-rental.js",
+    "line": 1633,
+    "code": "legacy/guaranteed-rental.js:1633",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1633',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/intel.js",
+    "line": 319,
+    "code": "legacy/intel.js:319",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/intel.js:319',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/legacy-discovery.js",
+    "line": 16,
+    "code": "legacy/legacy-discovery.js:16",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/legacy-discovery.js:16',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/legacy-discovery.js",
+    "line": 108,
+    "code": "legacy/legacy-discovery.js:108",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/legacy-discovery.js:108',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/library.js",
+    "line": 263,
+    "code": "legacy/library.js:263",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/library.js:263',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/maps-account.js",
+    "line": 23,
+    "code": "legacy/maps-account.js:23",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:23',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/maps-account.js",
+    "line": 26,
+    "code": "legacy/maps-account.js:26",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:26',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/maps-account.js",
+    "line": 37,
+    "code": "legacy/maps-account.js:37",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:37',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/maps-account.js",
+    "line": 50,
+    "code": "legacy/maps-account.js:50",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:50',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/maps-account.js",
+    "line": 51,
+    "code": "legacy/maps-account.js:51",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:51',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/maps-account.js",
+    "line": 111,
+    "code": "legacy/maps-account.js:111",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:111',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/maps-account.js",
+    "line": 138,
+    "code": "legacy/maps-account.js:138",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:138',e2,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/market-ux.js",
+    "line": 4,
+    "code": "legacy/market-ux.js:4",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:4',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/market-ux.js",
+    "line": 12,
+    "code": "legacy/market-ux.js:12",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:12',x,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/market-ux.js",
+    "line": 13,
+    "code": "legacy/market-ux.js:13",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:13',x,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/market-ux.js",
+    "line": 15,
+    "code": "legacy/market-ux.js:15",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:15',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/market-ux.js",
+    "line": 24,
+    "code": "legacy/market-ux.js:24",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:24',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/market-ux.js",
+    "line": 34,
+    "code": "legacy/market-ux.js:34",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:34',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/market-ux.js",
+    "line": 36,
+    "code": "legacy/market-ux.js:36",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:36',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/market-ux.js",
+    "line": 223,
+    "code": "legacy/market-ux.js:223",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:223',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/market-ux.js",
+    "line": 350,
+    "code": "legacy/market-ux.js:350",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:350',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/navigation.js",
+    "line": 52,
+    "code": "legacy/navigation.js:52",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/navigation.js:52',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/navigation.js",
+    "line": 91,
+    "code": "legacy/navigation.js:91",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/navigation.js:91',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/notifications.js",
+    "line": 41,
+    "code": "legacy/notifications.js:41",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/notifications.js:41',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/property-services.js",
+    "line": 7,
+    "code": "legacy/property-services.js:7",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/property-services.js:7',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/property-services.js",
+    "line": 10,
+    "code": "legacy/property-services.js:10",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/property-services.js:10',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/property-services.js",
+    "line": 91,
+    "code": "legacy/property-services.js:91",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/property-services.js:91',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/property-services.js",
+    "line": 100,
+    "code": "legacy/property-services.js:100",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/property-services.js:100',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 43,
+    "code": "legacy/rich-conversation.js:43",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:43',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 125,
+    "code": "legacy/rich-conversation.js:125",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:125',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 144,
+    "code": "legacy/rich-conversation.js:144",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:144',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 191,
+    "code": "legacy/rich-conversation.js:191",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:191',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 198,
+    "code": "legacy/rich-conversation.js:198",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:198',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 217,
+    "code": "legacy/rich-conversation.js:217",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:217',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 303,
+    "code": "legacy/rich-conversation.js:303",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:303',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 311,
+    "code": "legacy/rich-conversation.js:311",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:311',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 410,
+    "code": "legacy/rich-conversation.js:410",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:410',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 565,
+    "code": "legacy/rich-conversation.js:565",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:565',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 594,
+    "code": "legacy/rich-conversation.js:594",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:594',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 605,
+    "code": "legacy/rich-conversation.js:605",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:605',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 668,
+    "code": "legacy/rich-conversation.js:668",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:668',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 835,
+    "code": "legacy/rich-conversation.js:835",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:835',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 911,
+    "code": "legacy/rich-conversation.js:911",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:911',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 1050,
+    "code": "legacy/rich-conversation.js:1050",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1050',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 1068,
+    "code": "legacy/rich-conversation.js:1068",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1068',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 1073,
+    "code": "legacy/rich-conversation.js:1073",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1073',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 1078,
+    "code": "legacy/rich-conversation.js:1078",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1078',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 1119,
+    "code": "legacy/rich-conversation.js:1119",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1119',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 1252,
+    "code": "legacy/rich-conversation.js:1252",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1252',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 1253,
+    "code": "legacy/rich-conversation.js:1253",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1253',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 1257,
+    "code": "legacy/rich-conversation.js:1257",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1257',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/rich-conversation.js",
+    "line": 1313,
+    "code": "legacy/rich-conversation.js:1313",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:1313',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/sample-data.js",
+    "line": 383,
+    "code": "legacy/sample-data.js:383",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sample-data.js:383',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/sample-data.js",
+    "line": 447,
+    "code": "legacy/sample-data.js:447",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sample-data.js:447',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/sample-data.js",
+    "line": 522,
+    "code": "legacy/sample-data.js:522",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sample-data.js:522',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/sample-data.js",
+    "line": 532,
+    "code": "legacy/sample-data.js:532",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sample-data.js:532',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/scenario-dispatch.js",
+    "line": 268,
+    "code": "legacy/scenario-dispatch.js:268",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/scenario-dispatch.js:268',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/scenario-dispatch.js",
+    "line": 295,
+    "code": "legacy/scenario-dispatch.js:295",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/scenario-dispatch.js:295',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/sharing.js",
+    "line": 154,
+    "code": "legacy/sharing.js:154",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:154',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/sharing.js",
+    "line": 155,
+    "code": "legacy/sharing.js:155",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:155',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/sharing.js",
+    "line": 195,
+    "code": "legacy/sharing.js:195",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:195',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/sharing.js",
+    "line": 216,
+    "code": "legacy/sharing.js:216",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:216',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/sharing.js",
+    "line": 217,
+    "code": "legacy/sharing.js:217",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:217',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/shell.js",
+    "line": 171,
+    "code": "legacy/shell.js:171",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:171',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/shell.js",
+    "line": 225,
+    "code": "legacy/shell.js:225",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:225',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/shell.js",
+    "line": 226,
+    "code": "legacy/shell.js:226",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:226',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/shell.js",
+    "line": 232,
+    "code": "legacy/shell.js:232",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:232',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/shell.js",
+    "line": 235,
+    "code": "legacy/shell.js:235",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:235',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/shell.js",
+    "line": 246,
+    "code": "legacy/shell.js:246",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:246',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/shell.js",
+    "line": 249,
+    "code": "legacy/shell.js:249",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:249',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/shell.js",
+    "line": 263,
+    "code": "legacy/shell.js:263",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:263',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/shell.js",
+    "line": 265,
+    "code": "legacy/shell.js:265",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:265',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/shell.js",
+    "line": 269,
+    "code": "legacy/shell.js:269",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:269',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/shell.js",
+    "line": 284,
+    "code": "legacy/shell.js:284",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:284',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/shell.js",
+    "line": 288,
+    "code": "legacy/shell.js:288",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:288',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/shell.js",
+    "line": 289,
+    "code": "legacy/shell.js:289",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:289',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/shell.js",
+    "line": 290,
+    "code": "legacy/shell.js:290",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:290',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/trust-productivity.js",
+    "line": 3,
+    "code": "legacy/trust-productivity.js:3",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:3',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/trust-productivity.js",
+    "line": 4,
+    "code": "legacy/trust-productivity.js:4",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:4',x,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/trust-productivity.js",
+    "line": 4,
+    "code": "legacy/trust-productivity.js:4",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:4',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/trust-productivity.js",
+    "line": 5,
+    "code": "legacy/trust-productivity.js:5",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:5',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/trust-productivity.js",
+    "line": 22,
+    "code": "legacy/trust-productivity.js:22",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:22',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/trust-productivity.js",
+    "line": 29,
+    "code": "legacy/trust-productivity.js:29",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:29',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/trust-productivity.js",
+    "line": 52,
+    "code": "legacy/trust-productivity.js:52",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:52',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/trust-productivity.js",
+    "line": 384,
+    "code": "legacy/trust-productivity.js:384",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:384',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/utilities.js",
+    "line": 7,
+    "code": "legacy/utilities.js:7",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:7',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/utilities.js",
+    "line": 8,
+    "code": "legacy/utilities.js:8",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:8',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/utilities.js",
+    "line": 160,
+    "code": "legacy/utilities.js:160",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:160',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/utilities.js",
+    "line": 175,
+    "code": "legacy/utilities.js:175",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:175',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/utilities.js",
+    "line": 197,
+    "code": "legacy/utilities.js:197",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:197',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/utilities.js",
+    "line": 289,
+    "code": "legacy/utilities.js:289",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:289',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/utilities.js",
+    "line": 298,
+    "code": "legacy/utilities.js:298",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:298',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/utilities.js",
+    "line": 303,
+    "code": "legacy/utilities.js:303",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:303',null,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/utilities.js",
+    "line": 318,
+    "code": "legacy/utilities.js:318",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:318',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/wallet-charts.js",
+    "line": 22,
+    "code": "legacy/wallet-charts.js:22",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/wallet-charts.js:22',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/workflow-engine.js",
+    "line": 500,
+    "code": "legacy/workflow-engine.js:500",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/workflow-engine.js:500',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "legacy/workflows.js",
+    "line": 53,
+    "code": "legacy/workflows.js:53",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/workflows.js:53',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-core.js",
+    "line": 40,
+    "code": "v32-core.js:40",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-core.js:40',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-flows.js",
+    "line": 73,
+    "code": "v32-flows.js:73",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-flows.js:73',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-flows.js",
+    "line": 97,
+    "code": "v32-flows.js:97",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-flows.js:97',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-flows.js",
+    "line": 148,
+    "code": "v32-flows.js:148",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-flows.js:148',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-flows.js",
+    "line": 537,
+    "code": "v32-flows.js:537",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-flows.js:537',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-guidance.js",
+    "line": 205,
+    "code": "v32-guidance.js:205",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-guidance.js:205',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-intel.js",
+    "line": 33,
+    "code": "v32-intel.js:33",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:33',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-intel.js",
+    "line": 110,
+    "code": "v32-intel.js:110",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:110',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-intel.js",
+    "line": 614,
+    "code": "v32-intel.js:614",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:614',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-intel.js",
+    "line": 621,
+    "code": "v32-intel.js:621",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:621',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-intel.js",
+    "line": 704,
+    "code": "v32-intel.js:704",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:704',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-intel.js",
+    "line": 858,
+    "code": "v32-intel.js:858",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:858',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-intel.js",
+    "line": 1287,
+    "code": "v32-intel.js:1287",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:1287',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-intel.js",
+    "line": 1362,
+    "code": "v32-intel.js:1362",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:1362',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-intel.js",
+    "line": 1453,
+    "code": "v32-intel.js:1453",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:1453',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-landing.js",
+    "line": 30,
+    "code": "v32-landing.js:30",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-landing.js:30',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-landing.js",
+    "line": 228,
+    "code": "v32-landing.js:228",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-landing.js:228',e2,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-payment.js",
+    "line": 21,
+    "code": "v32-payment.js:21",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:21',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-payment.js",
+    "line": 88,
+    "code": "v32-payment.js:88",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:88',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-payment.js",
+    "line": 95,
+    "code": "v32-payment.js:95",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:95',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-payment.js",
+    "line": 128,
+    "code": "v32-payment.js:128",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:128',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-payment.js",
+    "line": 129,
+    "code": "v32-payment.js:129",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:129',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-payment.js",
+    "line": 153,
+    "code": "v32-payment.js:153",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:153',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-payment.js",
+    "line": 175,
+    "code": "v32-payment.js:175",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:175',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-payment.js",
+    "line": 192,
+    "code": "v32-payment.js:192",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:192',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 35,
+    "code": "v32-shell.js:35",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:35',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 45,
+    "code": "v32-shell.js:45",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:45',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 48,
+    "code": "v32-shell.js:48",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:48',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 56,
+    "code": "v32-shell.js:56",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:56',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 83,
+    "code": "v32-shell.js:83",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:83',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 88,
+    "code": "v32-shell.js:88",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:88',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 133,
+    "code": "v32-shell.js:133",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:133',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 136,
+    "code": "v32-shell.js:136",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:136',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 139,
+    "code": "v32-shell.js:139",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:139',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 165,
+    "code": "v32-shell.js:165",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:165',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 180,
+    "code": "v32-shell.js:180",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:180',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 183,
+    "code": "v32-shell.js:183",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:183',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 224,
+    "code": "v32-shell.js:224",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:224',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 265,
+    "code": "v32-shell.js:265",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:265',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 280,
+    "code": "v32-shell.js:280",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:280',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 302,
+    "code": "v32-shell.js:302",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:302',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 305,
+    "code": "v32-shell.js:305",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:305',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 311,
+    "code": "v32-shell.js:311",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:311',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 314,
+    "code": "v32-shell.js:314",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:314',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 336,
+    "code": "v32-shell.js:336",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:336',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 338,
+    "code": "v32-shell.js:338",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:338',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 351,
+    "code": "v32-shell.js:351",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:351',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 358,
+    "code": "v32-shell.js:358",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:358',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 362,
+    "code": "v32-shell.js:362",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:362',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 379,
+    "code": "v32-shell.js:379",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:379',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 389,
+    "code": "v32-shell.js:389",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:389',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 391,
+    "code": "v32-shell.js:391",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:391',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 393,
+    "code": "v32-shell.js:393",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:393',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 394,
+    "code": "v32-shell.js:394",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:394',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 396,
+    "code": "v32-shell.js:396",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:396',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 447,
+    "code": "v32-shell.js:447",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:447',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 493,
+    "code": "v32-shell.js:493",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:493',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 510,
+    "code": "v32-shell.js:510",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:510',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 526,
+    "code": "v32-shell.js:526",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:526',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 597,
+    "code": "v32-shell.js:597",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:597',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 639,
+    "code": "v32-shell.js:639",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:639',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 642,
+    "code": "v32-shell.js:642",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:642',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 645,
+    "code": "v32-shell.js:645",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:645',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 646,
+    "code": "v32-shell.js:646",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:646',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 647,
+    "code": "v32-shell.js:647",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:647',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 648,
+    "code": "v32-shell.js:648",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:648',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 663,
+    "code": "v32-shell.js:663",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:663',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-shell.js",
+    "line": 669,
+    "code": "v32-shell.js:669",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:669',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-ux.js",
+    "line": 10,
+    "code": "v32-ux.js:10",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:10',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-ux.js",
+    "line": 18,
+    "code": "v32-ux.js:18",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:18',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-ux.js",
+    "line": 172,
+    "code": "v32-ux.js:172",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:172',err,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-ux.js",
+    "line": 245,
+    "code": "v32-ux.js:245",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:245',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-ux.js",
+    "line": 246,
+    "code": "v32-ux.js:246",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:246',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-ux.js",
+    "line": 247,
+    "code": "v32-ux.js:247",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:247',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-ux.js",
+    "line": 520,
+    "code": "v32-ux.js:520",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:520',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-ux.js",
+    "line": 521,
+    "code": "v32-ux.js:521",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:521',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-ux.js",
+    "line": 522,
+    "code": "v32-ux.js:522",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:522',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-ux.js",
+    "line": 523,
+    "code": "v32-ux.js:523",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:523',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  },
+  {
+    "file": "v32-ux.js",
+    "line": 524,
+    "code": "v32-ux.js:524",
+    "statement": "if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:524',e,'caught');",
+    "policy": "caught fallback; required failures also use explicit report/status"
+  }
+]

@@ -82,7 +82,7 @@ function lkPostalAddress(code){
     return fetch(cfg.postalEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({postalCode:code})})
       .then(function(r){return r.json()})
       .then(function(j){if(!j||j.ok===false||!j.address)return {ok:false,why:'notfound'};return {ok:true,addr:j.address,approx:!!j.approximate}})
-      .catch(function(){return {ok:false,why:'unavailable'}});
+      .catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:85',null,'caught');return {ok:false,why:'unavailable'}});
   }
   return fetch('https://photon.komoot.io/api/?q='+encodeURIComponent(code)+'&limit=3')
     .then(function(r){return r.json()})
@@ -96,7 +96,7 @@ function lkPostalAddress(code){
         .then(function(r){return r.json()})
         .then(function(a){if(a&&a[0])return {ok:true,addr:a[0].display_name,approx:false};return {ok:false,why:'notfound'}});
     })
-    .catch(function(){return {ok:false,why:'unavailable'}});
+    .catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:99',null,'caught');return {ok:false,why:'unavailable'}});
 }
 function lkIdentityName(nid){
   var v=String(nid||'').replace(/\D/g,'');
@@ -112,7 +112,7 @@ function lkIdentityName(nid){
       if(!j||j.ok===false||!j.firstName&&!j.lastName)return {ok:false,why:'notfound'};
       return {ok:true,name:[j.firstName||'',j.lastName||''].join(' ').trim()};
     })
-    .catch(function(){if(timer)clearTimeout(timer);return {ok:false,why:'unavailable'}});
+    .catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:115',null,'caught');if(timer)clearTimeout(timer);return {ok:false,why:'unavailable'}});
 }
 function lookupIdentity(id,role,approved){
   var D=wd(conKind()).data,c=conInit(D,conKind());
@@ -274,7 +274,7 @@ function printContract(snap){
   document.body.classList.add('doc-printing');
   var done=function(){document.body.classList.remove('doc-printing');root.innerHTML='';document.title=oldTitle;window.removeEventListener('afterprint',done)};
   window.addEventListener('afterprint',done);
-  setTimeout(function(){try{window.print()}catch(e){}setTimeout(done,1200)},90);
+  setTimeout(function(){try{window.print()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:277',e,'caught');}setTimeout(done,1200)},90);
 }
 function conFinalize(D,kind){
   if(D.signed)return true;
@@ -294,7 +294,7 @@ if(window.E29){try{
     tokenCost:COSTS.contract_draft||0,txnId:window.__v29conTxn||null});
   window.__v29conTxn=null;
   E29.bus.emit('contract.status',{title:'قرارداد ثبت شد',msg:title+' — '+c.code,code:c.code,status:'signed',libId:_lit?_lit.id:null});
-}catch(e){console.error('E29 contract save',e)}}
+}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/contracts.js:297',e,'caught');console.error('E29 contract save',e)}}
   if(D.grtId){var _ge=grtOf(D.grtId);if(_ge){_ge.contractCode=c.code;_ge.contractWf=wfId;_ge.rentWf=wfId;grtLog(_ge,'اجاره‌نامهٔ مستأجر امضا شد — '+c.code);_ge.updatedAt=Date.now()}}
   save();toast('قرارداد داخلی ثبت شد — '+c.code);
   if(CURRENT==='rent'||CURRENT==='buy'||CURRENT==='dash')renderCurrent();

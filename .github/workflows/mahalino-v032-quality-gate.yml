@@ -8,11 +8,13 @@ on:
     paths:
       - 'V0.32/**'
       - '.github/workflows/mahalino-v032-quality-gate.yml'
+      - '.github/workflows/pages.yml'
   pull_request:
     branches: [main]
     paths:
       - 'V0.32/**'
       - '.github/workflows/mahalino-v032-quality-gate.yml'
+      - '.github/workflows/pages.yml'
 
 permissions:
   contents: read

@@ -202,7 +202,7 @@ E30.guide=(function(){
   }
   function setNode(n){
     var s=state();s.node=n;s.seq=(s.seq||0)+1;
-    try{save()}catch(e){}
+    try{save()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-guidance.js:205',e,'caught');}
   }
   function showList(arr,heading,empty,fmt){
     if(!arr||!arr.length){botC(empty,null);return}

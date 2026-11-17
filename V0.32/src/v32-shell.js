@@ -32,7 +32,7 @@ E30.autoAnswer=function(f){
       s_area:function(){var v=G('prop_area');if(v==null)v=G('m2');return v!=null?String(v):null},
       s_rooms:function(){var v=G('prop_rooms')||G('rooms');return v!=null?String(v):null},
       s_age:function(){var v=G('prop_age');return v!=null?String(v):null},
-      s_hood:function(){var h=G('hood');try{return h?findH(h).n:null}catch(e){return null}},
+      s_hood:function(){var h=G('hood');try{return h?findH(h).n:null}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:35',e,'caught');return null}},
       s_motiv:function(){var v=G('sale_motivation');return typeof v==='string'&&v?v:null},
       s_urg:function(){var v=G('sale_urgency');return v==='fast'?'fast':(v==='maxvalue'?'maxvalue':null)},
       s_price:function(){var v=G('expected_price');return v&&v.v?String(v.v[0]):null},
@@ -42,10 +42,10 @@ E30.autoAnswer=function(f){
       i_obj:function(){var v=G('invest_objective');return v||null},
       i_cap:function(){var v=G('invest_capital');return v&&v.v?String(v.v[1]):null},
       i_hor:function(){var v=G('invest_horizon');return v==='کوتاه‌مدت'?'۲–۳ سال':(v==='میان‌مدت'?'۵ سال':(v==='بلندمدت'?'۱۰ سال+':null))},
-      i_hood:function(){var h=G('hood');try{return h?findH(h).n:null}catch(e){return null}}
+      i_hood:function(){var h=G('hood');try{return h?findH(h).n:null}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:45',e,'caught');return null}}
     }
   }[f];
-  if(map&&map[id]){try{return map[id]()}catch(e){return null}}
+  if(map&&map[id]){try{return map[id]()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:48',e,'caught');return null}}
   return null;
 };
 E30.autoRun=function(){
@@ -53,7 +53,7 @@ E30.autoRun=function(){
      answer. Do not immediately auto-skip that very step from the old profile. */
   if(E30._manualEdit&&E30._manualEdit.f===CE.f&&E30._manualEdit.i===CE.i){
     E30._manualEdit=null;
-    try{E30.flowsAPI.syncStage()}catch(e){}
+    try{E30.flowsAPI.syncStage()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:56',e,'caught');}
     return;
   }
   var guard=0;
@@ -80,12 +80,12 @@ E30.autoRun=function(){
     var done=null;
     /* autoAnswer returns already normalized stored values, including prices
        whose steps do not use the generic st.money parser. */
-    try{done=st.set?moneyCanonical(function(){return st.set(wd(CE.f).data,val)}):null}catch(e){break}
+    try{done=st.set?moneyCanonical(function(){return st.set(wd(CE.f).data,val)}):null}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:83',e,'caught');break}
     if(done==='ERR')break;
     botC('✓ همین را از حرف‌های قبلی‌تان داشتم — دوباره نمی‌پرسم.');
     CE.i++;CE.li=0;save();
   }
-  try{E30.flowsAPI.syncStage()}catch(e){}
+  try{E30.flowsAPI.syncStage()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:88',e,'caught');}
 };
 
 /* render-time payment-card honesty: never show a dead confirm button as live */
@@ -128,14 +128,15 @@ E30.payVisual=function(){
 };
 
 E30.init=function(){
+  if(E30._installed)return;E30._installed=true;
   /* 1) workflow registry: sell / invest / landlord + FRC + WSTEPS */
-  try{E30.flowsAPI.install()}catch(e){console.error('E30 install',e)}
+  try{E30.flowsAPI.install()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:133',e,'caught');console.error('E30 install',e)}
 
   /* 2) boot recovery for interrupted payments (§11.7 reload-variant) */
-  try{E30.pay.recover()}catch(e){console.error('E30 recover',e)}
+  try{E30.pay.recover()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:136',e,'caught');console.error('E30 recover',e)}
 
   /* Restore an interrupted slot-collector before the next user turn. */
-  try{E30.discAPI.resume()}catch(e){console.error('E30 discovery resume',e)}
+  try{E30.discAPI.resume()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:139',e,'caught');console.error('E30 discovery resume',e)}
 
   /* Contract payment is asynchronous: the V0.28 click wrapper refreshes the
      form while the 60-Bana confirmation is merely presented, before it has
@@ -161,7 +162,7 @@ E30.init=function(){
       }
       return done;
     };
-  }catch(e){console.error('E30 signed-contract refresh',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:165',e,'caught');console.error('E30 signed-contract refresh',e)}
 
   /* 3) discovery engine routes free-form openings FIRST (outermost ceSend wrap) */
   try{
@@ -176,10 +177,10 @@ E30.init=function(){
         E30.chatMap({hood:hoodFromText(mapQuery)});
         return;
       }
-      try{if(E30.discAPI.route(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){console.error('E30 disc',e)}
+      try{if(E30.discAPI.route(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:180',e,'caught');console.error('E30 disc',e)}
       curSend(t);
     };
-  }catch(e){console.error('E30 wrap ceSend',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:183',e,'caught');console.error('E30 wrap ceSend',e)}
 
   /* 3a) Interactive map belongs to the conversation.  Leaflet's tiles are
          fetched only after an explicit click, and the card remains useful
@@ -220,7 +221,7 @@ E30.init=function(){
       if(mode==='stay'&&listing){selected=SLIST.filter(function(x){return x.id===listing})[0];if(selected){ll=selected.ll;zoom=13}}
       else if(hid&&HOODS.some(function(h){return h.id===hid})){ll=findH(hid).ll;zoom=13}
       if(canvas.id&&MAPS[canvas.id]){
-        try{MAPS[canvas.id].remove()}catch(e){}
+        try{MAPS[canvas.id].remove()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:224',e,'caught');}
         delete MAPS[canvas.id];
       }
       canvas.id='e30-chat-map-'+(++mapSeq30);
@@ -261,7 +262,7 @@ E30.init=function(){
       }
       canvas.setAttribute('data-e30-map-loaded','true');
       el.textContent='بارگذاری دوبارهٔ نقشه';
-      setTimeout(function(){try{m.invalidateSize()}catch(e){}},80);
+      setTimeout(function(){try{m.invalidateSize()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:265',e,'caught');}},80);
     };
     CBACT.e30MapInfo=function(el){
       var stayId=el.getAttribute('data-stay'),hid=el.getAttribute('data-h');
@@ -276,7 +277,7 @@ E30.init=function(){
         if(step.acts&&typeof step.acts.map==='function')step.acts.map=function(){return E30.chatMap({mode:mode})};
       });
     });
-  }catch(e){console.error('E30 chat map',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:280',e,'caught');console.error('E30 chat map',e)}
 
   /* 3a) Revisiting a previously committed money step creates an editable revision.
      Historical slider controls remain locked by lockSliders() after ceStep renders
@@ -298,19 +299,19 @@ E30.init=function(){
             }
           }
         }
-      }catch(e){console.error('E30 back revision',e)}
+      }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:302',e,'caught');console.error('E30 back revision',e)}
       return _ceBack30();
     };
-  }catch(e){console.error('E30 wrap ceBack',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:305',e,'caught');console.error('E30 wrap ceBack',e)}
 
   /* 3b) auto-advance known steps whenever the script is about to render one */
   try{
     var _ceStep=ceStep;
     ceStep=function(){
-      try{E30.autoRun()}catch(e){console.error('E30 autoRun',e)}
+      try{E30.autoRun()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:311',e,'caught');console.error('E30 autoRun',e)}
       _ceStep();
     };
-  }catch(e){console.error('E30 wrap ceStep',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:314',e,'caught');console.error('E30 wrap ceStep',e)}
 
   /* 4) Back is a real, editable navigation action. The historical bot slider
      remains locked, but a freshly rendered slider at the revisited step is
@@ -332,9 +333,9 @@ E30.init=function(){
         }
       }
       _ceBack();
-      try{E30.flowsAPI.syncStage()}catch(e){}
+      try{E30.flowsAPI.syncStage()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:336',e,'caught');}
     };
-  }catch(e){console.error('E30 back navigation',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:338',e,'caught');console.error('E30 back navigation',e)}
 
   /* 5) stage sync after every value commit (§2.4) + slider commit marker (§2.5) */
   try{
@@ -347,18 +348,18 @@ E30.init=function(){
       }
       var pre=CE.f?CE.i:-1;
       var r=curVal(v,raw);
-      try{E30.flowsAPI.syncStage()}catch(e){}
+      try{E30.flowsAPI.syncStage()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:351',e,'caught');}
       try{
         if(CE.f&&E30._slidPending&&pre!==CE.i){
           var D=wd(CE.f).data;
           if(!D._slid)D._slid={};
           D._slid[E30._slidPending]=true;
         }
-      }catch(e){}
+      }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:358',e,'caught');}
       E30._slidPending=null;
       return r;
     };
-  }catch(e){console.error('E30 wrap ceVal',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:362',e,'caught');console.error('E30 wrap ceVal',e)}
 
   /* 5) slider commit with lock guard (§2.5): lock after commit, edit via explicit بازگشت */
   try{
@@ -375,7 +376,7 @@ E30.init=function(){
       usrC('تأیید مقدار لغزنده: '+rial(v));
       ceVal(String(v)+((SCRIPTS[CE.f]||[])[CE.i]&&SCRIPTS[CE.f][CE.i].money?' ریال':''));
     };
-  }catch(e){console.error('E30 slSet',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:379',e,'caught');console.error('E30 slSet',e)}
 
   /* 6) cr() post-render pass: lock committed sliders + pay-card states */
   try{
@@ -385,14 +386,14 @@ E30.init=function(){
          before their containers are detached. Standalone legacy maps survive. */
       try{Object.keys(MAPS||{}).forEach(function(id){
         if(id.indexOf('e30-chat-map-')!==0)return;
-        try{MAPS[id].remove()}catch(e){}
+        try{MAPS[id].remove()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:389',e,'caught');}
         delete MAPS[id];
-      })}catch(e){}
+      })}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:391',e,'caught');}
       _cr();
-      try{E30.flowsAPI.lockSliders()}catch(e){}
-      try{E30.payVisual()}catch(e){}
+      try{E30.flowsAPI.lockSliders()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:393',e,'caught');}
+      try{E30.payVisual()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:394',e,'caught');}
     };
-  }catch(e){console.error('E30 wrap cr',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:396',e,'caught');console.error('E30 wrap cr',e)}
 
   /* 7) Route EVERY legacy paid action through the same explicit confirmation
         and transaction FSM as new services. A legacy spend() is never permitted
@@ -443,7 +444,7 @@ E30.init=function(){
         try{
           spend=function(key,cat,desc){throw {e30SpendTrap:trap,key:key,cat:cat,desc:desc}};
           result=fn.apply(self,args);
-        }catch(e){
+        }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:447',e,'caught');
           if(e&&e.e30SpendTrap===trap)quote=e;
           else throw e;
         }finally{spend=prev}
@@ -471,26 +472,25 @@ E30.init=function(){
       wrapped._e30PayGuard=true;
       return wrapped;
     }
-    function paidSource(fn){
-      try{var action=fn.e30PaidDelegate||fn;return /\b(?:spend|doRentVisit)\s*\(/.test(Function.prototype.toString.call(action))}catch(e){return false}
-    }
+    var paidRegistry={"ACT.rdet": true, "ACT.bdet": true, "ACT.rvisit": true, "ACT.blegal": true, "ACT.besc": true, "ACT.pbidok": true, "ACT.sbook": true, "CBACT.detL": true, "CBACT.detB": true, "SCRIPTS.rent.visit.go": true, "SCRIPTS.buy.lg.lg": true, "SCRIPTS.mkt.send.b": true, "SCRIPTS.stay.book.b": true};
+    E30.paidActionRegistry=Object.keys(paidRegistry);
     var legacyGuarded=[];
     [[ACT,'ACT'],[CBACT,'CBACT']].forEach(function(pair){
       var group=pair[0];
       Object.keys(group||{}).forEach(function(k){
-        if(paidSource(group[k])){group[k]=guardPaidAction(group[k]);legacyGuarded.push(pair[1]+'.'+k)}
+        if(paidRegistry[pair[1]+'.'+k]){group[k]=guardPaidAction(group[k]);legacyGuarded.push(pair[1]+'.'+k)}
       });
     });
     Object.keys(SCRIPTS||{}).forEach(function(k){
       (SCRIPTS[k]||[]).forEach(function(step){
         if(!step||!step.acts)return;
         Object.keys(step.acts).forEach(function(a){
-          if(paidSource(step.acts[a])){step.acts[a]=guardPaidAction(step.acts[a]);legacyGuarded.push('SCRIPTS.'+k+'.'+(step.id||'?')+'.'+a)}
+          if(paidRegistry['SCRIPTS.'+k+'.'+(step.id||'?')+'.'+a]){step.acts[a]=guardPaidAction(step.acts[a]);legacyGuarded.push('SCRIPTS.'+k+'.'+(step.id||'?')+'.'+a)}
         });
       });
     });
     E30.legacyPayGuarded=legacyGuarded;
-  }catch(e){console.error('E30 legacy payment guards',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:493',e,'caught');console.error('E30 legacy payment guards',e)}
 
   /* 7b) composer-lock leak fix: the E22 openModal wrapper counts EVERY open; a modal
          replacing an open modal leaks a count and locks the composer forever.
@@ -507,7 +507,7 @@ E30.init=function(){
       }
       return _openModal30(html,cb);
     };
-  }catch(e){console.error('E30 openModal wrap',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:510',e,'caught');console.error('E30 openModal wrap',e)}
 
   /* 7c) chip-value typing: matchChipText matched labels only — typing a raw chip
          value («ok») on an action-only step dead-ended. Accept exact values too. */
@@ -523,7 +523,7 @@ E30.init=function(){
       }
       return null;
     };
-  }catch(e){console.error('E30 mct wrap',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:526',e,'caught');console.error('E30 mct wrap',e)}
 
   /* 7e) Keep service entry routes in the chat canvas. A few legacy ceSmart
          shortcuts still redirected to independent pages and cleared the chat
@@ -594,7 +594,7 @@ E30.init=function(){
       return _smart30(t);
     };
     CBACT.e30StartRent=function(){return inChatFlow('rent','اجاره و قرارداد')};
-  }catch(e){console.error('E30 chat-first service routes',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:597',e,'caught');console.error('E30 chat-first service routes',e)}
 
   /* 7d) Honest termination guidance. Without a document parser/backend it is
          misleading to sell "AI document analysis". Show a FREE checklist in
@@ -636,16 +636,16 @@ E30.init=function(){
       return E29.termAI(code);
     };
     CBACT.e29termLater=function(){usrC('فعلاً نه');botC('هر وقت خواستید چک‌لیست رایگان پیگیری فسخ را از همین گفتگو باز کنید.',null)};
-  }catch(e){console.error('E30 termination guidance',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:639',e,'caught');console.error('E30 termination guidance',e)}
 
   /* 8) landing/splash route + view (public, pre-auth allowed) */
-  try{E30.landingInit()}catch(e){console.error('E30 landing',e)}
+  try{E30.landingInit()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:642',e,'caught');console.error('E30 landing',e)}
 
   /* 9) UX patches: saved listings, share independence, projects, reminders */
-  try{E30.uxInit()}catch(e){console.error('E30 ux',e)}
-  try{E30.uiTidyInit()}catch(e){console.error('E30 guided UI',e)}
-  try{E30.guide.install()}catch(e){console.error('E31 deterministic guide',e)}
-  try{E30.turns.install()}catch(e){console.error('E31 chat turns',e)}
+  try{E30.uxInit()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:645',e,'caught');console.error('E30 ux',e)}
+  try{E30.uiTidyInit()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:646',e,'caught');console.error('E30 guided UI',e)}
+  try{E30.guide.install()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:647',e,'caught');console.error('E31 deterministic guide',e)}
+  try{E30.turns.install()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:648',e,'caught');console.error('E31 chat turns',e)}
 
   /* 9b) A burst of toasts used to cover the fixed chat composer. Deduplicate
          near-identical events and bound the simultaneous visible stack. */
@@ -660,11 +660,11 @@ E30.init=function(){
       if(root){while(root.children.length>=3)root.removeChild(root.firstElementChild)}
       return _toast30(msg);
     };
-  }catch(e){console.error('E30 toast guard',e)}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:663',e,'caught');console.error('E30 toast guard',e)}
 
   /* 10) persona fix regression hook (§2.7): disc engine reclassifies on every turn —
          make the deterministic engine's saved persona follow the dynamic one */
   try{
     E29.intelAPI.personaOf=function(){return E30.discAPI.personaOf('rent')};
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-shell.js:669',e,'caught');}
 };

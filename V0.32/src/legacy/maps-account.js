@@ -20,10 +20,10 @@ function mkMap(elId,center,zoom){
   var el=document.getElementById(elId);
   if(!el)return null;
   if(!window.L){mapFallback(el,'کتابخانهٔ نقشه بارگذاری نشد.',elId!=='lfm2');return null}
-  if(MAPS[elId]){try{MAPS[elId].remove()}catch(e){}delete MAPS[elId]}
+  if(MAPS[elId]){try{MAPS[elId].remove()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:23',e,'caught');}delete MAPS[elId]}
   el.innerHTML='';el.style.position='relative';
   var m=L.map(el,{zoomControl:true,attributionControl:true,scrollWheelZoom:true}).setView(center,zoom);
-  try{m.attributionControl.setPrefix(false)}catch(e){}
+  try{m.attributionControl.setPrefix(false)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:26',e,'caught');}
   var loaded=0,failed=0,notified=false,pi=0,tl=null;
   function warn(){
     if(notified||!document.body.contains(el))return;
@@ -34,7 +34,7 @@ function mkMap(elId,center,zoom){
     el.appendChild(n);
   }
   function addTiles(){
-    if(tl){try{m.removeLayer(tl)}catch(e){}}
+    if(tl){try{m.removeLayer(tl)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:37',e,'caught');}}
     var p=MAP_TILE.providers[pi];
     tl=L.tileLayer(p.u,{maxZoom:MAP_TILE.maxZoom,attribution:p.a,crossOrigin:true}).addTo(m);
     tl.on('tileload',function(){loaded++});
@@ -47,8 +47,8 @@ function mkMap(elId,center,zoom){
   addTiles();
   setTimeout(function(){if(loaded===0&&failed>0)warn()},9000);
   MAPS[elId]=m;
-  setTimeout(function(){try{m.invalidateSize()}catch(e){}},80);
-  setTimeout(function(){try{m.invalidateSize()}catch(e){}},450);
+  setTimeout(function(){try{m.invalidateSize()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:50',e,'caught');}},80);
+  setTimeout(function(){try{m.invalidateSize()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:51',e,'caught');}},450);
   return m;
 }
 function jll(i){return [((i%3)-1)*0.004,(Math.floor(i/3)%3-1)*0.004]}
@@ -108,7 +108,7 @@ function openMapModal(ll,title,sub,hoodId,placeId){
         var pl=placeLL(p);if(!pl)return;
         L.marker(pl,{zIndexOffset:1000,icon:pinIcon(p.kind==='family'?'family':(p.kind==='work'?'work':(p.kind==='school'?'school':'place')),p.label)}).addTo(m).bindPopup('<b>'+esc(p.label)+'</b><br>'+placeKindLabel(p.kind));
       });
-      setTimeout(function(){try{m.invalidateSize()}catch(e){}},260);
+      setTimeout(function(){try{m.invalidateSize()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:111',e,'caught');}},260);
     }
   });
 }
@@ -135,7 +135,7 @@ function openPickMap(title,cb){
       if(!m)return;
       var mk=null;
       m.on('click',function(e){
-        if(mk){try{mk.remove()}catch(e2){}}
+        if(mk){try{mk.remove()}catch(e2){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/maps-account.js:138',e2,'caught');}}
         mk=L.marker(e.latlng,{icon:pinIcon('pick',title)}).addTo(m);
         PM.ll=[e.latlng.lat,e.latlng.lng];
         if(b){b.disabled=false}

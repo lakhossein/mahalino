@@ -34,7 +34,7 @@ E22.applyTheme=function(){
   try{
     if(E22.isDark())document.documentElement.setAttribute('data-theme','dark');
     else document.documentElement.removeAttribute('data-theme');
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:37',e,'caught');}
   E22.syncThemeControls();
 };
 E22.syncThemeControls=function(){
@@ -74,7 +74,7 @@ ACT.themeSet=function(el){
 E22.afterSidebar=function(){};
 ACT.sideFold=function(){
   document.body.classList.toggle('sidefold');
-  try{localStorage.setItem('mahalino_sidefold',document.body.classList.contains('sidefold')?'1':'0')}catch(e){}
+  try{localStorage.setItem('mahalino_sidefold',document.body.classList.contains('sidefold')?'1':'0')}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:77',e,'caught');}
   renderSidebar();
 };
 
@@ -144,7 +144,7 @@ E22.rel=function(ts){
     if(diff===1)return 'دیروز';
     if(diff<7)return fa(diff,0)+' روز پیش';
     return fd(ts);
-  }catch(e){return ''}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:147',e,'caught');return ''}
 };
 E22.sessHTML=function(){
   if(!S.chats||!S.chats.length)return '';
@@ -253,16 +253,16 @@ ACT.sessDelOk=function(el){
 /* W2: بایگانی پیش از گفت‌وگوی جدید — ACT.chatNew الان پیچِ E21 است؛ این پیچ روی آن سوار می‌شود */
 var _oChatNew22=ACT.chatNew;
 ACT.chatNew=function(){
-  try{E22.collect()}catch(e){}
+  try{E22.collect()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:256',e,'caught');}
   _oChatNew22();
-  try{renderSidebar()}catch(e){} /* بایگانی تازه باید بی‌درنگ در سایدبار دیده شود */
+  try{renderSidebar()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:258',e,'caught');} /* بایگانی تازه باید بی‌درنگ در سایدبار دیده شود */
 };
 
 /* W1/W2: تزریق پس از رندر سایدبار */
 var _oRenderSidebar22=renderSidebar;
 renderSidebar=function(){
   _oRenderSidebar22();
-  try{E22.afterSidebar()}catch(e){}
+  try{E22.afterSidebar()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:265',e,'caught');}
 };
 
 /* W1: ردیف «حالت نمایش» در تب تنظیمات حساب */
@@ -286,8 +286,8 @@ E22.busy=function(n){
     var cwr=document.getElementById(sf+'Cwr');
     if(!cwr)return;
     cwr.classList.toggle('sendbusy',on);
-    var btn=cwr.querySelector('.cwr-send');if(btn){try{btn.disabled=on}catch(e){}}
-    var ta=cwr.querySelector('.cwr-in');if(ta){try{ta.readOnly=on}catch(e){}}
+    var btn=cwr.querySelector('.cwr-send');if(btn){try{btn.disabled=on}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:289',e,'caught');}}
+    var ta=cwr.querySelector('.cwr-in');if(ta){try{ta.readOnly=on}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:290',e,'caught');}}
   });
 };
 var _oOpenModal22=openModal;
@@ -303,7 +303,7 @@ closeModal=function(){
   try{
     /* W4: اگر برنامه (MODAL_PREV) فوکوس را برنگردانده باشد، تور ایمنی ما برمی‌گرداند */
     if(E22.lastFocus&&document.contains(E22.lastFocus)&&document.activeElement===document.body)E22.lastFocus.focus();
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:306',e,'caught');}
   E22.lastFocus=null;
 };
 
@@ -316,7 +316,7 @@ ceSendWithAtt=function(text,surface){
   try{
     var ta=document.getElementById(sf+'In');
     if(ta&&document.contains(ta)&&!E22.busyCount)ta.focus();
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-history.js:319',e,'caught');}
 };
 
 /* ─── راه‌اندازی اولیه: مقدارهای اولیهٔ پایدار + اعمال تم ذخیره‌شده (قبل از boot) ─── */

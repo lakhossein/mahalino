@@ -50,7 +50,7 @@ function wfData(m){var w=wf(m);return w?w.data:null}
 function wfRebind(m){
   if(CE.f&&CE.f===m){
     CE.i=0;CE.li=0;CE.hist=[];
-    if(FCHAT.open){try{ceStep()}catch(e){}}
+    if(FCHAT.open){try{ceStep()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/workflows.js:53',e,'caught');}}
   }
 }
 function resumeChips(cls){

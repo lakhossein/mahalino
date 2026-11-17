@@ -265,7 +265,7 @@ ceSend=function(t0){
       if(E23.checklist(nn,tt))return;
       if(E23.afford(nn,nt,tt))return;
       if(E23.duel(nn,nt,tt))return;
-    }catch(e){/* خطا: متن به زنجیرهٔ اصلی سپرده می‌شود */}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/scenario-dispatch.js:268',e,'caught');/* خطا: متن به زنجیرهٔ اصلی سپرده می‌شود */}
   }
   return _ceSend23(t);
 };
@@ -292,7 +292,7 @@ ceVal=function(v){
         return;
       }
     }
-  }catch(e){/* خطا: به زنجیرهٔ اصلی سپرده می‌شود */}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/scenario-dispatch.js:295',e,'caught');/* خطا: به زنجیرهٔ اصلی سپرده می‌شود */}
   return _ceVal23(v);
 };
 /* ═══ پایان بخش E23 ═══ */
