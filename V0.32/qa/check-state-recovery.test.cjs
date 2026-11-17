@@ -2,8 +2,8 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
-const source=fs.readFileSync(path.join(__dirname,'../src/legacy/utilities.js'),'utf8');
-const loader=source.slice(source.indexOf('/* 2) state */'));
+const source=fs.readFileSync(path.join(__dirname,'../src/legacy/utilities.js'),'utf8').replace('/* @mahalino:v32-state-codec-js */',()=>fs.readFileSync(path.join(__dirname,'../src/v32-state-codec.js'),'utf8'));
+const loader=source.slice(source.indexOf('/* 2) state */')).replace('/* @mahalino:v32-state-codec-js */',()=>fs.readFileSync(path.join(__dirname,'../src/v32-state-codec.js'),'utf8'));
 function boot(data={},failRecovery=false){
  const writes=[];const notices=[];
  const c={localStorage:{getItem:k=>data[k]??null,setItem(k,v){if(failRecovery&&k.endsWith('_recovery'))throw Error('quota');data[k]=v;writes.push(k)}},console:{warn:()=>notices.push('warn'),error:()=>notices.push('error')},window:{},Date,Math};

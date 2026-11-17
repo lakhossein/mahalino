@@ -32,3 +32,7 @@ saveهای بدون تغییر setItem ندارند؛ JSON.stringify هنوز ه
 پرداخت در زمان بارگذاری تعریف می‌شود؛ closeModal پرداخت، روی تابع عمومی نصب می‌شود؛ wrapperهای legacy سپس E30.init و وصلهٔ composer نصب می‌شوند؛ E30.uxInit handlerهای sharing/project/reminder را نهایی می‌کند. نام handlerهای پولی از registry، نتیجهٔ نصب از legacyPayGuarded و idempotency از تست مرورگر قابل بررسی است. حذف wrapperهای تاریخی بدون characterization مجاز نیست.
 
 گزارش Promise عمومی و شکست E28 boot اضافه شده است. هر catch مدیریت‌شده با شناسهٔ محل و cause از enum محدود ثبت می‌شود؛ fallbackها non-blocking باقی می‌مانند و خطاهای لازم با kind=fault پیام قابل مشاهده دارند. قرارداد scope-aware برای imports/exports/writes و loadOrder در runtime-dependencies.json ثبت و دقیقاً تست می‌شود؛ namespace سازگاری همچنان عمومی است.
+
+### codec آرشیو
+
+v32-state-codec.js مالک دادهٔ chats است و پیش از اجرای ماژول‌های مصرف‌کننده attach می‌شود. mutation از روی facade همان آرایه/رکوردها و با invalidation انجام می‌شود؛ آرایهٔ ورودی جدید به دادهٔ owned تبدیل می‌شود. cache فقط JSON chats را نگه می‌دارد و با هر تغییر آن بازسازی می‌شود. سایر فیلدها از جمله balance، journal و paySession همیشه تازه سریال می‌شوند. source API همچنان Array/Object است؛ تغییر نوع/محتوای فایل JSON persisted لازم نیست. encode با state root جدید، cache مستقل می‌سازد.

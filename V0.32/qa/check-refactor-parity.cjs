@@ -20,7 +20,7 @@ let expected=previous.replaceAll('V0.31','V0.32')
 const baseline=fs.readFileSync(path.join(__dirname,'fixtures/state-loader-v032-baseline.txt'),'utf8');
 assert.equal(require('node:crypto').createHash('sha256').update(baseline).digest('hex'),'f3d95de6830ee6ff3cb37584872d48e7f79ade8b240d6b37d27b6b3b37d6b246','state baseline was modified');
 assert.equal(expected.split(baseline).length,2,'baseline state block must occur exactly once');
-const utilities=fs.readFileSync(path.join(root,'src/legacy/utilities.js'),'utf8');
+const utilities=fs.readFileSync(path.join(root,'src/legacy/utilities.js'),'utf8').replace('/* @mahalino:v32-state-codec-js */',()=>fs.readFileSync(path.join(root,'src/v32-state-codec.js'),'utf8'));
 const stateBlock=utilities.slice(utilities.indexOf('/* 2) state */'));
 expected=expected.replace(baseline,()=>stateBlock);
 // M-04/M-07/M-08: only the three reviewed interaction blocks may differ.

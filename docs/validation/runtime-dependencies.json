@@ -10,6 +10,7 @@
     "v32-money-js",
     "v32-money-range-js",
     "v32-age-range-js",
+    "v32-state-codec-js",
     "legacy-workflows",
     "legacy-wallet-charts",
     "legacy-sample-data",
@@ -2032,6 +2033,12 @@
           ]
         },
         {
+          "name": "MahalinoStateCodec",
+          "owners": [
+            "v32-state-codec-js"
+          ]
+        },
+        {
           "name": "PRJ",
           "owners": [
             "legacy-sample-data"
@@ -2107,7 +2114,8 @@
       "includes": [
         "v32-money-js",
         "v32-money-range-js",
-        "v32-age-range-js"
+        "v32-age-range-js",
+        "v32-state-codec-js"
       ]
     },
     {
@@ -10328,6 +10336,16 @@
         "S.tokens",
         "closeModal"
       ],
+      "includes": []
+    },
+    {
+      "slot": "v32-state-codec-js",
+      "file": "src/v32-state-codec.js",
+      "exports": [
+        "MahalinoStateCodec"
+      ],
+      "imports": [],
+      "writes": [],
       "includes": []
     }
   ]

@@ -53,6 +53,7 @@
     "legacy-shell": "src/legacy/shell.js",
     "legacy-release-modules": "src/legacy/release-modules.js",
     "legacy-boot": "src/legacy/boot.js",
-    "v32-payment-js": "src/v32-payment.js"
+    "v32-payment-js": "src/v32-payment.js",
+    "v32-state-codec-js": "src/v32-state-codec.js"
   }
 }

@@ -285,6 +285,8 @@ if(!S.profile)S.profile={confirmed:{},inferred:{},stale:{},log:[]};
 if(!S.paySession)S.paySession=null;
 if(!S.savedListings)S.savedListings=[];
 if(!S.ctx30)S.ctx30={fields:{},log:[]};
+/* @mahalino:v32-state-codec-js */
+MahalinoStateCodec.attach(S);
 var stateLastRaw=null,stateConflict=false;
 try{stateLastRaw=localStorage.getItem(LSKEY)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:289',e,'caught');stateConflict=true}
 if(window.addEventListener)window.addEventListener('storage',function(e){
@@ -311,7 +313,7 @@ function save(){
       if(window.E24)E24.toastErr('ذخیره انجام نشد؛ داده‌ها در پنجرهٔ دیگری تغییر کرده است. صفحه را بازنشانی کنید.');
       return false;
     }
-    var encoded=JSON.stringify(S);
+    var encoded=MahalinoStateCodec.encode(S);
     if(stateRecovery.length){localStorage.setItem(LSKEY+'_recovery',JSON.stringify(stateRecovery));stateRecovery=[]}
     if(encoded!==stateLastRaw){localStorage.setItem(LSKEY,encoded);stateLastRaw=encoded}
     return true;

@@ -9,11 +9,11 @@ const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:
  const rows=await page.evaluate(async()=>{
  const before=JSON.stringify(S),rows=[];
  for(const count of [100,1000,10000]){
-  S.chats=[{id:'synthetic',hist:Array.from({length:count},(_,i)=>({r:'user',h:'synthetic '+i+' '+'.'.repeat(160)}))}];
+  S=Object.assign(JSON.parse(before),{chats:[{id:'synthetic',hist:Array.from({length:count},(_,i)=>({r:'user',h:'synthetic '+i+' '+'.'.repeat(160)}))}]});
   const durations=[],longTasks=[];const observer=new PerformanceObserver(list=>{for(const item of list.getEntries())longTasks.push(item.duration)});observer.observe({type:'longtask'});
-  for(let i=0;i<12;i++){await new Promise(r=>setTimeout(r,0));S.tokens=i;const start=performance.now();if(!save())throw Error('synthetic save failed');durations.push(performance.now()-start)}
-  await new Promise(r=>setTimeout(r,20));observer.disconnect();durations.sort((a,b)=>a-b);
-  rows.push({messages:count,bytes:new Blob([localStorage.getItem(LSKEY)]).size,p50Ms:durations[6],p95Ms:durations[11],longTasks:longTasks.length,maxLongTaskMs:Math.max(0,...longTasks)});
+  for(let i=0;i<30;i++){await new Promise(r=>setTimeout(r,0));S.tokens=i;const start=performance.now();if(!save())throw Error('synthetic save failed');durations.push(performance.now()-start)}
+  await new Promise(r=>setTimeout(r,20));observer.disconnect();const coldMs=durations[0];durations.sort((a,b)=>a-b);
+  rows.push({messages:count,bytes:new Blob([localStorage.getItem(LSKEY)]).size,coldMs:coldMs,p50Ms:durations[15],p95Ms:durations[28],longTasks:longTasks.length,maxLongTaskMs:Math.max(0,...longTasks)});
  }
  S=JSON.parse(before);if(!save())throw Error('restore failed');return rows;
  });

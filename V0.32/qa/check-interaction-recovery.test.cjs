@@ -15,14 +15,14 @@ test('reset deletes only current version; loader never imports predecessor after
  const {ctx,data}=resetHarness();ctx.ACT.reset();assert.ok(ctx.modal.includes('۰.۳۲'));ctx.ACT.resetOk();
  assert.equal(data.mahalino_v31,'{"tokens":999}');assert.equal(data.unrelated,'safe');assert.equal(data.mahalino_theme,'light');
  assert.equal(data.mahalino_v32_recovery,undefined);assert.equal(data.mahalino_v32,'{}');assert.equal(ctx.reloaded,true);
- const u=fs.readFileSync(path.join(root,'src/legacy/utilities.js'),'utf8');ctx.window={};vm.runInNewContext(u.slice(u.indexOf('/* 2) state */')),ctx);assert.equal(ctx.S.tokens,0);
+ const u=fs.readFileSync(path.join(root,'src/legacy/utilities.js'),'utf8').replace('/* @mahalino:v32-state-codec-js */',()=>fs.readFileSync(path.join(root,'src/v32-state-codec.js'),'utf8'));ctx.window={};vm.runInNewContext(u.slice(u.indexOf('/* 2) state */')),ctx);assert.equal(ctx.S.tokens,0);
 });
 test('reset storage denial preserves original and does not reload',()=>{
  const {ctx,data}=resetHarness(reset,'write');ctx.ACT.resetOk();assert.equal(data.mahalino_v32,'{"tokens":10}');assert.equal(ctx.reloaded,undefined);assert.ok(ctx.message.includes('انجام نشد'));
 });
 test('reset cleanup failure reports partial completion and blocks stale saves',()=>{
  const {ctx,data}=resetHarness(reset,'remove');ctx.ACT.resetOk();assert.ok(ctx.message.includes('ناقص'));assert.equal(ctx.reloaded,undefined);assert.equal(ctx.window.__mahalinoResetPending,true);
- const u=fs.readFileSync(path.join(root,'src/legacy/utilities.js'),'utf8');vm.runInNewContext(u.slice(u.indexOf('/* 2) state */')),ctx);ctx.S.tokens=300;ctx.save();assert.equal(data.mahalino_v32,'{}');
+ const u=fs.readFileSync(path.join(root,'src/legacy/utilities.js'),'utf8').replace('/* @mahalino:v32-state-codec-js */',()=>fs.readFileSync(path.join(root,'src/v32-state-codec.js'),'utf8'));vm.runInNewContext(u.slice(u.indexOf('/* 2) state */')),ctx);ctx.S.tokens=300;ctx.save();assert.equal(data.mahalino_v32,'{}');
 });
 for(const kind of ['success','reject-fallback','denied','missing','throw'])test('clipboard '+kind,async()=>{
  const messages=[];let selected=0;let resolveWrite;

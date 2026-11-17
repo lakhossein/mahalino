@@ -2,7 +2,7 @@
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..');
-let util=fs.readFileSync(path.join(root,'src/legacy/utilities.js'),'utf8');
+let util=fs.readFileSync(path.join(root,'src/legacy/utilities.js'),'utf8').replace('/* @mahalino:v32-state-codec-js */',()=>fs.readFileSync(path.join(root,'src/v32-state-codec.js'),'utf8'));
 const core=fs.readFileSync(path.join(root,'src/v32-payment.js'),'utf8');
 const a=core.indexOf('E30.pay=(function(){');let pay=core.slice(a,core.indexOf('\n})();',a)+7);
 if(process.env.QA_PAYMENT_BASELINE==='1'){pay=JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures/reliability-baselines.json'))).find(x=>x.file==='v32-payment.js').original+'\n})();';util=require('node:child_process').execFileSync('git',['show','f04b1f5:V0.32/src/legacy/utilities.js'],{cwd:root,encoding:'utf8'})}
