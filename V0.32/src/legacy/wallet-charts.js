@@ -19,7 +19,7 @@ function spend(key,cat,desc){
   }
   S.tokens-=c;var _txn='TXN-'+Date.now().toString(36)+Math.floor(Math.random()*999);
 S.log.unshift({t:Date.now(),d:desc,c:-c,cat:cat,id:_txn,svc:key});save();renderTok();
-if(window.E29){try{E29.bus.emit('token.deduct',{txn:_txn,cost:c,svc:key,desc:desc});if((S.tokens||0)<30)E29.bus.emit('wallet.low',{balance:S.tokens})}catch(e){}}
+if(window.E29){try{E29.bus.emit('token.deduct',{txn:_txn,cost:c,svc:key,desc:desc});if((S.tokens||0)<30)E29.bus.emit('wallet.low',{balance:S.tokens})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/wallet-charts.js:22',e,'caught');}}
   toast('−'+fa(c,0)+' کلید — '+desc);return true;
 }
 function earn(n,cat,desc){S.tokens+=n;S.log.unshift({t:Date.now(),d:desc,c:n,cat:cat});save();renderTok();toast('+'+fa(n,0)+' کلید — '+desc)}

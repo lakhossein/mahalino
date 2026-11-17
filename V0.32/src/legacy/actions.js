@@ -39,7 +39,7 @@ ACT.flowInChat=function(el){
   var m=el.getAttribute('data-m');
   if(m&&MODBY[m]){
     toggleF(true,true);
-    setTimeout(function(){try{ceStart(m)}catch(e){}},60);
+    setTimeout(function(){try{ceStart(m)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:42',e,'caught');}},60);
     toast('ادامهٔ «'+MODBY[m].t+'» در دستیار');
   }else{toggleF(true)}
 };
@@ -53,7 +53,7 @@ ACT.svcs=function(){go('svc')};
 ACT.svcOpen=function(el){openModal(svcOrderFormHTML(+el.getAttribute('data-c'),+el.getAttribute('data-i')))};
 ACT.svcReqOpen=function(el){openSvcOrderDetail(el.getAttribute('data-id'))};
 ACT.svcFilter=function(el){S.ui.svcf=el.getAttribute('data-f');save();renderCurrent()};
-ACT.svcReload=function(){SVC_CATALOG.failed=false;SVC_CATALOG.loaded=false;SVC_CATALOG.error='';svcLoadCatalog().then(function(){if(CURRENT==='svc')renderCurrent()}).catch(function(){if(CURRENT==='svc')renderCurrent()})};
+ACT.svcReload=function(){SVC_CATALOG.failed=false;SVC_CATALOG.loaded=false;SVC_CATALOG.error='';svcLoadCatalog().then(function(){if(CURRENT==='svc')renderCurrent()}).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:56',null,'caught');if(CURRENT==='svc')renderCurrent()})};
 ACT.svcQuote=function(el){
   var ci=+el.getAttribute('data-c'),ii=+el.getAttribute('data-i'),it=svcItem(ci,ii),form=svcReadForm();
   if(!it||!form)return;
@@ -63,7 +63,7 @@ ACT.svcQuote=function(el){
     if(!q)throw new Error('quote');
     SVC_Q={ci:ci,ii:ii,form:form,q:q};
     if(box)box.innerHTML=svcQuoteHTML(q,true);
-  }).catch(function(){if(box)box.innerHTML='<div class="alert al-bad">دریافت قیمت ممکن نشد؛ دوباره تلاش کنید.</div>'});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:66',null,'caught');if(box)box.innerHTML='<div class="alert al-bad">دریافت قیمت ممکن نشد؛ دوباره تلاش کنید.</div>'});
 };
 ACT.svcPay=function(el){
   var ci=+el.getAttribute('data-c'),ii=+el.getAttribute('data-i');
@@ -81,7 +81,7 @@ ACT.svcPay=function(el){
     openSvcOrderDetail(o.id);
     if(o.status==='submit_failed')toast('پرداخت انجام شد اما ثبت سفارش ناموفق بود؛ امکان تلاش دوباره یا بازپرداخت وجود دارد.');
     else toast('سفارش ثبت شد — '+o.id);
-  }).catch(function(){if(btn){btn.disabled=false;btn.textContent='پرداخت و ثبت سفارش'}svcError('پرداخت انجام نشد؛ دوباره تلاش کنید')});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:84',null,'caught');if(btn){btn.disabled=false;btn.textContent='پرداخت و ثبت سفارش'}svcError('پرداخت انجام نشد؛ دوباره تلاش کنید')});
 };
 ACT.svcGoWallet=function(){closeModal();S.ui.atab='wallet';save();go('profile')};
 ACT.svcSync=function(el){
@@ -92,7 +92,7 @@ ACT.svcSync=function(el){
     if(r.status&&r.status!==o.status){svcTimelinePush(o,r.status,r.note||'');svcAudit(o,'status',{demo:!!r.demo});svcReqSync(o);save()}
     else{o.updatedAt=Date.now();save()}
     if(CURRENT==='svc')renderCurrent();openSvcOrderDetail(o.id);
-  }).catch(function(){svcError('به‌روزرسانی وضعیت ممکن نشد؛ دوباره تلاش کنید')});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:95',null,'caught');svcError('به‌روزرسانی وضعیت ممکن نشد؛ دوباره تلاش کنید')});
 };
 ACT.svcCancel=function(el){
   var o=svcOrderById(el.getAttribute('data-id'));if(!o)return;
@@ -101,7 +101,7 @@ ACT.svcCancel=function(el){
     svcTimelinePush(o,'cancelled','لغو درخواست توسط کاربر');
     svcRefundOrder(o,'بازپرداخت کامل پس از لغو');
     svcReqSync(o);save();if(CURRENT==='svc')renderCurrent();openSvcOrderDetail(o.id);toast('سفارش لغو و مبلغ به کیف پول بازگشت');
-  }).catch(function(){svcError('لغو سفارش ممکن نشد؛ دوباره تلاش کنید')});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:104',null,'caught');svcError('لغو سفارش ممکن نشد؛ دوباره تلاش کنید')});
 };
 ACT.svcRetry=function(el){
   var o=svcOrderById(el.getAttribute('data-id'));if(!o||o.status!=='submit_failed')return;
@@ -109,7 +109,7 @@ ACT.svcRetry=function(el){
     if(r.priceChanged&&r.amount&&r.amount!==o.amount){svcRefundOrder(o,'تغییر قیمت پیش از ثبت');svcTimelinePush(o,'price_changed','قیمت تغییر کرد؛ مبلغ بازپرداخت شد');}
     else{o.providerOrderId=r.providerOrderId||'';o.demo=!!r.demo;svcTimelinePush(o,r.status||'submitted',r.demo?'وضعیت نمایشی':'ثبت در ارائه‌دهنده');svcAudit(o,'retry',{demo:!!r.demo})}
     svcReqSync(o);save();if(CURRENT==='svc')renderCurrent();openSvcOrderDetail(o.id);toast('نتیجهٔ ثبت سفارش به‌روزرسانی شد');
-  }).catch(function(){svcError('ثبت سفارش هنوز ناموفق است؛ بعداً دوباره تلاش کنید')});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:112',null,'caught');svcError('ثبت سفارش هنوز ناموفق است؛ بعداً دوباره تلاش کنید')});
 };
 ACT.svcRefund=function(el){
   var o=svcOrderById(el.getAttribute('data-id'));if(!o)return;
@@ -337,7 +337,7 @@ ACT.pickWork=function(){openPickMap('محل کار',function(ll){upsertPlace('wo
 ACT.pickSchool=function(){openPickMap('مدرسه',function(ll){upsertPlace('school','مدرسه',ll,null,2);MT.p=true;placeRefresh();toast('مدرسه ثبت شد')})};
 ACT.placeAdd=function(){openPlaceModal(null)};
 ACT.placeEdit=function(el){var id=el.getAttribute('data-id'),ps=getPlaces(),i;for(i=0;i<ps.length;i++){if(ps[i].id===id){openPlaceModal(ps[i]);return}}};
-ACT.placeDel=function(el){removePlace(el.getAttribute('data-id'));try{closeModal()}catch(e){}placeRefresh();toast('مکان حذف شد')};
+ACT.placeDel=function(el){removePlace(el.getAttribute('data-id'));try{closeModal()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:340',e,'caught');}placeRefresh();toast('مکان حذف شد')};
 ACT.placeFocus=function(el){var id=el.getAttribute('data-id'),ps=getPlaces(),p=null,i;for(i=0;i<ps.length;i++){if(ps[i].id===id){p=ps[i];break}}if(!p)return;var ll=placeLL(p);if(!ll){toast('موقعیت این مکان ثبت نشده است');return}openMapModal(ll,p.label,placeKindLabel(p.kind)+(p.hood?' · '+findH(p.hood).n:'')+' · این مکان با یک منبع داده روی نقشه نمایش داده می‌شود.',p.hood||null,p.id)};
 ACT.placePick=function(){var p=readPlaceForm();closeModal();openPickMap('مکان مهم',function(ll){p.ll=ll;p.hood='';openPlaceModal(p)})};
 ACT.placeSearch=function(){
@@ -355,7 +355,7 @@ ACT.placeSearch=function(){
         return '<button class="place-result" data-act="placeUse" data-i="'+i+'"><b>'+esc(x.name||x.display_name.split(',')[0])+'</b><small>'+esc(x.display_name)+'</small></button>';
       }).join(''):'<div class="note">نتیجه‌ای پیدا نشد. عبارت دیگری یا انتخاب روی نقشه را امتحان کنید.</div>';
     })
-    .catch(function(){if(box)box.innerHTML='<div class="note">جستجوی بیرونی در دسترس نیست؛ از انتخاب محله یا نقطه روی نقشه استفاده کنید.</div>'});
+    .catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:358',null,'caught');if(box)box.innerHTML='<div class="note">جستجوی بیرونی در دسترس نیست؛ از انتخاب محله یا نقطه روی نقشه استفاده کنید.</div>'});
 };
 ACT.placeUse=function(el){
   var i=+el.getAttribute('data-i'),x=PLACE_SEARCH[i],p=PLACE_TMP||readPlaceForm();
@@ -1183,9 +1183,9 @@ ACT.reset=function(){
 ACT.resetOk=function(){
   if(typeof stateWriterReady==='boolean'&&!stateWriterReady){toast('بازنشانی انجام نشد؛ پنجرهٔ دیگر محلینو را ببندید و این صفحه را بازنشانی کنید.');return}
   var errs=[];
-  function tryIt(fn,label){try{fn()}catch(e){errs.push(label)}}
+  function tryIt(fn,label){try{fn()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:1186',e,'caught');errs.push(label)}}
   // An explicit empty state prevents migration from importing V0.31 again.
-  try{localStorage.setItem(LSKEY,'{}')}catch(e){toast('بازنشانی انجام نشد؛ ذخیره‌سازی محلی در دسترس نیست.');return}
+  try{localStorage.setItem(LSKEY,'{}')}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:1188',e,'caught');toast('بازنشانی انجام نشد؛ ذخیره‌سازی محلی در دسترس نیست.');return}
   window.__mahalinoResetPending=true;
   tryIt(function(){localStorage.removeItem(LSKEY+'_recovery')},'localStorage');
   tryIt(function(){sessionStorage.removeItem(LSKEY);sessionStorage.removeItem(LSKEY+'_recovery')},'sessionStorage');

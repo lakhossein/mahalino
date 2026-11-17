@@ -27,7 +27,7 @@ E30.landing=(function(){
   function splIco(n,sz){
     return '<svg width="'+(sz||20)+'" height="'+(sz||20)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none">'+(SPLICO[n]||'')+'</svg>';
   }
-  function priceOf(k){try{return E30.PRICING[k]?E30.PRICING[k].cost:null}catch(e){return null}}
+  function priceOf(k){try{return E30.PRICING[k]?E30.PRICING[k].cost:null}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-landing.js:30',e,'caught');return null}}
 
   var SERVICES=[
     {ic:'home',t:'کمک اجاره',b:'پیدا کردن خانهٔ متناسب با بودجه و شرایط زندگی شما',get:'فهرست محله‌های همخوان، آگهی‌های منطبق، مقایسه و هماهنگی بازدید',req:'ودیعه و اجارهٔ ماهانه، محله یا محل کار/تحصیل، تعداد خواب',price:null},
@@ -225,7 +225,7 @@ E30.landing=(function(){
       el=t.closest('[data-splq]');
       if(el){ask(el.getAttribute('data-splq'));return}
       el=t.closest('[data-view]');
-      if(el){try{go(el.getAttribute('data-view'))}catch(e2){}}
+      if(el){try{go(el.getAttribute('data-view'))}catch(e2){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-landing.js:228',e2,'caught');}}
     });
     var inp=document.getElementById('spl-q'),send=document.getElementById('spl-send');
     if(send)send.addEventListener('click',function(){ask(inp?inp.value:'')});

@@ -30,7 +30,7 @@ E30.disc=(function(){
     return S.ctx30;
   }
   function persist(){
-    try{if(S.ctx30ByChat)S.ctx30ByChat[contextKey()]=S.ctx30;save()}catch(e){}
+    try{if(S.ctx30ByChat)S.ctx30ByChat[contextKey()]=S.ctx30;save()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:33',e,'caught');}
   }
   function useChat(id){
     saveCollector();
@@ -107,7 +107,7 @@ E30.disc=(function(){
         if(opts.inferred){if(S.profile.confirmed[id]===undefined)S.profile.inferred[id]=v}
         else S.profile.confirmed[id]=v;
       }
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:110',e,'caught');}
     persist();
   }
   function getF(id){var f=ctx().fields[id];return f?f.v:null}
@@ -611,14 +611,14 @@ E30.disc=(function(){
       if(!S.ctx30Collectors)S.ctx30Collectors={};
       S.ctx30Collectors[contextKey()]=Object.assign({},COL);
       persist();
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:614',e,'caught');}
   }
   function resume(){
     try{
       var saved=S.ctx30Collectors&&S.ctx30Collectors[contextKey()];
       if(saved&&saved.active&&saved.wf){COL=Object.assign({},saved);COL.optional=true}
       else COL={active:false,wf:null,fix:null,confirming:null,turns:0};
-    }catch(e){COL={active:false,wf:null,fix:null,confirming:null,turns:0}}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:621',e,'caught');COL={active:false,wf:null,fix:null,confirming:null,turns:0}}
     return COL.active;
   }
   function active(){return COL.active}
@@ -701,7 +701,7 @@ E30.disc=(function(){
     if(id==='persona')return {student:'دانشجو',couple:'زوج',young:'جوان',family:'خانواده'}[v]||String(v);
     if(id==='prop_age_range')return fa(v[0],0)+' تا '+fa(v[1],0)+' سال';
     if(typeof v==='boolean')return v?'بله':'خیر';
-    if(id==='work_loc'||id==='uni_loc'||id==='hood'){try{return findH(v).n}catch(e){return String(v)}}
+    if(id==='work_loc'||id==='uni_loc'||id==='hood'){try{return findH(v).n}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:704',e,'caught');return String(v)}}
     if(id==='prefs')return (v||[]).map(function(x){return ({parking:'پارکینگ',elevator:'آسانسور',balcony:'بالکن',quiet:'سکوت',metro:'مترو',storage:'انباری'})[x]||x}).join('، ');
     if(id==='prefRules'){
       var marks={required:'الزامی',preferred:'ترجیحی',irrelevant:'بی‌اهمیت',forbidden:'نامطلوب'};
@@ -855,7 +855,7 @@ E30.disc=(function(){
     botC(tone.q+q+(a.why?'<div class="note" style="margin-top:4px">'+esc(a.why)+'</div>':''),null);
     COL.expecting=top.id;
     saveCollector();
-    try{a11yify($('#v-landing')||document.body)}catch(e){}
+    try{a11yify($('#v-landing')||document.body)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:858',e,'caught');}
   }
   function financialPending(){
     return COL.wf==='rent'&&!COL.finConfirmed&&!!getF('budget_dep')&&!!getF('budget_rent');
@@ -1284,7 +1284,7 @@ E30.disc=(function(){
     });
     h+='</div>';
     botC(h,null);
-    try{a11yify($('#v-landing')||document.body)}catch(e){}
+    try{a11yify($('#v-landing')||document.body)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:1287',e,'caught');}
   }
   CBACT.e30fix=function(el){
     var slot=el.getAttribute('data-slot');
@@ -1359,7 +1359,7 @@ E30.disc=(function(){
           else ceJump('hoods');
         }
         else ceJump('imps');
-        try{E30.flowsAPI.syncStage()}catch(e){}
+        try{E30.flowsAPI.syncStage()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:1362',e,'caught');}
         return true;
       }
       if(wf==='buy'){
@@ -1450,7 +1450,7 @@ E30.disc=(function(){
         ceJump('l_role');
         return true;
       }
-    }catch(e){console.error('E30 handoff',e)}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:1453',e,'caught');console.error('E30 handoff',e)}
     return true;
   }
   function isFav(x){return (getF('prefs')||[]).indexOf(x)>=0}

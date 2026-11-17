@@ -168,7 +168,7 @@ E29.shell=(function(){
     a11yify(el);
   }
   function renderSidebarOnly(){
-    try{renderSidebar()}catch(e){}
+    try{renderSidebar()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:171',e,'caught');}
   }
   ACT.e29focusSearch=function(){
     var body=document.body;
@@ -222,17 +222,17 @@ E29.shell=(function(){
 
   /* ── init ── */
   E29.init=function(){
-    try{E22.applyTheme&&E22.applyTheme()}catch(e){}
-    try{addShareButton()}catch(e){}
+    try{E22.applyTheme&&E22.applyTheme()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:225',e,'caught');}
+    try{addShareButton()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:226',e,'caught');}
     /* wrap ceSend: intel route first (above E28 layers) */
     try{
       var curSend=ceSend;
       ceSend=function(t){
         if(String(t)==='!back'){curSend(t);return}
-        try{if(E29.intelAPI.route(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){console.error('E29 intel',e)}
+        try{if(E29.intelAPI.route(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:232',e,'caught');console.error('E29 intel',e)}
         curSend(t);
       };
-    }catch(e){console.error('E29 wrap ceSend',e)}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:235',e,'caught');console.error('E29 wrap ceSend',e)}
     /* ceVal hook: milestone saving after step advance */
     try{
       var curVal=ceVal;
@@ -243,10 +243,10 @@ E29.shell=(function(){
             var d=wd(CE.f);
             if(d&&!d.done)E29.intelAPI.maybeMilestone(CE.f,CE.i+1,d.data);
           }
-        }catch(e){}
+        }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:246',e,'caught');}
         return r;
       };
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:249',e,'caught');}
     /* reminder due → notification hook (wraps E28.remTick) */
     try{
       var curTick=ppmTick;
@@ -260,13 +260,13 @@ E29.shell=(function(){
               E29.notifsAPI.push({cat:'reminder',etype:'reminder.due',title:'یادآور: '+r.title,msg:'زمان انجام رسیده است.',action:{kind:'reminders'},dedupKey:'rem-'+r.id+'-'+new Date().toDateString()});
             }
           });
-        }catch(e){}
+        }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:263',e,'caught');}
       };
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:265',e,'caught');}
     /* conversation share button */
     try{
       ACT.e29shMsg=function(el){E29.share.dialog('conversation',null,{msgIx:+el.getAttribute('data-ix')})};
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:269',e,'caught');}
     /* wrap E28.applyTermination: offer AI analysis after a successful termination */
     try{
       if(E28&&E28.applyTermination){
@@ -281,13 +281,13 @@ E29.shell=(function(){
               botC('قرارداد فسخ شد — در صورت تمایل، تحلیل هوشمند اسناد فسخ (استخراج الزامات تسویه) موجود است.'+
                 '<div class="qr"><button data-cba="e29termAI" data-code="'+qesc(code)+'">تحلیل هوشمند اسناد</button><button data-cba="e29termLater">فعلاً نه</button></div>',null);
             }
-          }catch(e){}
+          }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:284',e,'caught');}
           return r;
         };
       }
-    }catch(e){}
-    try{checkHash()}catch(e){}
-    try{E29.notifsAPI.unread()}catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:288',e,'caught');}
+    try{checkHash()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:289',e,'caught');}
+    try{E29.notifsAPI.unread()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/shell.js:290',e,'caught');}
   };
   window.addEventListener('hashchange',checkHash);
 

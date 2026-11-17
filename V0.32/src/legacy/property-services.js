@@ -4,10 +4,10 @@ function svcDefaultAddress(){
     var r=wd('rent').data;if(r&&r.listing){var x=findL(r.listing);return x.t+'، '+findH(x.hood).n}
     var b=wd('buy').data;if(b&&b.blist){var y=findB(b.blist);return y.t+'، '+findH(y.hood).n}
     var p=getPlaces()[0];if(p)return p.label;
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/property-services.js:7',e,'caught');}
   return '';
 }
-function svcDefaultDate(){try{return new Date(Date.now()+86400000).toISOString().slice(0,10)}catch(e){return ''}}
+function svcDefaultDate(){try{return new Date(Date.now()+86400000).toISOString().slice(0,10)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/property-services.js:10',e,'caught');return ''}}
 function svcOrderFormHTML(ci,ii){
   var c=SVCS[ci],it=c?c.items[ii]:null;if(!c||!it)return '';
   var active=svcActiveOf(ci,ii);
@@ -88,7 +88,7 @@ function printServiceReceipt(o){
   var old=document.title;document.title='رسید-'+o.id;document.body.classList.add('doc-printing');
   var done=function(){document.body.classList.remove('doc-printing');root.innerHTML='';document.title=old;window.removeEventListener('afterprint',done)};
   window.addEventListener('afterprint',done);
-  setTimeout(function(){try{window.print()}catch(e){}setTimeout(done,1200)},90);
+  setTimeout(function(){try{window.print()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/property-services.js:91',e,'caught');}setTimeout(done,1200)},90);
 }
 VIEWS.svc=function(){
   var el=document.getElementById('v-svc');
@@ -97,7 +97,7 @@ VIEWS.svc=function(){
   var list=orders.filter(function(o){if(f==='active')return ['done','cancelled','refunded','rejected','failed'].indexOf(o.status)<0;if(f==='done')return o.status==='done';return true});
   var h='<div class="wtop"><div><h2>خدمات ملک</h2><p>سفارش، پرداخت و پیگیری خدمات خانه در محلینو</p></div><div class="head-actions"><button class="btn btn-sm" data-act="fcb">دستیار</button></div></div>';
   var cfg=svcCfg();
-  if(cfg.catalogEndpoint&&!SVC_CATALOG.loaded&&!SVC_CATALOG.loading&&!SVC_CATALOG.failed){svcLoadCatalog().then(function(){if(CURRENT==='svc')renderCurrent()}).catch(function(){if(CURRENT==='svc')renderCurrent()})}
+  if(cfg.catalogEndpoint&&!SVC_CATALOG.loaded&&!SVC_CATALOG.loading&&!SVC_CATALOG.failed){svcLoadCatalog().then(function(){if(CURRENT==='svc')renderCurrent()}).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/property-services.js:100',null,'caught');if(CURRENT==='svc')renderCurrent()})}
   if(svcIsDemo())h+='<div class="integration-note">در این نسخه سفارش‌ها به‌صورت نمایشی ثبت می‌شوند و به ارائه‌دهندهٔ واقعی ارسال نمی‌شوند.</div>';
   if(cfg.catalogEndpoint&&!SVC_CATALOG.loaded){h+='<div class="card tight"><div class="ct">دریافت خدمات</div><p class="note">'+(SVC_CATALOG.error||'در حال دریافت فهرست خدمات...')+'</p>'+(SVC_CATALOG.failed?'<button class="btn btn-sm" data-act="svcReload">تلاش دوباره</button>':'')+'</div>';}
   else h+='<div class="grid g2" style="margin-top:14px">'+SVCS.map(function(c,ci){

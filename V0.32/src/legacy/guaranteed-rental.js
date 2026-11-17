@@ -564,7 +564,7 @@ function grtHandlePhoto(inp){
     w=Math.max(1,Math.round(w*r));h=Math.max(1,Math.round(h*r));
     var cv=document.createElement('canvas');cv.width=w;cv.height=h;
     var data='';
-    try{cv.getContext('2d').drawImage(img,0,0,w,h);data=cv.toDataURL('image/jpeg',0.6)}catch(err){data=''}
+    try{cv.getContext('2d').drawImage(img,0,0,w,h);data=cv.toDataURL('image/jpeg',0.6)}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:567',err,'caught');data=''}
     URL.revokeObjectURL(url);
     if(!data||data.length>200000){toast('تصویر بسیار بزرگ است؛ کوچک‌تر کنید');return}
     it.photos=it.photos||[];it.photos.push({at:Date.now(),d:data});
@@ -802,7 +802,7 @@ ACT.grtReqGo=function(el){
   if(box)box.innerHTML='<span class="note">در حال دریافت برآورد...</span>';
   svcQuote(it.svc[0],it.svc[1],1,{address:e.prop.addr}).then(function(q){
     r.quote=q;r.ci=it.svc[0];r.ii=it.svc[1];grgSave(e);renderCurrent();
-  }).catch(function(){if(box)box.innerHTML='<span class="note">برآورد ممکن نشد</span>';toast('دریافت برآورد ممکن نشد')});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:805',null,'caught');if(box)box.innerHTML='<span class="note">برآورد ممکن نشد</span>';toast('دریافت برآورد ممکن نشد')});
 };
 ACT.grtExec=function(el){
   var e=grtCur();if(!e)return;
@@ -906,44 +906,44 @@ document.addEventListener('click',function(e){
   if(el){
     var lab=(el.textContent||'').replace(/^\s+|\s+$/g,'');
     usrC(lab);
-    try{ceVal(moneyChip(el))}catch(err){console.error('ceVal',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
+    try{ceVal(moneyChip(el))}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:909',err,'caught');console.error('ceVal',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
     return;
   }
   el=t.closest('[data-cq]');
   if(el){
-    try{ceSend(el.getAttribute('data-cq'))}catch(err){console.error('ceSend',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
+    try{ceSend(el.getAttribute('data-cq'))}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:914',err,'caught');console.error('ceSend',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
     return;
   }
   el=t.closest('[data-cf]');
   if(el){
     usrC((el.textContent||'').replace(/^\s+|\s+$/g,''));
-    try{ceStart(el.getAttribute('data-cf'))}catch(err){console.error('ceStart',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
+    try{ceStart(el.getAttribute('data-cf'))}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:920',err,'caught');console.error('ceStart',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
     return;
   }
   el=t.closest('[data-cba]');
   if(el){
     var f2=CBACT[el.getAttribute('data-cba')];
-    if(f2){try{f2(el)}catch(err){console.error('CBACT['+el.getAttribute('data-cba')+']',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}}
+    if(f2){try{f2(el)}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:926',err,'caught');console.error('CBACT['+el.getAttribute('data-cba')+']',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}}
     return;
   }
   el=t.closest('[data-w]');
   if(el){
-    try{wizardNav(el.getAttribute('data-m'),el.getAttribute('data-w'))}catch(err){console.error('wizardNav',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
+    try{wizardNav(el.getAttribute('data-m'),el.getAttribute('data-w'))}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:931',err,'caught');console.error('wizardNav',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
     return;
   }
   el=t.closest('[data-jump]');
   if(el){
-    try{jumpTo(el.getAttribute('data-m'),+el.getAttribute('data-jump'))}catch(err){console.error('jumpTo',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
+    try{jumpTo(el.getAttribute('data-m'),+el.getAttribute('data-jump'))}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:936',err,'caught');console.error('jumpTo',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}
     return;
   }
   el=t.closest('[data-act]');
   if(el){
     var f=ACT[el.getAttribute('data-act')];
-    if(f){try{f(el,e)}catch(err){console.error('ACT['+el.getAttribute('data-act')+']',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}}
+    if(f){try{f(el,e)}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:942',err,'caught');console.error('ACT['+el.getAttribute('data-act')+']',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}}
     return;
   }
   el=t.closest('[data-view]');
-  if(el){try{go(el.getAttribute('data-view'))}catch(err){console.error('go',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}}
+  if(el){try{go(el.getAttribute('data-view'))}catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:946',err,'caught');console.error('go',err);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}}
 });
 document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('[data-imp]'):null;if(b){ceImpSet(b.getAttribute('data-imp'),+b.getAttribute('data-v'));return}});
 document.addEventListener('change',function(e){var n=e.target&&e.target.closest?e.target.closest('[data-pt-num]'):null;if(n){ceNumSet(n.getAttribute('data-pt-num'),n.value);return}});
@@ -1011,7 +1011,7 @@ document.addEventListener('input',function(e){
         n2=Math.max(mn2,Math.min(mx2,n2));
         rg2.value=n2;
         var ev;
-        try{ev=new Event('input');rg2.dispatchEvent(ev)}catch(e2){}
+        try{ev=new Event('input');rg2.dispatchEvent(ev)}catch(e2){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1014',e2,'caught');}
       }
     }
     return;
@@ -1183,7 +1183,7 @@ function grtCheckReserve(){
       if(!j||j.ok===false)throw new Error('reserve');
       S.grtReserve={status:'ok',amount:+j.availableRials||0,checkedAt:Date.now(),src:'api'};save();return S.grtReserve;
     })
-    .catch(function(){S.grtReserve={status:'error',amount:0,checkedAt:Date.now(),src:'api'};save();return S.grtReserve});
+    .catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1186',null,'caught');S.grtReserve={status:'error',amount:0,checkedAt:Date.now(),src:'api'};save();return S.grtReserve});
 }
 function grtOfferOf(e){
   var mkt=grtMarketRent(e),exp=+e.exp.rent||0;
@@ -1267,7 +1267,7 @@ function grtPollSettle(e,n){
   fetch(cfg.settlementEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enrollment:e.id,cycle:n})})
     .then(function(r){return r.json()})
     .then(function(j){if(j&&j.ok!==false&&j.status==='settled')grtSettleCycle(e,n,{src:'api'})})
-    .catch(function(){});
+    .catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1270',null,'caught');});
 }
 function grtSettleCycle(e,n,info){
   var c=grtCycle(e,n);
@@ -1357,7 +1357,7 @@ function grtFetchLeads(e){
       var added=0;
       arr.forEach(function(x){var l=grtLeadNormalize(x);if(l.name||l.mobile){e.tenant.apps.unshift(l);added++}});
       grgSave(e);return {ok:true,added:added};
-    }).catch(function(){return {ok:false,why:'error'}});
+    }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1360',null,'caught');return {ok:false,why:'error'}});
 }
 function grtAppScore(e,a){
   var rent=e.offer?e.offer.rent:(+e.exp.rent||0),rows=[];
@@ -1553,7 +1553,7 @@ function printDoc(html,title){
   document.body.classList.add('doc-printing');
   var done=function(){document.body.classList.remove('doc-printing');root.innerHTML='';document.title=oldTitle;window.removeEventListener('afterprint',done)};
   window.addEventListener('afterprint',done);
-  setTimeout(function(){try{window.print()}catch(e){}setTimeout(done,1200)},90);
+  setTimeout(function(){try{window.print()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1556',e,'caught');}setTimeout(done,1200)},90);
 }
 
 /* ─── درخواست‌های تعمیراتی (اتصال به معماری سفارش خدمات) ─── */
@@ -1617,7 +1617,7 @@ function grtFundOrder(e,r,payer){
   return svcSubmitToProvider(o).then(function(res){
     svcTimelinePush(o,res.status||'submitted',res.demo?'وضعیت نمایشی':'ثبت در ارائه‌دهنده');
     svcReqSync(o);save();return o;
-  }).catch(function(){svcTimelinePush(o,'submit_failed','پرداخت انجام شد اما ثبت سفارش ناموفق بود');svcReqSync(o);save();return o});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1620',null,'caught');svcTimelinePush(o,'submit_failed','پرداخت انجام شد اما ثبت سفارش ناموفق بود');svcReqSync(o);save();return o});
 }
 function grtSyncReqs(e){
   var ids={};
@@ -1630,7 +1630,7 @@ function grtSyncReqs(e){
       ids[o.id].status=svcStatusMeta(res.status).l;ids[o.id].svcStatus=res.status;
       if(res.status==='done'&&o.payment==='grt-fund'){ids[o.id].note='انجام شد — از محل خدمات شامل'}
       return 1;
-    }).catch(function(){return 0});
+    }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/guaranteed-rental.js:1633',null,'caught');return 0});
   })).then(function(a){var n=a.reduce(function(x,y){return x+y},0);grgSave(e);return n});
 }
 

@@ -3,6 +3,10 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
 const root=path.resolve(__dirname,'..');
 const previous=fs.readFileSync(path.join(root,'..','V0.31','Mahalino+V0.31.html'),'utf8');
 const current=fs.readFileSync(path.join(root,'Mahalino+V0.32.html'),'utf8');
+const diagnosticSitesRaw=fs.readFileSync(path.join(__dirname,'fixtures/diagnostic-sites.json'),'utf8');
+assert.equal(require('node:crypto').createHash('sha256').update(diagnosticSitesRaw).digest('hex'),'6b9eea39f938e5487c75b47299f815fe729a07f662b6d15c0ba3265e89cfe680');
+function removeDiagnosticInsertions(text){for(const site of JSON.parse(diagnosticSitesRaw))text=text.split(site.statement).join('');return text}
+
 // Exhaustive allow-list: release labels, source comments, isolated storage and
 // a read-only migration candidate. No numeric sample data or runtime APIs change.
 let expected=previous.replaceAll('V0.31','V0.32')
@@ -23,7 +27,7 @@ expected=expected.replace(baseline,()=>stateBlock);
 const interactionRaw=fs.readFileSync(path.join(__dirname,'fixtures/approved-interaction-baselines.json'),'utf8');
 assert.equal(require('node:crypto').createHash('sha256').update(interactionRaw).digest('hex'),'01cb4a5538e4ba8cbd1c6d1f294040d6d13c349760f8688cfe6fa820e29c15db');
 for(const item of JSON.parse(interactionRaw)){
- const src=fs.readFileSync(path.join(root,'src',item.file),'utf8');
+ const src=removeDiagnosticInsertions(fs.readFileSync(path.join(root,'src',item.file),'utf8'));
  const start=src.indexOf(item.file==='legacy/actions.js'?'/* V0.32 — بازنشانی مستقل':item.file==='legacy/sharing.js'?item.start.replace('=function','=async function'):item.start);
  const end=src.indexOf(item.end,start);
  assert(start>=0&&end>start,'interaction boundaries missing');
@@ -33,14 +37,14 @@ for(const item of JSON.parse(interactionRaw)){
 const reliabilityRaw=fs.readFileSync(path.join(__dirname,'fixtures/reliability-baselines.json'),'utf8');
 assert.equal(require('node:crypto').createHash('sha256').update(reliabilityRaw).digest('hex'),'ae77d3b45407dbd10239a5e6237c0c711db18acffe31ec5e1e20c3552dfc8d33');
 for(const item of JSON.parse(reliabilityRaw)){
- const src=fs.readFileSync(path.join(root,'src',item.file),'utf8');
+ const src=removeDiagnosticInsertions(fs.readFileSync(path.join(root,'src',item.file),'utf8'));
  const start=item.file==='legacy/error-handler.js'?0:src.indexOf(item.start),end=item.end?src.indexOf(item.end,start):src.length;
  assert(start>=0&&end>start);
  // shell/UX/core blocks can contain previously approved handler changes.
  assert.equal(expected.split(item.original).length,2,'reviewed reliability baseline must occur once: '+item.file);
  expected=expected.replace(item.file==='legacy/error-handler.js'?'\n'+item.original:item.original,()=>src.slice(start,end));
 }
-assert.equal(current,expected,'V0.32 changed outside approved reliability blocks');
+assert.equal(removeDiagnosticInsertions(current),removeDiagnosticInsertions(expected),'V0.32 changed outside approved reliability blocks/diagnostic insertions');
 // Execute the actual loader against a fresh, prior-only and existing V0.32 store.
 const vm=require('node:vm');
 const loader=stateBlock;

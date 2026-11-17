@@ -13,7 +13,7 @@ function ctxFromStep(f,st,D){
       if(D.hood)CTX.hood=D.hood;
       if(D.PR&&D.PR.beds)CTX.beds=D.PR.beds;
     }else if(f==='stay'&&D&&D.city){CTX.city=D.city}
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/legacy-discovery.js:16',e,'caught');}
 }
 /* ── نمایش‌سازها ── */
 function rShort(v){v=(+v||0)/10;if(v>=1e9)return fa(v/1e9,1)+' میلیارد';if(v>=1e6)return fa(v/1e6,0)+' میلیون';return fa(v,0)}
@@ -105,7 +105,7 @@ function hoodChipsAct(prefix){return HOODS.slice(0,6).map(function(h){return {l:
 function rThink(label,fn){
   HIST.push({r:'bot',h:'<span class="typing"><span class="dots"><i></i><i></i><i></i></span>'+esc(label)+'</span>',proc:true});
   cr();
-  setTimeout(function(){HIST=HIST.filter(function(m){return !m.proc});try{fn()}catch(e){botC('در ساختن پاسخ مشکلی پیش آمد؛ دوباره تلاش کنید.')}},700);
+  setTimeout(function(){HIST=HIST.filter(function(m){return !m.proc});try{fn()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/legacy-discovery.js:108',e,'caught');botC('در ساختن پاسخ مشکلی پیش آمد؛ دوباره تلاش کنید.')}},700);
 }
 /* ── موتور نیت ── */
 var RINT={};

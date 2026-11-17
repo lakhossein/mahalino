@@ -16,10 +16,10 @@ V0.32 نسخهٔ فعال است. V0.1 تا V0.31 snapshotهای تاریخی‌
 | v32-shell.js | E30.init و paidActionRegistry | فقط یک نصب؛ ۱۳ مسیر پولی صریح، بدون بررسی متن تابع؛ guard سپس UX/guide/turns |
 | v32-ux.js | E30.uxInit | نصب library سپس sharing سپس project سپس reminder سپس valuation؛ تکرار نصب handler را عوض نمی‌کند |
 | legacy/sharing.js | E29.share و E29.safeSharedHTML | snapshot فقط‌خواندنی؛ نمایش و export از sanitizer مشترک می‌گذرند؛ event/action، script، active SVG و scheme اجرایی حذف می‌شوند |
-| legacy/error-handler.js | MahalinoDiagnostics.report | حداکثر ۵۰ رخداد شامل code/time؛ بدون reason، stack یا متن کاربر |
+| legacy/error-handler.js | MahalinoDiagnostics.report | حداکثر ۵۰ رخداد شامل code/time/cause-enum/kind؛ بدون reason، message، stack یا متن کاربر |
 | legacy/core.js | E29.llm | غیرفعال؛ فعال‌سازی فقط configure صریح؛ status/schema/timeout و callback یک‌بار؛ هدایت همچنان rule-based |
 
-ترتیب فایل‌ها در build-manifest.json و includeهای application.js به‌صورت ماشینی کنترل می‌شود. payment از core به فایل مستقل استخراج شده، ولی هنوز به S/save و APIهای مشترک وابسته است؛ این استخراج ادعای حذف همهٔ globalها نیست.
+ترتیب فایل‌ها در build-manifest.json و includeهای application.js به‌صورت ماشینی کنترل می‌شود. payment از core به فایل مستقل استخراج شده، ولی هنوز به S/save و APIهای مشترک وابسته است؛ این استخراج ادعای حذف namespace سازگاری نیست؛ هر export/import و write در قرارداد scope-aware ثبت و با gate مقایسه می‌شود.
 
 ## همزمانی و شکست
 
@@ -31,4 +31,4 @@ saveهای بدون تغییر setItem ندارند؛ JSON.stringify هنوز ه
 
 پرداخت در زمان بارگذاری تعریف می‌شود؛ closeModal پرداخت، روی تابع عمومی نصب می‌شود؛ wrapperهای legacy سپس E30.init و وصلهٔ composer نصب می‌شوند؛ E30.uxInit handlerهای sharing/project/reminder را نهایی می‌کند. نام handlerهای پولی از registry، نتیجهٔ نصب از legacyPayGuarded و idempotency از تست مرورگر قابل بررسی است. حذف wrapperهای تاریخی بدون characterization مجاز نیست.
 
-گزارش Promise عمومی و شکست E28 boot اضافه شده است. catchهای legacy اختیاری همچنان وجود دارند؛ جایگزینی دسته‌جمعی آنها انجام نشده و ممیزی معنایی تک‌تک catchها و refactor کامل وابستگی‌های global هنوز تمام نشده است.
+گزارش Promise عمومی و شکست E28 boot اضافه شده است. هر catch مدیریت‌شده با شناسهٔ محل و cause از enum محدود ثبت می‌شود؛ fallbackها non-blocking باقی می‌مانند و خطاهای لازم با kind=fault پیام قابل مشاهده دارند. قرارداد scope-aware برای imports/exports/writes و loadOrder در runtime-dependencies.json ثبت و دقیقاً تست می‌شود؛ namespace سازگاری همچنان عمومی است.

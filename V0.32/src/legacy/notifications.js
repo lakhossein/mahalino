@@ -38,7 +38,7 @@ E29.notifs=(function(){
     E29.shell.refreshBadges();
     if(prefs().inApp&&!inQuiet()){toast('🔔 '+n.title)}
     if(prefs().browser&&!inQuiet()&&typeof Notification!=='undefined'&&Notification.permission==='granted'){
-      try{new Notification('محلینو — '+n.title,{body:n.msg})}catch(e){}
+      try{new Notification('محلینو — '+n.title,{body:n.msg})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/notifications.js:41',e,'caught');}
     }
     return n;
   }

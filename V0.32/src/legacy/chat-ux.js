@@ -31,7 +31,7 @@ CBACT.mCopy=function(el){
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt);
     else{var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
     toast('پیام کپی شد');
-  }catch(e){toast('کپی ممکن نشد')}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:34',e,'caught');toast('کپی ممکن نشد')}
 };
 CBACT.mEdit=function(el){
   var ix=+el.getAttribute('data-ix'),m=HIST[ix];
@@ -94,7 +94,7 @@ E28.applyTermination=function(code){
   c.status='terminated';
   if(c.doc)c.doc.status='terminated';
   c.terminatedAt=Date.now();
-  try{addReq('rent','فسخ','فسخ قرارداد '+code,'کامل شد','وضعیت: فسخ‌شده')}catch(e){}
+  try{addReq('rent','فسخ','فسخ قرارداد '+code,'کامل شد','وضعیت: فسخ‌شده')}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:97',e,'caught');}
   return true;
 };
 E28.ctrBubble=function(){
@@ -134,7 +134,7 @@ conKind=function(){return (CURRENT==='landing'&&E28.ctrKind)?E28.ctrKind:_oConKi
 ['cback','lookupId','lookupPostal','cpartySave','cpropSave','capprove','cfinalize'].forEach(function(k){
   var o=ACT[k];
   if(typeof o!=='function')return;
-  ACT[k]=function(el){o(el);setTimeout(function(){try{E28.ctrRefresh()}catch(e){}},30)};
+  ACT[k]=function(el){o(el);setTimeout(function(){try{E28.ctrRefresh()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:137',e,'caught');}},30)};
 });
 CBACT.ctrCont=function(el){
   var v=el.getAttribute('data-v');
@@ -241,7 +241,7 @@ E28.remCap=function(){
       S.reminders.splice(iDone>=0?iDone:0,1);
       toast('سقف ۵۰ یادآور پر بود؛ قدیمی‌ترین حذف شد.');
     }
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:244',e,'caught');}
 };
 E28.remAuto=function(nn,raw){
   if(!E21.noFlow())return false;
@@ -321,7 +321,7 @@ E28.remTick=function(){
         if(window.Notification&&Notification.permission==='granted'){
           new Notification('یادآور محلینو',{body:r.title});
         }
-      }catch(e){}
+      }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:324',e,'caught');}
       var nx=E28.remNext(r);
       if(nx){
         a.unshift({id:'RM-'+Date.now().toString(36)+Math.floor(Math.random()*99),title:r.title,desc:r.desc||'',due:nx,
@@ -336,7 +336,7 @@ E28.askNotify=function(){
     if(window.Notification&&Notification.permission==='default'){
       Notification.requestPermission();
     }
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:339',e,'caught');}
 };
 E28.remListHTML=function(){
   E28.remNorm();
@@ -468,11 +468,11 @@ E28.route=function(nn,raw){
 var _oPpm28=ppmTick;
 ppmTick=function(){
   _oPpm28();
-  try{E28.remTick()}catch(e){}
+  try{E28.remTick()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:471',e,'caught');}
 };
 
 E28.init=function(){
-  try{E28.remNorm()}catch(e){}
+  try{E28.remNorm()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:475',e,'caught');}
   var cin=document.getElementById('chatIn');
   document.addEventListener('input',function(e){
     var t=e.target;
@@ -488,8 +488,8 @@ E28.init=function(){
 var _oCeSend28=ceSend;
 ceSend=function(t){
   if(String(t)==='!back'){_oCeSend28(t);return}
-  try{if(E28.route(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){}
-  try{if(E28.remAuto(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){}
+  try{if(E28.route(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:491',e,'caught');}
+  try{if(E28.remAuto(String(t).replace(/^\s+|\s+$/g,''),t))return}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:492',e,'caught');}
   _oCeSend28(t);
 };
 

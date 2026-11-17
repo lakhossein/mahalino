@@ -37,7 +37,7 @@ E30.PRICING={
   escrow      :{cost:150,label:'تسویهٔ امانی',              desc:'آزادسازی مرحله‌ای از حساب امانی',              cx:'high',  refund:'failed_only'}
 };
 /* keep legacy COSTS/COSTL mirrors in sync so unpatched legacy code agrees */
-try{Object.keys(E30.PRICING).forEach(function(k){COSTS[k]=E30.PRICING[k].cost;if(E30.PRICING[k].label)COSTL[k]=E30.PRICING[k].label})}catch(e){}
+try{Object.keys(E30.PRICING).forEach(function(k){COSTS[k]=E30.PRICING[k].cost;if(E30.PRICING[k].label)COSTL[k]=E30.PRICING[k].label})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-core.js:40',e,'caught');}
 E30.price=function(key){var p=E30.PRICING[key];return p?p.cost:(COSTS[key]!==undefined?COSTS[key]:0)};
 E30.label=function(key){var p=E30.PRICING[key];return p?p.label:(COSTL[key]||key)};
 

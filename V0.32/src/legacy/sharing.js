@@ -14,7 +14,7 @@ E29.share=(function(){
         Array.prototype.slice.call(el.attributes).forEach(function(attr){
           var name=attr.name.toLowerCase(),value=attr.value.replace(/[\x00-\x20]/g,'');
           if(name.indexOf('on')===0||name.indexOf('data-')===0||name==='srcdoc'||name==='is'||name==='formaction'||name==='xlink:href'||name==='srcset'){el.removeAttribute(attr.name);return}
-          if((name==='href'||name==='src')&&(!/^(https?:|mailto:|tel:|#|[^:]*$)/i.test(value)||/^data:/i.test(value))){el.removeAttribute(attr.name)}
+          if((name==='href'||name==='src')&&!((name==='src')&&/^data:image\/(?:png|jpeg|gif|webp);base64,[a-z0-9+/=]+$/i.test(value))&&(!/^(https?:|mailto:|tel:|#|[^:]*$)/i.test(value)||/^data:/i.test(value))){el.removeAttribute(attr.name)}
           if(name==='style'&&/url|expression|@import|behavior|binding|\\/i.test(attr.value))el.removeAttribute(attr.name);
         });
         if(el.tagName.toUpperCase()==='A'){el.setAttribute('rel','noopener noreferrer');el.removeAttribute('target')}
@@ -151,8 +151,8 @@ E29.share=(function(){
     var inp=document.getElementById('e29-shurl');
     if(!inp)return;
     var copied=false;
-    try{if(navigator.clipboard&&typeof navigator.clipboard.writeText==='function'){await navigator.clipboard.writeText(inp.value);copied=true}}catch(e){}
-    if(!copied){try{inp.select();copied=document.execCommand('copy')===true}catch(e){}}
+    try{if(navigator.clipboard&&typeof navigator.clipboard.writeText==='function'){await navigator.clipboard.writeText(inp.value);copied=true}}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:154',e,'caught');}
+    if(!copied){try{inp.select();copied=document.execCommand('copy')===true}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:155',e,'caught');}}
     toast(copied?'لینک کپی شد':'کپی انجام نشد؛ لینک را انتخاب و دستی کپی کنید.');
   };
   ACT.e29shExport=function(el){
@@ -192,7 +192,7 @@ E29.share=(function(){
     var sh=store().filter(function(x){return x.id===el.getAttribute('data-sh')})[0];
     if(!sh)return;
     if(navigator.share){
-      navigator.share({title:sh.title,url:shareURL(sh)}).catch(function(){});
+      navigator.share({title:sh.title,url:shareURL(sh)}).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:195',null,'caught');});
     }else{toast('اشتراک سیستمی در این مرورگر پشتیبانی نمی‌شود — لینک را کپی کنید')}
   };
 
@@ -213,8 +213,8 @@ E29.share=(function(){
   ACT.e29shCopy2=function(el){
     var sh=store().filter(function(x){return x.id===el.getAttribute('data-sh')})[0];if(!sh)return;
     var url=shareURL(sh);
-    if(navigator.clipboard)navigator.clipboard.writeText(url).catch(function(){});
-    try{var i=document.createElement('input');i.value=url;document.body.appendChild(i);i.select();document.execCommand('copy');i.remove()}catch(e){}
+    if(navigator.clipboard)navigator.clipboard.writeText(url).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:216',null,'caught');});
+    try{var i=document.createElement('input');i.value=url;document.body.appendChild(i);i.select();document.execCommand('copy');i.remove()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:217',e,'caught');}
     toast('لینک کپی شد');
   };
   ACT.e29shUpd=function(el){if(updateSnapshot(el.getAttribute('data-sh')))toast('اسنپ‌شات به‌روزرسانی شد');manage()};

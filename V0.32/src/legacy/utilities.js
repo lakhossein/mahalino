@@ -4,8 +4,8 @@ function $(s){return document.querySelector(s)}
 function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
 function fa(n,d){if(d===undefined)d=0;n=Number(n);if(isNaN(n))n=0;return n.toLocaleString('fa-IR',{maximumFractionDigits:d})}
 function rial(v){return fa(Number(v)/10,Number(v)%10?1:0)+' تومان'}
-function dt(t){try{return new Date(t).toLocaleDateString('fa-IR',{month:'long',day:'numeric'})}catch(e){return ''}}
-function fd(t){try{return new Date(t).toLocaleDateString('fa-IR',{year:'numeric',month:'long',day:'numeric'})}catch(e){return ''}}
+function dt(t){try{return new Date(t).toLocaleDateString('fa-IR',{month:'long',day:'numeric'})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:7',e,'caught');return ''}}
+function fd(t){try{return new Date(t).toLocaleDateString('fa-IR',{year:'numeric',month:'long',day:'numeric'})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:8',e,'caught');return ''}}
 function dateFa(v){if(!v)return '—';var n=(typeof v==='number')?v:Date.parse(v);return isNaN(n)?String(v):fd(n)}
 function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
 function qesc(t){return esc(t).replace(/"/g,'&quot;')}
@@ -157,7 +157,7 @@ function openModal(html,cb){
   a11yify(r);
   r.removeAttribute('role');r.removeAttribute('aria-modal');
   var m=r.querySelector('.modal');
-  if(m){m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');var title=m.querySelector('h1,h2,h3');if(title){title.id='mahalino-modal-title';m.setAttribute('aria-labelledby',title.id)}else{m.setAttribute('aria-label','پنجرهٔ محلینو')}m.setAttribute('tabindex','-1');setTimeout(function(){try{m.focus()}catch(e){}},20)}
+  if(m){m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');var title=m.querySelector('h1,h2,h3');if(title){title.id='mahalino-modal-title';m.setAttribute('aria-labelledby',title.id)}else{m.setAttribute('aria-label','پنجرهٔ محلینو')}m.setAttribute('tabindex','-1');setTimeout(function(){try{m.focus()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:160',e,'caught');}},20)}
   r.onkeydown=function(e){
     if(e.key==='Escape'){e.preventDefault();closeModal();return}
     if(e.key!=='Tab'||!m)return;
@@ -172,7 +172,7 @@ function openModal(html,cb){
 function closeModal(){
   var r=$('#modal-root');
   r.classList.remove('on');r.onkeydown=null;r.innerHTML='';
-  if(MODAL_PREV&&MODAL_PREV.focus){try{MODAL_PREV.focus()}catch(e){}}
+  if(MODAL_PREV&&MODAL_PREV.focus){try{MODAL_PREV.focus()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:175',e,'caught');}}
   MODAL_PREV=null;
 }
 /* 2) state */
@@ -194,7 +194,7 @@ for(LSi=0;LSi<LSCHAIN.length;LSi++){
     if(candidateRaw===null)continue;
     S=JSON.parse(candidateRaw);
     if(stateObject(S)){stateSource=LSCHAIN[LSi];stateRaw=candidateRaw;break}
-  }catch(e){S=null}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:197',e,'caught');S=null}
   if(candidateRaw!==null)stateRecovery.push({key:LSCHAIN[LSi],raw:candidateRaw});
   S=null;
 }
@@ -286,7 +286,7 @@ if(!S.paySession)S.paySession=null;
 if(!S.savedListings)S.savedListings=[];
 if(!S.ctx30)S.ctx30={fields:{},log:[]};
 var stateLastRaw=null,stateConflict=false;
-try{stateLastRaw=localStorage.getItem(LSKEY)}catch(e){stateConflict=true}
+try{stateLastRaw=localStorage.getItem(LSKEY)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:289',e,'caught');stateConflict=true}
 if(window.addEventListener)window.addEventListener('storage',function(e){
   if(e.key===LSKEY&&e.newValue!==stateLastRaw){stateConflict=true;if(window.E24)E24.toastErr('داده‌ها در پنجرهٔ دیگری تغییر کرد؛ پیش از ادامه صفحه را بازنشانی کنید.')}
 });
@@ -295,12 +295,12 @@ if(typeof navigator!=='undefined'&&navigator.locks&&navigator.locks.request){
   stateWriterReady=false;
   navigator.locks.request(LSKEY+'-writer',{ifAvailable:true},function(lock){
     if(!lock)return;
-    try{if(localStorage.getItem(LSKEY)!==stateLastRaw){stateConflict=true;return}}catch(e){stateConflict=true;return}
+    try{if(localStorage.getItem(LSKEY)!==stateLastRaw){stateConflict=true;return}}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:298',e,'caught');stateConflict=true;return}
     stateWriterReady=true;
     // Boot may have deferred a durable refund until writer ownership was known.
     if(window.E30&&E30.pay&&S.paySession&&S.paySession.paidFlag)E30.pay.recover();
     return new Promise(function(){}); // browser releases ownership when the tab closes
-  }).catch(function(){stateWriterReady=false});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:303',null,'caught');stateWriterReady=false});
 }
 function save(){
   if(window.__mahalinoResetPending)return false;
@@ -315,7 +315,7 @@ function save(){
     if(stateRecovery.length){localStorage.setItem(LSKEY+'_recovery',JSON.stringify(stateRecovery));stateRecovery=[]}
     if(encoded!==stateLastRaw){localStorage.setItem(LSKEY,encoded);stateLastRaw=encoded}
     return true;
-  }catch(e){
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:318',e,'caught');
     console.error('local persistence failed');
     if(window.E24)E24.toastErr('ذخیره‌سازی محلی ناموفق بود؛ تغییرات تا بازنشانی صفحه در همین نشست اعمال است.');
     return false;

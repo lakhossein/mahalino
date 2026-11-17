@@ -66,6 +66,8 @@ class PagesPublicationContract(unittest.TestCase):
     def test_workflow_contract_runs_in_ci_and_blocks_publication(self):
         steps = self.pages['jobs']['workflow-contract']['steps']
         runs = '\n'.join(step.get('run', '') for step in steps)
+        checkout = next(step for step in steps if step.get('uses', '').startswith('actions/checkout@'))
+        self.assertEqual(checkout['with']['fetch-depth'], '0', 'history-preservation checks require the audit baseline commit')
         self.assertIn('PyYAML==6.0.3', runs)
         self.assertIn('python3 -m unittest discover -s scripts/tests', runs)
         self.assertNotIn('continue-on-error', self.pages['jobs']['workflow-contract'])

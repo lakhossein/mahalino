@@ -70,7 +70,7 @@ E30.flows=(function(){
       var target=(CE.i>=sc.length)?sc.length:(CE.i+1);
       if(w.step!==target){w.step=target;save()}
       if(w.m===undefined)w.m=CE.f;
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-flows.js:73',e,'caught');}
   }
 
   /* ── slider locking (§2.5): a committed slider freezes; edit only via بازگشت/اصلاح ── */
@@ -94,7 +94,7 @@ E30.flows=(function(){
           if(D&&D._slid&&D._slid[slot])lockOne(s,false);
         });
       });
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-flows.js:97',e,'caught');}
   }
   function lockOne(s,hard){
     if(s.getAttribute('data-locked')==='1')return;
@@ -145,7 +145,7 @@ E30.flows=(function(){
     if(internal)return 'registered_internal';
     try{var buyer=wd('buy').data,bc=buyer&&buyer.ctr;
       if(D.sellerContractDraft&&bc&&bc.draftCode===D.sellerContractDraft&&bc.step>1)return 'draft';
-    }catch(e){}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-flows.js:148',e,'caught');}
     if(c&&c.step>1)return 'draft';
     return D.deal?'agreement':'listing';
   }
@@ -534,7 +534,7 @@ E30.flows=(function(){
     WSTEPS.invp=INVP.map(function(s){return s.id});
     WSTEPS.lndl=LNDL.map(function(s){return s.id});
     /* registry note for honest provenance labels (srcBadge rule) */
-    try{window.__E30FLOWS={sell:SELL.length,invp:INVP.length,lndl:LNDL.length}}catch(e){}
+    try{window.__E30FLOWS={sell:SELL.length,invp:INVP.length,lndl:LNDL.length}}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-flows.js:537',e,'caught');}
   }
 
   E30.flowsAPI={rentPass:rentPass,buyPass:buyPass,blPassBase:blPassBase,syncStage:syncStage,

@@ -1,8 +1,8 @@
 /* ═══ E24 — اعتمادپذیری (V0.24): توست خطای نرخ‌محدود، گارد خطای سراسری، گاردهای وضعیت ═══ */
 var E24={t:0};
-E24.toastErr=function(m){var n=Date.now();if(n-E24.t<15000)return;E24.t=n;try{toast(m)}catch(e){}};
-try{window.addEventListener('error',function(e){try{console.error('runtime:',e&&e.message);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}catch(x){}})}catch(e){};
-try{S.ui=S.ui||{};if(!S.chats)S.chats=[];}catch(e){};
+E24.toastErr=function(m){var n=Date.now();if(n-E24.t<15000)return;E24.t=n;try{toast(m)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:3',e,'caught');}};
+try{window.addEventListener('error',function(e){try{console.error('runtime:',e&&e.message);E24.toastErr('یک خطای غیرمنتظره رخ داد؛ وضعیت شما ذخیره است.')}catch(x){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:4',x,'caught');}})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:4',e,'caught');};
+try{S.ui=S.ui||{};if(!S.chats)S.chats=[];}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:5',e,'caught');};
 /* ═══ پایان E24 ═══ */
 
 /* ═══ E25 — توسعهٔ محصول (V0.25): F1 کمیسیون، F2 دفتر یادآور، F3 افزایش اجاره، F4 سرمایه‌گذاری، F5 خلاصهٔ مشاور ═══
@@ -19,14 +19,14 @@ var E25={temp:null,commAwait:null};
 E25.rem={stage:null,title:null,due:null,amt:null}; /* مینی‌فلو افزودن یادآور — فقط نشست جاری */
 
 /* گارد پایداری — عین الگوی E24؛ کلید تازه نیست، فیلد تازه روی S موجود است */
-try{if(!S.reminders)S.reminders=[]}catch(e){}
+try{if(!S.reminders)S.reminders=[]}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:22',e,'caught');}
 
 /* ─── ابزارهای مشترک ─── */
 E25.usr=function(raw){if(!E21.chipUsr)usrC(raw)}; /* نمایش پیام کاربر — الگوی E23.usr */
 E25.DAY=864e5;
 /* تفاضل روزِ تقویمی — هم‌ساز با E21.iso (تاریخ‌ها به شکل UTC ذخیره می‌شوند)؛ بدون خطای منطقهٔ زمانی */
 E25.mid=function(iso){var m=String(iso==null?'':iso).match(/^(\d{4})-(\d{2})-(\d{2})/);return m?Date.UTC(+m[1],+m[2]-1,+m[3]):null};
-E25.todayIso=function(){try{return new Date().toISOString().slice(0,10)}catch(e){return null}};
+E25.todayIso=function(){try{return new Date().toISOString().slice(0,10)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:29',e,'caught');return null}};
 E25.daysLeft=function(iso){
   var a=E25.mid(iso),b=E25.mid(E25.todayIso());
   if(a===null||b===null)return null;
@@ -49,7 +49,7 @@ E25.sorted=function(){
   return a;
 };
 E25.busyElsewhere=function(){return !!((E21.svc&&E21.svc.await)||(E21.grt&&E21.grt.await))}; /* مینی‌جریان‌های E21 اولویت دارند */
-E25.profileDirty=function(){try{if(CURRENT==='profile')renderCurrent()}catch(e){}};
+E25.profileDirty=function(){try{if(CURRENT==='profile')renderCurrent()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:52',e,'caught');}};
 E25.findRem=function(id){var i,a=S.reminders||[];for(i=0;i<a.length;i++){if(a[i].id===id)return a[i]}return null};
 
 /* ═══ F1) محاسبهٔ کمیسیون — برچسب مدل: «تعرفهٔ رایج بازار» (رسمی نیست) ═══
@@ -381,7 +381,7 @@ ceSend=function(t0){
         if(E25.brief(nn,tt))return;      /* F5 */
       }
     }
-  }catch(e){/* خطا: متن به زنجیرهٔ اصلی سپرده می‌شود — الگوی E23 */}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/trust-productivity.js:384',e,'caught');/* خطا: متن به زنجیرهٔ اصلی سپرده می‌شود — الگوی E23 */}
   return _ceSend25(t);
 };
 /* ═══ پایان بخش E25 ═══ */

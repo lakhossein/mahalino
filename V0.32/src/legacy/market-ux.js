@@ -1,7 +1,7 @@
 /* ═══ ۲۱.۸) بلوغ محصول (E26) — تلهٔ فوکوس، ترمیم داده، سقف یادآور ═══
    فوکوس‌تلهٔ مودال (M1): */
 var E26={t:0};
-E26.toastErr=function(m){var n=Date.now();if(n-E26.t<15000)return;E26.t=n;try{toast(m)}catch(e){}};
+E26.toastErr=function(m){var n=Date.now();if(n-E26.t<15000)return;E26.t=n;try{toast(m)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:4',e,'caught');}};
 E26.trapKey=function(e){
   if(e.key!=='Tab')return;
   var m=document.querySelector('#modal-root.on');
@@ -9,10 +9,10 @@ E26.trapKey=function(e){
   var f=m.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])');
   if(!f.length)return;
   var first=f[0],last=f[f.length-1],cur=document.activeElement;
-  if(e.shiftKey&&(cur===first||(cur&&!m.contains(cur)))){e.preventDefault();try{last.focus()}catch(x){}}
-  else if(!e.shiftKey&&(cur===last||!cur||!m.contains(cur))){e.preventDefault();try{first.focus()}catch(x){}}
+  if(e.shiftKey&&(cur===first||(cur&&!m.contains(cur)))){e.preventDefault();try{last.focus()}catch(x){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:12',x,'caught');}}
+  else if(!e.shiftKey&&(cur===last||!cur||!m.contains(cur))){e.preventDefault();try{first.focus()}catch(x){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:13',x,'caught');}}
 };
-try{document.addEventListener('keydown',E26.trapKey)}catch(e){}
+try{document.addEventListener('keydown',E26.trapKey)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:15',e,'caught');}
 /* ترمیم شکل داده (M2): */
 try{
   ['chats','reminders','wfs','reqs','contracts','grt'].forEach(function(k){
@@ -21,7 +21,7 @@ try{
   if(!S.chats)S.chats=[];
   if(!S.reminders)S.reminders=[];
   S.v=26;
-}catch(e){}
+}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:24',e,'caught');}
 /* سقف یادآور ۵۰ (M2): */
 E25&&(E25.remCap=function(){
   try{
@@ -31,9 +31,9 @@ E25&&(E25.remCap=function(){
       S.reminders.splice(iDone>=0?iDone:0,1);
       E26.toastErr('سقف ۵۰ یادآور پر بود؛ قدیمی‌ترین حذف شد.');
     }
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:34',e,'caught');}
 });
-try{E25&&E25.remCap&&E25.remCap()}catch(e){}
+try{E25&&E25.remCap&&E25.remCap()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:36',e,'caught');}
 /* ═══ ۲۱.۱۲) موتور V0.27 (E27) — بازار هوشمند، بودجهٔ آزاد، کیف پول، جزئیات کارت ═══ */
 
 /* ── بودجهٔ آزاد: تحلیل زبان طبیعی + مقادیر مؤثر ── */
@@ -220,7 +220,7 @@ try{
       if(CE.f==='rent'&&SCRIPTS.rent[CE.i]&&SCRIPTS.rent[CE.i].id==='tai')ceStep();
     }
   });
-}catch(e){}
+}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:223',e,'caught');}
 
 /* ── کیف پول: شارژ در گفت‌وگو با درگاه نمایشی + استقلال از کلید ── */
 E27.wf=null;
@@ -347,7 +347,7 @@ ceSend=function(t){
   if(String(t)==='!back'){_oCeSend27(t);return}
   try{
     if(E27.wf&&E27.wfHandle(t))return;
-  }catch(e){}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/market-ux.js:350',e,'caught');}
   _oCeSend27(t);
 };
 

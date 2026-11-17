@@ -316,7 +316,7 @@ E29.intel=(function(){
         ceJump('hoods');
         return;
       }
-    }catch(e){console.error('E29 handoff',e)}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/intel.js:319',e,'caught');console.error('E29 handoff',e)}
     if(wf==='contract')botC('برای تنظیم قرارداد، «قرارداد» را از منوی سرویس‌ها انتخاب کنید؛ نقش و نوع سند را ثبت کردم.',null);
   }
 

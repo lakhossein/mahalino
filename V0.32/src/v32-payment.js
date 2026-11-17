@@ -18,7 +18,7 @@ E30.pay=(function(){
         }
       }
       if(dead)cr();
-    }catch(e){console.error('E30 invalidate',e)}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:21',e,'caught');console.error('E30 invalidate',e)}
   }
 
   /* where does the card go? chat bubble when chat is the visible surface, else modal */
@@ -85,14 +85,14 @@ E30.pay=(function(){
     return true;
   }
   function invalidateIfNeeded(prev){
-    try{invalidateOthers(prev.payId)}catch(e){}
+    try{invalidateOthers(prev.payId)}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:88',e,'caught');}
   }
 
   function show(s,h,kind){
     invalidateOthers(s.payId);
     if(target()==='chat'&&!kind){botC(h,null)}
     else{openModal(h)}
-    try{E29.bus.emit('pay.presented',{payId:s.payId,key:s.key,cost:s.cost,state:s.state})}catch(e){}
+    try{E29.bus.emit('pay.presented',{payId:s.payId,key:s.key,cost:s.cost,state:s.state})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:95',e,'caught');}
   }
 
   /* ── explicit confirm → validating → processing → paid → executing → completed ── */
@@ -125,8 +125,8 @@ E30.pay=(function(){
     S.log.unshift({t:Date.now(),d:(s.title)+(s.ctx?' — '+s.ctx:''),c:-s.cost,cat:'bana',id:txn,svc:s.key,payId:s.payId});
     if(!save()){S.tokens+=s.cost;S.log.shift();s.paidFlag=false;delete s.txnId;s.state='failed';renderTok();toast('پرداخت ثبت نشد؛ خدمت اجرا نشد.');return false}
     renderTok();
-    try{E29.bus.emit('token.deduct',{txn:txn,cost:s.cost,svc:s.key,desc:s.title,payId:s.payId})}catch(e){}
-    if((S.tokens||0)<30){try{E29.bus.emit('wallet.low',{balance:S.tokens})}catch(e){}}
+    try{E29.bus.emit('token.deduct',{txn:txn,cost:s.cost,svc:s.key,desc:s.title,payId:s.payId})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:128',e,'caught');}
+    if((S.tokens||0)<30){try{E29.bus.emit('wallet.low',{balance:S.tokens})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:129',e,'caught');}}
     set('paid');
     usrC('پرداخت '+fa(s.cost,0)+' کلید برای «'+s.title+'»');
     set('executing');
@@ -150,7 +150,7 @@ E30.pay=(function(){
           function(err){return finish(false,err)});
       }
       return finish(result!==false,null);
-    }catch(e){return finish(false,e)}
+    }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:153',e,'caught');return finish(false,e)}
   }
 
   /* ── decline (explicit cancel or backdrop/ESC close while presented) ── */
@@ -172,7 +172,7 @@ E30.pay=(function(){
     var current=sess(),wasRefunded=current&&current.refunded;if(current&&payId===current.payId)current.refunded=true;
     if(!save()){S.tokens-=cost;S.log.shift();if(current&&payId===current.payId)current.refunded=wasRefunded;toast('بازپرداخت ذخیره نشد؛ دوباره تلاش کنید.');return false}
     renderTok();
-    try{E29.bus.emit('token.refund',{txn:txn,cost:cost,reason:reason})}catch(e){}
+    try{E29.bus.emit('token.refund',{txn:txn,cost:cost,reason:reason})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:175',e,'caught');}
     toast('+'+fa(cost,0)+' کلید بازگشت داده شد');
   }
 
@@ -189,7 +189,7 @@ E30.pay=(function(){
         var txn=E30.uid('TXN-R');
         if(refund(txn,s.key,s.cost,'بازیابی پس از وقفه',s.payId)===false)return false;
         s.refunded=true;save();
-        try{E29.notifsAPI.push({cat:'financial',etype:'pay.recovered',title:'پرداخت ناتمام بازگشت داده شد',msg:fa(s.cost,0)+' کلید بابت «'+s.title+'» بازگشت داده شد — سرویس اجرا نشده بود.',action:{kind:'wallet'},dedupKey:'rec-'+s.payId})}catch(e){}
+        try{E29.notifsAPI.push({cat:'financial',etype:'pay.recovered',title:'پرداخت ناتمام بازگشت داده شد',msg:fa(s.cost,0)+' کلید بابت «'+s.title+'» بازگشت داده شد — سرویس اجرا نشده بود.',action:{kind:'wallet'},dedupKey:'rec-'+s.payId})}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-payment.js:192',e,'caught');}
       }
     }
     clear();

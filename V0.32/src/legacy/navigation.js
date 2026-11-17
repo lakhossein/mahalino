@@ -49,7 +49,7 @@ E27.groupOf=function(ts){
     if(diff<7)return '۷ روز گذشته';
     if(diff<30)return '۳۰ روز گذشته';
     return 'قدیمی‌تر';
-  }catch(e){return ''}
+  }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/navigation.js:52',e,'caught');return ''}
 };
 E27.sessRow=function(s){
   var pinLab=s.pinned?'برداشتن سنجاق':'سنجاق کردن';
@@ -88,7 +88,7 @@ E27.sessListHTML=function(){
   return h;
 };
 function renderSidebar(){
-  if(window.E29&&E29.shell){try{E29.shell.renderSidebar();return}catch(e){console.error('E29 sidebar',e)}}
+  if(window.E29&&E29.shell){try{E29.shell.renderSidebar();return}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/navigation.js:91',e,'caught');console.error('E29 sidebar',e)}}
   var el=document.getElementById('side'),app=document.getElementById('appwrap');
   if(!el){return}
   if(!S.auth){

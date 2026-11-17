@@ -260,7 +260,7 @@ E29.lib=(function(){
     DOC_SNAP=snap||null;
     var content=snap?contractDocHTML(snap,false):('<div class="e29-detail">'+reportDetail(it)+'</div>');
     openModal('<h3>'+(snap?'سند قرارداد':'گزارش')+'</h3><div class="doc-actions"><button class="btn btn-sm btn-primary" data-act="cprint">دریافت PDF (چاپ مرورگر)</button><button class="btn btn-sm" data-act="closeModal">بستن</button></div><div class="doc-preview" style="max-height:62vh">'+content+'</div>');
-    if(print)setTimeout(function(){try{ACT.cprint()}catch(e){}},300);
+    if(print)setTimeout(function(){try{ACT.cprint()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/library.js:263',e,'caught');}},300);
   }
 
   /* ── ACT handlers ── */

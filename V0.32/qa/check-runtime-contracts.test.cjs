@@ -13,3 +13,17 @@ test('Promise/script diagnostic records are bounded and omit user/error text',()
  const callbacks={},bar={style:{}};const c={window:{addEventListener:(name,cb)=>callbacks[name]=cb},document:{getElementById:()=>bar},Date};vm.runInNewContext(fs.readFileSync(path.join(root,'src/legacy/error-handler.js'),'utf8'),c);
  for(let i=0;i<60;i++)callbacks.unhandledrejection({reason:'PRIVATE'});assert.equal(c.MahalinoDiagnostics.events.length,50);assert(!JSON.stringify(c.MahalinoDiagnostics.events).includes('PRIVATE'));assert(!bar.textContent.includes('PRIVATE'));assert.equal(c.window.onerror('PRIVATE'),false);
 });
+
+test('every diagnosed catch insertion is present at its declared module',()=>{
+ const sites=JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures/diagnostic-sites.json'),'utf8'));assert(sites.length>150);
+ for(const site of sites){const source=fs.readFileSync(path.join(root,'src',site.file),'utf8');assert(source.includes(site.statement),site.code)}
+});
+
+test('scoped imports/exports, writes and load order exactly match the reviewed runtime contract',()=>{
+ const actual=require('./runtime-contracts.cjs').inventory(root);const reviewed=JSON.parse(fs.readFileSync(path.join(repo,'docs/validation/runtime-dependencies.json'),'utf8'));assert.deepEqual(actual,reviewed);
+});
+
+test('diagnostics tolerate hostile name getters without exposing payloads',()=>{
+ const c={window:{addEventListener(){}},document:{getElementById:()=>null},Date};vm.runInNewContext(fs.readFileSync(path.join(root,'src/legacy/error-handler.js'),'utf8'),c);
+ const error={get name(){throw Error('PRIVATE')}};assert.doesNotThrow(()=>c.MahalinoDiagnostics.record('qa',error,'caught'));assert.equal(c.MahalinoDiagnostics.events[0].cause,'Unknown');
+});
