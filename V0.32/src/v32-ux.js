@@ -162,9 +162,9 @@ E30.ux=(function(){
       var file=document.getElementById('e30-pdf-file')?.files[0],status=document.getElementById('e30-pdf-status');
       if(!status)return;
       if(!file||!file.size||!/\.pdf$/i.test(file.name)){status.textContent='یک فایل PDF معتبر انتخاب کنید.';return}
-      var magic=new Uint8Array(await file.slice(0,5).arrayBuffer());
-      if(String.fromCharCode.apply(null,magic)!=='%PDF-'){status.textContent='محتوای فایل PDF معتبر نیست.';return}
       try{
+        var magic=new Uint8Array(await file.slice(0,5).arrayBuffer());
+        if(String.fromCharCode.apply(null,magic)!=='%PDF-'){status.textContent='محتوای فایل PDF معتبر نیست.';return}
         if(navigator.canShare&&navigator.canShare({files:[file]})){
           await navigator.share({files:[file],title:'سند قرارداد محلینو'});
           status.textContent='فایل برای اشتراک ارسال شد.';

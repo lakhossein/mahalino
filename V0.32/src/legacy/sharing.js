@@ -127,12 +127,13 @@ E29.share=(function(){
       '<button data-act="closeModal">بستن</button></div>'+
       '<div style="font-size:11px;color:var(--muted);margin-top:8px">مدیریت و باطل‌کردن لینک‌ها: کتابخانه → بخش اشتراک‌ها. انقضا: ۳۰ روز.</div>');
   };
-  ACT.e29shCopy=function(){
+  ACT.e29shCopy=async function(){
     var inp=document.getElementById('e29-shurl');
     if(!inp)return;
-    try{inp.select();document.execCommand('copy')}catch(e){}
-    if(navigator.clipboard)navigator.clipboard.writeText(inp.value).catch(function(){});
-    toast('لینک کپی شد');
+    var copied=false;
+    try{if(navigator.clipboard&&typeof navigator.clipboard.writeText==='function'){await navigator.clipboard.writeText(inp.value);copied=true}}catch(e){}
+    if(!copied){try{inp.select();copied=document.execCommand('copy')===true}catch(e){}}
+    toast(copied?'لینک کپی شد':'کپی انجام نشد؛ لینک را انتخاب و دستی کپی کنید.');
   };
   ACT.e29shExport=function(el){
     var sh=store().filter(function(x){return x.id===el.getAttribute('data-sh')})[0];

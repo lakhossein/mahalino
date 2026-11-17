@@ -19,7 +19,18 @@ assert.equal(expected.split(baseline).length,2,'baseline state block must occur 
 const utilities=fs.readFileSync(path.join(root,'src/legacy/utilities.js'),'utf8');
 const stateBlock=utilities.slice(utilities.indexOf('/* 2) state */'));
 expected=expected.replace(baseline,()=>stateBlock);
-assert.equal(current,expected,'V0.32 changed content outside approved identity/migration/state recovery blocks');
+// M-04/M-07/M-08: only the three reviewed interaction blocks may differ.
+const interactionRaw=fs.readFileSync(path.join(__dirname,'fixtures/approved-interaction-baselines.json'),'utf8');
+assert.equal(require('node:crypto').createHash('sha256').update(interactionRaw).digest('hex'),'01cb4a5538e4ba8cbd1c6d1f294040d6d13c349760f8688cfe6fa820e29c15db');
+for(const item of JSON.parse(interactionRaw)){
+ const src=fs.readFileSync(path.join(root,'src',item.file),'utf8');
+ const start=src.indexOf(item.file==='legacy/actions.js'?'/* V0.32 — بازنشانی مستقل':item.file==='legacy/sharing.js'?item.start.replace('=function','=async function'):item.start);
+ const end=src.indexOf(item.end,start);
+ assert(start>=0&&end>start,'interaction boundaries missing');
+ assert.equal(expected.split(item.original).length,2,'interaction baseline must occur once');
+ expected=expected.replace(item.original,()=>src.slice(start,end));
+}
+assert.equal(current,expected,'V0.32 changed content outside approved identity/state/interaction blocks');
 // Execute the actual loader against a fresh, prior-only and existing V0.32 store.
 const vm=require('node:vm');
 const loader=stateBlock;

@@ -275,7 +275,7 @@ if(!S.profile)S.profile={confirmed:{},inferred:{},stale:{},log:[]};
 if(!S.paySession)S.paySession=null;
 if(!S.savedListings)S.savedListings=[];
 if(!S.ctx30)S.ctx30={fields:{},log:[]};
-function save(){try{
+function save(){if(window.__mahalinoResetPending)return false;try{
   // Fail closed if preserving corrupt input fails (e.g. storage quota).
   // Only one recovery snapshot is kept; never touch predecessor keys.
   if(stateRecovery.length){localStorage.setItem(LSKEY+'_recovery',JSON.stringify(stateRecovery));stateRecovery=[]}

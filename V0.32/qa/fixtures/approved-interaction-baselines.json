@@ -1,0 +1,20 @@
+[
+  {
+    "file": "legacy/actions.js",
+    "start": "/* V0.27 — بازنشانی واقعی",
+    "end": "/* CJM handlers removed",
+    "original": "/* V0.27 — بازنشانی واقعی با تأیید و گزارش صادقانه */\nACT.reset=function(){\n  openModal('<h3>بازنشانی کامل داده‌ها</h3>'+\n  '<p class=\"note\">همهٔ داده‌های محلینو در این مرورگر حذف می‌شود:</p>'+\n  '<ul style=\"font-size:12.5px;line-height:2;color:var(--ink2);margin:6px 0 10px;padding-inline-start:18px\">'+\n  '<li>گفت‌وگوها و تاریخچهٔ چت</li><li>درخواست‌ها، فلوها و قراردادها</li><li>آگهی‌های نشان‌شده و یادآورها</li>'+\n  '<li>موجودی شبیه‌سازی‌شدهٔ کیف پول و کلیدها</li><li>تنظیمات، حساب کاربری و حالت نمایش</li></ul>'+\n  '<p class=\"note\">داده‌های سایت‌های دیگر دست‌نخورده می‌ماند. این کار بازگردانی ندارد.</p>'+\n  '<div class=\"fs-actions\" style=\"margin-top:12px\"><button class=\"btn btn-danger\" data-act=\"resetOk\">حذف کامل و شروع از نو</button><button class=\"btn\" data-act=\"closeModal\">انصراف</button></div>');\n};\nACT.resetOk=function(){\n  var errs=[];\n  function tryIt(fn,label){try{fn()}catch(e){errs.push(label+': '+(e&&e.message?e.message:e))}}\n  tryIt(function(){\n    var kill=[],i,k;\n    for(i=0;i<localStorage.length;i++){k=localStorage.key(i);if(k&&(k.indexOf('mahalino')===0||k.indexOf('khanyar')===0))kill.push(k)}\n    kill.forEach(function(k2){localStorage.removeItem(k2)});\n  },'localStorage');\n  tryIt(function(){\n    var kill=[],i,k;\n    for(i=0;i<sessionStorage.length;i++){k=sessionStorage.key(i);if(k&&(k.indexOf('mahalino')===0||k.indexOf('khanyar')===0))kill.push(k)}\n    kill.forEach(function(k2){sessionStorage.removeItem(k2)});\n  },'sessionStorage');\n  tryIt(function(){\n    if(window.indexedDB&&indexedDB.deleteDatabase){indexedDB.deleteDatabase('mahalino');indexedDB.deleteDatabase('mahalino-plus');indexedDB.deleteDatabase('khanyar')}\n  },'indexedDB');\n  tryIt(function(){\n    HIST=[];CE.f=null;CE.i=0;CE.li=0;CE.hist=[];E22.restoredId=null;E27.sq='';\n    try{ctxReset()}catch(e2){}\n  },'memory');\n  closeModal();\n  if(errs.length){toast('بازنشانی ناقص شد: '+errs[0]);return}\n  toast('همهٔ داده‌ها پاک شد — شروع از نو…');\n  setTimeout(function(){location.reload()},700);\n};\n"
+  },
+  {
+    "file": "legacy/sharing.js",
+    "start": "  ACT.e29shCopy=function(){",
+    "end": "  ACT.e29shExport=function",
+    "original": "  ACT.e29shCopy=function(){\n    var inp=document.getElementById('e29-shurl');\n    if(!inp)return;\n    try{inp.select();document.execCommand('copy')}catch(e){}\n    if(navigator.clipboard)navigator.clipboard.writeText(inp.value).catch(function(){});\n    toast('لینک کپی شد');\n  };\n"
+  },
+  {
+    "file": "v32-ux.js",
+    "start": "    ACT.e30pdfSend=async function(){",
+    "end": "    ACT.e30shWhole=function",
+    "original": "    ACT.e30pdfSend=async function(){\n      var file=document.getElementById('e30-pdf-file')?.files[0],status=document.getElementById('e30-pdf-status');\n      if(!status)return;\n      if(!file||!file.size||!/\\.pdf$/i.test(file.name)){status.textContent='یک فایل PDF معتبر انتخاب کنید.';return}\n      var magic=new Uint8Array(await file.slice(0,5).arrayBuffer());\n      if(String.fromCharCode.apply(null,magic)!=='%PDF-'){status.textContent='محتوای فایل PDF معتبر نیست.';return}\n      try{\n        if(navigator.canShare&&navigator.canShare({files:[file]})){\n          await navigator.share({files:[file],title:'سند قرارداد محلینو'});\n          status.textContent='فایل برای اشتراک ارسال شد.';\n        }else{status.textContent='اشتراک مستقیم در این مرورگر پشتیبانی نمی‌شود؛ همین فایل PDF را در پیام‌رسان یا ایمیل پیوست کنید.';}\n      }catch(err){status.textContent=err.name==='AbortError'?'اشتراک لغو شد؛ می‌توانید دوباره تلاش کنید.':'ارسال انجام نشد؛ دوباره تلاش کنید یا فایل را به پیام پیوست کنید.';}\n    };\n"
+  }
+]

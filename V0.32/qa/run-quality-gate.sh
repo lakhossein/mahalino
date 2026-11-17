@@ -12,7 +12,7 @@ export QA_BASE_URL="${QA_BASE_URL:-http://127.0.0.1:8731/Mahalino%2BV0.32.html}"
 for js in V0.32/build_v032.js V0.32/build/*.cjs V0.32/src/*.js V0.32/src/legacy/*.js V0.32/qa/smoke-v032.js V0.32/qa/e2e-*.js V0.32/qa/*.cjs; do
   node --check "$js"
 done
-node --test V0.32/qa/check-state-recovery.test.cjs V0.32/qa/check-priority-audit.test.cjs V0.32/qa/check-assembler.test.cjs V0.32/qa/check-build-cli.test.cjs
+node --test V0.32/qa/check-interaction-recovery.test.cjs V0.32/qa/check-state-recovery.test.cjs V0.32/qa/check-priority-audit.test.cjs V0.32/qa/check-assembler.test.cjs V0.32/qa/check-build-cli.test.cjs
 node V0.32/qa/check-refactor-parity.cjs
 node V0.32/qa/check-guidance.cjs
 node V0.32/qa/check-build-injection.cjs
@@ -75,7 +75,7 @@ if test "$ready" -ne 1; then
 fi
 
 failed_suites=0
-for suite in smoke-v032.js e2e-functional.js e2e-conversational.js v032-browser-regressions.cjs e2e-acceptance-v032.cjs e2e-scenarios-v032.cjs e2e-full-journeys-v032.cjs e2e-guided-usability-v032.cjs e2e-deterministic-guidance-v032.cjs e2e-priority-audit-v032.cjs; do
+for suite in e2e-interaction-recovery-v032.cjs smoke-v032.js e2e-functional.js e2e-conversational.js v032-browser-regressions.cjs e2e-acceptance-v032.cjs e2e-scenarios-v032.cjs e2e-full-journeys-v032.cjs e2e-guided-usability-v032.cjs e2e-deterministic-guidance-v032.cjs e2e-priority-audit-v032.cjs; do
   echo "========= $suite ========="
   if node "V0.32/qa/$suite" >"$result_dir/$suite.log" 2>&1; then
     echo "PASS $suite"

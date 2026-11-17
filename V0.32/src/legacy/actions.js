@@ -1174,40 +1174,26 @@ ACT.pname=function(){
   save();if(CURRENT==='profile')renderCurrent();else renderTok();toast('ذخیره شد');
 };
 ACT.logout=function(){S.auth=null;save();APH=0;toggleF(false);go('landing');toast('خروج')};
-/* V0.27 — بازنشانی واقعی با تأیید و گزارش صادقانه */
+/* V0.32 — بازنشانی مستقل نسخهٔ جاری */
 ACT.reset=function(){
-  openModal('<h3>بازنشانی کامل داده‌ها</h3>'+
-  '<p class="note">همهٔ داده‌های محلینو در این مرورگر حذف می‌شود:</p>'+
-  '<ul style="font-size:12.5px;line-height:2;color:var(--ink2);margin:6px 0 10px;padding-inline-start:18px">'+
-  '<li>گفت‌وگوها و تاریخچهٔ چت</li><li>درخواست‌ها، فلوها و قراردادها</li><li>آگهی‌های نشان‌شده و یادآورها</li>'+
-  '<li>موجودی شبیه‌سازی‌شدهٔ کیف پول و کلیدها</li><li>تنظیمات، حساب کاربری و حالت نمایش</li></ul>'+
-  '<p class="note">داده‌های سایت‌های دیگر دست‌نخورده می‌ماند. این کار بازگردانی ندارد.</p>'+
-  '<div class="fs-actions" style="margin-top:12px"><button class="btn btn-danger" data-act="resetOk">حذف کامل و شروع از نو</button><button class="btn" data-act="closeModal">انصراف</button></div>');
+  openModal('<h3>بازنشانی داده‌های نسخهٔ ۰.۳۲</h3>'+
+  '<p class="note">گفت‌وگوها، درخواست‌ها، قراردادها، ذخیره‌ها، یادآورها، موجودی نمایشی و تنظیمات نسخهٔ ۰.۳۲ پاک می‌شود. داده‌های نسخه‌های قبلی و سایت‌های دیگر حفظ می‌شود. این کار بازگردانی ندارد.</p>'+
+  '<div class="fs-actions" style="margin-top:12px"><button class="btn btn-danger" data-act="resetOk">حذف داده‌های نسخهٔ ۰.۳۲</button><button class="btn" data-act="closeModal">انصراف</button></div>');
 };
 ACT.resetOk=function(){
   var errs=[];
-  function tryIt(fn,label){try{fn()}catch(e){errs.push(label+': '+(e&&e.message?e.message:e))}}
-  tryIt(function(){
-    var kill=[],i,k;
-    for(i=0;i<localStorage.length;i++){k=localStorage.key(i);if(k&&(k.indexOf('mahalino')===0||k.indexOf('khanyar')===0))kill.push(k)}
-    kill.forEach(function(k2){localStorage.removeItem(k2)});
-  },'localStorage');
-  tryIt(function(){
-    var kill=[],i,k;
-    for(i=0;i<sessionStorage.length;i++){k=sessionStorage.key(i);if(k&&(k.indexOf('mahalino')===0||k.indexOf('khanyar')===0))kill.push(k)}
-    kill.forEach(function(k2){sessionStorage.removeItem(k2)});
-  },'sessionStorage');
-  tryIt(function(){
-    if(window.indexedDB&&indexedDB.deleteDatabase){indexedDB.deleteDatabase('mahalino');indexedDB.deleteDatabase('mahalino-plus');indexedDB.deleteDatabase('khanyar')}
-  },'indexedDB');
-  tryIt(function(){
-    HIST=[];CE.f=null;CE.i=0;CE.li=0;CE.hist=[];E22.restoredId=null;E27.sq='';
-    try{ctxReset()}catch(e2){}
-  },'memory');
+  function tryIt(fn,label){try{fn()}catch(e){errs.push(label)}}
+  // An explicit empty state prevents migration from importing V0.31 again.
+  try{localStorage.setItem(LSKEY,'{}')}catch(e){toast('بازنشانی انجام نشد؛ ذخیره‌سازی محلی در دسترس نیست.');return}
+  window.__mahalinoResetPending=true;
+  tryIt(function(){localStorage.removeItem(LSKEY+'_recovery')},'localStorage');
+  tryIt(function(){sessionStorage.removeItem(LSKEY);sessionStorage.removeItem(LSKEY+'_recovery')},'sessionStorage');
+  // Shared IndexedDB databases and unversioned preferences belong to no single
+  // release. Do not delete them as part of this version-only action.
   closeModal();
-  if(errs.length){toast('بازنشانی ناقص شد: '+errs[0]);return}
-  toast('همهٔ داده‌ها پاک شد — شروع از نو…');
-  setTimeout(function(){location.reload()},700);
+  if(errs.length){toast('بازنشانی ناقص شد؛ صفحه را بازنشانی کنید و دوباره تلاش کنید.');return}
+  toast('داده‌های نسخهٔ ۰.۳۲ پاک شد — شروع از نو…');
+  location.reload();
 };
 /* CJM handlers removed in V0.9 */
 
