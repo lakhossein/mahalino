@@ -169,7 +169,7 @@ E30.ux=(function(){
           await navigator.share({files:[file],title:'سند قرارداد محلینو'});
           status.textContent='فایل برای اشتراک ارسال شد.';
         }else{status.textContent='اشتراک مستقیم در این مرورگر پشتیبانی نمی‌شود؛ همین فایل PDF را در پیام‌رسان یا ایمیل پیوست کنید.';}
-      }catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:172',err,'caught');status.textContent=err.name==='AbortError'?'اشتراک لغو شد؛ می‌توانید دوباره تلاش کنید.':'ارسال انجام نشد؛ دوباره تلاش کنید یا فایل را به پیام پیوست کنید.';}
+      }catch(err){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-ux.js:172',err,'caught');status.textContent=err&&err.name==='AbortError'?'اشتراک لغو شد؛ می‌توانید دوباره تلاش کنید.':'ارسال انجام نشد؛ دوباره تلاش کنید یا فایل را به پیام پیوست کنید.';}
     };
     ACT.e30shWhole=function(){usrC('اشتراک‌گذاری کل گفت‌وگو');E29.share.dialog('conversation',null)};
     /* Device-local hashes never transfer the snapshot to a different browser.

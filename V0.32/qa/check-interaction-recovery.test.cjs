@@ -32,9 +32,9 @@ for(const kind of ['success','reject-fallback','denied','missing','throw'])test(
  vm.runInNewContext(copy,c);const promise=c.ACT.e29shCopy();if(kind==='success'){assert.equal(messages.length,0);resolveWrite()};await promise;
  assert.equal(messages.length,1);assert.equal(messages[0]==='لینک کپی شد',kind==='success'||kind==='reject-fallback');if(kind!=='success')assert.equal(selected,1);
 });
-for(const kind of ['read-reject','bad-magic','success','unsupported','abort','share-reject','slice-throw'])test('PDF '+kind,async()=>{
+for(const kind of ['read-reject','read-null','bad-magic','success','unsupported','abort','share-reject','slice-throw'])test('PDF '+kind,async()=>{
  const status={textContent:''};let shared=0;
- const file={size:9,name:'contract.pdf',slice(){if(kind==='slice-throw')throw Error();return {arrayBuffer:()=>kind==='read-reject'?Promise.reject(Error('read')):Promise.resolve(Uint8Array.from(Buffer.from(kind==='bad-magic'?'text!':'%PDF-')).buffer)}}};
+ const file={size:9,name:'contract.pdf',slice(){if(kind==='slice-throw')throw Error();return {arrayBuffer:()=>kind==='read-reject'?Promise.reject(Error('read')):kind==='read-null'?Promise.reject(null):Promise.resolve(Uint8Array.from(Buffer.from(kind==='bad-magic'?'text!':'%PDF-')).buffer)}}};
  const c={ACT:{},Uint8Array,document:{getElementById:id=>id==='e30-pdf-status'?status:{files:[file]}},navigator:{canShare:()=>kind!=='unsupported',share:async()=>{shared++;if(kind==='abort')throw {name:'AbortError'};if(kind==='share-reject')throw Error('share')}}};
  vm.runInNewContext(pdf,c);await assert.doesNotReject(c.ACT.e30pdfSend());assert.ok(status.textContent);
  assert.equal(status.textContent.includes('ارسال شد'),kind==='success');assert.equal(shared,kind==='success'||kind==='abort'||kind==='share-reject'?1:0);

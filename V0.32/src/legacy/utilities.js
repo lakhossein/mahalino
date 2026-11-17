@@ -150,7 +150,7 @@ function a11yify(root){
 var MODAL_PREV=null;
 function openModal(html,cb){
   var r=$('#modal-root');
-  MODAL_PREV=document.activeElement;
+  if(!r.classList.contains('on')||!r.contains(document.activeElement))MODAL_PREV=document.activeElement;
   r.innerHTML='<div class="modal">'+html+'</div>';
   r.classList.add('on');
   r.onclick=function(e){if(e.target===r)closeModal()};

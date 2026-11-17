@@ -13,6 +13,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict');
  await page.waitForTimeout(50);await page.locator('#last').focus();await page.keyboard.press('Tab');assert.equal(await page.evaluate(()=>document.activeElement.id),'first');
  await page.keyboard.press('Shift+Tab');assert.equal(await page.evaluate(()=>document.activeElement.id),'last');
  assert.equal(await page.locator('.modal').getAttribute('role'),'dialog');assert.equal(await page.locator('.modal').getAttribute('aria-labelledby'),'mahalino-modal-title');
+ await page.evaluate(()=>openModal('<h3>جایگزین</h3><button>بستن</button>'));await page.waitForTimeout(50);
  await page.keyboard.press('Escape');assert.equal(await page.evaluate(()=>document.activeElement.id),'return-focus');console.log('PASS modal focus trap, name, Escape and focus return');
  const safe=await page.evaluate(()=>{
  const payload='<b>keep</b><table><tr><td>cell</td></tr></table><img src="javascript:alert(1)" onerror="window.bad=1"><iframe srcdoc="bad"></iframe><svg><animate attributeName="href" values="javascript:alert(1)"></animate><path d="M0 0"></path></svg><a href="java&#10;script:alert(1)" data-act="resetOk">link</a><script>window.bad=1</script>';
