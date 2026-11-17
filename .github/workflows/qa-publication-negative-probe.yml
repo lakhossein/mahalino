@@ -1,0 +1,39 @@
+name: Controlled negative publication dependency probe
+on:
+  pull_request:
+    branches: [main]
+    paths: ['.github/workflows/qa-publication-negative-probe.yml']
+permissions:
+  contents: read
+jobs:
+  quality-v030:
+    runs-on: ubuntu-latest
+    steps:
+      - run: exit 0
+  quality-v031:
+    runs-on: ubuntu-latest
+    steps:
+      - run: exit 0
+  quality-v032:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Intentional failure without touching product or Pages
+        run: exit 1
+  publish:
+    needs: [quality-v030, quality-v031, quality-v032]
+    runs-on: ubuntu-latest
+    steps:
+      - name: This step must be skipped
+        run: exit 99
+  assert-blocked:
+    if: always()
+    needs: [quality-v032, publish]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prove a failed V0.32 dependency skips publication
+        env:
+          GATE_RESULT: ${{ needs.quality-v032.result }}
+          PUBLISH_RESULT: ${{ needs.publish.result }}
+        run: |
+          test "$GATE_RESULT" = failure
+          test "$PUBLISH_RESULT" = skipped
