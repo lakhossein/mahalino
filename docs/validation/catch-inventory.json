@@ -1,0 +1,1460 @@
+[
+  {
+    "file": "src/legacy/actions.js",
+    "line": 42,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 56,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 66,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 84,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 95,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 104,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 112,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 340,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 358,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 1186,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/actions.js",
+    "line": 1188,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/boot.js",
+    "line": 4,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/boot.js",
+    "line": 5,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/boot.js",
+    "line": 6,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/boot.js",
+    "line": 7,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/boot.js",
+    "line": 17,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 37,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 77,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 147,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 256,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 258,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 265,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 289,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 290,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 306,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-history.js",
+    "line": 319,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 34,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 97,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 137,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 244,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 324,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 339,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 471,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 475,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 491,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/chat-ux.js",
+    "line": 492,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/contracts.js",
+    "line": 85,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/contracts.js",
+    "line": 99,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/contracts.js",
+    "line": 115,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/contracts.js",
+    "line": 277,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/contracts.js",
+    "line": 297,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/conversation.js",
+    "line": 4,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/conversation.js",
+    "line": 159,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/conversation.js",
+    "line": 164,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/conversation.js",
+    "line": 165,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/conversation.js",
+    "line": 205,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/conversation.js",
+    "line": 226,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/core.js",
+    "line": 43,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/core.js",
+    "line": 61,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/core.js",
+    "line": 107,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/core.js",
+    "line": 140,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/core.js",
+    "line": 156,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 567,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 805,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 909,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 914,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 920,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 926,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 931,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 936,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 942,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 946,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 1014,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 1186,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 1270,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 1360,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 1556,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 1620,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/guaranteed-rental.js",
+    "line": 1633,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/intel.js",
+    "line": 319,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/legacy-discovery.js",
+    "line": 16,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/legacy-discovery.js",
+    "line": 108,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/library.js",
+    "line": 263,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/maps-account.js",
+    "line": 23,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/maps-account.js",
+    "line": 26,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/maps-account.js",
+    "line": 37,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/maps-account.js",
+    "line": 50,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/maps-account.js",
+    "line": 51,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/maps-account.js",
+    "line": 111,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/maps-account.js",
+    "line": 138,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 4,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 12,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 13,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 15,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 24,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 34,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 36,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 223,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/market-ux.js",
+    "line": 350,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/navigation.js",
+    "line": 52,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/navigation.js",
+    "line": 91,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/notifications.js",
+    "line": 41,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/property-services.js",
+    "line": 7,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/property-services.js",
+    "line": 10,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/property-services.js",
+    "line": 91,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/property-services.js",
+    "line": 100,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 43,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 125,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 144,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 191,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 198,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 217,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 303,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 311,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 410,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 565,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 594,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 605,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 668,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 835,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 911,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1050,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1068,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1073,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1078,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1119,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1252,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1253,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1257,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/rich-conversation.js",
+    "line": 1313,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/sample-data.js",
+    "line": 383,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/sample-data.js",
+    "line": 447,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/sample-data.js",
+    "line": 522,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/sample-data.js",
+    "line": 532,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/scenario-dispatch.js",
+    "line": 268,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/scenario-dispatch.js",
+    "line": 295,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/sharing.js",
+    "line": 154,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/sharing.js",
+    "line": 155,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/sharing.js",
+    "line": 195,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/sharing.js",
+    "line": 216,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/sharing.js",
+    "line": 217,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 171,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 225,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 226,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 232,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 235,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 246,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 249,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 263,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 265,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 269,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 284,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 288,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 289,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/shell.js",
+    "line": 290,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 3,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 4,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 5,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 22,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 29,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 52,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/trust-productivity.js",
+    "line": 384,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 7,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 8,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 160,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 175,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 197,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 289,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 298,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 303,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/utilities.js",
+    "line": 318,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/wallet-charts.js",
+    "line": 22,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/workflow-engine.js",
+    "line": 500,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/legacy/workflows.js",
+    "line": 53,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-core.js",
+    "line": 40,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-flows.js",
+    "line": 73,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-flows.js",
+    "line": 97,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-flows.js",
+    "line": 148,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-flows.js",
+    "line": 537,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-guidance.js",
+    "line": 205,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 33,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 110,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 614,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 621,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 704,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 858,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 1287,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 1362,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-intel.js",
+    "line": 1453,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-landing.js",
+    "line": 30,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-landing.js",
+    "line": 228,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 21,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 88,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 95,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 128,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 129,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 153,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 175,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-payment.js",
+    "line": 192,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 35,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 45,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 48,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 56,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 83,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 88,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 133,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 136,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 139,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 165,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 180,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 183,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 224,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 265,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 280,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 302,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 305,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 311,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 314,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 336,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 338,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 351,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 358,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 362,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 379,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 389,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 391,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 393,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 394,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 396,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 447,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 493,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 510,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 526,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 597,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 639,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 642,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 645,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 646,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 647,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 648,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 663,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-shell.js",
+    "line": 669,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 10,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 18,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 172,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 245,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 246,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 247,
+    "handling": "fallback-or-review",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 520,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 521,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 522,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 523,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  },
+  {
+    "file": "src/v32-ux.js",
+    "line": 524,
+    "handling": "reported",
+    "note": "Context review required; not a count of bugs"
+  }
+]

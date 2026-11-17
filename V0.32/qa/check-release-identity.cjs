@@ -19,7 +19,7 @@ const repo=path.resolve(root,'..');
 if(fs.existsSync(path.join(repo,'.git'))){
  let sha='';
  try{sha=child.execFileSync('git',['-C',repo,'rev-parse','HEAD:V0.31'],{encoding:'utf8'}).trim()}catch(e){}
- checks.untouchedV031=sha==='220389ed276bcc7069b5aa69a1c36d2405438873';
+ checks.untouchedV031=sha==='ef7c5b9b44808550dcda7050bb795acde8e3e074';
 }
 const failed=Object.keys(checks).filter(k=>!checks[k]);
 console.log(JSON.stringify({version:'0.32',checks,failed,pass:failed.length===0},null,2));

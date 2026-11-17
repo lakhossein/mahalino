@@ -128,6 +128,7 @@ E30.payVisual=function(){
 };
 
 E30.init=function(){
+  if(E30._installed)return;E30._installed=true;
   /* 1) workflow registry: sell / invest / landlord + FRC + WSTEPS */
   try{E30.flowsAPI.install()}catch(e){console.error('E30 install',e)}
 
@@ -471,21 +472,20 @@ E30.init=function(){
       wrapped._e30PayGuard=true;
       return wrapped;
     }
-    function paidSource(fn){
-      try{var action=fn.e30PaidDelegate||fn;return /\b(?:spend|doRentVisit)\s*\(/.test(Function.prototype.toString.call(action))}catch(e){return false}
-    }
+    var paidRegistry={"ACT.rdet": true, "ACT.bdet": true, "ACT.rvisit": true, "ACT.blegal": true, "ACT.besc": true, "ACT.pbidok": true, "ACT.sbook": true, "CBACT.detL": true, "CBACT.detB": true, "SCRIPTS.rent.visit.go": true, "SCRIPTS.buy.lg.lg": true, "SCRIPTS.mkt.send.b": true, "SCRIPTS.stay.book.b": true};
+    E30.paidActionRegistry=Object.keys(paidRegistry);
     var legacyGuarded=[];
     [[ACT,'ACT'],[CBACT,'CBACT']].forEach(function(pair){
       var group=pair[0];
       Object.keys(group||{}).forEach(function(k){
-        if(paidSource(group[k])){group[k]=guardPaidAction(group[k]);legacyGuarded.push(pair[1]+'.'+k)}
+        if(paidRegistry[pair[1]+'.'+k]){group[k]=guardPaidAction(group[k]);legacyGuarded.push(pair[1]+'.'+k)}
       });
     });
     Object.keys(SCRIPTS||{}).forEach(function(k){
       (SCRIPTS[k]||[]).forEach(function(step){
         if(!step||!step.acts)return;
         Object.keys(step.acts).forEach(function(a){
-          if(paidSource(step.acts[a])){step.acts[a]=guardPaidAction(step.acts[a]);legacyGuarded.push('SCRIPTS.'+k+'.'+(step.id||'?')+'.'+a)}
+          if(paidRegistry['SCRIPTS.'+k+'.'+(step.id||'?')+'.'+a]){step.acts[a]=guardPaidAction(step.acts[a]);legacyGuarded.push('SCRIPTS.'+k+'.'+(step.id||'?')+'.'+a)}
         });
       });
     });

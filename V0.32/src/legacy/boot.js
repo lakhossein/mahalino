@@ -2,7 +2,7 @@
 (function(){
   try{
     try{if(localStorage.getItem('mahalino_sidefold')==='1')document.body.classList.add('sidefold')}catch(e){}
-    try{E28.init()}catch(e){}
+    try{E28.init()}catch(e){MahalinoDiagnostics.report('boot.E28')}
     try{E29.init()}catch(e){console.error('E29 init',e)}
     try{E30.init()}catch(e){console.error('E30 init',e)}
     renderSidebar();renderTok();

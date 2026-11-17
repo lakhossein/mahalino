@@ -126,17 +126,18 @@ function balLow(){return (S.tokens||0)<30}
 
 /* ── LLM adapter (off by default; no fabrication — spec §4.5) ── */
 E29.llm={
-  endpoint:null,
-  enabled:false,
+  endpoint:null,enabled:false,timeoutMs:10000,
   configure:function(url){this.endpoint=url;this.enabled=!!url},
   complete:function(history,done){
     if(!this.enabled||!this.endpoint||typeof fetch!=='function'){done(null);return}
-    try{
-      fetch(this.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history})})
-        .then(function(r){return r.json()})
-        .then(function(j){done(j&&j.text||null)})
-        .catch(function(){done(null)});
-    }catch(e){done(null)}
+    var controller=typeof AbortController==='function'?new AbortController():null;
+    var settled=false,timer;
+    function finish(value){if(settled)return;settled=true;clearTimeout(timer);done(value)}
+    timer=setTimeout(function(){if(controller)controller.abort();finish(null)},this.timeoutMs);
+    try{Promise.resolve(fetch(this.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history}),signal:controller?controller.signal:undefined}))
+      .then(function(r){if(!r.ok)throw Error('http');return r.json()})
+      .then(function(j){finish(j&&typeof j.text==='string'?j.text:null)},function(){finish(null)})
+    }catch(e){finish(null)}
   }
 };
 

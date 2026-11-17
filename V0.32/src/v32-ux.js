@@ -516,6 +516,7 @@ E30.ux=(function(){
 
   /* ── init ── */
   E30.uxInit=function(){
+    if(E30._uxInstalled)return;E30._uxInstalled=true;
     try{mountLibraryPatch()}catch(e){console.error('E30 lib patch',e)}
     try{mountSharePatch()}catch(e){console.error('E30 share patch',e)}
     try{mountProjectPatch()}catch(e){console.error('E30 prj patch',e)}

@@ -37,7 +37,7 @@ python3 scripts/build_previews.py --check
 python3 -m http.server 8000 --directory build/pages
 ```
 
-Open `http://localhost:8000`. The generator never modifies archived versions. It omits development dependencies, QA fixtures, research notes, screenshots, Windows metadata files and build scripts from the public distribution while retaining runtime assets and source paths.
+Open `http://localhost:8000`. The generator never modifies archived versions. Source packages for V0.30–V0.32 include their builder and README, and every ZIP has a verified file manifest. Packaging stages and verifies the complete gallery before replacing previous output. It omits development dependencies, QA fixtures, research notes, screenshots, Windows metadata files and build scripts from the public distribution while retaining runtime assets and source paths. See [runtime and archive contracts](docs/Mahalino_Runtime_Contracts_FA.md).
 
 For a new release add a folder named `V0.NN` with the main `Mahalino+V0.NN.html` and its assets. A push to `main` triggers an updated gallery, direct URL and downloadable ZIP. The build validates packaging and entry-point presence, **not** the functionality of all scenarios; V0.30, V0.31 and V0.32 each have required Chromium/browser/build quality gates before Pages publication. Pull requests run validation without deploying. Audit-row coverage is distinct from source line/branch coverage.
 

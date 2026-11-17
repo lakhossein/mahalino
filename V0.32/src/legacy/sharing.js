@@ -4,6 +4,26 @@
    standalone HTML export for sending the artifact to others. This is documented
    in the dialog itself and in SHARING-AND-PRIVACY-SPEC-V0.29.md (spec §12.7). */
 E29.share=(function(){
+  // Snapshots are read-only data, including when local storage was edited.
+  E29.safeSharedHTML=function(html){
+    var template=document.createElement('template');template.innerHTML=String(html||'');
+    var allowed='DIV SPAN P BR HR H1 H2 H3 H4 H5 H6 B STRONG I EM U S SMALL BLOCKQUOTE PRE CODE UL OL LI TABLE THEAD TBODY TFOOT TR TD TH CAPTION COLGROUP COL A IMG FIGURE FIGCAPTION SECTION ARTICLE HEADER FOOTER SVG G PATH RECT CIRCLE ELLIPSE LINE POLYLINE POLYGON TEXT TSPAN DEFS CLIPPATH';
+    function clean(parent){
+      Array.prototype.slice.call(parent.children||[]).forEach(function(el){
+        if(allowed.split(' ').indexOf(el.tagName.toUpperCase())<0){el.remove();return}
+        Array.prototype.slice.call(el.attributes).forEach(function(attr){
+          var name=attr.name.toLowerCase(),value=attr.value.replace(/[\x00-\x20]/g,'');
+          if(name.indexOf('on')===0||name.indexOf('data-')===0||name==='srcdoc'||name==='is'||name==='formaction'||name==='xlink:href'||name==='srcset'){el.removeAttribute(attr.name);return}
+          if((name==='href'||name==='src')&&(!/^(https?:|mailto:|tel:|#|[^:]*$)/i.test(value)||/^data:/i.test(value))){el.removeAttribute(attr.name)}
+          if(name==='style'&&/url|expression|@import|behavior|binding|\\/i.test(attr.value))el.removeAttribute(attr.name);
+        });
+        if(el.tagName.toUpperCase()==='A'){el.setAttribute('rel','noopener noreferrer');el.removeAttribute('target')}
+        clean(el);
+      });
+    }
+    clean(template.content);return template.innerHTML;
+  };
+
   function store(){if(!S.shares)S.shares=[];return S.shares}
   function byToken(tok){var st=store(),i;for(i=0;i<st.length;i++){if(st[i].token===tok)return st[i]}return null}
   function valid(sh){return sh&&!sh.revoked&&(!sh.expiresAt||sh.expiresAt>Date.now())}
@@ -90,7 +110,7 @@ E29.share=(function(){
       '.msg .bub{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;font-size:14px}',
       '.msg.user .bub{background:#f0fdfa;border-color:#cceee9}',
       '.msg.bot .bub .qr{display:none}.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;margin:0 auto}'].join('');
-    document.body.innerHTML='<style>'+css+'</style><div style="max-width:680px;margin:0 auto 18px;padding:10px 14px;background:#0f766e;color:#fff;border-radius:12px;font-weight:700">محلینو — محتوای اشتراک‌گذاری‌شده (فقط‌خواندنی)</div>'+inner;
+    document.body.innerHTML='<style>'+css+'</style><div style="max-width:680px;margin:0 auto 18px;padding:10px 14px;background:#0f766e;color:#fff;border-radius:12px;font-weight:700">محلینو — محتوای اشتراک‌گذاری‌شده (فقط‌خواندنی)</div>'+E29.safeSharedHTML(inner);
   }
 
   /* ── dialog ── */
@@ -138,7 +158,7 @@ E29.share=(function(){
   ACT.e29shExport=function(el){
     var sh=store().filter(function(x){return x.id===el.getAttribute('data-sh')})[0];
     if(!sh)return;
-    var html='<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><title>'+esc(sh.title)+' — محلینو</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'+snapshotInner(sh)+'</body></html>';
+    var html='<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><title>'+esc(sh.title)+' — محلینو</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'+E29.safeSharedHTML(snapshotInner(sh))+'</body></html>';
     var blob=new Blob([html],{type:'text/html;charset=utf-8'});
     var a=document.createElement('a');
     a.href=URL.createObjectURL(blob);

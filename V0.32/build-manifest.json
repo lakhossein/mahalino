@@ -52,6 +52,7 @@
     "legacy-sharing": "src/legacy/sharing.js",
     "legacy-shell": "src/legacy/shell.js",
     "legacy-release-modules": "src/legacy/release-modules.js",
-    "legacy-boot": "src/legacy/boot.js"
+    "legacy-boot": "src/legacy/boot.js",
+    "v32-payment-js": "src/v32-payment.js"
   }
 }

@@ -10,6 +10,11 @@ import argparse
 import html
 import re
 import shutil
+import tempfile
+import json
+import hashlib
+from html.parser import HTMLParser
+from urllib.parse import urlsplit, unquote
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
@@ -41,7 +46,7 @@ def entry_file(folder: Path) -> Path:
 def exclude(directory: str, names: list[str]) -> set[str]:
     ignored = set()
     version_root = Path(directory).name
-    retained_builder = {"V0.30": "build_v030.js", "V0.31": "build_v031.js"}.get(version_root)
+    retained_builder = {"V0.30": "build_v030.js", "V0.31": "build_v031.js", "V0.32": "build_v032.js"}.get(version_root)
     for name in names:
         path = Path(directory) / name
         lower = name.lower()
@@ -78,44 +83,88 @@ def version_card(number: int, is_latest: bool) -> str:
     )
 
 
-def build() -> list[int]:
+def populate(output: Path) -> list[int]:
     items = versions()
     if not items:
         raise RuntimeError("No V0.* directories found")
     # Only this exact generated directory is replaced; version archives are never changed.
-    if OUTPUT.exists():
-        shutil.rmtree(OUTPUT)
-    OUTPUT.mkdir(parents=True)
-    (OUTPUT / ".nojekyll").touch()
-    downloads = OUTPUT / "downloads"
+    output.mkdir(parents=True, exist_ok=True)
+    (output / ".nojekyll").touch()
+    downloads = output / "downloads"
     downloads.mkdir()
 
     for number, folder in items:
         slug = f"v0.{number}"
-        target = OUTPUT / slug
+        target = output / slug
         shutil.copytree(folder, target, ignore=exclude)
         shutil.copy2(entry_file(folder), target / "index.html")
+        manifest = {"kind": "rebuildable-source" if number in (30, 31, 32) else "runtime-archive",
+                    "files": {p.relative_to(target).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+                              for p in sorted(target.rglob("*")) if p.is_file()}}
+        (target / "package-manifest.json").write_text(json.dumps(manifest, sort_keys=True), encoding="utf-8")
         create_zip(target, downloads / f"mahalino-{slug}.zip")
 
     template = (ROOT / "previews" / "index.template.html").read_text(encoding="utf-8")
     cards = "\n".join(version_card(number, i == 0) for i, (number, _) in enumerate(items))
     landing = template.replace("{{VERSION_CARDS}}", cards).replace("{{VERSION_COUNT}}", str(len(items)))
-    (OUTPUT / "index.html").write_text(landing, encoding="utf-8")
+    (output / "index.html").write_text(landing, encoding="utf-8")
     return [number for number, _ in items]
 
 
-def verify(numbers: list[int]) -> None:
-    assert (OUTPUT / "index.html").is_file()
+def verify(numbers: list[int], output: Path | None = None) -> None:
+    output = output or OUTPUT
+    assert (output / "index.html").is_file()
     for number in numbers:
         slug = f"v0.{number}"
-        html_file = OUTPUT / slug / "index.html"
-        zip_file = OUTPUT / "downloads" / f"mahalino-{slug}.zip"
+        html_file = output / slug / "index.html"
+        zip_file = output / "downloads" / f"mahalino-{slug}.zip"
         assert html_file.is_file() and html_file.stat().st_size > 0
         assert zip_file.is_file() and zip_file.stat().st_size > 0
         with ZipFile(zip_file) as bundle:
             assert bundle.testzip() is None
             assert "index.html" in bundle.namelist()
+            manifest = json.loads(bundle.read("package-manifest.json"))
+            assert set(bundle.namelist()) == set(manifest["files"]) | {"package-manifest.json"}
+            for name, digest in manifest["files"].items():
+                assert hashlib.sha256(bundle.read(name)).hexdigest() == digest
+            if number in (30, 31, 32):
+                assert f"build_v0{number}.js" in manifest["files"] and "README.md" in manifest["files"]
+        class ResourceParser(HTMLParser):
+            def handle_starttag(self, tag, attrs):
+                attrs = dict(attrs)
+                value = attrs.get("src") if tag in ("script", "img") else attrs.get("href") if tag == "link" else None
+                if not value or value.startswith(("#", "data:", "blob:", "//")) or urlsplit(value).scheme:
+                    return
+                relative = unquote(urlsplit(value).path)
+                asset = (html_file.parent / relative).resolve()
+                assert asset.is_relative_to(html_file.parent.resolve()) and asset.is_file() and asset.stat().st_size, value
+        ResourceParser().feed(html_file.read_text(encoding="utf-8"))
     print(f"Verified {len(numbers)} HTML entry points and ZIP archives")
+
+
+def build() -> list[int]:
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    stage = Path(tempfile.mkdtemp(prefix=".pages-stage-", dir=OUTPUT.parent))
+    backup = OUTPUT.parent / ".pages-previous"
+    try:
+        numbers = populate(stage)
+        verify(numbers, stage)
+        if backup.exists():
+            raise RuntimeError("Previous publication backup exists; inspect it before rebuilding")
+        if OUTPUT.exists():
+            OUTPUT.rename(backup)
+        try:
+            stage.rename(OUTPUT)
+        except BaseException:
+            if backup.exists():
+                backup.rename(OUTPUT)
+            raise
+        if backup.exists():
+            shutil.rmtree(backup)
+        return numbers
+    finally:
+        if stage.exists():
+            shutil.rmtree(stage)
 
 
 def main() -> None:

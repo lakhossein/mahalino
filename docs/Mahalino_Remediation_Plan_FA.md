@@ -7,7 +7,7 @@
 ## قرارداد اجرا
 
 - هر گام یک تغییر مستقل و قابل بازبینی است: بازخوانی شاهد در HEAD هدف، بازتولید/تست شکست، اصلاح محدود، تست موفق، ثبت commit و نتیجهٔ CI؛ سپس گام بعد.
-- فقط گام ۱ در این نوبت اجرا می‌شود. main مستقیماً تغییر نمی‌کند و انتشار عمومی انجام نمی‌شود.
+- اجرا در چند نوبت و روی شاخهٔ مستقل پیش رفته است؛ وضعیت تازه در انتهای همین سند ثبت می‌شود. main مستقیماً تغییر نمی‌کند و انتشار عمومی انجام نمی‌شود.
 - نسخهٔ فعال ۰.۳۲، ظاهر، متن‌ها، فلوها و هدایت rule-based حفظ می‌شوند. تغییر رفتار عمدی در reset یا همزمانی باید قرارداد مشخص داشته باشد.
 - موارد ریسک ابتدا بازتولید می‌شوند. نبود بازتولید، دلیل اجرای اصلاح فرضی یا بستن مورد نیست؛ وضعیت open با توضیح محدودیت باقی می‌ماند.
 - نسخه‌های تاریخی baseline هستند؛ حذف assertion برابری متنی، آرشیو یا dependency ثبت‌شده بدون جایگزین و بررسی سازگاری مجاز نیست.
@@ -99,3 +99,33 @@ M-01: **fixed در پیکربندی؛ تأیید نهایی رفتار runner ه
 وضعیت M-04/M-07/M-08: **fixed در کد، تأیید مرورگری commit جدید در انتظار CI**. M-23: **fixed در مستندات**. CI commit گام دوم `ccd5d9c` برای هر چهار workflow موفق است.
 
 M-05، M-06، M-09، M-15 و سایر موارد با این تغییر حل‌شده محسوب نمی‌شوند. کار بعدی: بازتولید failure ذخیره‌سازی در debit/refund (M-05)، سپس تصمیم قرارداد همزمانی M-06؛ بررسی مودال و هویت سرور QA نیز مستقل باقی است. main ادغام و انتشار عمومی انجام نشده است.
+
+## وضعیت اجرای گستردهٔ اصلاحات
+
+CI کامیت `f04b1f5` در هر چهار workflow موفق شد؛ سناریوهای مرورگری reset/clipboard/PDF نیز در gate موفق حضور داشتند. اصلاحات بعدی روی همان شاخه انجام می‌شوند و merge/deploy خودکار نشده‌اند.
+
+| مورد | وضعیت دقیق این مرحله | شاهد / محدودیت |
+|---|---|---|
+| M-05 | fixed در مسیر پرداخت ۰.۳۲ | save نتیجهٔ boolean؛ جلوگیری از callback در شکست ثبت debit؛ rollback حافظه در debit/refund ناموفق؛ ثبت نتیجهٔ ناموفق صادقانه؛ ۶ تست persistence/payment، شامل failure injection و idempotency |
+| M-06 | محافظت پیاده‌شده؛ محدودیت fallback باقی | Web Locks مالک نویسندهٔ یک‌تب تا پایان عمر تب؛ save/reset تب دوم مسدود؛ snapshot/storage-event برای stale writer؛ در مرورگر فاقد Web Locks، race دقیق همزمان هنوز تضمین اتمی ندارد |
+| M-09 | fixed در مودال عمومی | role/name، focus trap دوسویه، Escape، بازگشت focus؛ سناریوی Chromium اجباری جدید |
+| M-10 | fixed | ۱۳ مسیر پولی در registry صریح؛ حذف Function.toString از تشخیص؛ مقایسهٔ registry با guardهای نصب‌شده در تست Chromium |
+| M-11 | اصلاح نصب + قرارداد wrapperها | init و uxInit idempotent؛ نقشهٔ ترتیب و مالکیت در Runtime_Contracts؛ تست هویت handler پیش/پس از init تکراری؛ wrapperهای لازم تاریخی حذف نشده‌اند |
+| M-12 | open؛ پیشرفت معماری، حل کامل ادعا نمی‌شود | payment به فایل مستقل با slot جدا منتقل شد؛ API/مالکیت و inventory وابستگی ۵۱ ماژول ثبت و تست می‌شود؛ shared global scope هنوز وجود دارد |
+| M-13 | open؛ زیرساخت گزارش تکمیل، ممیزی معنایی همهٔ catchها باقی | unhandledrejection + خطای script + E28 boot؛ code/time محدود و بدون دادهٔ شخصی؛ inventory تمام catchها؛ ردیف‌های fallback-or-review هنوز نیازمند بررسی زمینه‌اند |
+| M-14 | open؛ اندازه‌گیری و کاهش نوشتن تکراری | ۱۰ save بدون تغییر، صفر setItem؛ benchmark مصنوعی ۱۰۰/۱۰۰۰/۱۰۰۰۰ پیام و p50/p95 در docs/validation/state-benchmark.json؛ stringify همچنان همگام و اندازه‌گیری دستگاه موبایل/long task واقعی انجام نشده |
+| M-15 | fixed | readiness فقط پس از bind موفق سرور خود QA؛ کنترل زنده‌بودن PID؛ تطبیق hash محتوای HTTP با artifact؛ تست پورت اشغال و HTTP 200 اشتباه |
+| M-16 | fixed در سیاست آزمون این اصلاحات | baselineهای قبلی با hash حفظ؛ فقط بلوک‌های مصوب + رفتار متناظر مجاز به اختلاف‌اند؛ بقیهٔ HTML همچنان برابر؛ assertion صرفاً برای سبزکردن CI حذف نشد |
+| M-17 | fixed | قرارداد rebuildable-source برای ۰.۳۰/۰.۳۱/۰.۳۲؛ entry سازنده/README همراه؛ manifest و تست محتویات ZIP |
+| M-18 | fixed | ۵۰۷ فایل node_modules از index خارج شدند؛ npm ci از lockfile ورودی QA است؛ تاریخچه بازنویسی نشد |
+| M-19 | مرز نگهداری تعیین شد؛ تکثیر تاریخی عمداً حفظ | snapshot تاریخی در برابر source فعال و QA مشترک جدید تفکیک شد؛ تست مستقل عدم تغییر runtime تاریخی؛ مشترک‌سازی همهٔ QA قدیمی انجام نشد چون baselineهای نسخه‌ای‌اند |
+| M-20 | اصلاح دو sink اشتراک، تست مرورگری لازم | sanitizer مشترک display/export با allowlist تگ، حذف handler/action/active SVG و scheme اجرایی؛ قالب bold/table حفظ می‌شود؛ این اصلاح ادعای ممیزی همهٔ innerHTMLها نیست |
+| M-21 | fixed | staging + verify پیش از replace، backup/rollback rename؛ تست asset مفقود، نسخه ناقص، exclusion، شکست میانی و manifest ZIP؛ crash/power-loss atomicity ادعا نمی‌شود |
+| M-22 | fixed در adapter اختیاری | غیرفعال باقی؛ timeout/abort، HTTP status، JSON/schema و callback یک‌بار؛ ۶ تست بدون فعال‌کردن AI |
+| M-24 | fixed | ۱۷۳ desktop.ini از index خارج؛ تست جلوگیری از برگشت metadata/dependency؛ hash درخت‌های تاریخی پس از همین حذف‌های غیرruntime دوباره تثبیت شد |
+
+شواهد محلی این مرحله: ۹۱ تست Node، ۱۷ تست Python، parity محدود به بلوک‌های مصوب، build بازتولیدپذیر و هر ۳۲ بسته موفق‌اند. تست‌های Chromium جدید هم در gate اجباری ثبت‌اند؛ نتیجهٔ CI commit این مرحله باید جدا خوانده شود. به‌دلیل مشکل نصب Chromium، اجرای مرورگری محلی ادعا نمی‌شود.
+
+در failure پایدار پس از اجرای callback، تراکنش مشترک میان side effect خارجی و localStorage وجود ندارد؛ پیام عدم ثبت نتیجه نمایش داده می‌شود. در این prototype callbackها عمدتاً محلی‌اند؛ تضمین exactly-once برای سرویس backend واقعی در این اصلاح تعریف نشده است.
+
+منابع ادامه: Mahalino_Runtime_Contracts_FA.md، docs/validation/runtime-dependencies.json و catch-inventory.json. M-12/M-13/M-14 و تضمین کامل fallback قدیمی M-06 نباید صرفاً با سبزشدن CI بسته شوند. این بخش عمداً وضعیت جزئی را روشن نگه می‌دارد، نه ادعای اتمام همهٔ بدهی‌های معماری.

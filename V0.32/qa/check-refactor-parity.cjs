@@ -30,7 +30,17 @@ for(const item of JSON.parse(interactionRaw)){
  assert.equal(expected.split(item.original).length,2,'interaction baseline must occur once');
  expected=expected.replace(item.original,()=>src.slice(start,end));
 }
-assert.equal(current,expected,'V0.32 changed content outside approved identity/state/interaction blocks');
+const reliabilityRaw=fs.readFileSync(path.join(__dirname,'fixtures/reliability-baselines.json'),'utf8');
+assert.equal(require('node:crypto').createHash('sha256').update(reliabilityRaw).digest('hex'),'ae77d3b45407dbd10239a5e6237c0c711db18acffe31ec5e1e20c3552dfc8d33');
+for(const item of JSON.parse(reliabilityRaw)){
+ const src=fs.readFileSync(path.join(root,'src',item.file),'utf8');
+ const start=item.file==='legacy/error-handler.js'?0:src.indexOf(item.start),end=item.end?src.indexOf(item.end,start):src.length;
+ assert(start>=0&&end>start);
+ // shell/UX/core blocks can contain previously approved handler changes.
+ assert.equal(expected.split(item.original).length,2,'reviewed reliability baseline must occur once: '+item.file);
+ expected=expected.replace(item.file==='legacy/error-handler.js'?'\n'+item.original:item.original,()=>src.slice(start,end));
+}
+assert.equal(current,expected,'V0.32 changed outside approved reliability blocks');
 // Execute the actual loader against a fresh, prior-only and existing V0.32 store.
 const vm=require('node:vm');
 const loader=stateBlock;
@@ -42,7 +52,7 @@ for(const existing of ['fresh','previous','current']){
  const before=data.mahalino_v31;
  const writes=[];
  const context={localStorage:{getItem:key=>data[key]||null,setItem:(key,value)=>{writes.push(key);data[key]=value}},
-   console,Date,Math};
+   console,Date,Math,window:{}};
  vm.runInNewContext(loader,context);
  assert.equal(context.S&&context.S.tokens,existing==='current'?123:existing==='previous'?321:0);
  assert.equal(data.mahalino_v31,before,'migration overwrote the predecessor');

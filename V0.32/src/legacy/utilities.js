@@ -155,13 +155,23 @@ function openModal(html,cb){
   r.classList.add('on');
   r.onclick=function(e){if(e.target===r)closeModal()};
   a11yify(r);
+  r.removeAttribute('role');r.removeAttribute('aria-modal');
   var m=r.querySelector('.modal');
-  if(m){m.setAttribute('tabindex','-1');setTimeout(function(){try{m.focus()}catch(e){}},20)}
+  if(m){m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');var title=m.querySelector('h1,h2,h3');if(title){title.id='mahalino-modal-title';m.setAttribute('aria-labelledby',title.id)}else{m.setAttribute('aria-label','پنجرهٔ محلینو')}m.setAttribute('tabindex','-1');setTimeout(function(){try{m.focus()}catch(e){}},20)}
+  r.onkeydown=function(e){
+    if(e.key==='Escape'){e.preventDefault();closeModal();return}
+    if(e.key!=='Tab'||!m)return;
+    var nodes=Array.prototype.filter.call(m.querySelectorAll('button,a[href],input,select,textarea,[tabindex]'),function(n){return !n.disabled&&n.tabIndex>=0&&n.getClientRects().length});
+    if(!nodes.length){e.preventDefault();m.focus();return}
+    var first=nodes[0],last=nodes[nodes.length-1],active=document.activeElement;
+    if(e.shiftKey&&(active===first||active===m)){e.preventDefault();last.focus()}
+    else if(!e.shiftKey&&(active===last||active===m)){e.preventDefault();first.focus()}
+  };
   if(cb)cb();
 }
 function closeModal(){
   var r=$('#modal-root');
-  r.classList.remove('on');r.innerHTML='';
+  r.classList.remove('on');r.onkeydown=null;r.innerHTML='';
   if(MODAL_PREV&&MODAL_PREV.focus){try{MODAL_PREV.focus()}catch(e){}}
   MODAL_PREV=null;
 }
@@ -275,9 +285,39 @@ if(!S.profile)S.profile={confirmed:{},inferred:{},stale:{},log:[]};
 if(!S.paySession)S.paySession=null;
 if(!S.savedListings)S.savedListings=[];
 if(!S.ctx30)S.ctx30={fields:{},log:[]};
-function save(){if(window.__mahalinoResetPending)return false;try{
-  // Fail closed if preserving corrupt input fails (e.g. storage quota).
-  // Only one recovery snapshot is kept; never touch predecessor keys.
-  if(stateRecovery.length){localStorage.setItem(LSKEY+'_recovery',JSON.stringify(stateRecovery));stateRecovery=[]}
-  localStorage.setItem(LSKEY,JSON.stringify(S))}catch(e){console.error('save failed',e);if(window.E24)E24.toastErr('ذخیره‌سازی محلی ناموفق بود؛ تغییرات تا بازنشانی صفحه در همین نشست اعمال است.')}}
-
+var stateLastRaw=null,stateConflict=false;
+try{stateLastRaw=localStorage.getItem(LSKEY)}catch(e){stateConflict=true}
+if(window.addEventListener)window.addEventListener('storage',function(e){
+  if(e.key===LSKEY&&e.newValue!==stateLastRaw){stateConflict=true;if(window.E24)E24.toastErr('داده‌ها در پنجرهٔ دیگری تغییر کرد؛ پیش از ادامه صفحه را بازنشانی کنید.')}
+});
+var stateWriterReady=true;
+if(typeof navigator!=='undefined'&&navigator.locks&&navigator.locks.request){
+  stateWriterReady=false;
+  navigator.locks.request(LSKEY+'-writer',{ifAvailable:true},function(lock){
+    if(!lock)return;
+    try{if(localStorage.getItem(LSKEY)!==stateLastRaw){stateConflict=true;return}}catch(e){stateConflict=true;return}
+    stateWriterReady=true;
+    // Boot may have deferred a durable refund until writer ownership was known.
+    if(window.E30&&E30.pay&&S.paySession&&S.paySession.paidFlag)E30.pay.recover();
+    return new Promise(function(){}); // browser releases ownership when the tab closes
+  }).catch(function(){stateWriterReady=false});
+}
+function save(){
+  if(window.__mahalinoResetPending)return false;
+  if(!stateWriterReady){if(window.E24)E24.toastErr('این پنجره امکان ذخیره ندارد؛ پنجرهٔ دیگر محلینو را ببندید و این صفحه را بازنشانی کنید.');return false}
+  try{
+    if(stateConflict||localStorage.getItem(LSKEY)!==stateLastRaw){
+      stateConflict=true;
+      if(window.E24)E24.toastErr('ذخیره انجام نشد؛ داده‌ها در پنجرهٔ دیگری تغییر کرده است. صفحه را بازنشانی کنید.');
+      return false;
+    }
+    var encoded=JSON.stringify(S);
+    if(stateRecovery.length){localStorage.setItem(LSKEY+'_recovery',JSON.stringify(stateRecovery));stateRecovery=[]}
+    if(encoded!==stateLastRaw){localStorage.setItem(LSKEY,encoded);stateLastRaw=encoded}
+    return true;
+  }catch(e){
+    console.error('local persistence failed');
+    if(window.E24)E24.toastErr('ذخیره‌سازی محلی ناموفق بود؛ تغییرات تا بازنشانی صفحه در همین نشست اعمال است.');
+    return false;
+  }
+}

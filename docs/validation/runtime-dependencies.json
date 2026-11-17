@@ -1,0 +1,630 @@
+{
+  "note": "Static references, not proof of runtime reachability or module encapsulation",
+  "modules": [
+    {
+      "slot": "v32-age-range-js",
+      "file": "src/v32-age-range.js",
+      "sharedSymbols": [],
+      "includes": []
+    },
+    {
+      "slot": "v32-core-js",
+      "file": "src/v32-core.js",
+      "sharedSymbols": [
+        "S",
+        "E29",
+        "E30"
+      ],
+      "includes": [
+        "v32-payment-js"
+      ]
+    },
+    {
+      "slot": "v32-flows-js",
+      "file": "src/v32-flows.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CE",
+        "ACT",
+        "E29",
+        "E30"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "v32-guidance-js",
+      "file": "src/v32-guidance.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CE",
+        "ACT",
+        "CBACT",
+        "E29",
+        "E30",
+        "HIST"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "v32-guided-ui-css",
+      "file": "src/v32-guided-ui.css",
+      "sharedSymbols": [],
+      "includes": []
+    },
+    {
+      "slot": "v32-guided-ui-js",
+      "file": "src/v32-guided-ui.js",
+      "sharedSymbols": [
+        "S",
+        "ACT",
+        "CBACT",
+        "E29",
+        "E30"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "v32-intel-js",
+      "file": "src/v32-intel.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CE",
+        "CBACT",
+        "E30"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "v32-landing-js",
+      "file": "src/v32-landing.js",
+      "sharedSymbols": [
+        "ACT",
+        "E30",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "v32-money-range-js",
+      "file": "src/v32-money-range.js",
+      "sharedSymbols": [],
+      "includes": []
+    },
+    {
+      "slot": "v32-money-js",
+      "file": "src/v32-money.js",
+      "sharedSymbols": [
+        "CE"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "v32-shell-js",
+      "file": "src/v32-shell.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CE",
+        "ACT",
+        "CBACT",
+        "E29",
+        "E30",
+        "HIST",
+        "openModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "v32-turns-js",
+      "file": "src/v32-turns.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "ACT",
+        "CBACT",
+        "E30",
+        "HIST"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "v32-ux-js",
+      "file": "src/v32-ux.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "ACT",
+        "CBACT",
+        "E29",
+        "E30",
+        "HIST",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "v32-css",
+      "file": "src/v32.css",
+      "sharedSymbols": [
+        "E30"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "styles",
+      "file": "src/legacy/styles.css",
+      "sharedSymbols": [
+        "E29"
+      ],
+      "includes": [
+        "v32-css",
+        "v32-guided-ui-css"
+      ]
+    },
+    {
+      "slot": "error-handler",
+      "file": "src/legacy/error-handler.js",
+      "sharedSymbols": [],
+      "includes": []
+    },
+    {
+      "slot": "application",
+      "file": "src/legacy/application.js",
+      "sharedSymbols": [],
+      "includes": [
+        "legacy-utilities",
+        "legacy-workflows",
+        "legacy-wallet-charts",
+        "legacy-sample-data",
+        "legacy-workflow-engine",
+        "legacy-navigation",
+        "legacy-conversation",
+        "legacy-legacy-discovery",
+        "legacy-landing-views",
+        "legacy-contracts",
+        "legacy-purchase",
+        "legacy-marketplace",
+        "legacy-construction-stays",
+        "legacy-property-services",
+        "legacy-maps-account",
+        "legacy-actions",
+        "legacy-guaranteed-rental",
+        "legacy-rich-conversation",
+        "legacy-chat-history",
+        "legacy-scenario-dispatch",
+        "legacy-trust-productivity",
+        "legacy-market-ux",
+        "legacy-chat-ux",
+        "legacy-core",
+        "legacy-notifications",
+        "legacy-library",
+        "legacy-projects",
+        "legacy-intel",
+        "legacy-sharing",
+        "legacy-shell",
+        "legacy-release-modules",
+        "legacy-boot"
+      ]
+    },
+    {
+      "slot": "boot-watchdog",
+      "file": "src/legacy/boot-watchdog.js",
+      "sharedSymbols": [],
+      "includes": []
+    },
+    {
+      "slot": "legacy-utilities",
+      "file": "src/legacy/utilities.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "E30",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": [
+        "v32-money-js",
+        "v32-money-range-js",
+        "v32-age-range-js"
+      ]
+    },
+    {
+      "slot": "legacy-workflows",
+      "file": "src/legacy/workflows.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CE"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-wallet-charts",
+      "file": "src/legacy/wallet-charts.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "E29",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-sample-data",
+      "file": "src/legacy/sample-data.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-workflow-engine",
+      "file": "src/legacy/workflow-engine.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CE",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-navigation",
+      "file": "src/legacy/navigation.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "E29",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-conversation",
+      "file": "src/legacy/conversation.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CE",
+        "ACT",
+        "CBACT",
+        "E30",
+        "HIST"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-legacy-discovery",
+      "file": "src/legacy/legacy-discovery.js",
+      "sharedSymbols": [
+        "S",
+        "CBACT",
+        "HIST"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-landing-views",
+      "file": "src/legacy/landing-views.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "ACT",
+        "HIST"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-contracts",
+      "file": "src/legacy/contracts.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "E29",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-purchase",
+      "file": "src/legacy/purchase.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "E30"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-marketplace",
+      "file": "src/legacy/marketplace.js",
+      "sharedSymbols": [
+        "S"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-construction-stays",
+      "file": "src/legacy/construction-stays.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-property-services",
+      "file": "src/legacy/property-services.js",
+      "sharedSymbols": [
+        "S",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-maps-account",
+      "file": "src/legacy/maps-account.js",
+      "sharedSymbols": [
+        "S",
+        "ACT",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-actions",
+      "file": "src/legacy/actions.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CE",
+        "ACT",
+        "E29",
+        "E30",
+        "HIST",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-guaranteed-rental",
+      "file": "src/legacy/guaranteed-rental.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "ACT",
+        "CBACT",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-rich-conversation",
+      "file": "src/legacy/rich-conversation.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CE",
+        "ACT",
+        "CBACT",
+        "HIST",
+        "openModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-chat-history",
+      "file": "src/legacy/chat-history.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "ACT",
+        "E30",
+        "HIST",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-scenario-dispatch",
+      "file": "src/legacy/scenario-dispatch.js",
+      "sharedSymbols": [
+        "save",
+        "CE",
+        "CBACT"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-trust-productivity",
+      "file": "src/legacy/trust-productivity.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "ACT",
+        "CBACT",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-market-ux",
+      "file": "src/legacy/market-ux.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CE",
+        "ACT",
+        "CBACT"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-chat-ux",
+      "file": "src/legacy/chat-ux.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CE",
+        "ACT",
+        "CBACT",
+        "HIST",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-core",
+      "file": "src/legacy/core.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CBACT",
+        "E29",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-notifications",
+      "file": "src/legacy/notifications.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "ACT",
+        "E29"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-library",
+      "file": "src/legacy/library.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CE",
+        "ACT",
+        "E29",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-projects",
+      "file": "src/legacy/projects.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "ACT",
+        "E29",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-intel",
+      "file": "src/legacy/intel.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CE",
+        "CBACT",
+        "E29"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-sharing",
+      "file": "src/legacy/sharing.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "ACT",
+        "E29",
+        "HIST",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-shell",
+      "file": "src/legacy/shell.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CE",
+        "ACT",
+        "E29",
+        "HIST",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "legacy-release-modules",
+      "file": "src/legacy/release-modules.js",
+      "sharedSymbols": [],
+      "includes": [
+        "v32-core-js",
+        "v32-intel-js",
+        "v32-flows-js",
+        "v32-ux-js",
+        "v32-landing-js",
+        "v32-guided-ui-js",
+        "v32-guidance-js",
+        "v32-turns-js",
+        "v32-shell-js"
+      ]
+    },
+    {
+      "slot": "legacy-boot",
+      "file": "src/legacy/boot.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "E29",
+        "E30"
+      ],
+      "includes": []
+    },
+    {
+      "slot": "v32-payment-js",
+      "file": "src/v32-payment.js",
+      "sharedSymbols": [
+        "S",
+        "save",
+        "CBACT",
+        "E29",
+        "E30",
+        "HIST",
+        "openModal",
+        "closeModal"
+      ],
+      "includes": []
+    }
+  ]
+}

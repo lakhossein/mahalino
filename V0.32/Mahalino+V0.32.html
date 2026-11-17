@@ -3052,7 +3052,13 @@ body.authed.widemain .ch-main{width:100%;max-width:1280px;min-width:0;margin-inl
 <div id="modal-root" role="dialog" aria-modal="true" aria-label="پنجره"></div>
 
 <script>
-window.onerror=function(m,s,l){var e=document.getElementById('errbar');if(e){e.style.display='block';e.textContent='خطای اسکریپت: '+m+' — خط '+l;}return false;};
+var MahalinoDiagnostics=(function(){
+  var events=[];
+  function report(code){events.push({code:code,at:Date.now()});if(events.length>50)events.shift();var e=document.getElementById('errbar');if(e){e.style.display='block';e.textContent='خطای برنامه ('+code+')؛ صفحه را بازنشانی کنید.'}}
+  if(window.addEventListener)window.addEventListener('unhandledrejection',function(){report('promise.unhandled')});
+  return {report:report,events:events};
+})();
+window.onerror=function(){MahalinoDiagnostics.report('script.error');return false;};
 </script>
 <script src="./assets/leaflet/leaflet.js"></script>
 <script>
@@ -3287,13 +3293,23 @@ function openModal(html,cb){
   r.classList.add('on');
   r.onclick=function(e){if(e.target===r)closeModal()};
   a11yify(r);
+  r.removeAttribute('role');r.removeAttribute('aria-modal');
   var m=r.querySelector('.modal');
-  if(m){m.setAttribute('tabindex','-1');setTimeout(function(){try{m.focus()}catch(e){}},20)}
+  if(m){m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');var title=m.querySelector('h1,h2,h3');if(title){title.id='mahalino-modal-title';m.setAttribute('aria-labelledby',title.id)}else{m.setAttribute('aria-label','پنجرهٔ محلینو')}m.setAttribute('tabindex','-1');setTimeout(function(){try{m.focus()}catch(e){}},20)}
+  r.onkeydown=function(e){
+    if(e.key==='Escape'){e.preventDefault();closeModal();return}
+    if(e.key!=='Tab'||!m)return;
+    var nodes=Array.prototype.filter.call(m.querySelectorAll('button,a[href],input,select,textarea,[tabindex]'),function(n){return !n.disabled&&n.tabIndex>=0&&n.getClientRects().length});
+    if(!nodes.length){e.preventDefault();m.focus();return}
+    var first=nodes[0],last=nodes[nodes.length-1],active=document.activeElement;
+    if(e.shiftKey&&(active===first||active===m)){e.preventDefault();last.focus()}
+    else if(!e.shiftKey&&(active===last||active===m)){e.preventDefault();first.focus()}
+  };
   if(cb)cb();
 }
 function closeModal(){
   var r=$('#modal-root');
-  r.classList.remove('on');r.innerHTML='';
+  r.classList.remove('on');r.onkeydown=null;r.innerHTML='';
   if(MODAL_PREV&&MODAL_PREV.focus){try{MODAL_PREV.focus()}catch(e){}}
   MODAL_PREV=null;
 }
@@ -3407,12 +3423,42 @@ if(!S.profile)S.profile={confirmed:{},inferred:{},stale:{},log:[]};
 if(!S.paySession)S.paySession=null;
 if(!S.savedListings)S.savedListings=[];
 if(!S.ctx30)S.ctx30={fields:{},log:[]};
-function save(){if(window.__mahalinoResetPending)return false;try{
-  // Fail closed if preserving corrupt input fails (e.g. storage quota).
-  // Only one recovery snapshot is kept; never touch predecessor keys.
-  if(stateRecovery.length){localStorage.setItem(LSKEY+'_recovery',JSON.stringify(stateRecovery));stateRecovery=[]}
-  localStorage.setItem(LSKEY,JSON.stringify(S))}catch(e){console.error('save failed',e);if(window.E24)E24.toastErr('ذخیره‌سازی محلی ناموفق بود؛ تغییرات تا بازنشانی صفحه در همین نشست اعمال است.')}}
-
+var stateLastRaw=null,stateConflict=false;
+try{stateLastRaw=localStorage.getItem(LSKEY)}catch(e){stateConflict=true}
+if(window.addEventListener)window.addEventListener('storage',function(e){
+  if(e.key===LSKEY&&e.newValue!==stateLastRaw){stateConflict=true;if(window.E24)E24.toastErr('داده‌ها در پنجرهٔ دیگری تغییر کرد؛ پیش از ادامه صفحه را بازنشانی کنید.')}
+});
+var stateWriterReady=true;
+if(typeof navigator!=='undefined'&&navigator.locks&&navigator.locks.request){
+  stateWriterReady=false;
+  navigator.locks.request(LSKEY+'-writer',{ifAvailable:true},function(lock){
+    if(!lock)return;
+    try{if(localStorage.getItem(LSKEY)!==stateLastRaw){stateConflict=true;return}}catch(e){stateConflict=true;return}
+    stateWriterReady=true;
+    // Boot may have deferred a durable refund until writer ownership was known.
+    if(window.E30&&E30.pay&&S.paySession&&S.paySession.paidFlag)E30.pay.recover();
+    return new Promise(function(){}); // browser releases ownership when the tab closes
+  }).catch(function(){stateWriterReady=false});
+}
+function save(){
+  if(window.__mahalinoResetPending)return false;
+  if(!stateWriterReady){if(window.E24)E24.toastErr('این پنجره امکان ذخیره ندارد؛ پنجرهٔ دیگر محلینو را ببندید و این صفحه را بازنشانی کنید.');return false}
+  try{
+    if(stateConflict||localStorage.getItem(LSKEY)!==stateLastRaw){
+      stateConflict=true;
+      if(window.E24)E24.toastErr('ذخیره انجام نشد؛ داده‌ها در پنجرهٔ دیگری تغییر کرده است. صفحه را بازنشانی کنید.');
+      return false;
+    }
+    var encoded=JSON.stringify(S);
+    if(stateRecovery.length){localStorage.setItem(LSKEY+'_recovery',JSON.stringify(stateRecovery));stateRecovery=[]}
+    if(encoded!==stateLastRaw){localStorage.setItem(LSKEY,encoded);stateLastRaw=encoded}
+    return true;
+  }catch(e){
+    console.error('local persistence failed');
+    if(window.E24)E24.toastErr('ذخیره‌سازی محلی ناموفق بود؛ تغییرات تا بازنشانی صفحه در همین نشست اعمال است.');
+    return false;
+  }
+}
 /* ═══ ۲.۵) نمونه‌های فلو — چند گردش کار هم‌زمان ═══ */
 function wfOf(id){var i;if(!id){return null}for(i=0;i<S.wfs.length;i++){if(S.wfs[i].id===id)return S.wfs[i]}return null}
 function wfAll(m){var out=[],i,w;for(i=0;i<S.wfs.length;i++){w=S.wfs[i];if(w.m===m)out.push(w)}return out}
@@ -9061,6 +9107,7 @@ ACT.reset=function(){
   '<div class="fs-actions" style="margin-top:12px"><button class="btn btn-danger" data-act="resetOk">حذف داده‌های نسخهٔ ۰.۳۲</button><button class="btn" data-act="closeModal">انصراف</button></div>');
 };
 ACT.resetOk=function(){
+  if(typeof stateWriterReady==='boolean'&&!stateWriterReady){toast('بازنشانی انجام نشد؛ پنجرهٔ دیگر محلینو را ببندید و این صفحه را بازنشانی کنید.');return}
   var errs=[];
   function tryIt(fn,label){try{fn()}catch(e){errs.push(label)}}
   // An explicit empty state prevents migration from importing V0.31 again.
@@ -14069,17 +14116,18 @@ function balLow(){return (S.tokens||0)<30}
 
 /* ── LLM adapter (off by default; no fabrication — spec §4.5) ── */
 E29.llm={
-  endpoint:null,
-  enabled:false,
+  endpoint:null,enabled:false,timeoutMs:10000,
   configure:function(url){this.endpoint=url;this.enabled=!!url},
   complete:function(history,done){
     if(!this.enabled||!this.endpoint||typeof fetch!=='function'){done(null);return}
-    try{
-      fetch(this.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history})})
-        .then(function(r){return r.json()})
-        .then(function(j){done(j&&j.text||null)})
-        .catch(function(){done(null)});
-    }catch(e){done(null)}
+    var controller=typeof AbortController==='function'?new AbortController():null;
+    var settled=false,timer;
+    function finish(value){if(settled)return;settled=true;clearTimeout(timer);done(value)}
+    timer=setTimeout(function(){if(controller)controller.abort();finish(null)},this.timeoutMs);
+    try{Promise.resolve(fetch(this.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history}),signal:controller?controller.signal:undefined}))
+      .then(function(r){if(!r.ok)throw Error('http');return r.json()})
+      .then(function(j){finish(j&&typeof j.text==='string'?j.text:null)},function(){finish(null)})
+    }catch(e){finish(null)}
   }
 };
 
@@ -15239,6 +15287,26 @@ E29.intel=(function(){
    standalone HTML export for sending the artifact to others. This is documented
    in the dialog itself and in SHARING-AND-PRIVACY-SPEC-V0.29.md (spec §12.7). */
 E29.share=(function(){
+  // Snapshots are read-only data, including when local storage was edited.
+  E29.safeSharedHTML=function(html){
+    var template=document.createElement('template');template.innerHTML=String(html||'');
+    var allowed='DIV SPAN P BR HR H1 H2 H3 H4 H5 H6 B STRONG I EM U S SMALL BLOCKQUOTE PRE CODE UL OL LI TABLE THEAD TBODY TFOOT TR TD TH CAPTION COLGROUP COL A IMG FIGURE FIGCAPTION SECTION ARTICLE HEADER FOOTER SVG G PATH RECT CIRCLE ELLIPSE LINE POLYLINE POLYGON TEXT TSPAN DEFS CLIPPATH';
+    function clean(parent){
+      Array.prototype.slice.call(parent.children||[]).forEach(function(el){
+        if(allowed.split(' ').indexOf(el.tagName.toUpperCase())<0){el.remove();return}
+        Array.prototype.slice.call(el.attributes).forEach(function(attr){
+          var name=attr.name.toLowerCase(),value=attr.value.replace(/[\x00-\x20]/g,'');
+          if(name.indexOf('on')===0||name.indexOf('data-')===0||name==='srcdoc'||name==='is'||name==='formaction'||name==='xlink:href'||name==='srcset'){el.removeAttribute(attr.name);return}
+          if((name==='href'||name==='src')&&(!/^(https?:|mailto:|tel:|#|[^:]*$)/i.test(value)||/^data:/i.test(value))){el.removeAttribute(attr.name)}
+          if(name==='style'&&/url|expression|@import|behavior|binding|\\/i.test(attr.value))el.removeAttribute(attr.name);
+        });
+        if(el.tagName.toUpperCase()==='A'){el.setAttribute('rel','noopener noreferrer');el.removeAttribute('target')}
+        clean(el);
+      });
+    }
+    clean(template.content);return template.innerHTML;
+  };
+
   function store(){if(!S.shares)S.shares=[];return S.shares}
   function byToken(tok){var st=store(),i;for(i=0;i<st.length;i++){if(st[i].token===tok)return st[i]}return null}
   function valid(sh){return sh&&!sh.revoked&&(!sh.expiresAt||sh.expiresAt>Date.now())}
@@ -15325,7 +15393,7 @@ E29.share=(function(){
       '.msg .bub{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;font-size:14px}',
       '.msg.user .bub{background:#f0fdfa;border-color:#cceee9}',
       '.msg.bot .bub .qr{display:none}.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;margin:0 auto}'].join('');
-    document.body.innerHTML='<style>'+css+'</style><div style="max-width:680px;margin:0 auto 18px;padding:10px 14px;background:#0f766e;color:#fff;border-radius:12px;font-weight:700">محلینو — محتوای اشتراک‌گذاری‌شده (فقط‌خواندنی)</div>'+inner;
+    document.body.innerHTML='<style>'+css+'</style><div style="max-width:680px;margin:0 auto 18px;padding:10px 14px;background:#0f766e;color:#fff;border-radius:12px;font-weight:700">محلینو — محتوای اشتراک‌گذاری‌شده (فقط‌خواندنی)</div>'+E29.safeSharedHTML(inner);
   }
 
   /* ── dialog ── */
@@ -15373,7 +15441,7 @@ E29.share=(function(){
   ACT.e29shExport=function(el){
     var sh=store().filter(function(x){return x.id===el.getAttribute('data-sh')})[0];
     if(!sh)return;
-    var html='<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><title>'+esc(sh.title)+' — محلینو</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'+snapshotInner(sh)+'</body></html>';
+    var html='<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><title>'+esc(sh.title)+' — محلینو</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'+E29.safeSharedHTML(snapshotInner(sh))+'</body></html>';
     var blob=new Blob([html],{type:'text/html;charset=utf-8'});
     var a=document.createElement('a');
     a.href=URL.createObjectURL(blob);
@@ -15790,7 +15858,7 @@ E30._lock=0;
 E30.pay=(function(){
   var STATES=['idle','selected','priced','presented','awaiting_confirm','confirmed','validating','processing','paid','executing','completed','declined','insufficient','failed','refunded'];
   function sess(){if(!S.paySession)S.paySession=null;return S.paySession}
-  function set(st){var s=sess();if(s){s.state=st;s.ts=Date.now();save()}}
+  function set(st){var s=sess();if(s){s.state=st;s.ts=Date.now();return save()}return false}
   function clear(){S.paySession=null;save()}
   function validService(key){return Object.prototype.hasOwnProperty.call(E30.PRICING,key)&&
     Number.isFinite(E30.PRICING[key].cost)&&E30.PRICING[key].cost>0}
@@ -15893,7 +15961,7 @@ E30.pay=(function(){
       if(s.state==='completed'){toast('این پرداخت قبلاً انجام شده است');return false}
       toast('این کارت تأیید معتبر نیست');return false;
     }
-    set('validating');
+    if(!set('validating')){toast('پرداخت انجام نشد؛ ذخیره‌سازی در دسترس نیست.');return false}
     /* A reload serializes the session but cannot serialize its callback. Check
        BEFORE any mutation; the previously presented card is now obsolete. */
     if(typeof s._cb!=='function'||!validService(s.key)||s.cost!==E30.price(s.key)){
@@ -15902,7 +15970,7 @@ E30.pay=(function(){
       return false;
     }
     if((S.tokens||0)<s.cost){set('insufficient');toast('موجودی در فاصلهٔ تأیید تغییر کرد — لطفاً دوباره تلاش کنید');begin({key:s.key,title:s.title,desc:s.desc,ctx:s.ctx,onConfirm:s._cb});return false}
-    set('processing');
+    if(!set('processing')){toast('پرداخت انجام نشد؛ ذخیره‌سازی در دسترس نیست.');return false}
     var btns=document.querySelectorAll('[data-paygo="'+payId+'"]');
     Array.prototype.forEach.call(btns,function(b){b.disabled=true;b.textContent='در حال پردازش…'});
     /* Mutate idempotency flag, transaction record and balance as ONE persisted
@@ -15912,7 +15980,8 @@ E30.pay=(function(){
     s.txnId=txn;s.paidFlag=true;
     S.tokens-=s.cost;
     S.log.unshift({t:Date.now(),d:(s.title)+(s.ctx?' — '+s.ctx:''),c:-s.cost,cat:'bana',id:txn,svc:s.key,payId:s.payId});
-    save();renderTok();
+    if(!save()){S.tokens+=s.cost;S.log.shift();s.paidFlag=false;delete s.txnId;s.state='failed';renderTok();toast('پرداخت ثبت نشد؛ خدمت اجرا نشد.');return false}
+    renderTok();
     try{E29.bus.emit('token.deduct',{txn:txn,cost:s.cost,svc:s.key,desc:s.title,payId:s.payId})}catch(e){}
     if((S.tokens||0)<30){try{E29.bus.emit('wallet.low',{balance:S.tokens})}catch(e){}}
     set('paid');
@@ -15921,10 +15990,10 @@ E30.pay=(function(){
     function finish(ok,err){
       /* The only definitive post-payment states are completed with an actual
          successful callback, or refunded with a matching credit-journal entry. */
-      if(ok){s.executed=true;set('completed');S.paySession=s;save()}
+      if(ok){s.executed=true;s.state='completed';S.paySession=s;if(!save()){toast('خدمت اجرا شد اما ثبت نتیجه ناموفق بود؛ پیش از تلاش دوباره وضعیت را بررسی کنید.');return false}}
       else{
         if(err)console.error('E30 pay exec',err);
-        refund(txn,s.key,s.cost,'خطا در اجرای سرویس',s.payId);
+        if(refund(txn,s.key,s.cost,'خطا در اجرای سرویس',s.payId)===false){s.state='failed';toast('بازپرداخت ثبت نشد؛ پیش از ادامه ذخیره‌سازی را بررسی کنید.');return false}
         s.refunded=true;
         set('refunded');
         botC('پرداخت انجام شد اما اجرای سرویس با خطا مواجه شد — <b>'+fa(s.cost,0)+' کلید بازگشت داده شد</b>. می‌توانید دوباره تلاش کنید.',null);
@@ -15957,8 +16026,9 @@ E30.pay=(function(){
     if(payId&&(S.log||[]).some(function(x){return x.payId===payId&&x.refund}))return false;
     S.tokens+=cost;
     S.log.unshift({t:Date.now(),d:'بازگشت کلید — '+(reason||''),c:cost,cat:'bana',id:txn,svc:key,payId:payId||null,refund:true});
-    var current=sess();if(current&&payId===current.payId)current.refunded=true;
-    save();renderTok();
+    var current=sess(),wasRefunded=current&&current.refunded;if(current&&payId===current.payId)current.refunded=true;
+    if(!save()){S.tokens-=cost;S.log.shift();if(current&&payId===current.payId)current.refunded=wasRefunded;toast('بازپرداخت ذخیره نشد؛ دوباره تلاش کنید.');return false}
+    renderTok();
     try{E29.bus.emit('token.refund',{txn:txn,cost:cost,reason:reason})}catch(e){}
     toast('+'+fa(cost,0)+' کلید بازگشت داده شد');
   }
@@ -15974,7 +16044,7 @@ E30.pay=(function(){
            (!s.txnId||x.id===s.txnId)})&&
          !(S.log||[]).some(function(x){return x.refund&&x.payId===s.payId})){
         var txn=E30.uid('TXN-R');
-        refund(txn,s.key,s.cost,'بازیابی پس از وقفه',s.payId);
+        if(refund(txn,s.key,s.cost,'بازیابی پس از وقفه',s.payId)===false)return false;
         s.refunded=true;save();
         try{E29.notifsAPI.push({cat:'financial',etype:'pay.recovered',title:'پرداخت ناتمام بازگشت داده شد',msg:fa(s.cost,0)+' کلید بابت «'+s.title+'» بازگشت داده شد — سرویس اجرا نشده بود.',action:{kind:'wallet'},dedupKey:'rec-'+s.payId})}catch(e){}
       }
@@ -18632,6 +18702,7 @@ E30.ux=(function(){
 
   /* ── init ── */
   E30.uxInit=function(){
+    if(E30._uxInstalled)return;E30._uxInstalled=true;
     try{mountLibraryPatch()}catch(e){console.error('E30 lib patch',e)}
     try{mountSharePatch()}catch(e){console.error('E30 share patch',e)}
     try{mountProjectPatch()}catch(e){console.error('E30 prj patch',e)}
@@ -19819,6 +19890,7 @@ E30.payVisual=function(){
 };
 
 E30.init=function(){
+  if(E30._installed)return;E30._installed=true;
   /* 1) workflow registry: sell / invest / landlord + FRC + WSTEPS */
   try{E30.flowsAPI.install()}catch(e){console.error('E30 install',e)}
 
@@ -20162,21 +20234,20 @@ E30.init=function(){
       wrapped._e30PayGuard=true;
       return wrapped;
     }
-    function paidSource(fn){
-      try{var action=fn.e30PaidDelegate||fn;return /\b(?:spend|doRentVisit)\s*\(/.test(Function.prototype.toString.call(action))}catch(e){return false}
-    }
+    var paidRegistry={"ACT.rdet": true, "ACT.bdet": true, "ACT.rvisit": true, "ACT.blegal": true, "ACT.besc": true, "ACT.pbidok": true, "ACT.sbook": true, "CBACT.detL": true, "CBACT.detB": true, "SCRIPTS.rent.visit.go": true, "SCRIPTS.buy.lg.lg": true, "SCRIPTS.mkt.send.b": true, "SCRIPTS.stay.book.b": true};
+    E30.paidActionRegistry=Object.keys(paidRegistry);
     var legacyGuarded=[];
     [[ACT,'ACT'],[CBACT,'CBACT']].forEach(function(pair){
       var group=pair[0];
       Object.keys(group||{}).forEach(function(k){
-        if(paidSource(group[k])){group[k]=guardPaidAction(group[k]);legacyGuarded.push(pair[1]+'.'+k)}
+        if(paidRegistry[pair[1]+'.'+k]){group[k]=guardPaidAction(group[k]);legacyGuarded.push(pair[1]+'.'+k)}
       });
     });
     Object.keys(SCRIPTS||{}).forEach(function(k){
       (SCRIPTS[k]||[]).forEach(function(step){
         if(!step||!step.acts)return;
         Object.keys(step.acts).forEach(function(a){
-          if(paidSource(step.acts[a])){step.acts[a]=guardPaidAction(step.acts[a]);legacyGuarded.push('SCRIPTS.'+k+'.'+(step.id||'?')+'.'+a)}
+          if(paidRegistry['SCRIPTS.'+k+'.'+(step.id||'?')+'.'+a]){step.acts[a]=guardPaidAction(step.acts[a]);legacyGuarded.push('SCRIPTS.'+k+'.'+(step.id||'?')+'.'+a)}
         });
       });
     });
@@ -20364,7 +20435,7 @@ E30.init=function(){
 (function(){
   try{
     try{if(localStorage.getItem('mahalino_sidefold')==='1')document.body.classList.add('sidefold')}catch(e){}
-    try{E28.init()}catch(e){}
+    try{E28.init()}catch(e){MahalinoDiagnostics.report('boot.E28')}
     try{E29.init()}catch(e){console.error('E29 init',e)}
     try{E30.init()}catch(e){console.error('E30 init',e)}
     renderSidebar();renderTok();

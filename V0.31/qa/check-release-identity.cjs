@@ -15,7 +15,7 @@ const checks={
  noExternalBuildBase:builder.includes('const SRC=BUNDLED_BASE;')&&!builder.includes('REPO_BASE'),
  noV030RuntimeAssetDependency:!/(?:src|href)\s*=\s*["'](?:\.\.\/)+V0\.30\//i.test(html)
 };
-const repo=path.resolve(root,'..'),expectedOldTree='95cba5f115d7823614db3d435a269e4fae600940';
+const repo=path.resolve(root,'..'),expectedOldTree='a54a88a717cd6112e9567f6d021f925d81dfa434';
 if(fs.existsSync(path.join(repo,'.git'))){
  let sha='';
  try{sha=child.execFileSync('git',['-C',repo,'rev-parse','HEAD:V0.30'],{encoding:'utf8'}).trim()}catch(e){}

@@ -1181,6 +1181,7 @@ ACT.reset=function(){
   '<div class="fs-actions" style="margin-top:12px"><button class="btn btn-danger" data-act="resetOk">حذف داده‌های نسخهٔ ۰.۳۲</button><button class="btn" data-act="closeModal">انصراف</button></div>');
 };
 ACT.resetOk=function(){
+  if(typeof stateWriterReady==='boolean'&&!stateWriterReady){toast('بازنشانی انجام نشد؛ پنجرهٔ دیگر محلینو را ببندید و این صفحه را بازنشانی کنید.');return}
   var errs=[];
   function tryIt(fn,label){try{fn()}catch(e){errs.push(label)}}
   // An explicit empty state prevents migration from importing V0.31 again.
