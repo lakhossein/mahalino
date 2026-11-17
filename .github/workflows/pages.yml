@@ -7,19 +7,38 @@ on:
       - 'V0.*/**'
       - 'previews/**'
       - 'scripts/build_previews.py'
-      - '.github/workflows/pages.yml'
+      - 'scripts/tests/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'V0.*/**'
+      - 'previews/**'
+      - 'scripts/build_previews.py'
+      - 'scripts/tests/**'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: mahalino-pages
   cancel-in-progress: false
 
 jobs:
+  workflow-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install workflow parser
+        run: python3 -m pip install PyYAML==6.0.3
+      - name: Check publication dependencies and triggers
+        run: python3 -m unittest discover -s scripts/tests -v
+
   quality-v030:
     # Preserve V0.30's original release gate after restoring that archive.
     uses: ./.github/workflows/mahalino-v030-quality-gate.yml
@@ -28,9 +47,19 @@ jobs:
     # The new version cannot publish until all Chromium and standalone checks pass.
     uses: ./.github/workflows/mahalino-v031-quality-gate.yml
 
+  quality-v032:
+    # The active version must pass before the gallery can be published.
+    uses: ./.github/workflows/mahalino-v032-quality-gate.yml
+
   publish:
-    needs: [quality-v030, quality-v031]
+    needs: [workflow-contract, quality-v030, quality-v031, quality-v032]
+    # Keep the implicit success() guard; pull requests only validate.
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
