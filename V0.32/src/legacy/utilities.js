@@ -302,7 +302,7 @@ if(typeof navigator!=='undefined'&&navigator.locks&&navigator.locks.request){
     // Boot may have deferred a durable refund until writer ownership was known.
     if(window.E30&&E30.pay&&S.paySession&&S.paySession.paidFlag)E30.pay.recover();
     return new Promise(function(){}); // browser releases ownership when the tab closes
-  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:303',null,'caught');stateWriterReady=false});
+  }).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/utilities.js:303',null,'caught');stateWriterReady=true;if(window.E30&&E30.pay&&S.paySession&&S.paySession.paidFlag)E30.pay.recover()});
 }
 function save(){
   if(window.__mahalinoResetPending)return false;

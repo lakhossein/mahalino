@@ -6,7 +6,7 @@
 
 اصلاحات در محدودهٔ prototype فعال ۰.۳۲، قراردادهای صریح runtime و gateهای Chromium انجام شده‌اند. runtime نسخه‌های تاریخی حفظ شده است؛ فقط dependency بازتولیدپذیر و metadata غیرمحصولی از Git خارج و hash gateهای مربوط دوباره تثبیت شدند. تصمیم مالک برای reset: فقط نسخهٔ جاری. هیچ merge به main یا انتشار عمومی انجام نشده است.
 
-آخرین کد این جمع‌بندی: `5b6f86ca49bd8f4ac1d8364d0557db427bde3d9b`. هر چهار workflow این کد موفق شدند؛ gate نسخهٔ ۰.۳۲ صفر شکست داشت و publish در PR برابر skipped بود. ۱۰۰ تست Node و ۱۷ تست Python در بررسی محلی موفق‌اند. از موفقیت این تست‌ها، پوشش سطر/شاخهٔ ۱۰۰٪ یا رفع همهٔ باگ‌های احتمالی استنتاج نمی‌شود.
+آخرین کد این جمع‌بندی: `5b6f86ca49bd8f4ac1d8364d0557db427bde3d9b`. هر چهار workflow این کد موفق شدند؛ gate نسخهٔ ۰.۳۲ صفر شکست داشت و publish در PR برابر skipped بود. ۱۰۱ تست Node و ۱۷ تست Python در بررسی محلی موفق‌اند. از موفقیت این تست‌ها، پوشش سطر/شاخهٔ ۱۰۰٪ یا رفع همهٔ باگ‌های احتمالی استنتاج نمی‌شود.
 
 ## تعیین تکلیف ۲۴ مورد
 
@@ -17,7 +17,7 @@
 | M-03 | fixed در schema containerهای فعلی | انواع مجموعه‌ها، objectهای state/profile/context و balances کنترل می‌شوند؛ دادهٔ سالم/unknown حفظ؛ ادعای schema همهٔ فیلدهای افزونه‌های آینده نیست |
 | M-04 | fixed طبق تصمیم مالک | reset نسخه‌ای؛ state خالی مانع migration دوباره؛ حفظ predecessor و shared DB؛ شکست storage و stale save کنترل می‌شوند |
 | M-05 | fixed در پرداخت نمایشی | callback فقط پس از ثبت debit؛ rollback debit/refund ناموفق؛ پیام شکست ثبت نتیجه؛ تضمین exactly-once سرویس backend خارجی ادعا نمی‌شود |
-| M-06 | fixed در مرورگر هدف دارای Web Locks | یک writer؛ تب دوم save/reset ندارد؛ storage-event و snapshot check؛ fallback بدون Web Locks تضمین اتمی race دقیق ندارد |
+| M-06 | fixed در مرورگر هدف دارای Web Locks قابل‌استفاده | یک writer؛ تب دوم save/reset ندارد؛ storage-event و snapshot check؛ fallback بدون Web Locks تضمین اتمی race دقیق ندارد |
 | M-07 | fixed | موفقیت فقط پس از Clipboard API یا execCommand=true؛ denial و unavailable با پیام صادقانه |
 | M-08 | fixed | slice/arrayBuffer/share در try؛ rejection از جمله null وضعیت قابل مشاهده دارد |
 | M-09 | fixed در مودال عمومی | role/name، trap دوسویه، Escape، focus return حتی پس از replacement؛ تست Chromium |
@@ -222,3 +222,5 @@ CI کامیت `f04b1f5` در هر چهار workflow موفق شد؛ سناریو
 قرارداد وابستگی‌ها پس از افزودن codec شامل ۵۲ slot است. همهٔ نسخه‌های تاریخی همچنان بدون تغییر runtime هستند؛ CI بعدی دوباره همان gateها را اجرا می‌کند. محدودیت اندازه‌گیری روی دستگاه فیزیکی و مرورگر بدون Web Locks همچنان از ادعای اعتبارسنجی خارج است.
 
 دو حالت مرزی نهایی نیز پوشش داده شد: rejection خواندن PDF با مقدار null دیگر در خود catch خطا تولید نمی‌کند؛ جایگزینی یک مودال با مودال دیگر، focus بازگشت را به دکمهٔ حذف‌شدهٔ مودال قبلی منتقل نمی‌کند و trigger اصلی حفظ می‌شود. مجموعهٔ محلی نهایی شامل ۱۰۰ تست Node موفق است؛ تست مرورگر focus بازگشت در حالت جایگزینی هم در gate وجود دارد.
+
+مسیر API قفلِ موجود ولی غیرقابل‌استفاده (برای نمونه SecurityError در origin محدود) نیز با تست failure injection پوشش داده شد؛ این حالت از fallback مقایسهٔ snapshot استفاده می‌کند و ذخیرهٔ standalone را صرفاً به‌علت ردشدن API قفل غیرفعال نمی‌کند. رد مالکیت به دلیل writer فعال دیگر همچنان read-only است.
