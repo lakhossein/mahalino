@@ -19,6 +19,14 @@ if (process.argv.includes('--check')) {
   if (fs.readFileSync(output, 'utf8') !== html) throw new Error('Generated HTML is stale; run node build_v032.js');
   console.log('PASS V0.32 reproducible build');
 } else {
-  fs.writeFileSync(output, html, 'utf8');
+  // Stage beside the artifact so rename is atomic on the same filesystem.
+  const staging = fs.mkdtempSync(path.join(root, '.v032-build-'));
+  try {
+    const stagedOutput = path.join(staging, manifest.output);
+    fs.writeFileSync(stagedOutput, html, 'utf8');
+    fs.renameSync(stagedOutput, output);
+  } finally {
+    fs.rmSync(staging, { recursive: true, force: true });
+  }
   console.log('Built V0.32: ' + Object.keys(manifest.slots).length + ' explicit modules -> ' + output);
 }

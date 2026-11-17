@@ -28,3 +28,20 @@ overrides requires separate behavior-focused changes. No runtime speedup is clai
 Run `bash V0.32/qa/run-quality-gate.sh` for the full result. New checks cover
 assembler errors, literal injection, syntax, complete artifact parity and storage
 selection. Existing browser suites and coverage thresholds are retained.
+
+## Build reliability follow-up — 2026-11-17
+- Publish generated HTML by staging beside the destination and atomically renaming
+  it; clean staging even when publication fails. Validation still precedes writes.
+- The quality gate uses `--check` instead of rewriting a stale artifact before
+  reporting failure, keeping the developer's checkout available for diagnosis.
+- Three CLI regressions cover successful publication, read-only stale detection,
+  syntax rejection preserving prior output, and cleanup on publication failure.
+- These changes do not modify generated HTML or any application runtime source.
+
+Follow-up validation: all 19 Node unit tests passed, along with complete artifact
+parity, static contract checks, reproducible build, standalone build, release
+identity and asset checks. Local browser execution is blocked by the host:
+Chromium aborts with `socket() failed: Operation not permitted` before opening a
+page. The pinned browser download also returned an invalid ZIP. Therefore the
+follow-up does not claim a green full browser gate; rerun CI after pushing.
+Baseline CI for 143031a passed: https://github.com/lakhossein/mahalino/actions/runs/43976137383.
