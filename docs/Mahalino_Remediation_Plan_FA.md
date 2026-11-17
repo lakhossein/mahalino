@@ -1,3 +1,66 @@
+# وضعیت نهایی رسیدگی به ممیزی محلینو
+
+تاریخ: ۱۷ نوامبر ۲۰۲۶. مبنای ممیزی: `ba0591ec114898e87813fbf06898823bdb17a6b3`. شاخهٔ اجرا: `fix/m01-v032-publication-gate`؛ PR شمارهٔ ۹. این بخش، جمع‌بندی جاری است؛ بخش‌های بعدی سوابق اجرا هستند و وضعیت «در انتظار» در آن سوابق مربوط به زمان ثبت آنهاست.
+
+## محدودهٔ نتیجه
+
+اصلاحات در محدودهٔ prototype فعال ۰.۳۲، قراردادهای صریح runtime و gateهای Chromium انجام شده‌اند. runtime نسخه‌های تاریخی حفظ شده است؛ فقط dependency بازتولیدپذیر و metadata غیرمحصولی از Git خارج و hash gateهای مربوط دوباره تثبیت شدند. تصمیم مالک برای reset: فقط نسخهٔ جاری. هیچ merge به main یا انتشار عمومی انجام نشده است.
+
+آخرین کد این جمع‌بندی: `5b6f86ca49bd8f4ac1d8364d0557db427bde3d9b`. هر چهار workflow این کد موفق شدند؛ gate نسخهٔ ۰.۳۲ صفر شکست داشت و publish در PR برابر skipped بود. ۱۰۰ تست Node و ۱۷ تست Python در بررسی محلی موفق‌اند. از موفقیت این تست‌ها، پوشش سطر/شاخهٔ ۱۰۰٪ یا رفع همهٔ باگ‌های احتمالی استنتاج نمی‌شود.
+
+## تعیین تکلیف ۲۴ مورد
+
+| ID | نتیجه در محدودهٔ تعریف‌شده | شاهد اصلی و مرز ادعا |
+|---|---|---|
+| M-01 | fixed | انتشار وابسته به هر سه gate و تست قرارداد؛ PR بدون deploy؛ probe واقعی runner: gate ۰.۳۲ failure، publish skipped، assert-blocked success؛ PR آزمایشی ۱۰ بسته و merge نشد |
+| M-02 | fixed | ریشهٔ غیرobject/آرایه رد می‌شود؛ fallback و backup خام پیش از overwrite؛ تست loader واقعی و reload |
+| M-03 | fixed در schema containerهای فعلی | انواع مجموعه‌ها، objectهای state/profile/context و balances کنترل می‌شوند؛ دادهٔ سالم/unknown حفظ؛ ادعای schema همهٔ فیلدهای افزونه‌های آینده نیست |
+| M-04 | fixed طبق تصمیم مالک | reset نسخه‌ای؛ state خالی مانع migration دوباره؛ حفظ predecessor و shared DB؛ شکست storage و stale save کنترل می‌شوند |
+| M-05 | fixed در پرداخت نمایشی | callback فقط پس از ثبت debit؛ rollback debit/refund ناموفق؛ پیام شکست ثبت نتیجه؛ تضمین exactly-once سرویس backend خارجی ادعا نمی‌شود |
+| M-06 | fixed در مرورگر هدف دارای Web Locks | یک writer؛ تب دوم save/reset ندارد؛ storage-event و snapshot check؛ fallback بدون Web Locks تضمین اتمی race دقیق ندارد |
+| M-07 | fixed | موفقیت فقط پس از Clipboard API یا execCommand=true؛ denial و unavailable با پیام صادقانه |
+| M-08 | fixed | slice/arrayBuffer/share در try؛ rejection از جمله null وضعیت قابل مشاهده دارد |
+| M-09 | fixed در مودال عمومی | role/name، trap دوسویه، Escape، focus return حتی پس از replacement؛ تست Chromium |
+| M-10 | fixed | registry صریح ۱۳ action؛ تشخیص از متن تابع حذف؛ registry و guarded actions برابرند |
+| M-11 | fixed در قرارداد نصب | init/uxInit idempotent؛ مالکیت و ترتیب wrapperها مستند؛ هویت handler در نصب تکراری ثابت |
+| M-12 | fixed در مرزبندی و قرارداد وابستگی | payment و state-codec مستقل؛ owner/import/export/write/loadOrder برای ۵۲ slot با parser/scope ثبت و دقیقاً تست؛ namespace سازگاری عمدی باقی است |
+| M-13 | fixed در مشاهده‌پذیری | ۲۴۴ محل catch با کد ثابت و cause-enum؛ caught غیرمسدودکننده در برابر fault لازم؛ سقف ۵۰ رخداد و حذف متن exception/کاربر از diagnostics؛ Promise/script/boot نیز پوشش دارند |
+| M-14 | fixed در هزینهٔ تکراری آرشیو | cache آرشیو owned و invalidation همهٔ mutationها؛ سایر فیلدها تازه و durable؛ benchmark ۱۰۰/۱۰۰۰/۱۰۰۰۰ و cold/steady؛ ذخیرهٔ سرد و setItem همگام باقی‌اند |
+| M-15 | fixed | readiness پس از bind، PID زنده و hash واقعی HTTP؛ occupied port و پاسخ 200 اشتباه تست می‌شوند |
+| M-16 | fixed در سیاست آزمون | baselineهای ثابت/hash، برابری خارج از بلوک‌های مصوب و رفتار متناظر؛ هیچ assertion صرفاً برای عبور از CI حذف نشده |
+| M-17 | fixed | source قابل ساخت برای ۰.۳۰–۰.۳۲، builder/README و manifest دقیق ZIP |
+| M-18 | fixed | node_modules از index خارج؛ npm ci از lockfile؛ تاریخچه بازنویسی نشده |
+| M-19 | fixed در سیاست archive | snapshotهای تاریخی و QA نسخه‌ای عمداً باقی؛ source فعال/QA مشترک ابزارها مشخص؛ تست عدم تغییر runtime تاریخی؛ ادعای حذف همهٔ تکرارهای تاریخی نیست |
+| M-20 | fixed در دو sink اشتراک ممیزی‌شده | sanitizer مشترک display/export؛ allowlist، حذف event/action/active SVG و scheme اجرایی؛ قالب معتبر حفظ؛ ادعای ممیزی تمام innerHTMLها نیست |
+| M-21 | fixed | staging/verify، manifest ZIP/assets، backup و rollback replace؛ missing/exclusion/نسخه ناقص/failure میانی تست؛ atomicity قطع برق ادعا نمی‌شود |
+| M-22 | fixed در adapter اختیاری | غیرفعال؛ timeout/abort/status/schema/callback-once؛ هیچ AI به هدایت افزوده نشده |
+| M-23 | fixed | README ریشه و نسخه: release فعال، build/QA، هر سه gate، coverage و reset |
+| M-24 | fixed | metadata سیستم عامل از index خارج؛ hygiene gate مانع بازگشت؛ hashهای تاریخی حفظ و دوباره تثبیت شده‌اند |
+
+## شواهد و محدودیت‌های قابل پیگیری
+
+- `qa/check-state-recovery.test.cjs`، `check-persistence-payments.test.cjs`، `check-state-codec.test.cjs` و `check-interaction-recovery.test.cjs`: مسیرهای داده و خطا؛ مجموعه‌های مرورگری جدید همان قراردادهای اصلی را روی app واقعی نیز کنترل می‌کنند.
+- `qa/check-runtime-contracts.test.cjs` و `runtime-contracts.cjs`: مالکیت/وابستگی و privacy diagnostics؛ ابزار parser از toolchain QA با نسخهٔ pinned می‌آید و dependency محصول نیست.
+- `scripts/tests/`: قرارداد workflow، بسته‌بندی، هویت سرور و عدم تغییر runtime تاریخی.
+- `docs/Mahalino_Runtime_Contracts_FA.md`: مالکیت، wrapper order، concurrency و archive policy.
+- `docs/validation/`: dependency/catch inventory و benchmark میزبان؛ اندازه‌گیری مرورگر در artifact هر اجرای QA با نام state-performance.json ذخیره می‌شود.
+
+در یک اجرای ثبت‌شدهٔ Chromium با viewport موبایل و CPU چهار برابر کندتر، برای آرشیو ۱۰هزارپیامی، p95 ذخیره پیش از cache حدود ۶۵٫۸ ms و پس از cache حدود ۳۲٫۶ ms بود؛ p50 از ۴۶٫۹ به ۲۸٫۰ ms رسید. ذخیرهٔ سرد پس از cache حدود ۵۴٫۴ ms و یک long task داشت. این اعداد تضمین همهٔ دستگاه‌ها نیستند؛ benchmark قبل ۱۲ و بعد ۳۰ نمونه ثبت کرده و cold را جدا گزارش می‌کند. شواهد، کاهش هزینهٔ تکراری آرشیو ثابت را نشان می‌دهد؛ تغییر خود آرشیو، نوشتن کل state و ذخیرهٔ سرد هنوز هزینه دارند. پروفایل‌گیری روی گوشی فیزیکی و تضمین race اتمی در مرورگر فاقد Web Locks خارج از اعتبارسنجی انجام‌شده‌اند.
+
+شواهد CI کد نهایی:
+
+- [انتشار و هر سه gate وابسته](https://github.com/lakhossein/mahalino/actions/runs/44082277615): success؛ job انتشار عمومی در PR skipped.
+- [gate مستقل ۰.۳۲](https://github.com/lakhossein/mahalino/actions/runs/44082277412): success؛ صفر suite شکست‌خورده.
+- [gate مستقل ۰.۳۱](https://github.com/lakhossein/mahalino/actions/runs/44082277482): success.
+- [gate مستقل ۰.۳۰](https://github.com/lakhossein/mahalino/actions/runs/44082277523): success.
+- [probe منفی بدون انتشار](https://github.com/lakhossein/mahalino/actions/runs/44076079722): overall عمداً failure؛ gate ۰.۳۲ عمداً fail، publish skipped و assert-blocked success.
+
+این جمع‌بندی فقط مستنداتِ کد تأییدشدهٔ بالا را به‌روز می‌کند؛ SHA کامیت خود گزارش از تاریخچهٔ فایل قابل استخراج است.
+
+---
+
+# سوابق برنامه‌ریزی و اجرای اصلاحات
+
 # برنامهٔ اجرای اصلاحات ممیزی محلینو
 
 تاریخ: ۱۷ نوامبر ۲۰۲۶ — مبنا: `ba0591ec114898e87813fbf06898823bdb17a6b3`
