@@ -12,7 +12,7 @@ export QA_BASE_URL="${QA_BASE_URL:-http://127.0.0.1:8731/Mahalino%2BV0.32.html}"
 for js in V0.32/build_v032.js V0.32/build/*.cjs V0.32/src/*.js V0.32/src/legacy/*.js V0.32/qa/smoke-v032.js V0.32/qa/e2e-*.js V0.32/qa/*.cjs; do
   node --check "$js"
 done
-node --test V0.32/qa/check-priority-audit.test.cjs V0.32/qa/check-assembler.test.cjs V0.32/qa/check-build-cli.test.cjs
+node --test V0.32/qa/check-state-recovery.test.cjs V0.32/qa/check-priority-audit.test.cjs V0.32/qa/check-assembler.test.cjs V0.32/qa/check-build-cli.test.cjs
 node V0.32/qa/check-refactor-parity.cjs
 node V0.32/qa/check-guidance.cjs
 node V0.32/qa/check-build-injection.cjs

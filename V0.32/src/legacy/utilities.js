@@ -173,12 +173,57 @@ var OLD_LS4=['mahal','ino_','v29'].join('');
 var OLD_LS5=['mahal','ino_','v18'].join('');
 var OLD_LS2=['mahal','ino_','v16'].join('');
 var OLD_LS3=['khan','yar','_v15'].join('');
+// Container validation is intentionally separate from domain/business validation.
+function stateObject(v){return !!v&&typeof v==='object'&&!Array.isArray(v)}
 var S=null,LSCHAIN=[LSKEY,PREVIOUS_LS,OLD_LS,OLD_LS4,OLD_LS5,OLD_LS2,OLD_LS3],LSi;
+var stateRecovery=[],stateSource=null,stateRaw=null;
 for(LSi=0;LSi<LSCHAIN.length;LSi++){
-  try{S=JSON.parse(localStorage.getItem(LSCHAIN[LSi]))}catch(e){S=null}
-  if(S&&typeof S==='object')break;
+  var candidateRaw=null;
+  try{
+    candidateRaw=localStorage.getItem(LSCHAIN[LSi]);
+    if(candidateRaw===null)continue;
+    S=JSON.parse(candidateRaw);
+    if(stateObject(S)){stateSource=LSCHAIN[LSi];stateRaw=candidateRaw;break}
+  }catch(e){S=null}
+  if(candidateRaw!==null)stateRecovery.push({key:LSCHAIN[LSi],raw:candidateRaw});
+  S=null;
 }
-if(!S||typeof S!=='object'){S={}}
+if(!stateObject(S)){S={}}
+var stateRepaired=false;
+function stateField(obj,key,valid,fallback){
+  if(!valid(obj[key])){
+    if(obj[key]!==undefined)stateRepaired=true;
+    obj[key]=fallback;
+  }
+}
+function stateArrays(obj,keys){keys.split(' ').forEach(function(k){stateField(obj,k,Array.isArray,[])})}
+function stateRecord(obj,key,fallback){stateField(obj,key,stateObject,fallback||{})}
+['reminders','liveHistory'].forEach(function(k){if(S[k]!==undefined)stateArrays(S,k)});
+stateArrays(S,'wlog log reqs wfs contracts reviews nprj svcOrders svcAudit grt grtAudit notifs library projects shares savedListings chats');
+['tokens','wallet'].forEach(function(k){stateField(S,k,function(v){return typeof v==='number'&&isFinite(v)&&v>=0},0)});
+stateField(S,'welcomed',function(v){return typeof v==='boolean'},false);
+stateField(S,'pending',function(v){return v===null||typeof v==='string'},null);
+['auth','sub','paySession','grtReserve'].forEach(function(k){stateField(S,k,function(v){return v===null||stateObject(v)},null)});
+stateRecord(S,'prof',{work:null,school:null,workLL:null,schoolLL:null});
+stateRecord(S,'active');stateRecord(S,'prefs');
+stateRecord(S,'ui',{tab:'b',dcat:'rent',yh:24,crng:12,nrng:12,atab:'overview'});
+stateRecord(S,'profile');
+['confirmed','inferred','stale'].forEach(function(k){stateRecord(S.profile,k)});
+stateArrays(S.profile,'log');
+function stateContext(ctx){stateRecord(ctx,'fields');stateArrays(ctx,'log')}
+stateRecord(S,'ctx30');stateContext(S.ctx30);
+['ctx30ByChat','ctx30Collectors','scratch'].forEach(function(k){if(S[k]!==undefined)stateRecord(S,k)});
+if(S.ctx30ByChat)Object.keys(S.ctx30ByChat).forEach(function(k){stateRecord(S.ctx30ByChat,k);stateContext(S.ctx30ByChat[k])});
+if(S.ctx30ActiveKey!==undefined)stateField(S,'ctx30ActiveKey',function(v){return typeof v==='string'},'');
+if(S.flow!==undefined)stateRecord(S,'flow');
+['log','wfs','chats','contracts'].forEach(function(k){
+  var rows=S[k].filter(stateObject);
+  if(rows.length!==S[k].length){S[k]=rows;stateRepaired=true}
+});
+S.wfs.forEach(function(w){stateRecord(w,'data')});
+S.chats.forEach(function(c){if(c.hist!==undefined)stateArrays(c,'hist')});
+if(stateRepaired&&stateSource)stateRecovery.push({key:stateSource,raw:stateRaw});
+if(stateRecovery.length)console.warn('Stored state required recovery; raw data will be preserved before saving.');
 function ph(seed,w,h,fb){var hu=hseed(seed)||seedimg(seed);if(hu)return '<div class="ph"><div class="fb">'+fb+'</div><img src="'+hu+'" alt="" loading="lazy" onerror="this.remove()"></div>';return '<div class="ph"><div class="fb">'+fb+'</div><img src="https://picsum.photos/seed/'+seed+'/'+w+'/'+h+'" alt="" loading="lazy" onerror="this.remove()"></div>'}
 if(S.auth===undefined){S.auth=null}
 if(S.tokens===undefined){S.tokens=0}
@@ -197,7 +242,7 @@ if(S.flow){
     if(!S.wfs.length){
       for(i=0;i<mods.length;i++){
         m=mods[i];f=S.flow[m];
-        if(!f||typeof f!=='object'){continue}
+        if(!stateObject(f)){continue}
         w={id:'WF-'+m+'-legacy',m:m,num:(function(){var k=0,j;for(j=0;j<S.wfs.length;j++){if(S.wfs[j].m===m)k++}return k+1})(),step:f.step||1,data:f.data||{},done:!!f.done,cancelled:false,createdAt:Date.now(),updatedAt:Date.now()};
         S.wfs.push(w);S.active[m]=w.id;
       }
@@ -230,5 +275,9 @@ if(!S.profile)S.profile={confirmed:{},inferred:{},stale:{},log:[]};
 if(!S.paySession)S.paySession=null;
 if(!S.savedListings)S.savedListings=[];
 if(!S.ctx30)S.ctx30={fields:{},log:[]};
-function save(){try{localStorage.setItem(LSKEY,JSON.stringify(S))}catch(e){console.error('save failed',e);if(window.E24)E24.toastErr('ذخیره‌سازی محلی ناموفق بود؛ تغییرات تا بازنشانی صفحه در همین نشست اعمال است.')}}
+function save(){try{
+  // Fail closed if preserving corrupt input fails (e.g. storage quota).
+  // Only one recovery snapshot is kept; never touch predecessor keys.
+  if(stateRecovery.length){localStorage.setItem(LSKEY+'_recovery',JSON.stringify(stateRecovery));stateRecovery=[]}
+  localStorage.setItem(LSKEY,JSON.stringify(S))}catch(e){console.error('save failed',e);if(window.E24)E24.toastErr('ذخیره‌سازی محلی ناموفق بود؛ تغییرات تا بازنشانی صفحه در همین نشست اعمال است.')}}
 

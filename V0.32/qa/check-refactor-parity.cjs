@@ -5,18 +5,24 @@ const previous=fs.readFileSync(path.join(root,'..','V0.31','Mahalino+V0.31.html'
 const current=fs.readFileSync(path.join(root,'Mahalino+V0.32.html'),'utf8');
 // Exhaustive allow-list: release labels, source comments, isolated storage and
 // a read-only migration candidate. No numeric sample data or runtime APIs change.
-const expected=previous.replaceAll('V0.31','V0.32')
+let expected=previous.replaceAll('V0.31','V0.32')
  .replaceAll('v031','v032').replaceAll('V031','V032').replaceAll('v31','v32')
  .replaceAll("VER:'0.31'","VER:'0.32'")
  .replace("var OLD_LS=['mahal','ino_','v30'].join('');","var PREVIOUS_LS='mahalino_v31';\nvar OLD_LS=['mahal','ino_','v30'].join('');")
  .replace("LSCHAIN=[LSKEY,OLD_LS,","LSCHAIN=[LSKEY,PREVIOUS_LS,OLD_LS,");
-assert.equal(current,expected,'V0.32 changed runtime content beyond release identity and migration');
+// M-02/M-03 approve changes only inside the persistent-state initialization
+// block. Keep the frozen original block and full equality for every other byte;
+// behavioral recovery tests are mandatory in run-quality-gate.sh.
+const baseline=fs.readFileSync(path.join(__dirname,'fixtures/state-loader-v032-baseline.txt'),'utf8');
+assert.equal(require('node:crypto').createHash('sha256').update(baseline).digest('hex'),'f3d95de6830ee6ff3cb37584872d48e7f79ade8b240d6b37d27b6b3b37d6b246','state baseline was modified');
+assert.equal(expected.split(baseline).length,2,'baseline state block must occur exactly once');
+const utilities=fs.readFileSync(path.join(root,'src/legacy/utilities.js'),'utf8');
+const stateBlock=utilities.slice(utilities.indexOf('/* 2) state */'));
+expected=expected.replace(baseline,()=>stateBlock);
+assert.equal(current,expected,'V0.32 changed content outside approved identity/migration/state recovery blocks');
 // Execute the actual loader against a fresh, prior-only and existing V0.32 store.
 const vm=require('node:vm');
-const start=current.indexOf("var LSKEY='");
-const end=current.indexOf('if(!S.profile)',start);
-assert(start>=0&&end>start,'missing persistent state initialization');
-const loader=current.slice(start,end);
+const loader=stateBlock;
 for(const existing of ['fresh','previous','current']){
  const previousState={auth:{name:'QA'},tokens:321,log:[],chats:[],wfs:{},profile:{confirmed:{},inferred:{},stale:{},log:[]}};
  const ownState={...previousState,tokens:123};
@@ -26,13 +32,9 @@ for(const existing of ['fresh','previous','current']){
  const writes=[];
  const context={localStorage:{getItem:key=>data[key]||null,setItem:(key,value)=>{writes.push(key);data[key]=value}},
    console,Date,Math};
- // Initialization can depend on surrounding helpers; run the focused key/chain
- // loader through the end of its first successful read, before default seeding.
- const stop=loader.indexOf("if(!S||typeof S!=='object')");
- assert(stop>0,'missing state fallback boundary');
- vm.runInNewContext(loader.slice(0,stop),context);
- assert.equal(context.S&&context.S.tokens,existing==='current'?123:existing==='previous'?321:null);
+ vm.runInNewContext(loader,context);
+ assert.equal(context.S&&context.S.tokens,existing==='current'?123:existing==='previous'?321:0);
  assert.equal(data.mahalino_v31,before,'migration overwrote the predecessor');
  assert(!writes.includes('mahalino_v31'));
 }
-console.log('PASS complete artifact parity and previous/current state selection');
+console.log('PASS artifact parity outside approved state recovery block and previous/current state selection');
