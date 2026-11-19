@@ -18,6 +18,14 @@ const {chromium}=require('playwright');
     });
     const wrap=page.locator('#emptying-test .ba27-wrap');
     const range=page.locator('#emptying-test .ba27-range');
+    const labels=await page.locator('#emptying-test .ba27-labs span').evaluateAll(spans=>spans.map(s=>({
+      left:s.getBoundingClientRect().left,right:s.getBoundingClientRect().right,direction:getComputedStyle(s).direction,text:s.textContent
+    })));
+    assert.match(labels[0].text,/روز ورود/);
+    assert.match(labels[1].text,/روز تخلیه/);
+    assert.ok(labels[0].right<labels[1].left,'The furnished endpoint label must be physically left of the empty endpoint label');
+    assert.equal(labels[0].direction,'rtl');
+    assert.equal(labels[1].direction,'rtl');
     await wrap.locator('img').evaluateAll(imgs=>Promise.all(imgs.map(i=>i.decode())));
     const bounds=await wrap.boundingBox();
     const x=v=>bounds.x+bounds.width*v/100;

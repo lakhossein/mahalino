@@ -2495,7 +2495,8 @@ body.sidefold .e27-expand{display:inline-flex;align-items:center;justify-content
 .ba27-handle{position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.25);cursor:ew-resize}
 .ba27-handle::after{content:'⇔';position:absolute;top:50%;right:50%;transform:translate(50%,-50%);width:30px;height:30px;border-radius:50%;background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .ba27-range{width:100%;margin-top:10px;accent-color:var(--brand);direction:ltr}
-.ba27-labs{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;margin-top:6px}
+.ba27-labs{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;margin-top:6px;direction:ltr}
+.ba27-labs span{direction:rtl}
 .ba27-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .ba27-demo{font-size:10.5px;color:var(--ink2);margin-top:8px;line-height:1.8}
 .ba27-zoom{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:120;display:flex;align-items:center;justify-content:center;cursor:zoom-out}
