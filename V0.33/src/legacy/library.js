@@ -74,16 +74,20 @@ E29.lib=(function(){
     var it=byId(id);if(!it||it.type!=='wf_progress')return;
     var a=it.artifact||{};
     if(typeof wd!=='function'||typeof CE==='undefined'){toast('امکان ادامه در این صفحه نیست');return}
-    if(!a.m){toast('گردش کار یافت نشد');return}
-    var w=wfOf(it.workflowId)||wd(a.m);
-    w.data=JSON.parse(JSON.stringify(a.data||{}));w.step=a.step;w.done=!!a.done;w.cancelled=false;
-    if(w.id)S.active[a.m]=w.id;
-    save();closeModal();
-    toast('گردش کار ادامه یافت');
+    if(!a.m||!MODBY[a.m]){toast('گردش کار یافت نشد');return}
+    var w=wfOf(it.workflowId);
+    if(!w||w.m!==a.m){
+      // Never restore a Library snapshot over another active workflow of the same service.
+      var previous=S.active[a.m];
+      w=wfNew(a.m);it.workflowId=w.id;
+      if(previous)S.active[a.m]=previous;else delete S.active[a.m];
+    }
+    w.data=JSON.parse(JSON.stringify(a.data||{}));w.step=Math.max(1,Number(a.step)||1);w.done=!!a.done;w.cancelled=false;
+    save();
     E29.shell.closePanel();
-    if(MODBY[a.m]&&MODBY[a.m].v){go(MODBY[a.m].v);return}
-    if(CURRENT!=='landing')go('landing');else{renderCurrent()}
-    botC('ادامهٔ «'+esc(it.title)+'» از همان‌جا که مانده بودید:',null);
+    // Use the same Assistant-first resume dispatcher as the ordinary workflow controls.
+    ACT.resume({getAttribute:function(k){return k==='data-m'?a.m:(k==='data-wf'?w.id:null)}});
+    toast('گردش کار ادامه یافت');
   }
 
   /* delete (does NOT delete source conversation or contract) */
