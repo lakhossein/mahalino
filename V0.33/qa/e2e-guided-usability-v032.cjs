@@ -49,7 +49,7 @@ const results=[];
       await page.locator('[data-act="e30AccountMenu"]').click();
       assert(await page.locator('.e30-account-menu').count()===1,'account menu did not open');
       assert(await page.locator('.e30-account-menu [data-act="wallet"]').count()===1,'wallet was lost rather than moved');
-      assert(await page.locator('.e30-account-menu [data-act="e29shManage"]').count()===1,'share manager was lost');
+      assert(await page.locator('.e30-account-menu [data-act="e29shManage"], .e30-account-menu [data-act="themeToggle"]').count()===0,'sharing or theme still occupy the account menu');
       await page.keyboard.press('Escape');
       assert(await page.locator('.e30-account-menu').count()===0,'Escape did not close account menu');
       await page.locator('#side [data-act="sideFold"]').click();
@@ -66,6 +66,7 @@ const results=[];
       });
       assert(state.fullscreen&&state.width>=1298,'library is still a narrow slide-over: '+JSON.stringify(state));
       assert(state.tabWidth>650&&state.tabCount>=2,'tabs are clipped: '+JSON.stringify(state));
+      assert(await page.locator('#e29-panel [data-act="e29shManage"]').count()===1,'share manager is missing from Library');
     });
     await test('Reminder date picker rejects past creation and past edits',async page=>{
       await page.locator('#side [data-act="e29panelRem"]').click();

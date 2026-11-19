@@ -132,13 +132,8 @@ E30.ux=(function(){
       SV.tab=false;
       _mount(opts);
       refreshSavedTab();
-      var inp=document.getElementById('e29-lsq');
-      if(inp){
-        /* rebind search so it also filters saved listings */
-        var fresh=inp.cloneNode(true);
-        inp.parentNode.replaceChild(fresh,inp);
-        fresh.addEventListener('input',function(){if(SV.tab)renderSavedBody();else E29.libAPI.render()});
-      }
+      /* The original listener updates its private search query and then
+         dispatches through the public render wrapper for either tab. */
     };
     /* listing save buttons route through the store, keeping old behavior */
     var _savL=CBACT.savL;
@@ -209,7 +204,7 @@ E30.ux=(function(){
     };
     var _manageCopy=ACT.e29shCopy2;
     ACT.e29shCopy2=function(el){
-      _manageCopy(el);toast('نشانی کپی‌شده فقط روی همین مرورگر معتبر است.');
+      return _manageCopy(el);
     };
     /* add a whole-conversation button inside the share manager */
     var _manage=E29.share.manage;
@@ -223,6 +218,7 @@ E30.ux=(function(){
         m.appendChild(row);
       }
     };
+    ACT.e29shManage=function(){E29.share.manage()};
     /* independent entry in the chat summary strip */
     var _rcm=renderChatMeta;
     renderChatMeta=function(){

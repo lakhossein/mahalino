@@ -67,9 +67,7 @@ E30.uiTidyInit=function(){
     menu.innerHTML='<div class="e30-account-summary"><b>'+who+'</b><span>اعتبار باقی‌مانده: '+balance+' کلید</span></div>'+
       '<button type="button" data-act="account" data-tab="overview">پروفایل و حساب کاربری</button>'+
       '<button type="button" data-act="wallet">کیف پول و تراکنش‌ها</button>'+
-      '<button type="button" data-act="e29shManage">لینک‌های اشتراک‌گذاری</button>'+
-      '<button type="button" data-act="themeToggle">تغییر حالت روشن و تاریک</button>'+
-      '<button type="button" data-view="profile">تنظیمات</button>';
+      '<button type="button" data-act="account" data-tab="settings">تنظیمات</button>';
     document.body.appendChild(menu);
     var r=trigger.getBoundingClientRect();
     var w=Math.min(316,window.innerWidth-24);

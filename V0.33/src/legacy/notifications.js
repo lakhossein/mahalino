@@ -100,7 +100,13 @@ E29.notifs=(function(){
       '</div>';
     box.innerHTML=h;
   }
-  function render(){renderBody();renderPrefs()}
+  function render(){
+    renderBody();
+    document.querySelectorAll('#e29-panel [data-act="e29ntFilter"]').forEach(function(el){
+      var active=el.getAttribute('data-cat')===curCat;
+      el.classList.toggle('on',active);el.setAttribute('aria-pressed',String(active));
+    });
+  }
 
   ACT.e29ntOpen=function(el){var st=store(),i,id=el.getAttribute('data-nt');for(i=0;i<st.length;i++){if(st[i].id===id){openAction(st[i]);return}}};
   ACT.e29ntRead=function(el){markRead(el.getAttribute('data-nt'));E29.shell.refreshBadges();render()};
@@ -121,12 +127,13 @@ E29.notifs=(function(){
 
   /* panel content */
   function panelHTML(){
+    curCat='all';
     var h='<div class="e29-phead"><b>مرکز اعلان‌ها</b>'+
       '<button class="e29-pclose" data-act="e29panelClose" title="بستن">'+e29ico('x',16)+'</button></div>'+
       '<div class="e29-ptabs">'+
       '<button class="e29-ptab on" data-act="e29ntFilter" data-cat="all">همه</button>';
     Object.keys(CATS).forEach(function(c){h+='<button class="e29-ptab" data-act="e29ntFilter" data-cat="'+c+'">'+CATS[c]+'</button>'});
-    h+='</div><div class="e29-pbody"><div id="e29-nprefs"></div><div id="e29-nlist"></div></div>'+
+    h+='</div><div class="e29-pbody"><div id="e29-nlist"></div></div>'+
       '<div class="e29-pfoot"><button class="btn btn-sm" data-act="e29ntReadAll">خواندن همه</button><button class="btn btn-sm" data-act="e29ntClear">پاک‌کردن همه</button></div>';
     return h;
   }

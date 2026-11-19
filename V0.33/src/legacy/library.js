@@ -74,15 +74,14 @@ E29.lib=(function(){
     var it=byId(id);if(!it||it.type!=='wf_progress')return;
     var a=it.artifact||{};
     if(typeof wd!=='function'||typeof CE==='undefined'){toast('امکان ادامه در این صفحه نیست');return}
-    if(wd(a.m)){ /* live flow exists */
-      wd(a.m).data=a.data||{};wd(a.m).step=a.step;wd(a.m).done=!!a.done;
-      S.active[a.m]=a.m;save();
-    }else{
-      var w=wfOf(it.workflowId);
-      if(w){w.data=a.data||{};w.step=a.step;w.done=!!a.done;w.cancelled=false;S.active[a.m]=w.id;save()}
-    }
+    if(!a.m){toast('گردش کار یافت نشد');return}
+    var w=wfOf(it.workflowId)||wd(a.m);
+    w.data=JSON.parse(JSON.stringify(a.data||{}));w.step=a.step;w.done=!!a.done;w.cancelled=false;
+    if(w.id)S.active[a.m]=w.id;
+    save();closeModal();
     toast('گردش کار ادامه یافت');
     E29.shell.closePanel();
+    if(MODBY[a.m]&&MODBY[a.m].v){go(MODBY[a.m].v);return}
     if(CURRENT!=='landing')go('landing');else{renderCurrent()}
     botC('ادامهٔ «'+esc(it.title)+'» از همان‌جا که مانده بودید:',null);
   }
@@ -147,9 +146,9 @@ E29.lib=(function(){
     var snap=(it.artifact&&it.artifact.doc)||null;
     var c=snap&&snap.kind==='buy'?'مبایعه‌نامه':'اجاره‌نامه';
     var h='<div class="e29-detail">';
+    var kv=function(k,v){return '<div class="kv"><span>'+k+'</span><b>'+v+'</b></div>'};
     if(snap){
       h+='<h4>اطلاعات قرارداد</h4><div class="sect">';
-      var kv=function(k,v){return '<div class="kv"><span>'+k+'</span><b>'+v+'</b></div>'};
       h+=kv('نوع',c)+kv('شناسه','<span style="direction:ltr">'+esc(snap.code||snap.draftCode||'—')+'</span>')+
         kv('عنوان',esc(it.title));
       if(snap.party)h+=kv('موجر / فروشنده',esc(snap.party.name||'—'));
@@ -258,10 +257,23 @@ E29.lib=(function(){
     var it=byId(id);if(!it)return;
     var snap=it.artifact&&it.artifact.doc;
     DOC_SNAP=snap||null;
-    var content=snap?contractDocHTML(snap,false):('<div class="e29-detail">'+reportDetail(it)+'</div>');
-    openModal('<h3>'+(snap?'سند قرارداد':'گزارش')+'</h3><div class="doc-actions"><button class="btn btn-sm btn-primary" data-act="cprint">دریافت PDF (چاپ مرورگر)</button><button class="btn btn-sm" data-act="closeModal">بستن</button></div><div class="doc-preview" style="max-height:62vh">'+content+'</div>');
-    if(print)setTimeout(function(){try{ACT.cprint()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/library.js:263',e,'caught');}},300);
+    var content=snap?contractDocHTML(snap,false):(it.type==='wf_progress'?wfDetail(it):reportDetail(it));
+    openModal('<h3>'+(snap?'سند قرارداد':'گزارش')+'</h3><div class="doc-actions"><button class="btn btn-sm btn-primary" data-act="e29libPrint" data-lib="'+qesc(it.id)+'">دریافت PDF (چاپ مرورگر)</button><button class="btn btn-sm" data-act="closeModal">بستن</button></div><div class="doc-preview" style="max-height:62vh">'+content+'</div>');
+    if(print)printArtifact(it);
   }
+  function printArtifact(it){
+    var snap=it.artifact&&it.artifact.doc;
+    if(snap){printContract(snap);return}
+    var root=document.getElementById('print-root'),oldTitle=document.title;
+    if(!root){root=document.createElement('div');root.id='print-root';document.body.appendChild(root)}
+    root.innerHTML='<h2>'+esc(it.title)+'</h2>'+(it.type==='wf_progress'?wfDetail(it):reportDetail(it));
+    Array.from(root.querySelectorAll('button,.qr')).forEach(function(x){x.remove()});
+    document.title=it.title;document.body.classList.add('doc-printing');
+    var done=function(){document.body.classList.remove('doc-printing');root.innerHTML='';document.title=oldTitle;window.removeEventListener('afterprint',done)};
+    window.addEventListener('afterprint',done);
+    setTimeout(function(){try{window.print()}finally{done()}},90);
+  }
+  ACT.e29libPrint=function(el){var it=byId(el.getAttribute('data-lib'));if(it)printArtifact(it)};
 
   /* ── ACT handlers ── */
   ACT.e29libOpen=function(el){openDetail(el.getAttribute('data-lib'))};
@@ -275,7 +287,7 @@ E29.lib=(function(){
       '<button data-act="e29libRename" data-lib="'+qesc(it.id)+'">تغییر نام</button>'+
       '<button data-act="e29libDoc" data-lib="'+qesc(it.id)+'" data-print="1">دریافت PDF</button>'+
       (it.sourceChat?'<button data-act="e29libChat" data-sess="'+qesc(it.sourceChat)+'">گفت‌وگوی اصلی</button>':'')+
-      '<button data-act="e29libTxn" data-lib="'+qesc(it.id)+'">تراکنش کلید</button>'+
+      (it.txnId?'<button data-act="e29libTxn" data-lib="'+qesc(it.id)+'">تراکنش کلید</button>':'')+
       '<button data-act="e29libDel" data-lib="'+qesc(it.id)+'" style="color:var(--danger)">حذف</button>'+
       '</div>');
   };
@@ -287,7 +299,7 @@ E29.lib=(function(){
   ACT.e29libRenameGo=function(el){
     var v=(document.getElementById('e29-rn')||{}).value;
     if(v&&v.replace(/\s/g,''))rename(el.getAttribute('data-lib'),v);
-    closeModal();render();toast('نام تغییر کرد');
+    closeModal();E29.libAPI.render();toast('نام تغییر کرد');
   };
   ACT.e29libDel=function(el){
     var it=byId(el.getAttribute('data-lib'));if(!it)return;
@@ -296,7 +308,7 @@ E29.lib=(function(){
   };
   ACT.e29libDelGo=function(el){
     del(el.getAttribute('data-lib'));closeModal();
-    render();E29.shell.refreshBadges();toast('از کتابخانه حذف شد');
+    E29.libAPI.render();E29.shell.refreshBadges();toast('از کتابخانه حذف شد');
   };
   ACT.e29libDoc=function(el){openDoc(el.getAttribute('data-lib'),el.getAttribute('data-print')==='1')};
   ACT.e29libChat=function(el){
@@ -315,20 +327,21 @@ E29.lib=(function(){
     openModal(h);
   };
   ACT.e29libResume=function(el){resumeWf(el.getAttribute('data-lib'))};
-  ACT.e29libBack=function(){render()};
+  ACT.e29libBack=function(){E29.libAPI.render()};
 
   /* search input wiring delegated to shell panel render */
   function bindSearch(){
     var inp=document.getElementById('e29-lsq');
     if(!inp)return;
     inp.value=sq;
-    inp.addEventListener('input',function(){sq=inp.value;renderBody()});
+    inp.addEventListener('input',function(){sq=inp.value;E29.libAPI.render()});
   }
 
   function panelHTML(){
     var h='<div class="e29-phead"><b>کتابخانه</b>'+
+      '<button class="btn btn-sm" data-act="e29shManage">'+e29ico('share',16)+' لینک‌های اشتراک‌گذاری</button>'+
       '<button class="e29-pclose" data-act="e29panelClose" title="بستن">'+e29ico('x',16)+'</button></div>'+
-      '<div style="padding:10px 14px 0"><input id="e29-lsq" class="inp" type="text" placeholder="جست‌وجو در کتابخانه…" style="width:100%"></div>'+
+      '<div class="e29-library-search"><input id="e29-lsq" class="inp" type="search" aria-label="جست‌وجو در کتابخانه" placeholder="جست‌وجو در کتابخانه…"></div>'+
       '<div class="e29-ptabs" id="e29-ltabs"></div>'+
       '<div class="e29-pbody" id="e29-lbody"></div>';
     return h;
@@ -336,9 +349,9 @@ E29.lib=(function(){
   function mountPanel(opts){
     curTab='all';sq='';
     var body=document.getElementById('e29-lbody');
-    if(opts&&opts.item){openDetail(opts.item);return}
     render();
     bindSearch();
+    if(opts&&opts.item)openDetail(opts.item);
   }
 
   E29.libAPI={saveArtifact:saveArtifact,saveWorkflowProgress:saveWorkflowProgress,byId:byId,store:store,

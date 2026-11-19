@@ -155,11 +155,9 @@ E29.shell=(function(){
     h+='</div>';
     /* E. account area */
     h+='<div class="e29-sbot">'+
-      '<button class="e29-srow" data-act="themeToggle" aria-pressed="'+(E22.isDark()?'true':'false')+'" data-tip="'+(E22.isDark()?'حالت روشن':'حالت تاریک')+'"><span class="si">'+(E22.isDark()?E22.ICO.sun:E22.ICO.moon)+'</span><span class="lbl">'+(E22.isDark()?'حالت روشن':'حالت تاریک')+'</span></button>'+
       '<button class="e29-srow" data-act="wallet" data-tip="کیف پول"><span class="si">'+e29ico('wallet',17)+'</span><span class="lbl">کیف پول</span></button>'+
-      '<button class="e29-srow" data-act="e29shManage" data-tip="لینک‌های اشتراک‌گذاری"><span class="si">'+e29ico('share',17)+'</span><span class="lbl">لینک‌های اشتراک‌گذاری</span></button>'+
       '<button class="e29-srow" data-act="account" data-tab="overview" data-tip="حساب کاربری"><span class="si">'+e29ico('user',17)+'</span><span class="lbl">'+esc(S.auth.name||'حساب کاربری')+'</span><small style="margin-inline-start:auto">'+fa(S.tokens,0)+' کلید</small></button>'+
-      '<button class="e29-srow" data-view="profile" data-tip="تنظیمات"><span class="si">'+e29ico('gear',17)+'</span><span class="lbl">تنظیمات و حساب</span></button>'+
+      '<button class="e29-srow" data-act="account" data-tab="settings" data-tip="تنظیمات"><span class="si">'+e29ico('gear',17)+'</span><span class="lbl">تنظیمات و حساب</span></button>'+
       '</div>';
     el.innerHTML=h;
     var sq=el.querySelector('#e27-sq');

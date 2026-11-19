@@ -199,28 +199,31 @@ E29.share=(function(){
   /* manage dialog */
   function manage(){
     var st=store();
-    var h='<h3>لینک‌های اشتراک‌گذاری</h3>';
+    var h='<h3>لینک‌های اشتراک‌گذاری</h3><p class="note">لینک‌ها فقط در همین مرورگر قابل مشاهده هستند. برای ارسال به دیگران، فایل اشتراک‌گذاری را دریافت کنید.</p>';
     if(!st.length){h+='<p class="note">هنوز لینکی نساخته‌اید.</p>'}
     st.forEach(function(sh){
-      h+='<div class="kv" style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px dashed var(--line-soft)">'+
+      h+='<div class="kv" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px dashed var(--line-soft)">'+
         '<span><b>'+esc(sh.title)+'</b><br><small style="color:var(--muted)">'+fd(sh.createdAt)+' · '+(sh.revoked?'باطل‌شده':(sh.expiresAt&&sh.expiresAt<Date.now()?'منقضی':'فعال'))+' · '+fa(sh.views.length,0)+' بازدید</small></span>'+
-        '<span>'+(sh.revoked?'':'<button class="e29-cact" data-act="e29shCopy2" data-sh="'+qesc(sh.id)+'" title="کپی لینک">'+e29ico('link',15)+'</button>'+
+        '<span>'+(!valid(sh)?'':'<a class="btn btn-sm" href="'+qesc(shareURL(sh))+'" target="_blank" rel="noopener noreferrer">مشاهده</a> <button class="e29-cact" data-act="e29shCopy2" data-sh="'+qesc(sh.id)+'" title="کپی لینک">'+e29ico('link',15)+'</button>'+
+        '<button class="btn btn-sm" data-act="e29shExport" data-sh="'+qesc(sh.id)+'">دریافت فایل</button>'+
         '<button class="e29-cact" data-act="e29shUpd" data-sh="'+qesc(sh.id)+'" title="به‌روزرسانی اسنپ‌شات">'+e29ico('refresh',15)+'</button>'+
         '<button class="e29-cact" data-act="e29shRevoke" data-sh="'+qesc(sh.id)+'" title="باطل‌کردن" style="color:var(--danger)">'+e29ico('x',15)+'</button>')+'</span></div>';
     });
-    openModal(h);
+    openModal(h+'<div class="qr"><button data-act="closeModal">بستن</button></div>');
   }
-  ACT.e29shCopy2=function(el){
-    var sh=store().filter(function(x){return x.id===el.getAttribute('data-sh')})[0];if(!sh)return;
+  ACT.e29shCopy2=async function(el){
+    var sh=store().filter(function(x){return x.id===el.getAttribute('data-sh')})[0];if(!valid(sh))return;
     var url=shareURL(sh);
-    if(navigator.clipboard)navigator.clipboard.writeText(url).catch(function(){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:216',null,'caught');});
-    try{var i=document.createElement('input');i.value=url;document.body.appendChild(i);i.select();document.execCommand('copy');i.remove()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:217',e,'caught');}
-    toast('لینک کپی شد');
+    var copied=false;
+    try{if(navigator.clipboard){await navigator.clipboard.writeText(url);copied=true}}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:216',e,'caught');}
+    if(!copied){var i=document.createElement('input');i.value=url;document.body.appendChild(i);try{i.select();copied=document.execCommand('copy')===true}finally{i.remove()}}
+    if(copied){toast('لینک محلی کپی شد');return}
+    openModal('<h3>کپی لینک محلی</h3><div class="e29-linkbox"><input id="e29-shurl" readonly value="'+qesc(url)+'"><button data-act="e29shCopy">کپی</button></div><div class="qr"><button data-act="e29shManage">بازگشت</button></div>');
   };
-  ACT.e29shUpd=function(el){if(updateSnapshot(el.getAttribute('data-sh')))toast('اسنپ‌شات به‌روزرسانی شد');manage()};
+  ACT.e29shUpd=function(el){if(updateSnapshot(el.getAttribute('data-sh')))toast('اسنپ‌شات به‌روزرسانی شد');E29.share.manage()};
   ACT.e29shRevoke=function(el){
     if(revoke(el.getAttribute('data-sh'))){toast('لینک باطل شد — محتوای اصلی دست‌نخورده ماند');E29.shell.refreshBadges()}
-    manage();
+    E29.share.manage();
   };
   ACT.e29shManage=function(){manage()};
 
