@@ -2500,11 +2500,11 @@ body.sidefold .e27-expand{display:inline-flex;align-items:center;justify-content
 .ba27-step.on::before{background:var(--brand);border-color:var(--brand)}
 .ba27-step.done::before{background:var(--brand);border-color:var(--brand);content:'✓';color:#fff;font-size:9px;line-height:15px}
 .ba27-wrap{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:3/2;background:var(--bg)}
-.ba27-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.ba27-after{clip-path:inset(0 0 0 50%)}
+.ba27-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-drag:none}
+.ba27-after{position:absolute;inset:0;clip-path:inset(0 50% 0 0)}
 .ba27-handle{position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.25);cursor:ew-resize}
 .ba27-handle::after{content:'⇔';position:absolute;top:50%;right:50%;transform:translate(50%,-50%);width:30px;height:30px;border-radius:50%;background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.ba27-range{width:100%;margin-top:10px;accent-color:var(--brand)}
+.ba27-range{width:100%;margin-top:10px;accent-color:var(--brand);direction:ltr}
 .ba27-labs{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;margin-top:6px}
 .ba27-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .ba27-demo{font-size:10.5px;color:var(--ink2);margin-top:8px;line-height:1.8}
@@ -2596,7 +2596,7 @@ body.sidefold .e27-expand{display:inline-flex;align-items:center;justify-content
 .e28-disc-g{font-size:10.5px;color:var(--ink2);font-weight:700;margin:8px 2px 4px}
 .e28-disc .racts{margin:0}
 /* اسلایدر قبل/بعد — کارایی */
-.ba27-wrap{contain:content;touch-action:pan-y}
+.ba27-wrap{contain:content;touch-action:pan-y;cursor:ew-resize;user-select:none}
 .ba27-wrap img{decoding:async}
 .ba27-after{will-change:clip-path}
 .ba27-handle{transform:translateX(-50%)}
@@ -4728,7 +4728,7 @@ function baHTML(){
   '<div class="ba27-after"><img src="'+E27.baImg('after')+'" width="1200" height="800" decoding="async" alt="روز تخلیه — پس از خارج‌شدن اثاثیه"></div>'+
   '<div class="ba27-handle" style="left:50%"></div>'+
   '</div>'+
-  '<input type="range" class="ba27-range" min="5" max="95" value="50" aria-label="لغزندهٔ مقایسهٔ قبل و بعد">'+
+  '<input type="range" class="ba27-range" min="0" max="100" value="50" aria-label="لغزندهٔ مقایسهٔ قبل و بعد">'+
   '<div class="ba27-labs"><span>روز ورود — مبلمان موجود</span><span>روز تخلیه — خالی</span></div>'+
   '<div class="ba27-acts">'+
   '<button class="btn btn-xs" data-cba="baZoom" data-src="'+E27.baImg('before')+'">بزرگ‌نمایی روز ورود</button>'+
@@ -13353,38 +13353,39 @@ try{
     if(!(t&&t.classList&&t.classList.contains('ba27-range')))return;
     var root=t.closest('.ba27');if(!root)return;
     var w=root.querySelector('.ba27-wrap');if(!w)return;
-    var v=+t.value;
     if(!w._raf){
       w._raf=requestAnimationFrame(function(){w._raf=null;E28.baPaint(w,+t.value)});
     }
   });
   document.addEventListener('pointerdown',function(e){
     var w=e.target&&e.target.closest?e.target.closest('.ba27-wrap'):null;
-    if(!w)return;
-    var ba=w.closest('.ba27'),rng=ba?ba.querySelector('.ba27-range'):null;
+    if(!w||e.button!==0||e.isPrimary===false)return;
+    e.preventDefault();
     function toPct(ev){
       var r=w.getBoundingClientRect();
-      /* RTL: سمت راست = روز ورود (۱۰۰٪) */
-      return Math.max(0,Math.min(100,Math.round((r.right-ev.clientX)/r.width*100)));
+      /* Physical x-coordinate: rightward movement reveals more of the empty room. */
+      return r.width?Math.max(0,Math.min(100,Math.round((ev.clientX-r.left)/r.width*100))):50;
     }
     w.setPointerCapture&&w.setPointerCapture(e.pointerId);
     E28.baPaint(w,toPct(e));
-    function mv(ev){ev.preventDefault();E28.baPaint(w,toPct(ev))}
-    function up(){w.removeEventListener('pointermove',mv);w.removeEventListener('pointerup',up);w.removeEventListener('pointercancel',up)}
+    function mv(ev){if(ev.pointerId!==e.pointerId)return;E28.baPaint(w,toPct(ev))}
+    function up(ev){if(ev.pointerId!==e.pointerId)return;w.removeEventListener('pointermove',mv);w.removeEventListener('pointerup',up);w.removeEventListener('pointercancel',up);w.removeEventListener('lostpointercapture',up)}
     w.addEventListener('pointermove',mv);
     w.addEventListener('pointerup',up);
     w.addEventListener('pointercancel',up);
-    if(rng)rng.focus({preventScroll:true});
+    w.addEventListener('lostpointercapture',up);
+    w.focus({preventScroll:true});
   });
   document.addEventListener('keydown',function(e){
     var w=e.target&&e.target.closest?e.target.closest('.ba27-wrap'):null;
     if(w&&e.target===w){
       var v=+(w.getAttribute('aria-valuenow')||50);
-      if(e.key==='ArrowLeft')v=Math.min(100,v+4);
-      else if(e.key==='ArrowRight')v=Math.max(0,v-4);
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown')v=Math.max(0,v-4);
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp')v=Math.min(100,v+4);
+      else if(e.key==='Home')v=0;
+      else if(e.key==='End')v=100;
       else return;
       e.preventDefault();
-      w.setAttribute('aria-valuenow',v);
       E28.baPaint(w,v);
       return;
     }
@@ -13538,10 +13539,12 @@ ceSend=function(t){
 var E28={ctrKind:null,ctrDone:null,remPend:null,remF:'all'};
 E28.tsv=function(n,sz){return '<svg width="'+(sz||16)+'" height="'+(sz||16)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none">'+TABLER[n]+'</svg>'};
 E28.baPaint=function(w,v){
+  v=Math.max(0,Math.min(100,Math.round(v)));
   if(w._pv===v)return;w._pv=v;
   var after=w.querySelector('.ba27-after'),hd=w.querySelector('.ba27-handle');
-  if(after)after.style.clipPath='inset(0 0 0 '+v+'%)';
+  if(after)after.style.clipPath='inset(0 '+(100-v)+'% 0 0)';
   if(hd)hd.style.left=v+'%';
+  w.setAttribute('aria-valuenow',v);
   var r=w.parentNode&&w.parentNode.querySelector('.ba27-range');
   if(r&&+r.value!==v)r.value=v;
 };

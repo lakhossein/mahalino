@@ -170,38 +170,39 @@ try{
     if(!(t&&t.classList&&t.classList.contains('ba27-range')))return;
     var root=t.closest('.ba27');if(!root)return;
     var w=root.querySelector('.ba27-wrap');if(!w)return;
-    var v=+t.value;
     if(!w._raf){
       w._raf=requestAnimationFrame(function(){w._raf=null;E28.baPaint(w,+t.value)});
     }
   });
   document.addEventListener('pointerdown',function(e){
     var w=e.target&&e.target.closest?e.target.closest('.ba27-wrap'):null;
-    if(!w)return;
-    var ba=w.closest('.ba27'),rng=ba?ba.querySelector('.ba27-range'):null;
+    if(!w||e.button!==0||e.isPrimary===false)return;
+    e.preventDefault();
     function toPct(ev){
       var r=w.getBoundingClientRect();
-      /* RTL: سمت راست = روز ورود (۱۰۰٪) */
-      return Math.max(0,Math.min(100,Math.round((r.right-ev.clientX)/r.width*100)));
+      /* Physical x-coordinate: rightward movement reveals more of the empty room. */
+      return r.width?Math.max(0,Math.min(100,Math.round((ev.clientX-r.left)/r.width*100))):50;
     }
     w.setPointerCapture&&w.setPointerCapture(e.pointerId);
     E28.baPaint(w,toPct(e));
-    function mv(ev){ev.preventDefault();E28.baPaint(w,toPct(ev))}
-    function up(){w.removeEventListener('pointermove',mv);w.removeEventListener('pointerup',up);w.removeEventListener('pointercancel',up)}
+    function mv(ev){if(ev.pointerId!==e.pointerId)return;E28.baPaint(w,toPct(ev))}
+    function up(ev){if(ev.pointerId!==e.pointerId)return;w.removeEventListener('pointermove',mv);w.removeEventListener('pointerup',up);w.removeEventListener('pointercancel',up);w.removeEventListener('lostpointercapture',up)}
     w.addEventListener('pointermove',mv);
     w.addEventListener('pointerup',up);
     w.addEventListener('pointercancel',up);
-    if(rng)rng.focus({preventScroll:true});
+    w.addEventListener('lostpointercapture',up);
+    w.focus({preventScroll:true});
   });
   document.addEventListener('keydown',function(e){
     var w=e.target&&e.target.closest?e.target.closest('.ba27-wrap'):null;
     if(w&&e.target===w){
       var v=+(w.getAttribute('aria-valuenow')||50);
-      if(e.key==='ArrowLeft')v=Math.min(100,v+4);
-      else if(e.key==='ArrowRight')v=Math.max(0,v-4);
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown')v=Math.max(0,v-4);
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp')v=Math.min(100,v+4);
+      else if(e.key==='Home')v=0;
+      else if(e.key==='End')v=100;
       else return;
       e.preventDefault();
-      w.setAttribute('aria-valuenow',v);
       E28.baPaint(w,v);
       return;
     }

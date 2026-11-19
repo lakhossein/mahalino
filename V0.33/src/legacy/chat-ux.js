@@ -2,10 +2,12 @@
 var E28={ctrKind:null,ctrDone:null,remPend:null,remF:'all'};
 E28.tsv=function(n,sz){return '<svg width="'+(sz||16)+'" height="'+(sz||16)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none">'+TABLER[n]+'</svg>'};
 E28.baPaint=function(w,v){
+  v=Math.max(0,Math.min(100,Math.round(v)));
   if(w._pv===v)return;w._pv=v;
   var after=w.querySelector('.ba27-after'),hd=w.querySelector('.ba27-handle');
-  if(after)after.style.clipPath='inset(0 0 0 '+v+'%)';
+  if(after)after.style.clipPath='inset(0 '+(100-v)+'% 0 0)';
   if(hd)hd.style.left=v+'%';
+  w.setAttribute('aria-valuenow',v);
   var r=w.parentNode&&w.parentNode.querySelector('.ba27-range');
   if(r&&+r.value!==v)r.value=v;
 };

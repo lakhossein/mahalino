@@ -509,7 +509,7 @@ function baHTML(){
   '<div class="ba27-after"><img src="'+E27.baImg('after')+'" width="1200" height="800" decoding="async" alt="روز تخلیه — پس از خارج‌شدن اثاثیه"></div>'+
   '<div class="ba27-handle" style="left:50%"></div>'+
   '</div>'+
-  '<input type="range" class="ba27-range" min="5" max="95" value="50" aria-label="لغزندهٔ مقایسهٔ قبل و بعد">'+
+  '<input type="range" class="ba27-range" min="0" max="100" value="50" aria-label="لغزندهٔ مقایسهٔ قبل و بعد">'+
   '<div class="ba27-labs"><span>روز ورود — مبلمان موجود</span><span>روز تخلیه — خالی</span></div>'+
   '<div class="ba27-acts">'+
   '<button class="btn btn-xs" data-cba="baZoom" data-src="'+E27.baImg('before')+'">بزرگ‌نمایی روز ورود</button>'+
