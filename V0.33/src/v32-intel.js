@@ -808,7 +808,7 @@ E30.disc=(function(){
        deterministic hand-off after the user has asked for recommendations. */
     COL.skipOptionalToHoods=true;
     missing(COL.wf).forEach(function(item){
-      markUnknown(item.id);
+      if(getF(item.id)==null)markUnknown(item.id);
     });
     COL.expecting=null;saveCollector();
     complete();
@@ -1143,7 +1143,7 @@ E30.disc=(function(){
       if(/^(درسته|درست است|اوکی|بله|تایید|تأیید|همینه|همین است|صحیح)$/i.test(nt.trim())){
         COL.finConfirmed=true;COL.finPrompted=true;COL.confirming=null;
         ['budget_dep','budget_rent'].forEach(function(id){var f=fMeta(id);if(f)f.requiresConfirmation=false});
-        persist();saveCollector();botC('✓ هر دو مبلغ با تأیید شما ثبت شد.',null);askNext();return true;
+        persist();saveCollector();botC('✓ هر دو مبلغ با تأیید شما ثبت شد.',null);if(COL.skipOptionalToHoods)complete();else askNext();return true;
       }
       if(/اصلاح|تغییر|اشتباه|غلط|نه/.test(nt)){
         var isDep=/ودیعه|رهن|پول جلو/.test(nt),isRent=/اجاره|کرایه|ماهانه|ماهی/.test(nt);
@@ -1264,7 +1264,7 @@ E30.disc=(function(){
       saveCollector();
       return;
     }
-    if(financialPending()){promptFinancial();return}
+    if(financialPending()&&!COL.skipOptionalToHoods){promptFinancial();return}
     if(hardContradiction()){promptContradiction();return}
     profileCard();
     botC('اگر همه‌چیز درست است بنویسید <b>«درسته»</b> — یا هر موردی را اصلاح کنید.',null);
@@ -1300,9 +1300,13 @@ E30.disc=(function(){
     botC('عالی — جمع‌بندی کامل شد. می‌رویم سراغ گزینه‌ها:',null);
     try{
       if(wf==='rent'){
-        ceStart('rent');
+        ceStart('rent',true);
         var D=wd('rent').data;defP(D);
         var dep=getF('budget_dep'),rent=getF('budget_rent');
+        if(d.skipOptionalToHoods){
+          D.P=Object.assign(D.P,{beds:0,bedsNum:'',minM2:0,floor:'any',floorNum:null,elev:false,park:false,balc:false,requirements:{},requiredFloor:null});
+          D.hood=getF('hood')||null;
+        }
         if(dep&&dep.v){D.B=D.B||{inc:1500000000,depB:15000000000,rentB:0,chg:50000000,incr:100000000};D.B.depB=dep.v[1];D.depOpen=!!dep.open;D._depSet=1}
         if(rent&&rent.v){D.B=D.B||{inc:1500000000,depB:15000000000,rentB:0,chg:50000000,incr:100000000};D.B.rentB=rent.v[1];D.rentBOpen=!!rent.open;D._rentbSet=1}
         /* persona-driven priorities — from the DYNAMIC persona (§2.7 fix) */
@@ -1342,30 +1346,26 @@ E30.disc=(function(){
         if(w==='both'){P.work=4;P.metro=4} /* equal weight → balanced access (§4.8) */
         if(getF('commute_max'))P._commuteMax=getF('commute_max');
         D._e30=1;save();
-        /* jump to the first missing REQUIRED step — financial never skipped (§2.1) */
-        if(d.skipOptionalToHoods&&(!dep||!dep.v||!rent||!rent.v)){
+        /* An explicit request to continue goes straight to the current matches.
+           Unspecified budgets do not become illustrative slider defaults. */
+        if(d.skipOptionalToHoods){
           D.B=D.B||{};
           if(!dep||!dep.v){D.B.depB=null;D.depOpen=true}
           if(!rent||!rent.v){D.B.rentB=null;D.rentBOpen=true}
           D.P.beds=getF('rooms')||0;D.P.minM2=getF('m2')||0;
-          var skipHood=getF('hood');if(skipHood)D.hood=skipHood;
-          ceJump(skipHood?'mk':'hoods');
+          ceJump('list');
         }
         else if(!dep||!dep.v)ceJump('dep');
         else if(!rent||!rent.v)ceJump('rentb');
-        else if(d.skipOptionalToHoods){
-          var chosenHood=getF('hood');
-          if(chosenHood){D.hood=chosenHood;ceJump('mk')}
-          else ceJump('hoods');
-        }
         else ceJump('imps');
         try{E30.flowsAPI.syncStage()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:1362',e,'caught');}
         return true;
       }
       if(wf==='buy'){
-        ceStart('buy');
+        ceStart('buy',true);
         var D2=wd('buy').data;defP(D2);defPR(D2);
         var bud=getF('buy_budget');
+        if(d.skipOptionalToHoods){D2.PR={age:[0,100],m2:[0,100000],ppm:[0,Number.MAX_SAFE_INTEGER],beds:0,floorR:[-100,200],elev:'no',park:'no',balc:'no'};D2.hood=getF('hood')||null}
         if(bud&&bud.v){
           D2.budg=bud.v[1];D2.budgOpen=!!bud.open;D2._budgSet=1;
           /* §8.1: if the stated number covers the WHOLE transaction, keep a labeled
@@ -1381,7 +1381,7 @@ E30.disc=(function(){
         if(getF('purpose')==='invest'){D2.P.metro=2;D2.P.school=2;D2.P.work=2}
         var v2;
         if((v2=getF('rooms'))!=null)D2.PR.beds=+v2;
-        if((v2=getF('m2'))!=null)D2.PR.m2=[+v2,Math.max(+v2+30,120)];
+        if((v2=getF('m2'))!=null)D2.PR.m2=[+v2,d.skipOptionalToHoods?100000:Math.max(+v2+30,120)];
         if((v2=getF('prop_age'))!=null)D2.PR.age=getF('prop_age_range')||[0,+v2];
         if(getF('prop_new')==='new'||getF('prop_new')==='preferred'){
           if(isHard('prop_new'))D2.PR.age=[0,3];
@@ -1401,8 +1401,7 @@ E30.disc=(function(){
           D2.PR.beds=getF('rooms')||0;
           if(!getF('m2'))D2.PR.m2=[0,100000];
           if(getF('prop_age')==null&&!isHard('prop_new'))D2.PR.age=[0,100];
-          var buyHood=getF('hood');if(buyHood)D2.hood=buyHood;
-          ceJump(buyHood?'mk':'hoods');
+          ceJump('list');
         }else if(!bud||!bud.v)ceJump('budg');else ceJump('imps');
         return true;
       }
@@ -1461,7 +1460,10 @@ E30.disc=(function(){
     var nt=nz(text);
     if(/درسته|درست است|درست فع|اوکی|باشه|تأیید|تایید|همینه|همین/.test(nt)){
       usrC(text);
-      if(financialPending()){promptFinancial();return true}
+      if(financialPending()){
+        if(!COL.skipOptionalToHoods){promptFinancial();return true}
+        COL.finConfirmed=true;['budget_dep','budget_rent'].forEach(function(id){var f=fMeta(id);if(f)f.requiresConfirmation=false});persist();saveCollector();
+      }
       if(hardContradiction()){promptContradiction();return true}
       handoff();return true;
     }

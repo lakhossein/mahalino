@@ -238,9 +238,50 @@ E30.guide=(function(){
         '<button data-cba="e31ProjectBid" data-i="'+i+'">ثبت پیشنهاد به‌عنوان پیمانکار</button><button data-cba="e31ProjectEmployer" data-i="'+i+'">بررسی پیمانکارها به‌عنوان کارفرما</button><button data-cba="detPr" data-i="'+i+'">جزئیات همین پروژه</button></div></div>';
     }).join('')+'</div>',null);
   }
-  function sample(){
+  function criteriaAction(flow,source){
+    return '<p>آگهی منطبق پیدا نشد. هیچ محدودیتی خودکار تغییر نکرده است.</p><button type="button" class="primary" data-cba="e33EditCriteria" data-flow="'+flow+'" data-source="'+source+'">ویرایش معیارهای جست‌وجو</button>';
+  }
+  function criteriaEditor(flow,source){
+    var f=E30.discAPI.getF,D=source==='legacy'?wd(flow).data:null;
+    var ids=flow==='rent'?['budget_dep','budget_rent','hood','m2','rooms','prop_age']:['buy_budget','hood','m2','rooms','prop_age','price_per_m2'];
+    function current(id){
+      if(!D){var v=f(id);return v==null?'تعیین نشده':E30.discAPI.show(id,v)}
+      var p=D.P||{},r=D.PR||{},v;
+      if(id==='budget_dep')return D.depOpen||!D.B?'بدون سقف':rial(D.B.depB);
+      if(id==='budget_rent')return D.rentBOpen||!D.B?'بدون سقف':rial(D.B.rentB);
+      if(id==='buy_budget')return D.budgOpen||!D.budg?'بدون سقف':rial(D.budg);
+      if(id==='hood')return D.hood?findH(D.hood).n:'همهٔ محله‌ها';
+      if(id==='m2')v=flow==='rent'?p.minM2:r.m2&&r.m2[0];
+      if(id==='rooms')v=flow==='rent'?(p.bedsNum||p.beds):r.beds;
+      if(id==='prop_age')v=flow==='rent'?p.maxAge:r.age&&r.age[1];
+      if(id==='price_per_m2')v=r.ppm&&r.ppm[1];
+      return v==null?'تعیین نشده':fa(v,0);
+    }
+    botC('<div class="e33-criteria-editor" data-flow="'+flow+'" data-source="'+source+'"'+(D?' data-work="'+qesc(wd(flow).id)+'"':'')+'><b>ویرایش یک معیار و جست‌وجوی دوباره</b><p class="note">فقط همان معیار تغییر می‌کند. برای برداشتن محدودیت، «مهم نیست» را بنویسید؛ برای مبلغ، واحد تومان را مشخص کنید.</p>'+ids.map(function(id){
+      var label=E30.discAPI.SLOT_LABEL[id]||id;
+      return '<div class="fld" data-criterion="'+id+'"><label>'+esc(label)+' — '+esc(current(id))+'<input type="text" aria-label="'+qesc(label)+'" placeholder="مقدار جدید"></label> <button type="button" data-cba="e33ApplyCriterion" data-slot="'+id+'">تغییر و جست‌وجو</button></div>';
+    }).join('')+'</div>',null);
+  }
+  function updateLegacy(flow,id,value){
+    var D=wd(flow).data,p=D.P||{},r=D.PR||{},skip=/^(مهم نیست|بدون سقف)$/.test(norm(value)),n;
+    if(id==='hood'){var h=skip?null:hoodFromText(value);if(!skip&&!h)return false;D.hood=h;return true}
+    if(id==='budget_dep'||id==='budget_rent'||id==='buy_budget'||id==='price_per_m2'){
+      var parsed=skip?null:parseMoneyFA(value);if(!skip&&(!parsed||!parsed.ok))return false;
+      n=skip?null:parsed.value;
+      if(id==='budget_dep'||id==='budget_rent'){D.B=D.B||{};if(id==='budget_dep'){D.B.depB=n;D.depOpen=skip}else{D.B.rentB=n;D.rentBOpen=skip}}
+      else if(id==='buy_budget'){D.budg=n;D.budgOpen=skip}
+      else r.ppm=[0,skip?Number.MAX_SAFE_INTEGER:n];
+      return true;
+    }
+    var count=skip?null:parseCountFA(value);if(!skip&&(!count||!count.ok||count.value<0))return false;n=skip?0:count.value;
+    if(id==='m2'){if(flow==='rent')p.minM2=n;else r.m2=[n,Math.max(n,(r.m2||[0,100000])[1])];return true}
+    if(id==='rooms'){if(flow==='rent'){p.beds=n;p.bedsNum=n}else r.beds=n;return true}
+    if(id==='prop_age'){if(flow==='rent'){p.maxAge=skip?null:n;p._ageHard=!skip;if(skip)p.minAge=0}else r.age=[skip?0:Math.min((r.age||[0])[0],n),skip?100:n];return true}
+    return false;
+  }
+  function sample(explicitFlow){
     var col=S.ctx30Collectors&&S.ctx30Collectors[S.ctx30ActiveKey];
-    var flow=(col&&col.wf==='buy')||CE.f==='buy'?'buy':'rent',f=E30.discAPI.getF;
+    var flow=explicitFlow||((col&&col.wf==='buy')||CE.f==='buy'?'buy':'rent'),f=E30.discAPI.getF;
     var dep=f('budget_dep'),rent=f('budget_rent'),budget=f('buy_budget'),age=f('prop_age');
     var rules=f('prefRules')||{},floor=f('floor_preference');
     var fields=E30.discAPI.ctx().fields;
@@ -265,7 +306,7 @@ E30.guide=(function(){
     botC('<b>آگهی‌های منطبق با اطلاعات فعلی: '+fa(matches.length,0)+'</b><p class="note">دادهٔ ساختگی نمونه، نه آگهی زنده. ترجیحات اعلام‌نشده فیلتر نمی‌شوند.'+
       (matches.length>3?' سه نمونهٔ نخست نمایش داده می‌شود.':'')+'</p>'+
       (cards?'<div class="chcards e31-results" data-result-flow="'+flow+'">'+cards+'</div>':
-        '<p>آگهی منطبق پیدا نشد. برای تغییر نتیجه، محدودیت دلخواه را صریحاً اصلاح کنید؛ هیچ قیدی خودکار حذف نشده است.</p>'),null);
+        criteriaAction(flow,'sample')),null);
   }
   function suspend(){
     var st=state(),col=E30.discAPI.collector();
@@ -393,6 +434,26 @@ E30.guide=(function(){
   var installed=false;
   function install(){
     if(installed)return;installed=true;
+    CBACT.e33EditCriteria=function(el){
+      var flow=el.getAttribute('data-flow'),source=el.getAttribute('data-source');
+      if(['rent','buy'].indexOf(flow)<0||['legacy','sample'].indexOf(source)<0)return;
+      if(source==='legacy'&&CE.f!==flow){toast('این جست‌وجو دیگر فعال نیست.');return}
+      criteriaEditor(flow,source);
+    };
+    CBACT.e33ApplyCriterion=function(el){
+      var editor=el.closest('.e33-criteria-editor'),row=el.closest('[data-criterion]');if(!editor||!row)return;
+      var flow=editor.getAttribute('data-flow'),source=editor.getAttribute('data-source'),id=el.getAttribute('data-slot'),value=row.querySelector('input').value.trim();
+      if(!value){toast('مقدار جدید را وارد کنید.');return}
+      if(source==='legacy'){
+        if(CE.f!==flow||wd(flow).id!==editor.getAttribute('data-work')){toast('این جست‌وجو دیگر فعال نیست.');return}
+        if(!updateLegacy(flow,id,value)){toast('مقدار معتبر وارد کنید.');return}
+        if(wd(flow).data._e30)E30.discAPI.answer(id,value);
+        save();el.disabled=true;usrC('تغییر '+(E30.discAPI.SLOT_LABEL[id]||id)+': '+value);ceJump('list');
+      }else{
+        if(!E30.discAPI.answer(id,value).ok){toast('مقدار معتبر وارد کنید.');return}
+        save();el.disabled=true;usrC('تغییر '+(E30.discAPI.SLOT_LABEL[id]||id)+': '+value);sample(flow);
+      }
+    };
     function startProjectAction(el,role){
       var raw=el.getAttribute('data-i'),i=Number(raw);
       if(raw==null||raw===''||!Number.isInteger(i)||typeof PRJ==='undefined'||!PRJ[i]){toast('پروژهٔ هدف در دسترس نیست.');return null}
@@ -495,6 +556,6 @@ E30.guide=(function(){
       return previousSend(t);
     };
   }
-  return {registry:REGISTRY,install:install,route:route,suggestions:suggestions,normalize:norm,getCurrent:function(){return state().node},actions:BY_ID,
+  return {registry:REGISTRY,install:install,route:route,suggestions:suggestions,normalize:norm,getCurrent:function(){return state().node},actions:BY_ID,criteriaAction:criteriaAction,
     canSuggest:function(id){return can(BY_ID[id],false)}};
 })();

@@ -117,7 +117,7 @@ function renderChatMeta(){
 }
 function botC(html,chips){HIST.push({r:'bot',h:html,c:chips||null});S.liveHistory=HIST.slice();save();cr()}
 function usrC(t){HIST.push({r:'user',h:esc(t)});S.liveHistory=HIST.slice();save();cr()}
-function ceStart(f){
+function ceStart(f,silent){
   CE.f=f;CE.i=0;CE.li=0;CE.hist=[];
   if(MODBY[f]&&!SCRIPTS[f]){
     CE.f=null;save();go(MODBY[f].v);
@@ -125,7 +125,7 @@ function ceStart(f){
     return;
   }
   if(MODBY[f]){var w=wf(f);if(!w||w.done){wfNew(f)}}
-  ceStep();
+  if(!silent)ceStep();
 }
 function ceStartGate(){
   CE.f='gate';CE.li=0;CE.hist=[];
@@ -435,12 +435,12 @@ SCRIPTS.rent=[
  acts:{back:function(){ceJump('hoods')}}},
 {id:'list',q:function(D){
   defP(D);
-  var all=RLIST.filter(function(x){return x.hood===D.hood});
+  var all=RLIST.filter(function(x){return !D.hood||x.hood===D.hood});
   var hard=all.filter(function(x){return E30.flowsAPI.rentPass(x,D)});
-  return ' آگهی‌های منطبق ('+fa(hard.length,0)+' از '+fa(all.length,0)+'):'},
+  return ' آگهی‌های منطبق ('+fa(hard.length,0)+' از '+fa(all.length,0)+'):'+(hard.length?'':E30.guide.criteriaAction('rent','legacy'))},
  cards:function(D){
   defP(D);
-  var hard=RLIST.filter(function(x){return x.hood===D.hood}).filter(function(x){return E30.flowsAPI.rentPass(x,D)});
+  var hard=RLIST.filter(function(x){return E30.flowsAPI.rentPass(x,D)});
   return hard.sort(function(a,b){return lscore(b,D)-lscore(a,D)}).slice(0,3).map(function(x){return chatListCard(x,D.listing===x.id)}).join('')},
  chips:function(D){
   var c=[];
@@ -450,7 +450,7 @@ SCRIPTS.rent=[
   return c},
  acts:{
   cmp:function(){cmpListModal('rent');botC('جدول مقایسه باز شد ✓',[['برو به بازدید','!skp']])},
-  all:function(D){var ms=RLIST.filter(function(x){return x.hood===D.hood}),ok=ms.filter(function(x){return E30.flowsAPI.rentPass(x,D)}),no=ms.filter(function(x){return !E30.flowsAPI.rentPass(x,D)});botC('منطبق با الزام‌های شما: '+fa(ok.length,0)+' آگهی'+(no.length?' — '+fa(no.length,0)+' آگهی دیگرِ این محله خارج از الزام‌هاست و «انطباق» حساب نمی‌شود':'')+':<div class="chcards">'+ok.concat(no).map(function(x){return chatListCard(x,D.listing===x.id)}).join('')+'</div>',[['برو به بازدید','!skp']])},
+  all:function(D){var ms=RLIST.filter(function(x){return !D.hood||x.hood===D.hood}),ok=ms.filter(function(x){return E30.flowsAPI.rentPass(x,D)}),no=ms.filter(function(x){return !E30.flowsAPI.rentPass(x,D)});botC('منطبق با الزام‌های شما: '+fa(ok.length,0)+' آگهی'+(no.length?' — '+fa(no.length,0)+' آگهی دیگر خارج از الزام‌هاست و «انطباق» حساب نمی‌شود':'')+':<div class="chcards">'+ok.concat(no).map(function(x){return chatListCard(x,D.listing===x.id)}).join('')+'</div>',[['برو به بازدید','!skp']])},
   back:function(){ceJump('hoods')},
   dist:function(D){if(!D.listing){botC('اول یک ملک را «انتخاب» کنید.');return}var x=findL(D.listing);botC('<b>'+x.t+'</b>'+placesHTML(x.hood,8),[['نقشه','!map']])},
   map:function(){go('map')},
@@ -617,10 +617,10 @@ SCRIPTS.buy=[
  chips:function(){return [['در صفحهٔ فلو','page'],['رد کردن','skip']]},
  set:function(D,v){if(v==='skip'){D.liqSkip=true}if(v==='page'){D.liqPage=true}return null}},
 {id:'list',q:function(D){
-  var hard=BLIST.filter(function(x){return x.hood===D.hood}).filter(function(x){return blPass(x,D)});
-  return ' آگهی‌های منطبق ('+fa(hard.length,0)+'):'},
+  var hard=BLIST.filter(function(x){return blPass(x,D)});
+  return ' آگهی‌های منطبق ('+fa(hard.length,0)+'):'+(hard.length?'':E30.guide.criteriaAction('buy','legacy'))},
  cards:function(D){
-  return BLIST.filter(function(x){return x.hood===D.hood}).filter(function(x){return blPass(x,D)}).sort(function(a,b){return bScore(b,D)-bScore(a,D)}).slice(0,3).map(function(x){return chatBCard(x,D.blist===x.id)}).join('')},
+  return BLIST.filter(function(x){return blPass(x,D)}).sort(function(a,b){return bScore(b,D)-bScore(a,D)}).slice(0,3).map(function(x){return chatBCard(x,D.blist===x.id)}).join('')},
  chips:function(D){
   var c=[];
   if((D.savedB||[]).length>=2)c.push([' مقایسه','!cmp']);
@@ -629,7 +629,7 @@ SCRIPTS.buy=[
   return c},
  acts:{
   cmp:function(){cmpListModal('buy');botC('جدول باز شد ✓',[['برو به حقوقی','!skp']])},
-  all:function(D){botC('همه:<div class="chcards">'+BLIST.filter(function(x){return x.hood===D.hood}).map(function(x){return chatBCard(x,D.blist===x.id)}).join('')+'</div>',[['برو به حقوقی','!skp']])},
+  all:function(D){botC('همه:<div class="chcards">'+BLIST.filter(function(x){return !D.hood||x.hood===D.hood}).map(function(x){return chatBCard(x,D.blist===x.id)}).join('')+'</div>',[['برو به حقوقی','!skp']])},
   back:function(){ceJump('hoods')},
   dist:function(D){if(!D.blist){botC('اول یک ملک «انتخاب» کنید.');return}var x=findB(D.blist);botC('<b>'+x.t+'</b>'+placesHTML(x.hood,8),[['نقشه','!map']])},
   map:function(){go('map')},
