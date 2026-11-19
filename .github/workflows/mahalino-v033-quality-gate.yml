@@ -19,6 +19,11 @@ on:
 permissions:
   contents: read
 
+# New feature revisions supersede earlier checkpoints, without cancelling main/Pages runs.
+concurrency:
+  group: mahalino-v033-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/heads/feature/') }}
+
 jobs:
   chromium-acceptance:
     name: Browser acceptance and reproducible build
