@@ -301,7 +301,7 @@ E30.disc=(function(){
       /* An amount cannot populate two labels. A missing/ambiguous amount is
          left unknown rather than borrowed from the neighbouring clause. */
       if(isD===isR){i=j-1;continue}
-      var value=/^(0|صفر)$/.test(span)?[0,0]:segMoney(span);
+      var value=/^(?:0+|صفر)(?:\s*(?:تومان|تومن|ریال))?$/.test(span)?[0,0]:segMoney(span);
       if(value){var key=isD?'dep':'rent';if(!out[key])out[key]=value}
       i=j-1;
     }
@@ -912,7 +912,7 @@ E30.disc=(function(){
       case 'price_per_m2': case 'invest_income':{
         var range=parseMoneyRangeFA(t),one;
         if(range&&range.ok){var values=range.value.split('|').map(Number);setF(id,{v:values},{src:'answer',hard:id==='price_per_m2'});return {ok:true}}
-        one=parseMoneyFA(t);if(!one||!one.ok)return {ok:false};setF(id,{v:[one.value,one.value]},{src:'answer',hard:id==='price_per_m2'});return {ok:true};
+        one=(id==='price_per_m2'?parseSearchMoneyFA:parseMoneyFA)(t);if(!one||!one.ok)return {ok:false};setF(id,{v:[one.value,one.value]},{src:'answer',hard:id==='price_per_m2'});return {ok:true};
       }
       case 'property_floor':{
         var raw=nt.replace(/طبقه|ملک|است|هست/g,' ').trim(),floor=/همکف/.test(raw)?0:/^-?\d+$/.test(raw)?Number(raw):null;
@@ -962,7 +962,8 @@ E30.disc=(function(){
         var clean=stripFin(t);
         var r=parseMoneyRangeFA(clean);
         if(r&&r.ok){var p=r.value.split('|');setF(id,{v:[+p[0],+p[1]]},{src:'answer',fin:true});return {ok:true}}
-        var m=parseMoneyFA(normHalf(clean));
+        var searchBudget=id==='budget_dep'||id==='budget_rent'||id==='buy_budget';
+        var m=(searchBudget?parseSearchMoneyFA:parseMoneyFA)(normHalf(clean));
         if(m&&m.ok){setF(id,{v:[m.value,m.value]},{src:'answer',fin:true});return {ok:true}}
         var s1=segMoney(t);
         if(s1){setF(id,{v:s1},{src:'answer',fin:true});return {ok:true}}
@@ -1350,8 +1351,8 @@ E30.disc=(function(){
            Unspecified budgets do not become illustrative slider defaults. */
         if(d.skipOptionalToHoods){
           D.B=D.B||{};
-          if(!dep||!dep.v){D.B.depB=null;D.depOpen=true}
-          if(!rent||!rent.v){D.B.rentB=null;D.rentBOpen=true}
+          if(!dep||!dep.v){D.B.depB=null;D.depOpen=!!(dep&&dep.open)}
+          if(!rent||!rent.v){D.B.rentB=null;D.rentBOpen=!!(rent&&rent.open)}
           D.P.beds=getF('rooms')||0;D.P.minM2=getF('m2')||0;
           ceJump('list');
         }
@@ -1397,7 +1398,7 @@ E30.disc=(function(){
         if(floorBuy){D2.PR._floorRange=floorBuy;if(floorBuy.level==='required')D2.PR.requiredFloor={min:floorBuy.min,max:floorBuy.max}}
         D2._e30=1;save();
         if(d.skipOptionalToHoods){
-          if(!bud||!bud.v){D2.budg=0;D2.budgOpen=true}
+          if(!bud||!bud.v){D2.budg=null;D2.budgOpen=!!(bud&&bud.open)}
           D2.PR.beds=getF('rooms')||0;
           if(!getF('m2'))D2.PR.m2=[0,100000];
           if(getF('prop_age')==null&&!isHard('prop_new'))D2.PR.age=[0,100];
