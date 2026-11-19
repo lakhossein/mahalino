@@ -316,6 +316,7 @@ function chatListCard(x,sel){
   '<div class="pcard-foot">'+
   '<button class="btn btn-xs btn-primary" data-cba="selL" data-l="'+x.id+'">'+(sel?'✓ انتخاب‌شده':'انتخاب')+'</button>'+
   '<button class="btn btn-xs" data-cba="detL" data-l="'+x.id+'">جزئیات</button>'+
+  '<button class="btn btn-xs" data-act="vtour" data-id="'+x.id+'">تور مجازی</button>'+
   '<button class="btn btn-xs" data-cba="savL" data-l="'+x.id+'" aria-label="نشان‌کردن" title="نشان‌کردن">★</button>'+
   '<button class="btn btn-xs" data-cba="pcardMore">بیشتر</button>'+
   '</div></div>';
@@ -336,6 +337,7 @@ function chatBCard(x,sel){
   '<div class="pcard-foot">'+
   '<button class="btn btn-xs btn-primary" data-cba="selB" data-l="'+x.id+'">'+(sel?'✓ انتخاب‌شده':'انتخاب')+'</button>'+
   '<button class="btn btn-xs" data-cba="detB" data-l="'+x.id+'">جزئیات</button>'+
+  '<button class="btn btn-xs" data-act="vtour" data-id="'+x.id+'">تور مجازی</button>'+
   '<button class="btn btn-xs" data-cba="savB" data-l="'+x.id+'" aria-label="نشان‌کردن" title="نشان‌کردن">★</button>'+
   '<button class="btn btn-xs" data-cba="pcardMore">بیشتر</button>'+
   '</div></div>';
@@ -939,7 +941,7 @@ CBACT.selL=function(el){var D=wd('rent').data,x=findL(el.getAttribute('data-l'))
 CBACT.detL=function(el){
   var x=findL(el.getAttribute('data-l'));
   if(!spend('detail','rent','جزئیات '+x.t))return;
-  botC(' <b>'+x.t+'</b> — '+findH(x.hood).n+'<br>• اجاره '+rial(x.rent)+' • رهن '+rial(x.dep)+'<br>• '+fa(x.m2,0)+' متر • '+fa(x.age,0)+' ساله • طبقهٔ '+fa(x.floor,0)+' • '+fa(x.beds,0)+' خواب<br>• '+esc(placeText(x.hood,2))+' • ★ '+fa(x.rate,1)+'<br>برای تور ۳۶۰°، دکمهٔ تور را بزنید.',[[' تور مجازی','!tour']]);
+  botC(' <b>'+x.t+'</b> — '+findH(x.hood).n+'<br>• اجاره '+rial(x.rent)+' • رهن '+rial(x.dep)+'<br>• '+fa(x.m2,0)+' متر • '+fa(x.age,0)+' ساله • طبقهٔ '+fa(x.floor,0)+' • '+fa(x.beds,0)+' خواب<br>• '+esc(placeText(x.hood,2))+' • ★ '+fa(x.rate,1)+'<div class="qr"><button data-act="vtour" data-id="'+x.id+'">تور مجازی</button></div>',null);
 };
 CBACT.savL=function(el){var D=wd('rent').data;if(!D.saved){D.saved=[]}var id=el.getAttribute('data-l'),i=D.saved.indexOf(id);if(i>=0){D.saved.splice(i,1)}else{D.saved.push(id)}save();toast((i>=0?'حذف':'★ '+fa(D.saved.length,0)))};
 CBACT.selB=function(el){var D=wd('buy').data,x=findB(el.getAttribute('data-l'));if(!x||!E30.flowsAPI.buyPass(x,D)){toast('این آگهی با سقف بودجه یا الزام‌های قطعی شما منطبق نیست؛ ابتدا محدودیت‌ها را اصلاح کنید.');return}D.blist=x.id;save();if(CURRENT==='buy')renderCurrent();botC('✓ انتخاب شد.',[['حقوقی','!skp']])};
