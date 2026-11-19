@@ -37,14 +37,14 @@ try{E25&&E25.remCap&&E25.remCap()}catch(e){if(typeof MahalinoDiagnostics!=='unde
 /* ═══ ۲۱.۱۲) موتور V0.27 (E27) — بازار هوشمند، بودجهٔ آزاد، کیف پول، جزئیات کارت ═══ */
 
 /* ── بودجهٔ آزاد: تحلیل زبان طبیعی + مقادیر مؤثر ── */
-E27.budgParse=function(v){
+E27.budgParse=function(v,searchCeiling){
   var t=normFa(String(v||'')).trim();
   if(!t)return {ok:false,msg:'مبلغ را وارد کنید.'};
   if(/بدون بودجه|بدون سقف|نامحدود|بدون محدودیت|فرقی نمی|مهم نیست|هرچی|هر چی/.test(t))return {ok:true,mode:'open'};
   var isMin=/به بالا|و بالاتر|یا بیشتر/.test(t)&&!/کمتر/.test(t);
   var isMax=/حداکثر|تا سقف|سقف|کمتر از/.test(t)&&!/به بالا/.test(t);
   var t2=t.replace(/به بالا|و بالاتر|یا بیشتر|حداکثر|تا سقف|کمتر از|سقف/g,' ');
-  var pm=parseMoneyFA(t2);
+  var pm=(searchCeiling?parseSearchMoneyFA:parseMoneyFA)(t2);
   if(!pm.ok)return {ok:false,msg:'بودجه را مثل «۳۰ میلیارد»، «۵ میلیارد به بالا» یا «بدون بودجهٔ مشخص» بنویسید.'};
   if(isMin)return {ok:true,mode:'min',n:pm.value,note:pm.note};
   if(isMax)return {ok:true,mode:'max',n:pm.value,note:pm.note};

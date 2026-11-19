@@ -199,10 +199,11 @@ function ceVal(v){
     D._inputs=D._inputs||{};D._inputs[st.id||('step'+CE.i)]=v0;
   }
   if(st.money){
-    var pm=parseMoneyFA(v0);
+    var searchCeiling=(CE.f==='rent'&&['dep','rentb'].indexOf(st.id)>=0)||(CE.f==='buy'&&st.id==='budg');
+    var pm=(searchCeiling?parseSearchMoneyFA:parseMoneyFA)(v0);
     if(!pm.ok){
       var p27=null;
-      try{p27=E27.budgParse(v0)}catch(e27x){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:205',e27x,'caught');}
+      try{p27=E27.budgParse(v0,searchCeiling)}catch(e27x){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/conversation.js:205',e27x,'caught');}
       if(p27&&p27.ok){v=v0;note=null}
       else{botC(pm.msg);return}
     }else{v=String(pm.value);note=pm.note}
@@ -373,20 +374,20 @@ SCRIPTS.rent=[
  set:function(D,v){
    if(!D.B){D.B={inc:1500000000,depB:15000000000,rentB:500000000,chg:50000000,incr:100000000}}
    D._depSet=1;
-   var p=E27.budgParse(v);
+   var p=E27.budgParse(v,true);
    if(!p.ok)return 'ERR';
    if(p.mode==='open'){D.depOpen=true;D.B.depB=D.B.depB||15000000000;return null}
-   if(p.n<=0)return 'ERR';
+   if(p.n<0)return 'ERR';
    D.depOpen=false;D.B.depB=p.n;return null},
  err:'ودیعه را به تومان بنویسید (مثلاً «۱۵ میلیارد» یا «۱٫۵ میلیارد تومان») — بدون سقف؛ یا «بدون سقف» بفرستید.'},
 {id:'rentb',money:true,q:' <b>اجارهٔ ماهانهٔ شما</b> چقدر است؟ (تومان)',kind:'num',
  pre:function(D){if(CTX.rent&&!D._rentbSet){D.B=D.B||{inc:1500000000,depB:CTX.dep||15000000000,rentB:CTX.rent,chg:50000000,incr:100000000};D.B.rentB=CTX.rent;D._rentbSet=1;botC('✓ سقف اجاره از گفت‌وگوی قبلی: <b>'+rial(CTX.rent)+'</b>');return false}return true},
  chips:function(){return [['۳۰ میلیون تومان','300000000'],['۵۰ میلیون تومان','500000000'],['۸۰ میلیون تومان','800000000'],['بدون سقف','بدون سقف']]},
  set:function(D,v){
-   var p=E27.budgParse(v);
+   var p=E27.budgParse(v,true);
    if(!p.ok)return 'ERR';
    if(p.mode==='open'){D.rentBOpen=true;D._rentbSet=1;return null}
-   if(p.n<=0)return 'ERR';
+   if(p.n<0)return 'ERR';
    D.rentBOpen=false;D._rentbSet=1;D.B.rentB=p.n;return null},
  err:'اجارهٔ ماهانه را به تومان بنویسید (مثلاً «۸۰ میلیون تومان») — بدون سقف؛ یا «بدون سقف» بفرستید.'},
 {id:'imps',loop:[{k:'metro',t:' اهمیت دسترسی به مترو (۱–۵)؟'},{k:'school',t:' اهمیت نزدیکی به مدرسه؟'},{k:'work',t:' اهمیت کوتاه‌بودن رفت‌وآمد به کار'+wLabel()+'؟'}],pre:function(D){defP(D);return true}},
@@ -572,13 +573,13 @@ SCRIPTS.buy=[
  pre:function(D){if(CTX.budg&&!D._budgSet&&CTX.budg>=50000000000){D.budg=CTX.budg;D._budgSet=1;botC('✓ بودجه از گفت‌وگوی قبلی: <b>'+rial(CTX.budg)+'</b> — برای تغییر، «بازگشت» را بزنید.');return false}return true},
  chips:function(){return [['۱۵ میلیارد تومان','150000000000'],['۳۰ میلیارد تومان','300000000000'],['۵۰ میلیارد تومان','500000000000'],['بدون بودجهٔ مشخص','بدون بودجهٔ مشخص'],['۵ میلیارد به بالا','۵ میلیارد به بالا']]},
  set:function(D,v){
-   var p=E27.budgParse(v);
+   var p=E27.budgParse(v,true);
    if(!p.ok)return 'ERR';
    D._budgSet=1;
    if(p.mode==='open'){D.budgOpen=true;D.budgMin=null;return null}
    if(p.mode==='min'){D.budgOpen=true;D.budgMin=p.n;botC('✓ بودجهٔ «حداقل '+rial(p.n)+'» ثبت شد — بدون سقف.');return null}
    if(p.mode==='max'){D.budgOpen=false;D.budg=p.n;botC('✓ سقف بودجه '+rial(p.n)+' ثبت شد — بدون کف.');return null}
-   if(p.n<=0)return 'ERR';
+   if(p.n<0)return 'ERR';
    D.budgOpen=false;D.budg=p.n;return null},
  err:'بودجه را به تومان بنویسید (مثلاً «۳۰ میلیارد» یا «۵ میلیارد به بالا» یا «بدون بودجهٔ مشخص»).'},
 {id:'imps',loop:[{k:'metro',t:' اهمیت مترو؟'},{k:'school',t:' اهمیت مدرسه؟'},{k:'work',t:' اهمیت رفت‌وآمد'+wLabel()+'؟'}],pre:function(D){defP(D);defPR(D);return true}},

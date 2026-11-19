@@ -19,3 +19,10 @@ function moneyChip(el){
   if(st&&st.money&&/^\d+$/.test(value))return value+' ریال';
   return value;
 }
+
+/* Zero is a valid search ceiling, but not a valid payment. */
+function parseSearchMoneyFA(input){
+  var t=normFa(String(input==null?'':input)).trim();
+  if(/^(?:0+|صفر)(?:\s*(?:تومان|تومن|ریال))?$/.test(t))return {ok:true,value:0,unit:'toman',note:'✓ مبلغ: '+rial(0)};
+  return parseMoneyFA(input);
+}

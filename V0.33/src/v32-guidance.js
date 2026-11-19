@@ -244,40 +244,72 @@ E30.guide=(function(){
   function criteriaEditor(flow,source){
     var f=E30.discAPI.getF,D=source==='legacy'?wd(flow).data:null;
     var ids=flow==='rent'?['budget_dep','budget_rent','hood','m2','rooms','prop_age']:['buy_budget','hood','m2','rooms','prop_age','price_per_m2'];
+    ids=ids.concat(['floor_preference','amenity_parking','amenity_elevator','amenity_balcony','amenity_storage']);
+    var amenities={parking:'پارکینگ',elevator:'آسانسور',balcony:'بالکن',storage:'انباری'};
     function current(id){
+      if(id.indexOf('amenity_')===0){var key=id.slice(8),p=D?((flow==='rent'?D.P:D.PR)||{}):null,rules=D?(p.prefRules||{}):(f('prefRules')||{}),legacyKey={parking:'park',elevator:'elev',balcony:'balc',storage:'storage'}[key],level=rules[key];if(!level&&p&&(p[legacyKey]===true||p[legacyKey]==='yes'||(p.requirements||{})[key]==='required'))level='required';return ({required:'الزامی',preferred:'ترجیحی',irrelevant:'مهم نیست',forbidden:'نباید داشته باشد'})[level]||'تعیین نشده'}
       if(!D){var v=f(id);return v==null?'تعیین نشده':E30.discAPI.show(id,v)}
       var p=D.P||{},r=D.PR||{},v;
-      if(id==='budget_dep')return D.depOpen||!D.B?'بدون سقف':rial(D.B.depB);
-      if(id==='budget_rent')return D.rentBOpen||!D.B?'بدون سقف':rial(D.B.rentB);
-      if(id==='buy_budget')return D.budgOpen||!D.budg?'بدون سقف':rial(D.budg);
+      if(id==='budget_dep')return D.depOpen?'بدون سقف':!D.B||D.B.depB==null?'تعیین نشده':rial(D.B.depB);
+      if(id==='budget_rent')return D.rentBOpen?'بدون سقف':!D.B||D.B.rentB==null?'تعیین نشده':rial(D.B.rentB);
+      if(id==='buy_budget')return D.budgOpen?'بدون سقف':D.budg==null?'تعیین نشده':rial(D.budg);
       if(id==='hood')return D.hood?findH(D.hood).n:'همهٔ محله‌ها';
       if(id==='m2')v=flow==='rent'?p.minM2:r.m2&&r.m2[0];
       if(id==='rooms')v=flow==='rent'?(p.bedsNum||p.beds):r.beds;
       if(id==='prop_age')v=flow==='rent'?p.maxAge:r.age&&r.age[1];
       if(id==='price_per_m2')v=r.ppm&&r.ppm[1];
+      if(id==='floor_preference'){var floor=flow==='rent'?p.requiredFloor||((p.requirements||{}).floor):r.requiredFloor;if(floor)return fa(floor.min,0)+' تا '+fa(floor.max,0);if(flow==='buy'&&r.floorR)return fa(r.floorR[0],0)+' تا '+fa(r.floorR[1],0);if(p.floorNum!=null&&p.floorNum!=='')return fa(p.floorNum,0);if(p.floor==='low')return '۱ تا ۳';if(p.floor==='high')return '۴ به بالا';return 'تعیین نشده'}
       return v==null?'تعیین نشده':fa(v,0);
     }
     botC('<div class="e33-criteria-editor" data-flow="'+flow+'" data-source="'+source+'"'+(D?' data-work="'+qesc(wd(flow).id)+'"':'')+'><b>ویرایش یک معیار و جست‌وجوی دوباره</b><p class="note">فقط همان معیار تغییر می‌کند. برای برداشتن محدودیت، «مهم نیست» را بنویسید؛ برای مبلغ، واحد تومان را مشخص کنید.</p>'+ids.map(function(id){
-      var label=E30.discAPI.SLOT_LABEL[id]||id;
-      return '<div class="fld" data-criterion="'+id+'"><label>'+esc(label)+' — '+esc(current(id))+'<input type="text" aria-label="'+qesc(label)+'" placeholder="مقدار جدید"></label> <button type="button" data-cba="e33ApplyCriterion" data-slot="'+id+'">تغییر و جست‌وجو</button></div>';
+      var label=amenities[id.slice(8)]||E30.discAPI.SLOT_LABEL[id]||id;
+      var control=id.indexOf('amenity_')===0?'<select aria-label="'+qesc(label)+'"><option value="">انتخاب مقدار جدید</option><option value="required">الزامی</option><option value="preferred">ترجیحی</option><option value="irrelevant">مهم نیست</option><option value="forbidden">نباید داشته باشد</option></select>':'<input type="text" aria-label="'+qesc(label)+'" placeholder="'+(id==='floor_preference'?'مثلاً ۲ تا ۴':'مقدار جدید')+'">';
+      return '<div class="fld" data-criterion="'+id+'"><label>'+esc(label)+' — '+esc(current(id))+control+'</label> <button type="button" data-cba="e33ApplyCriterion" data-slot="'+id+'">تغییر و جست‌وجو</button></div>';
     }).join('')+'</div>',null);
   }
   function updateLegacy(flow,id,value){
     var D=wd(flow).data,p=D.P||{},r=D.PR||{},skip=/^(مهم نیست|بدون سقف)$/.test(norm(value)),n;
+    if(id.indexOf('amenity_')===0){
+      var key=id.slice(8),legacyKey={parking:'park',elevator:'elev',balcony:'balc',storage:'storage'}[key],pr=flow==='rent'?p:r;
+      if(!legacyKey||['required','preferred','irrelevant','forbidden'].indexOf(value)<0)return false;
+      pr.prefRules=Object.assign({},pr.prefRules||{});pr.prefRules[key]=value;
+      if(pr.requirements)delete pr.requirements[key];
+      pr[legacyKey]=flow==='rent'?value==='required':value==='required'?'yes':'no';return true;
+    }
+    if(id==='floor_preference'){
+      var raw=pd(value).trim(),m=raw.match(/^(\d+)(?:\s*(?:تا|الی|-)\s*(\d+))?$/),range=m?{min:+m[1],max:+(m[2]||m[1])}:null;
+      if(!skip&&(!range||range.min>range.max||range.max>100))return false;
+      if(flow==='rent'){p.floor='any';p.floorNum=null;p.requiredFloor=skip?null:range;if(p.requirements)delete p.requirements.floor}
+      else{r.floorR=[-100,200];r.requiredFloor=skip?null:range}return true;
+    }
     if(id==='hood'){var h=skip?null:hoodFromText(value);if(!skip&&!h)return false;D.hood=h;return true}
     if(id==='budget_dep'||id==='budget_rent'||id==='buy_budget'||id==='price_per_m2'){
-      var parsed=skip?null:parseMoneyFA(value);if(!skip&&(!parsed||!parsed.ok))return false;
+      var parsed=skip?null:parseSearchMoneyFA(value);if(!skip&&(!parsed||!parsed.ok))return false;
       n=skip?null:parsed.value;
-      if(id==='budget_dep'||id==='budget_rent'){D.B=D.B||{};if(id==='budget_dep'){D.B.depB=n;D.depOpen=skip}else{D.B.rentB=n;D.rentBOpen=skip}}
-      else if(id==='buy_budget'){D.budg=n;D.budgOpen=skip}
+      var open=norm(value)==='بدون سقف';
+      if(id==='budget_dep'||id==='budget_rent'){D.B=D.B||{};if(id==='budget_dep'){D.B.depB=n;D.depOpen=open}else{D.B.rentB=n;D.rentBOpen=open}}
+      else if(id==='buy_budget'){D.budg=n;D.budgOpen=open}
       else r.ppm=[0,skip?Number.MAX_SAFE_INTEGER:n];
       return true;
     }
     var count=skip?null:parseCountFA(value);if(!skip&&(!count||!count.ok||count.value<0))return false;n=skip?0:count.value;
-    if(id==='m2'){if(flow==='rent')p.minM2=n;else r.m2=[n,Math.max(n,(r.m2||[0,100000])[1])];return true}
+    if(id==='m2'){if(flow==='rent')p.minM2=n;else r.m2=skip?[0,100000]:[n,Math.max(n,(r.m2||[0,100000])[1])];return true}
     if(id==='rooms'){if(flow==='rent'){p.beds=n;p.bedsNum=n}else r.beds=n;return true}
     if(id==='prop_age'){if(flow==='rent'){p.maxAge=skip?null:n;p._ageHard=!skip;if(skip)p.minAge=0}else r.age=[skip?0:Math.min((r.age||[0])[0],n),skip?100:n];return true}
     return false;
+  }
+  function updateCollector(id,value){
+    if(id.indexOf('amenity_')===0){
+      var key=id.slice(8),api=E30.discAPI,rules=Object.assign({},api.getF('prefRules')||{});
+      if(['parking','elevator','balcony','storage'].indexOf(key)<0||['required','preferred','irrelevant','forbidden'].indexOf(value)<0)return false;
+      rules[key]=value;api.setF('prefRules',rules,{src:'answer'});api.setF('prefs',Object.keys(rules).filter(k=>rules[k]==='required'),{src:'answer',hard:true});return true;
+    }
+    if(id==='floor_preference'&&norm(value)!=='مهم نیست'){
+      var m=pd(value).trim().match(/^(\d+)(?:\s*(?:تا|الی|-)\s*(\d+))?$/);
+      if(!m||+m[1]>+(m[2]||m[1])||+(m[2]||m[1])>100)return false;
+      value='طبقه '+value+' الزامی';
+    }
+    return E30.discAPI.answer(id,value).ok;
   }
   function sample(explicitFlow){
     var col=S.ctx30Collectors&&S.ctx30Collectors[S.ctx30ActiveKey];
@@ -288,8 +320,8 @@ E30.guide=(function(){
     if(age==null&&f('prop_new')==='new'&&fields.prop_new&&fields.prop_new.kind==='hard')age=3;
     /* Build an independent query from explicit facts. Never import the legacy
        workflow's illustrative defaults or mutate its operational state. */
-    var D={hood:f('hood'),budg:budget&&budget.v?budget.v[1]:0,budgOpen:!budget||!!budget.open,
-      depOpen:!dep||!!dep.open,rentBOpen:!rent||!!rent.open,
+    var D={hood:f('hood'),budg:budget&&budget.v?budget.v[1]:null,budgOpen:!!(budget&&budget.open),
+      depOpen:!!(dep&&dep.open),rentBOpen:!!(rent&&rent.open),
       B:{depB:dep&&dep.v?dep.v[1]:null,rentB:rent&&rent.v?rent.v[1]:null},
       P:{beds:f('rooms')||0,minM2:f('m2')||0,maxAge:age,minAge:(f('prop_age_range')||[0])[0],_ageHard:age!=null,prefRules:rules},
       PR:{ppm:(f('price_per_m2')||{}).v||[0,Infinity],beds:f('rooms')||0,m2:[f('m2')||0,Infinity],age:f('prop_age_range')||[0,age==null?Infinity:age],
@@ -442,16 +474,16 @@ E30.guide=(function(){
     };
     CBACT.e33ApplyCriterion=function(el){
       var editor=el.closest('.e33-criteria-editor'),row=el.closest('[data-criterion]');if(!editor||!row)return;
-      var flow=editor.getAttribute('data-flow'),source=editor.getAttribute('data-source'),id=el.getAttribute('data-slot'),value=row.querySelector('input').value.trim();
+      var flow=editor.getAttribute('data-flow'),source=editor.getAttribute('data-source'),id=el.getAttribute('data-slot'),value=row.querySelector('input,select').value.trim(),label=row.querySelector('input,select').getAttribute('aria-label');
       if(!value){toast('مقدار جدید را وارد کنید.');return}
       if(source==='legacy'){
         if(CE.f!==flow||wd(flow).id!==editor.getAttribute('data-work')){toast('این جست‌وجو دیگر فعال نیست.');return}
         if(!updateLegacy(flow,id,value)){toast('مقدار معتبر وارد کنید.');return}
-        if(wd(flow).data._e30)E30.discAPI.answer(id,value);
-        save();el.disabled=true;usrC('تغییر '+(E30.discAPI.SLOT_LABEL[id]||id)+': '+value);ceJump('list');
+        if(wd(flow).data._e30)updateCollector(id,value);
+        save();el.disabled=true;usrC('تغییر '+label+': '+(row.querySelector('select')?row.querySelector('select').selectedOptions[0].textContent:value));ceJump('list');
       }else{
-        if(!E30.discAPI.answer(id,value).ok){toast('مقدار معتبر وارد کنید.');return}
-        save();el.disabled=true;usrC('تغییر '+(E30.discAPI.SLOT_LABEL[id]||id)+': '+value);sample(flow);
+        if(!updateCollector(id,value)){toast('مقدار معتبر وارد کنید.');return}
+        save();el.disabled=true;usrC('تغییر '+label+': '+(row.querySelector('select')?row.querySelector('select').selectedOptions[0].textContent:value));sample(flow);
       }
     };
     function startProjectAction(el,role){
