@@ -80,7 +80,7 @@ const base=process.env.QA_BASE_URL||pathToFileURL(path.join(__dirname,'..','Maha
         const x=blocking==='floor'?list[0]:list.find(x=>!x.park&&!list.some(y=>y.hood===x.hood&&y.park&&y.m2>=x.m2&&y.beds>=x.beds));
         if(!x)throw Error('no fixture with impossible parking');
         const set=(k,v)=>E30.discAPI.setF(k,v,{src:'answer',hard:true});set('hood',x.hood);set('m2',x.m2);set('rooms',x.beds);
-        if(blocking==='floor')set('floor_preference',{min:99,max:99,level:'required'});else{set('prefs',['parking']);set('prefRules',{parking:'required'})}
+        if(blocking==='floor')set('floor_preference',{min:99,max:99,level:'required'});else{set('prefs',['parking','quiet','metro'].concat(x.elev?['elevator']:[]));set('prefRules',{parking:'required'})}
         return x;
       },{flow,blocking});
       if(mode==='continue'){await send(await page.evaluate(()=>E30.guide.actions['start-service'].prompt));await send('درسته')}
@@ -92,6 +92,7 @@ const base=process.env.QA_BASE_URL||pathToFileURL(path.join(__dirname,'..','Maha
       assert.equal(await page.evaluate(()=>E30.discAPI.getF('hood')),x.hood);
       assert.equal(await page.evaluate(()=>E30.discAPI.getF('m2')),x.m2);
       assert.equal(await page.evaluate(()=>E30.discAPI.getF('rooms')),x.beds);
+      if(blocking==='amenity')assert.deepEqual(await page.evaluate(()=>E30.discAPI.getF('prefs')),['quiet','metro'].concat(x.elev?['elevator']:[]),'editing parking changed unrelated legacy preferences');
       assert(await page.locator('#chatB .msg.bot').last().locator('.ccard,.pcard').count()>0,'blocking criterion was not cleared');
       console.log('PASS',flow,mode,blocking);await page.close();
     }
