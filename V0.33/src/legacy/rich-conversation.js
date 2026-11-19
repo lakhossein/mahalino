@@ -668,7 +668,7 @@ E21.chipExact=function(st,nt){
   }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/rich-conversation.js:668',e,'caught');return false}
 };
 E21.stepParseOk=function(st,nt){
-  if(st.money)return parseMoneyFA(nt).ok;
+  if(st.money){var searchCeiling=(CE.f==='rent'&&['dep','rentb'].indexOf(st.id)>=0)||(CE.f==='buy'&&st.id==='budg');return (searchCeiling?parseSearchMoneyFA:parseMoneyFA)(nt).ok}
   if(st.count)return parseCountFA(nt).ok;
   if(st.range)return parseRangeFA(nt).ok;
   if(st.moneyRange)return parseMoneyRangeFA(nt).ok;
