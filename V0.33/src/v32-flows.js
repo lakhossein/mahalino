@@ -36,7 +36,7 @@ E30.flows=(function(){
     if(!x||!D)return false;
     if(!blPassBase(x,D))return false;
     if(D.hood&&x.hood&&D.hood!==x.hood)return false;
-    if(D.budg>0&&!D.budgOpen){
+    if(D.budg!=null&&Number.isFinite(Number(D.budg))&&(D.budg>0||(D.budg===0&&D.budgOpen===false))&&!D.budgOpen){
       var tot=x.m2*x.ppm;
       if(tot>D.budg)return false;
     }
