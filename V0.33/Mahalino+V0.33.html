@@ -17737,6 +17737,7 @@ E30.flows=(function(){
     if(pref.elevator==='forbidden'&&x.elev)return false;
     if(pref.parking==='forbidden'&&x.park)return false;
     if(pref.balcony==='forbidden'&&x.balc)return false;
+    if(pref.storage==='forbidden'&&x.storage)return false;
     /* Every explicit maximum age is hard unless the collector deliberately marked it soft. */
     if(P._ageHard!==false&&Number.isFinite(Number(P.maxAge))&&P.maxAge!==''&&P.maxAge!=null&&x.age>Number(P.maxAge))return false;
     if(P.minAge!=null&&Number.isFinite(Number(P.minAge))&&x.age<Number(P.minAge))return false;
@@ -17777,6 +17778,7 @@ E30.flows=(function(){
     if(pref.elevator==='forbidden'&&x.elev)return false;
     if(pref.parking==='forbidden'&&x.park)return false;
     if(pref.balcony==='forbidden'&&x.balc)return false;
+    if(pref.storage==='forbidden'&&x.storage)return false;
     return true;
   }
 
@@ -19603,7 +19605,10 @@ E30.guide=(function(){
     if(id.indexOf('amenity_')===0){
       var key=id.slice(8),api=E30.discAPI,rules=Object.assign({},api.getF('prefRules')||{});
       if(['parking','elevator','balcony','storage'].indexOf(key)<0||['required','preferred','irrelevant','forbidden'].indexOf(value)<0)return false;
-      rules[key]=value;api.setF('prefRules',rules,{src:'answer'});api.setF('prefs',Object.keys(rules).filter(k=>rules[k]==='required'),{src:'answer',hard:true});return true;
+      rules[key]=value;
+      var prefs=(api.getF('prefs')||[]).filter(function(existing){return existing!==key});
+      if(value==='required')prefs.push(key);
+      api.setF('prefRules',rules,{src:'answer'});api.setF('prefs',prefs,{src:'answer',hard:true});return true;
     }
     if(id==='floor_preference'&&norm(value)!=='مهم نیست'){
       var m=pd(value).trim().match(/^(\d+)(?:\s*(?:تا|الی|-)\s*(\d+))?$/);

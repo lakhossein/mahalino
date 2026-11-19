@@ -17,6 +17,7 @@ E30.flows=(function(){
     if(pref.elevator==='forbidden'&&x.elev)return false;
     if(pref.parking==='forbidden'&&x.park)return false;
     if(pref.balcony==='forbidden'&&x.balc)return false;
+    if(pref.storage==='forbidden'&&x.storage)return false;
     /* Every explicit maximum age is hard unless the collector deliberately marked it soft. */
     if(P._ageHard!==false&&Number.isFinite(Number(P.maxAge))&&P.maxAge!==''&&P.maxAge!=null&&x.age>Number(P.maxAge))return false;
     if(P.minAge!=null&&Number.isFinite(Number(P.minAge))&&x.age<Number(P.minAge))return false;
@@ -57,6 +58,7 @@ E30.flows=(function(){
     if(pref.elevator==='forbidden'&&x.elev)return false;
     if(pref.parking==='forbidden'&&x.park)return false;
     if(pref.balcony==='forbidden'&&x.balc)return false;
+    if(pref.storage==='forbidden'&&x.storage)return false;
     return true;
   }
 
