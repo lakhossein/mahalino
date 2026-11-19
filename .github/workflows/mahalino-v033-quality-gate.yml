@@ -42,6 +42,8 @@ jobs:
         run: npm ci --prefix V0.33/qa
       - name: Install Chromium
         run: V0.33/qa/node_modules/.bin/playwright install --with-deps chromium
+      - name: Record reviewed-runtime inventory delta for diagnosis
+        run: node V0.33/qa/runtime-contracts.cjs --review-delta
       - name: Run every V0.33 quality gate
         run: bash V0.33/qa/run-quality-gate.sh
       - name: Preserve logs, screen captures and JSON results

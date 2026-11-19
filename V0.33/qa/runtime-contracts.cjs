@@ -26,5 +26,31 @@ function inventory(root){
  expand(manifest.entry);
  return {contract:'Explicit compatibility globals; imports resolve to declared owner slots. No claim of ES-module isolation.',loadOrder,modules:[...parsed.values()].map(x=>x.entry)};
 }
-module.exports={inventory};
-if(require.main===module)console.log(JSON.stringify(inventory(path.resolve(__dirname,'..')),null,2));
+// Compact, deterministic evidence for an audited per-release delta; this never
+// accepts or writes a new baseline on behalf of the test.
+function reviewedDelta(actual,baseline){
+ const assert=require('node:assert/strict');
+ assert.equal(actual.contract,baseline.contract);
+ assert.deepEqual(actual.modules.map(x=>[x.slot,x.file]),baseline.modules.map(x=>[x.slot,x.file]));
+ const modules=[];
+ for(let i=0;i<actual.modules.length;i++){
+  const a=actual.modules[i],b=baseline.modules[i],patch={slot:a.slot};
+  for(const key of ['exports','imports','writes','includes']){
+   if(JSON.stringify(a[key])!==JSON.stringify(b[key]))patch[key]=a[key];
+  }
+  if(Object.keys(patch).length>1)modules.push(patch);
+ }
+ const delta={modules};
+ if(JSON.stringify(actual.loadOrder)!==JSON.stringify(baseline.loadOrder))delta.loadOrder=actual.loadOrder;
+ return delta;
+}
+module.exports={inventory,reviewedDelta};
+if(require.main===module){
+ const root=path.resolve(__dirname,'..'),actual=inventory(root);
+ if(process.argv.includes('--review-delta')){
+  const baseline=JSON.parse(fs.readFileSync(path.join(root,'../docs/validation/runtime-dependencies.json')));
+  console.log('V033_CONTRACT_DELTA '+JSON.stringify(reviewedDelta(actual,baseline)));
+  const sites=JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures/diagnostic-sites.json')));
+  console.log('V033_MISSING_DIAGNOSTICS '+JSON.stringify(sites.filter(site=>!fs.readFileSync(path.join(root,'src',site.file),'utf8').includes(site.statement)).map(site=>site.code)));
+ }else console.log(JSON.stringify(actual,null,2));
+}
