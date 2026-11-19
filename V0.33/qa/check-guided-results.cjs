@@ -24,5 +24,15 @@ assert(buy.shown.some(x=>x.id===b.id),'purchase search did not use the purchase 
 assert(buy.shown.every(x=>x.m2*x.ppm<=b.m2*b.ppm&&x.hood===b.hood&&x.m2>=b.m2&&x.beds>=b.beds));
 const forbidden=runtime('rent');forbidden.set('prefRules',{parking:'forbidden'});forbidden.run();
 assert(forbidden.shown.length>0&&forbidden.shown.every(x=>!x.park),'forbidden amenity was ignored');
+for(const flow of ['rent','buy']){
+  for(const [key,prop] of Object.entries({parking:'park',elevator:'elev',balcony:'balc',storage:'storage'})){
+    const r=runtime(flow);
+    const pass=flow==='rent'?r.c.E30.flowsAPI.rentPass:r.c.E30.flowsAPI.buyPass;
+    const original={hood:'h1',m2:50,ppm:100,age:1,beds:1,floor:1,dep:10,rent:5};
+    const D=flow==='rent'?{P:{prefRules:{[key]:'forbidden'}}}:{PR:{prefRules:{[key]:'forbidden'}}};
+    assert.equal(pass({...original,[prop]:true},D),false,flow+' forbidden '+key+' allowed a violating listing');
+    assert.equal(pass({...original,[prop]:false},D),true,flow+' forbidden '+key+' excluded a compliant listing');
+  }
+}
 const missing=runtime('rent');missing.set('hood','unavailable');missing.run();assert.equal(missing.shown.length,0);
 console.log('PASS guided rental/purchase results: strict constraints, zero results, absent preferences and unchanged context');
