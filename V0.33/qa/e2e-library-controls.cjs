@@ -46,10 +46,33 @@ const base=process.env.QA_BASE_URL||pathToFileURL(path.join(__dirname,'..','Maha
     await card('hood_analysis').locator('[data-act="e29libMenu"]').click();
     await modal.locator('[data-act="e29libDoc"]').click();
     await page.waitForFunction(()=>window.qaPrinted?.includes('Report value'));
+    const titleBeforePrint=await page.title();
+    await page.evaluate(()=>{window.print=()=>{throw new Error('simulated print failure')}});
+    await modal.locator('[data-act="e29libPrint"]').click();
+    await page.waitForFunction(()=>MahalinoDiagnostics.events.some(e=>e.code==='legacy/library.js:263'&&e.cause==='Error')&&!document.body.classList.contains('doc-printing'));
+    assert.equal(await page.title(),titleBeforePrint);
+    assert.equal(await page.locator('#print-root').innerHTML(),'');
+    assert.match(await page.locator('#toast-root').innerText(),/چاپ گزارش انجام نشد/);
     await modal.locator('[data-act="closeModal"]').click();
     await panel.locator('[data-act="e29shManage"]').click();
     assert.equal(await modal.locator('[data-act="e29shRevoke"]').count(),7);
     assert.equal(await modal.locator('a[href*="#s/"]').count(),7);
+    const copySetup=await page.evaluate(()=>{
+      const rootInputs=document.body.querySelectorAll(':scope > input').length;
+      Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:()=>Promise.reject(new TypeError('private clipboard details'))}});
+      document.execCommand=()=>{throw new Error('simulated fallback failure')};
+      return rootInputs;
+    });
+    await modal.locator('[data-act="e29shCopy2"]').first().click();
+    await modal.locator('#e29-shurl').waitFor({state:'visible'});
+    assert.match(await modal.locator('#e29-shurl').inputValue(),/#s\//);
+    const failedCopy=await page.evaluate(()=>({
+      causes:MahalinoDiagnostics.events.filter(e=>['legacy/sharing.js:216','legacy/sharing.js:217'].includes(e.code)).map(e=>[e.code,e.cause]),
+      rootInputs:document.body.querySelectorAll(':scope > input').length
+    }));
+    assert.deepEqual(failedCopy.causes,[['legacy/sharing.js:216','Unknown'],['legacy/sharing.js:217','Error']]);
+    assert.equal(failedCopy.rootInputs,copySetup);
+    await modal.locator('[data-act="e29shManage"]').click();
     await modal.locator('[data-act="e29shRevoke"]').first().click();
     assert.equal(await modal.locator('a[href*="#s/"]').count(),6);
     await page.keyboard.press('Escape');

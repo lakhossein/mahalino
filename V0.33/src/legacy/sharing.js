@@ -215,8 +215,8 @@ E29.share=(function(){
     var sh=store().filter(function(x){return x.id===el.getAttribute('data-sh')})[0];if(!valid(sh))return;
     var url=shareURL(sh);
     var copied=false;
-    try{if(navigator.clipboard){await navigator.clipboard.writeText(url);copied=true}}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:216',e,'caught');}
-    if(!copied){var i=document.createElement('input');i.value=url;document.body.appendChild(i);try{i.select();copied=document.execCommand('copy')===true}finally{i.remove()}}
+    try{if(navigator.clipboard){await navigator.clipboard.writeText(url);copied=true}}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:216',null,'caught');}
+    if(!copied){var i=document.createElement('input');i.value=url;document.body.appendChild(i);try{i.select();copied=document.execCommand('copy')===true}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/sharing.js:217',e,'caught');}finally{i.remove()}}
     if(copied){toast('لینک محلی کپی شد');return}
     openModal('<h3>کپی لینک محلی</h3><div class="e29-linkbox"><input id="e29-shurl" readonly value="'+qesc(url)+'"><button data-act="e29shCopy">کپی</button></div><div class="qr"><button data-act="e29shManage">بازگشت</button></div>');
   };
