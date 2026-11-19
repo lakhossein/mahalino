@@ -59,6 +59,17 @@ const base=process.env.QA_BASE_URL||pathToFileURL(path.join(__dirname,'..','Maha
     await page.keyboard.press('Escape');
     await panel.locator('[data-act="e30svDel"]').click();assert.equal(await panel.locator('.e30-svcard').count(),0);
     await page.setViewportSize({width:390,height:844});await centered();
+    await panel.locator('[data-act="e29libTab"][data-tab="all"]').click();
+    await card('valuation').locator('[data-act="e29libMenu"]').click();
+    await modal.locator('[data-act="e29libRename"]').click();
+    await modal.locator('#e29-rn').fill('QA mobile valuation');
+    await modal.locator('[data-act="e29libRenameGo"]').click();
+    await card('mobile valuation').locator('[data-act="e29libShare"]').click();
+    await modal.locator('[data-act="e29shGo"]').click();
+    await modal.locator('[data-act="closeModal"]').click();
+    await card('mobile valuation').locator('.ttl').click();
+    assert.match(await panel.locator('#e29-lbody > .e29-phead').innerText(),/QA mobile valuation/);
+    await panel.locator('[data-act="e29libBack"]').click();
     await panel.locator('[data-act="e29panelClose"]').click();
     await page.setViewportSize({width:1300,height:900});
     await page.locator('#side [data-act="e29panelNotif"]').click();
@@ -67,6 +78,22 @@ const base=process.env.QA_BASE_URL||pathToFileURL(path.join(__dirname,'..','Maha
     assert.equal(await page.locator('#e29-panel [data-cat="financial"]').getAttribute('aria-pressed'),'true');
     assert.equal(await page.locator('#e29-panel [data-cat="all"]').getAttribute('aria-pressed'),'false');
     assert.equal(await page.locator('#e29-nlist .e29-notif').count(),0);
+    await page.locator('#e29-panel [data-act="e29panelClose"]').click();
+    await page.evaluate(()=>{
+      const untouched=wfNew('rent');untouched.data={qaUnrelated:'keep this'};untouched.step=4;
+      window.qaUntouchedId=untouched.id;
+      const snapshot=E29.libAPI.store().find(x=>x.type==='wf_progress');
+      snapshot.workflowId='stale-id';snapshot.artifact={m:'rent',step:2,data:{qaSnapshot:'restore this'},done:false};
+      save();
+    });
+    await page.locator('#side [data-act="e29panelLib"]').click();
+    await card('wf_progress').locator('.ttl').click();
+    await panel.locator('[data-act="e29libResume"]').click();
+    const restored=await page.evaluate(()=>{
+      const prior=wfOf(window.qaUntouchedId),item=E29.libAPI.store().find(x=>x.type==='wf_progress'),w=wfOf(item.workflowId);
+      return {unrelated:prior.data.qaUnrelated,priorStep:prior.step,distinct:w.id!==prior.id,snapshot:w.data.qaSnapshot,step:w.step,active:S.active.rent===w.id,current:CURRENT,service:CE.f,ceStep:CE.i};
+    });
+    assert.deepEqual(restored,{unrelated:'keep this',priorStep:4,distinct:true,snapshot:'restore this',step:2,active:true,current:'landing',service:'rent',ceStep:1});
     assert.deepEqual(errors,[]);
     console.log('PASS Library controls desktop/mobile, Settings theme and notification tabs');
   }finally{await browser.close()}
