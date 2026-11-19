@@ -53,8 +53,12 @@ jobs:
     # The active version must pass before the gallery can be published.
     uses: ./.github/workflows/mahalino-v032-quality-gate.yml
 
+  quality-v033:
+    # Gate every newly packaged version before publication.
+    uses: ./.github/workflows/mahalino-v033-quality-gate.yml
+
   publish:
-    needs: [workflow-contract, quality-v030, quality-v031, quality-v032]
+    needs: [workflow-contract, quality-v030, quality-v031, quality-v032, quality-v033]
     # Keep the implicit success() guard; pull requests only validate.
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest

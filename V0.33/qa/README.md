@@ -33,6 +33,11 @@ screenshots, and structured JSON are saved to `V0.33/qa/results/`.
 | `check-guidance.cjs` | Machine-readable checks of 25 preview registry entries, normalized phrase uniqueness and valid action transitions |
 | `e2e-full-journeys-v032.cjs` | Continuous rental discovery through visit/contract/termination; purchase contract/escrow/delivery; seller agreement/contract/status; personalized investment/save/tracking; all ten paid tariffs; PDF file sharing; Browser-operated UI: free-form and recurring reminder creation/edit/complete/reload; project+archived chat; Library workflow resume across categories; money-slider commit, Back/edit and historical lock; full in-chat contract, 60-Bana confirmation and termination through settlement; native PDF print; hard-vs-soft ranking; interactive in-chat Leaflet map |
 
+| `e2e-emptying-slider.cjs` | Physical before/after slider endpoints, captions, keyboard and pointer behavior |
+| `e2e-criteria-v033.cjs` | Continue with current rent/buy criteria and zero-result criterion edits |
+| `e2e-library-controls.cjs` | Library artifact controls, account settings navigation and sharing behavior |
+| `e2e-independent-services-v033.cjs` | Independent service directory, contract creation/tours and workflow isolation |
+
 All tests run in real Chromium, without mocking the application code. H18 stubs only the operating-system Web Share boundary and verifies the actual selected PDF bytes, cancellation and unsupported-browser fallback. H17 exercises the common payment engine for every paid tariff with synthetic delivery callbacks; domain journeys separately verify delivered artifacts and requests. Assertions
 must check actual effects; the previous false-negative `C.2` expected 2 billion
 **rials** after the user stated 2 billion **tomans**, and is corrected.

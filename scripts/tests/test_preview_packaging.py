@@ -33,6 +33,21 @@ class PackagingContract(unittest.TestCase):
         packager.verify([32])
         self.assertTrue((self.output / 'v0.32/build_v032.js').is_file())
 
+    def test_v033_source_package_remains_rebuildable_alongside_v032(self):
+        version = self.root / 'V0.33'
+        version.mkdir()
+        (version / 'Mahalino+V0.33.html').write_text('<script src="asset.js"></script>')
+        (version / 'asset.js').write_text('var ok=true;')
+        (version / 'build_v033.js').write_text('// builder')
+        (version / 'README.md').write_text('source contract')
+        self.assertEqual(packager.build(), [33, 32])
+        packager.verify([33, 32])
+        import json
+        source = self.output / 'v0.33'
+        self.assertTrue((source / 'build_v033.js').is_file())
+        self.assertEqual(json.loads((source / 'package-manifest.json').read_text())['kind'], 'rebuildable-source')
+        self.assertTrue((self.output / 'v0.32/build_v032.js').is_file())
+
     def test_missing_asset_preserves_previous_output(self):
         packager.build()
         (self.output / 'marker').write_text('previous')

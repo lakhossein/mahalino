@@ -21,11 +21,11 @@ class PagesPublicationContract(unittest.TestCase):
         self.pages = load_workflow('pages.yml')
 
     def test_all_versions_are_required_dependencies(self):
-        required = {'quality-v030', 'quality-v031', 'quality-v032', 'workflow-contract'}
+        required = {'quality-v030', 'quality-v031', 'quality-v032', 'quality-v033', 'workflow-contract'}
         self.assertTrue(required.issubset(self.pages['jobs']['publish']['needs']))
 
     def test_quality_jobs_call_local_callable_gates_without_skip_conditions(self):
-        for version in ('030', '031', '032'):
+        for version in ('030', '031', '032', '033'):
             with self.subTest(version=version):
                 job = self.pages['jobs'][f'quality-v{version}']
                 filename = f'mahalino-v{version}-quality-gate.yml'
@@ -42,10 +42,10 @@ class PagesPublicationContract(unittest.TestCase):
 
     def test_push_and_pr_cover_every_gate_and_contract_test(self):
         paths = [
-            'V0.32/src/legacy/utilities.js', 'previews/index.html',
+            'V0.32/src/legacy/utilities.js', 'V0.33/src/legacy/utilities.js', 'previews/index.html',
             'scripts/build_previews.py', 'scripts/tests/test_pages_workflow.py',
             '.github/workflows/pages.yml',
-            *[f'.github/workflows/mahalino-v{v}-quality-gate.yml' for v in ('030', '031', '032')],
+            *[f'.github/workflows/mahalino-v{v}-quality-gate.yml' for v in ('030', '031', '032', '033')],
         ]
         for event in ('push', 'pull_request'):
             with self.subTest(event=event):
@@ -72,10 +72,11 @@ class PagesPublicationContract(unittest.TestCase):
         self.assertIn('python3 -m unittest discover -s scripts/tests', runs)
         self.assertNotIn('continue-on-error', self.pages['jobs']['workflow-contract'])
 
-    def test_v032_direct_checks_cover_pages_changes(self):
-        gate = load_workflow('mahalino-v032-quality-gate.yml')
-        for event in ('push', 'pull_request'):
-            self.assertIn('.github/workflows/pages.yml', gate['on'][event]['paths'])
+    def test_active_direct_checks_cover_pages_changes(self):
+        for version in ('032', '033'):
+            gate = load_workflow(f'mahalino-v{version}-quality-gate.yml')
+            for event in ('push', 'pull_request'):
+                self.assertIn('.github/workflows/pages.yml', gate['on'][event]['paths'])
 
 
 if __name__ == '__main__':
