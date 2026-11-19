@@ -1,0 +1,67 @@
+/* 2) state */
+var LSKEY='mahalino_v32';
+var PREVIOUS_LS='mahalino_v31';
+var OLD_LS=['mahal','ino_','v30'].join('');
+var OLD_LS4=['mahal','ino_','v29'].join('');
+var OLD_LS5=['mahal','ino_','v18'].join('');
+var OLD_LS2=['mahal','ino_','v16'].join('');
+var OLD_LS3=['khan','yar','_v15'].join('');
+var S=null,LSCHAIN=[LSKEY,PREVIOUS_LS,OLD_LS,OLD_LS4,OLD_LS5,OLD_LS2,OLD_LS3],LSi;
+for(LSi=0;LSi<LSCHAIN.length;LSi++){
+  try{S=JSON.parse(localStorage.getItem(LSCHAIN[LSi]))}catch(e){S=null}
+  if(S&&typeof S==='object')break;
+}
+if(!S||typeof S!=='object'){S={}}
+function ph(seed,w,h,fb){var hu=hseed(seed)||seedimg(seed);if(hu)return '<div class="ph"><div class="fb">'+fb+'</div><img src="'+hu+'" alt="" loading="lazy" onerror="this.remove()"></div>';return '<div class="ph"><div class="fb">'+fb+'</div><img src="https://picsum.photos/seed/'+seed+'/'+w+'/'+h+'" alt="" loading="lazy" onerror="this.remove()"></div>'}
+if(S.auth===undefined){S.auth=null}
+if(S.tokens===undefined){S.tokens=0}
+if(S.wallet===undefined){S.wallet=0}
+if(S.welcomed===undefined){S.welcomed=false}
+if(S.pending===undefined){S.pending=null}
+if(!S.prof){S.prof={work:null,school:null,workLL:null,schoolLL:null}}
+if(!S.wlog){S.wlog=[]}
+if(!S.log){S.log=[]}
+if(!S.reqs){S.reqs=[]}
+if(!S.wfs){S.wfs=[]}
+if(!S.active){S.active={}}
+if(S.flow){
+  (function(){
+    var mods=['rent','buy','invr','mkt','build','stay'],i,m,f,w;
+    if(!S.wfs.length){
+      for(i=0;i<mods.length;i++){
+        m=mods[i];f=S.flow[m];
+        if(!f||typeof f!=='object'){continue}
+        w={id:'WF-'+m+'-legacy',m:m,num:(function(){var k=0,j;for(j=0;j<S.wfs.length;j++){if(S.wfs[j].m===m)k++}return k+1})(),step:f.step||1,data:f.data||{},done:!!f.done,cancelled:false,createdAt:Date.now(),updatedAt:Date.now()};
+        S.wfs.push(w);S.active[m]=w.id;
+      }
+    }
+    delete S.flow;
+  })();
+}
+if(!S.contracts){S.contracts=[]}
+if(!S.reviews){S.reviews=[]}
+if(!S.nprj){S.nprj=[]}
+if(!S.ui){S.ui={tab:'b',dcat:'rent',yh:24,crng:12,nrng:12,atab:'overview'}}
+if(!S.ui.atab){S.ui.atab='overview'}
+if(S.ui.navg===undefined){S.ui.navg=0.32}
+
+if(!S.ui.svcf){S.ui.svcf='open'}
+if(!S.svcOrders){S.svcOrders=[]}
+if(!S.svcAudit){S.svcAudit=[]}
+if(!S.grt){S.grt=[]}
+if(!S.grtAudit){S.grtAudit=[]}
+if(!S.grtReserve){S.grtReserve=null}
+if(S.sub===undefined){S.sub=null}
+/* V0.29 state defaults */
+if(!S.notifs)S.notifs=[];
+if(!S.library)S.library=[];
+if(!S.projects)S.projects=[];
+if(!S.shares)S.shares=[];
+if(!S.prefs)S.prefs={};
+if(!S.profile)S.profile={confirmed:{},inferred:{},stale:{},log:[]};
+/* V0.32 state defaults */
+if(!S.paySession)S.paySession=null;
+if(!S.savedListings)S.savedListings=[];
+if(!S.ctx30)S.ctx30={fields:{},log:[]};
+function save(){try{localStorage.setItem(LSKEY,JSON.stringify(S))}catch(e){console.error('save failed',e);if(window.E24)E24.toastErr('ذخیره‌سازی محلی ناموفق بود؛ تغییرات تا بازنشانی صفحه در همین نشست اعمال است.')}}
+
