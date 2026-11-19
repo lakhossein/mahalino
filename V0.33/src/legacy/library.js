@@ -275,7 +275,7 @@ E29.lib=(function(){
     document.title=it.title;document.body.classList.add('doc-printing');
     var done=function(){document.body.classList.remove('doc-printing');root.innerHTML='';document.title=oldTitle;window.removeEventListener('afterprint',done)};
     window.addEventListener('afterprint',done);
-    setTimeout(function(){try{window.print()}finally{done()}},90);
+    setTimeout(function(){try{window.print()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/library.js:263',e,'caught');toast('چاپ گزارش انجام نشد؛ دوباره تلاش کنید.')}finally{done()}},90);
   }
   ACT.e29libPrint=function(el){var it=byId(el.getAttribute('data-lib'));if(it)printArtifact(it)};
 
