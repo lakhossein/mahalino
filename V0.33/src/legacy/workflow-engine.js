@@ -556,7 +556,9 @@ function openGateway(amt,title,cb){
   '<button class="btn" style="width:100%;margin-top:8px" data-act="closeModal">انصراف و بازگشت</button></div>');
 }
 function openTourModal(lid){
-  TOURX=findL(lid);TOURROT=0;
+  if(CURRENT==='landing')return openTourChat(lid);
+  var selected=tourListing(lid);if(!selected){toast('ملک مشخصی برای تور انتخاب نشده است');return false}
+  TOURX=selected;TOURROT=0;
   openModal('<h3> تور مجازی ۳۶۰° — '+TOURX.t+'</h3>'+
   '<p class="note">تصویر را بکشید تا بچرخد؛ با انتخاب اتاق بین فضاها جابه‌جا شوید.</p>'+
   '<div class="tourwrap" id="tourwrap"><div class="tourimg" id="tourimg"><img id="tourpic" src="https://picsum.photos/seed/'+TOURX.seed+'-r0/1600/420" alt=""></div>'+
@@ -584,6 +586,58 @@ function openTourModal(lid){
     drawTour();
   });
 }
+/* Inline tour cards keep per-listing, per-card state in the transcript. */
+function tourListing(lid){return RLIST.concat(BLIST).find(function(x){return x.id===lid})}
+function tourSpaces(x){
+  if(Array.isArray(x.rooms)&&x.rooms.length)return x.rooms.map(function(r,i){return {key:String(r.key||i),label:String(r.label||r.name||r),photo:r.photo||r.image||''}});
+  var rooms=[{key:'living',label:'نشیمن'},{key:'kitchen',label:'آشپزخانه'}];
+  for(var b=1;b<=Math.max(0,Math.min(20,Number(x.beds)||0));b++)rooms.push({key:'bed'+b,label:'اتاق خواب '+fa(b,0)});
+  rooms.push({key:'bath',label:'حمام (نمونه)'},{key:'facade',label:'نما (نمونه)'});
+  if(x.balc)rooms.push({key:'balcony',label:'بالکن (نمونه)'});
+  return rooms;
+}
+function tourIllustration(x,r){
+  var seed=String(x.seed||x.id)+r.key,hash=0;
+  for(var n=0;n<seed.length;n++)hash=((hash*31)+seed.charCodeAt(n))>>>0;
+  var hue=hash%360,windowX=120+hash%150,accent='hsl('+hue+',35%,45%)',wall='hsl('+hue+',30%,84%)';
+  var shape=r.key.indexOf('bed')===0?'<rect x="490" y="230" width="610" height="120" rx="20" fill="'+accent+'"/><rect x="535" y="213" width="515" height="50" rx="12" fill="#fff"/>':r.key==='kitchen'?'<path d="M430 220h740v120H430z" fill="'+accent+'"/><path d="M430 214h740v18H430zm180 25v100m240-100v100" fill="#eee8da" stroke="#eee8da" stroke-width="8"/>':r.key==='bath'?'<rect x="450" y="185" width="200" height="160" rx="18" fill="#eaf8fc"/><rect x="850" y="270" width="280" height="75" rx="25" fill="#fff"/>':/facade|balcony/.test(r.key)?'<path d="M480 110h640v235H480z" fill="'+accent+'"/><path d="M560 140h180v120H560zm300 0h150v120H860z" fill="#b8e3f1"/>':'<rect x="430" y="250" width="740" height="95" rx="25" fill="'+accent+'"/><rect x="490" y="200" width="620" height="90" rx="20" fill="'+accent+'"/>';
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 420"><path fill="'+wall+'" d="M0 0h1600v420H0z"/><path d="M0 420V350L420 245h760l420 105v70z" fill="#b39e84"/><path d="M0 0l420 90v155L0 350zm1600 0l-420 90v155l420 105z" fill="#526d72" opacity=".32"/><rect x="'+windowX+'" y="110" width="170" height="150" fill="#a9d9ef" stroke="#fff" stroke-width="12"/><rect x="1250" y="110" width="190" height="150" fill="#a9d9ef" stroke="#fff" stroke-width="12"/>'+shape+'<text x="800" y="70" text-anchor="middle" font-size="26" font-family="sans-serif" fill="#213c3e">'+esc(r.label)+' — نمونهٔ ترسیمی</text><text x="800" y="105" text-anchor="middle" font-size="19" font-family="sans-serif" fill="#213c3e">'+esc(x.t)+' • '+fa(x.beds||0,0)+' خواب</text></svg>';
+  return 'data:image/svg+xml,'+encodeURIComponent(svg);
+}
+function tourSource(x,r){
+  var listed=r.photo||(x.tourImages&&x.tourImages[r.key]);
+  if(typeof listed==='string'&&/^(https:\/\/|data:image\/(?:jpeg|png|webp);)/.test(listed))return {url:listed,label:'تصویر معرفی‌شده برای این فضا'};
+  var sample=r.key==='living'&&typeof SEEDIMG!=='undefined'&&SEEDIMG[x.seed];
+  if(sample)return {url:sample,label:'عکس نمونهٔ اختصاص‌یافته به کارت آگهی؛ نه تصویر واقعی ملک'};
+  return null;
+}
+function tourCardHTML(x,id,room,rot){
+  var rooms=tourSpaces(x),r=rooms.find(function(v){return v.key===room})||rooms[0],fallback=tourIllustration(x,r),src=tourSource(x,r);
+  var angle=Math.max(0,Math.min(100,Number(rot)||0));
+  return '<section class="e33-tour-card" data-tour-id="'+qesc(id)+'" data-listing="'+qesc(x.id)+'" data-room="'+qesc(r.key)+'" data-rotation="'+angle+'"><h3>تور تصویری در دستیار — '+esc(x.t)+'</h3><p class="note">'+fa(x.m2,0)+' متر • '+fa(x.beds||0,0)+' خواب'+(x.balc?' • بالکن':'')+' — پیش‌نمایش آموزشی؛ نمای واقعی ۳۶۰ درجه تأیید نشده است.</p><div class="tourwrap" data-tour-wrap><div class="tourimg" data-tour-pan style="transform:translateX('+(angle*.6).toFixed(1)+'%)"><img data-tour-picture src="'+qesc(src?src.url:fallback)+'" data-tour-fallback="'+qesc(fallback)+'" alt="'+qesc(r.label)+'"></div><span class="tourhud" data-tour-deg>'+fa(Math.round(angle*3.6),0)+'°</span></div><p class="note" data-tour-source>'+(src?esc(src.label):'نمای ترسیمی نمونه، بر پایهٔ مشخصات آگهی؛ عکس واقعی نیست.')+'</p><label>زاویهٔ دید <input data-tour-angle type="range" min="0" max="100" value="'+angle+'" aria-label="زاویهٔ دید '+qesc(x.t)+'"></label><div class="chips">'+rooms.map(function(rr){return '<button type="button" class="chip'+(r.key===rr.key?' on':'')+'" aria-pressed="'+(r.key===rr.key?'true':'false')+'" data-act="e33TourRoom" data-room="'+qesc(rr.key)+'">'+esc(rr.label)+'</button>'}).join('')+'</div><p class="note">نمایش نمونه جایگزین بازدید واقعی نیست.</p></section>';
+}
+function openTourChat(lid){
+  var x=tourListing(lid);if(!x){toast('ملک مشخصی برای تور انتخاب نشده است');return false}
+  botC(tourCardHTML(x,E30.uid('tour'),null,0),null);return true;
+}
+function storeTourCard(card,room,rot){
+  var id=card.getAttribute('data-tour-id'),x=tourListing(card.getAttribute('data-listing'));if(!x)return;
+  var html=tourCardHTML(x,id,room,rot);
+  for(var i=HIST.length-1;i>=0;i--){var m=HIST[i];if(m.r==='bot'&&m.h.indexOf('data-tour-id="'+id+'"')>=0){m.h=m.h.replace(/<section class="e33-tour-card"[\s\S]*?<\/section>/g,function(h){return h.indexOf('data-tour-id="'+id+'"')>=0?html:h});break}}
+  S.liveHistory=HIST.slice();save();return html;
+}
+function rotateTourCard(card,value){
+  var angle=Math.max(0,Math.min(100,Number(value)||0));card.setAttribute('data-rotation',angle);
+  card.querySelector('[data-tour-pan]').style.transform='translateX('+(angle*.6).toFixed(1)+'%)';
+  card.querySelector('[data-tour-deg]').textContent=fa(Math.round(angle*3.6),0)+'°';card.querySelector('[data-tour-angle]').value=angle;
+}
+document.addEventListener('error',function(e){var img=e.target;if(!img||!img.matches||!img.matches('[data-tour-picture]'))return;var fallback=img.getAttribute('data-tour-fallback');if(img.getAttribute('src')===fallback)return;img.src=fallback;var note=img.closest('.e33-tour-card').querySelector('[data-tour-source]');note.textContent='تصویر در دسترس نیست؛ نمای ترسیمی نمونه، نه عکس واقعی.'},true);
+document.addEventListener('input',function(e){var el=e.target;if(!el||!el.matches||!el.matches('[data-tour-angle]'))return;var card=el.closest('.e33-tour-card');rotateTourCard(card,el.value);storeTourCard(card,card.getAttribute('data-room'),el.value)},true);
+document.addEventListener('pointerdown',function(e){var wrap=e.target.closest&&e.target.closest('[data-tour-wrap]');if(!wrap)return;e.preventDefault();var card=wrap.closest('.e33-tour-card'),start=e.clientX,rot=Number(card.getAttribute('data-rotation'))||0;
+  function move(ev){rotateTourCard(card,rot+(ev.clientX-start)/(wrap.clientWidth||1)*100)}
+  function stop(){document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',stop);document.removeEventListener('pointercancel',stop);storeTourCard(card,card.getAttribute('data-room'),card.getAttribute('data-rotation'))}
+  document.addEventListener('pointermove',move);document.addEventListener('pointerup',stop);document.addEventListener('pointercancel',stop);
+},true);
 function openServicesModal(){go('svc')}
 
 function pinfoBody(p,i,k){
