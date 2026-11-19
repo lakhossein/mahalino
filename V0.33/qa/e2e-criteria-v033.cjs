@@ -3,7 +3,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const {pathToFileURL}=require('node:url');
 const path=require('node:path');
-const base=process.env.QA_BASE_URL||pathToFileURL(path.join(__dirname,'..','Mahalino+V0.32.html')).href;
+const base=process.env.QA_BASE_URL||pathToFileURL(path.join(__dirname,'..','Mahalino+V0.33.html')).href;
 (async()=>{
   const browser=await chromium.launch({headless:true});
   try{

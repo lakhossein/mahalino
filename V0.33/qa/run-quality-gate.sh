@@ -79,7 +79,7 @@ if test "$ready" -ne 1; then
 fi
 
 failed_suites=0
-for suite in e2e-state-performance-v032.cjs e2e-reliability-v032.cjs e2e-interaction-recovery-v032.cjs smoke-v032.js e2e-functional.js e2e-conversational.js v032-browser-regressions.cjs e2e-acceptance-v032.cjs e2e-scenarios-v032.cjs e2e-full-journeys-v032.cjs e2e-guided-usability-v032.cjs e2e-deterministic-guidance-v032.cjs e2e-priority-audit-v032.cjs; do
+for suite in e2e-state-performance-v032.cjs e2e-reliability-v032.cjs e2e-interaction-recovery-v032.cjs smoke-v032.js e2e-functional.js e2e-conversational.js v032-browser-regressions.cjs e2e-acceptance-v032.cjs e2e-scenarios-v032.cjs e2e-full-journeys-v032.cjs e2e-guided-usability-v032.cjs e2e-deterministic-guidance-v032.cjs e2e-priority-audit-v032.cjs e2e-emptying-slider.cjs e2e-criteria-v033.cjs e2e-library-controls.cjs e2e-independent-services-v033.cjs; do
   echo "========= $suite ========="
   if node "V0.33/qa/$suite" >"$result_dir/$suite.log" 2>&1; then
     echo "PASS $suite"

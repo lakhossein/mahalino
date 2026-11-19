@@ -8,7 +8,7 @@ const {chromium}=require('playwright');
   const browser=await chromium.launch({headless:true,executablePath:process.env.QA_CHROMIUM_EXECUTABLE||undefined});
   try {
     const page=await browser.newPage({viewport:{width:800,height:700},hasTouch:true});
-    await page.goto(process.env.QA_BASE_URL||pathToFileURL(path.join(__dirname,'../Mahalino+V0.32.html')).href);
+    await page.goto(process.env.QA_BASE_URL||pathToFileURL(path.join(__dirname,'../Mahalino+V0.33.html')).href);
     await page.evaluate(()=>{
       const mount=document.createElement('div');
       mount.id='emptying-test';
