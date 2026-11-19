@@ -16,7 +16,7 @@ assert.equal(api.active(),false);assert.equal(g.canSuggest('resume-service'),tru
 assert.equal(g.route(g.actions['resume-service'].prompt),true);
 assert.equal(api.active(),true);assert.equal(JSON.stringify(api.ctx().fields),before,'side task or resume changed primary financial context');
 assert(c.S.contracts.every(x=>x.status==='signed_internal'));
-const b=runtime('rent'),html=fs.readFileSync(path.join(__dirname,'..','Mahalino+V0.32.html'),'utf8');
+const b=runtime('rent'),html=fs.readFileSync(path.join(__dirname,'..','Mahalino+V0.33.html'),'utf8');
 b.c.SCRIPTS={};
 vm.runInContext(html.match(/var PRJ=\[[\s\S]*?\];/)[0],b.c);
 vm.runInContext(html.match(/SCRIPTS\.build=\[[\s\S]*?\n\];/)[0],b.c);

@@ -186,7 +186,7 @@ E30.landing=(function(){
       '<div><b>مسیرها</b><button data-spl="services">خدمات</button><button data-spl="how">نحوهٔ کار</button><button data-spl="pricing">تعرفه</button><button data-spl="faq">پرسش‌ها</button></div>'+
       '<div><b>شروع نمایشی</b><button data-view="auth">ورود نمایشی</button><button data-view="auth">شروع</button></div>'+
       '</div>'+
-      '<div class="spl-copy">محلینو — حافظهٔ محلی مرورگر؛ جست‌وجوی نشانی ممکن است درخواست بیرونی ارسال کند · نسخهٔ V0.32</div>'+
+      '<div class="spl-copy">محلینو — حافظهٔ محلی مرورگر؛ جست‌وجوی نشانی ممکن است درخواست بیرونی ارسال کند · نسخهٔ V0.33</div>'+
       '</div></footer>';
     return h;
   }

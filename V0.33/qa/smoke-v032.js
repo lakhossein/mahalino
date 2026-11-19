@@ -3,7 +3,7 @@ const { chromium } = require('playwright');
 const fs=require('node:fs');
 const path=require('node:path');
 
-const URL=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.32.html';
+const URL=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.33.html';
 let pass=0,fail=0;const fails=[];
 function ok(name,cond,extra){if(cond){pass++;console.log('  ✓ '+name)}else{fail++;fails.push(name);console.log('  ✗ '+name+(extra?' — '+JSON.stringify(extra).slice(0,220):''))}}
 
@@ -38,7 +38,7 @@ async function send(page,text){
     hoods:(typeof HOODS!=='undefined')?HOODS.length:0,
     errbar:(document.getElementById('errbar')||{}).textContent||''
   }));
-  ok('booted without error',st.booted&&st.e30==='0.32'&&!st.errbar,st);
+  ok('booted without error',st.booted&&st.e30==='0.33'&&!st.errbar,st);
   ok('guest lands on public splash',st.current==='splash'&&st.splash,st);
   ok('landing sections present (14 cards/6 steps/4 why/12 pricing/8 faq/nav)',st.cards===14&&st.how===6&&st.why===4&&st.table===12&&st.faq===8&&st.nav===4,st);
   ok('sample dataset extended to 8 hoods (ونک/انقلاب for §4.8)',st.hoods===8,st.hoods);

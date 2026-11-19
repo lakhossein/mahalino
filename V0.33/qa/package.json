@@ -1,8 +1,8 @@
 {
-  "name": "mahalino-v032-release-qa",
+  "name": "mahalino-v033-release-qa",
   "private": true,
-  "version": "0.32.0",
-  "description": "Reproducible Chromium acceptance gate for Mahalino V0.32",
+  "version": "0.33.0",
+  "description": "Reproducible Chromium acceptance gate for Mahalino V0.33",
   "scripts": {
     "test:smoke": "node smoke-v032.js",
     "test:functional": "node e2e-functional.js",

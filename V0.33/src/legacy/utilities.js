@@ -176,8 +176,8 @@ function closeModal(){
   MODAL_PREV=null;
 }
 /* 2) state */
-var LSKEY='mahalino_v32';
-var PREVIOUS_LS='mahalino_v31';
+var LSKEY='mahalino_v33';
+var PREVIOUS_LS='mahalino_v32';
 var OLD_LS=['mahal','ino_','v30'].join('');
 var OLD_LS4=['mahal','ino_','v29'].join('');
 var OLD_LS5=['mahal','ino_','v18'].join('');
@@ -185,7 +185,7 @@ var OLD_LS2=['mahal','ino_','v16'].join('');
 var OLD_LS3=['khan','yar','_v15'].join('');
 // Container validation is intentionally separate from domain/business validation.
 function stateObject(v){return !!v&&typeof v==='object'&&!Array.isArray(v)}
-var S=null,LSCHAIN=[LSKEY,PREVIOUS_LS,OLD_LS,OLD_LS4,OLD_LS5,OLD_LS2,OLD_LS3],LSi;
+var S=null,LSCHAIN=[LSKEY,PREVIOUS_LS,'mahalino_v31',OLD_LS,OLD_LS4,OLD_LS5,OLD_LS2,OLD_LS3],LSi;
 var stateRecovery=[],stateSource=null,stateRaw=null;
 for(LSi=0;LSi<LSCHAIN.length;LSi++){
   var candidateRaw=null;

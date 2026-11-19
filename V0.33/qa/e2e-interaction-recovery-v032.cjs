@@ -6,12 +6,12 @@ const assert=require('node:assert/strict');
  try{
   const context=await browser.newContext();const page=await context.newPage();const errors=[];
   page.on('pageerror',e=>errors.push(e.message));
-  await page.goto(process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.32.html');
+  await page.goto(process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.33.html');
   await page.waitForFunction(()=>window.__BOOTED===true);
-  await page.evaluate(()=>{localStorage.setItem('mahalino_v31','{"tokens":999}');localStorage.setItem('other','keep');S.tokens=77;save();ACT.reset()});
+  await page.evaluate(()=>{localStorage.setItem('mahalino_v32','{"tokens":999}');localStorage.setItem('other','keep');S.tokens=77;save();ACT.reset()});
   await Promise.all([page.waitForEvent('load'),page.locator('[data-act="resetOk"]').click()]);
   await page.waitForFunction(()=>window.__BOOTED===true);
-  const after=await page.evaluate(()=>({tokens:S.tokens,previous:localStorage.getItem('mahalino_v31'),other:localStorage.getItem('other')}));
+  const after=await page.evaluate(()=>({tokens:S.tokens,previous:localStorage.getItem('mahalino_v32'),other:localStorage.getItem('other')}));
   assert.equal(after.tokens,0);assert.equal(after.previous,'{"tokens":999}');assert.equal(after.other,'keep');console.log('PASS version-only reset and reload without remigration');
   const copy=await page.evaluate(async()=>{
    openModal('<input id="e29-shurl" value="test-link">');

@@ -5,7 +5,7 @@ const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:
  try{
  const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:2});const page=await ctx.newPage();
  const cdp=await ctx.newCDPSession(page);await cdp.send('Emulation.setCPUThrottlingRate',{rate:4});
- await page.goto(process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.32.html');await page.waitForFunction(()=>window.__BOOTED===true&&stateWriterReady);
+ await page.goto(process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.33.html');await page.waitForFunction(()=>window.__BOOTED===true&&stateWriterReady);
  const rows=await page.evaluate(async()=>{
  const before=JSON.stringify(S),rows=[];
  for(const count of [100,1000,10000]){

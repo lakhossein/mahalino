@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),runtime=require('./guide-runtime.cjs');
-const r=runtime('rent'),c=r.c,html=fs.readFileSync(path.join(__dirname,'..','Mahalino+V0.32.html'),'utf8');
+const r=runtime('rent'),c=r.c,html=fs.readFileSync(path.join(__dirname,'..','Mahalino+V0.33.html'),'utf8');
 for(const name of ['PRJ','BIDS'])vm.runInContext(html.match(new RegExp('var '+name+'=\\[[\\s\\S]*?\\];'))[0],c);
 c.SCRIPTS={buy:[{id:'buy_ctr'}]};
 const start=html.indexOf('SCRIPTS.mkt=['),end=html.indexOf('SCRIPTS.build=[',start);

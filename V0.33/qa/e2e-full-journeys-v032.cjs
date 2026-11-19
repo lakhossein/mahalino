@@ -4,7 +4,7 @@
 const fs=require('node:fs');
 const path=require('node:path');
 const {chromium}=require('playwright');
-const url=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.32.html';
+const url=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.33.html';
 const out=process.env.QA_RESULTS_DIR||path.join(__dirname,'results');
 const results=[];
 const browserOpts={headless:true,executablePath:process.env.QA_CHROMIUM_EXECUTABLE||undefined,

@@ -2,7 +2,7 @@
    Browser data are all local demonstration data, never a live real-estate API. */
 'use strict';
 const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:path');
-const base=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.32.html';
+const base=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.33.html';
 const out=process.env.QA_RESULTS_DIR||path.join(__dirname,'results'),results=[];
 const assert=(x,s)=>{if(!x)throw Error(s)};
 (async()=>{

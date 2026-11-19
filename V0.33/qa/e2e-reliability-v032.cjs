@@ -4,8 +4,8 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict');
  const browser=await chromium.launch({headless:true,executablePath:process.env.QA_CHROMIUM_EXECUTABLE||undefined,args:process.env.QA_NO_SANDBOX==='1'?['--no-sandbox']:[]});
  try{
  const ctx=await browser.newContext(),page=await ctx.newPage();
- await page.goto(process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.32.html');await page.waitForFunction(()=>window.__BOOTED===true&&stateWriterReady);
- const second=await ctx.newPage();await second.goto(process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.32.html');await second.waitForFunction(()=>window.__BOOTED===true);await second.waitForTimeout(100);
+ await page.goto(process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.33.html');await page.waitForFunction(()=>window.__BOOTED===true&&stateWriterReady);
+ const second=await ctx.newPage();await second.goto(process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.33.html');await second.waitForFunction(()=>window.__BOOTED===true);await second.waitForTimeout(100);
  const blocked=await second.evaluate(()=>{S.tokens=999;return save()});assert.equal(blocked,false);await second.close();console.log('PASS second tab cannot obtain writer ownership');
  const refs=await page.evaluate(()=>{const before=[cr,openModal,ACT.cdoc,CBACT.savL];E30.init();E30.uxInit();return before.every((fn,i)=>fn===[cr,openModal,ACT.cdoc,CBACT.savL][i])});assert.equal(refs,true);console.log('PASS repeated init preserves handler identity');
  const registry=await page.evaluate(()=>({declared:E30.paidActionRegistry.slice().sort(),guarded:E30.legacyPayGuarded.slice().sort()}));assert.deepEqual(registry.declared,registry.guarded);assert.equal(registry.declared.length,13);console.log('PASS 13 explicit paid actions remain guarded');

@@ -1,7 +1,7 @@
 /* e2e-conversational.js — V0.32 conversational suite (§19.2 + §19.3)
    Scripted users with realistic imperfection, driven through the real engine in Chromium. */
 const { chromium } = require('playwright');
-const URL=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.32.html';
+const URL=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.33.html';
 let pass=0,fail=0;const fails=[];
 function ok(name,cond,extra){if(cond){pass++;console.log('  ✓ '+name)}else{fail++;fails.push(name);console.log('  ✗ '+name+(extra?' — '+JSON.stringify(extra).slice(0,240):''))}}
 

@@ -5,7 +5,7 @@
 const fs=require('node:fs');
 const path=require('node:path');
 const {chromium}=require('playwright');
-const url=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.32.html';
+const url=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.33.html';
 const out=process.env.QA_RESULTS_DIR||path.join(__dirname,'results');
 const checks=[];
 const assert=(id,name,ok,info)=>{
@@ -458,7 +458,7 @@ const start=async b=>{
       const s=await start(browser);await s.page.evaluate(()=>doLogin('QA'));
       const rows=[];
       for(const text of ['می‌خوام در تهران یه خونه رهن و اجاره پیدا کنم.','ودیعه ۱ میلیارد تومان اجاره ۲۰ میلیون تومان']){
-        rows.push(await s.page.evaluate(text=>{const before=HIST.length;ceSend(text);const added=HIST.slice(before);return {users:added.filter(x=>x.r==='user').length,bots:added.filter(x=>x.r==='bot').length,body:added.filter(x=>x.r==='bot').map(x=>x.h).join(''),rendered:document.querySelectorAll('#chatB .msg.bot').length,stored:JSON.parse(localStorage.getItem('mahalino_v32')).liveHistory.filter(x=>x.r==='bot').length}},text));
+        rows.push(await s.page.evaluate(text=>{const before=HIST.length;ceSend(text);const added=HIST.slice(before);return {users:added.filter(x=>x.r==='user').length,bots:added.filter(x=>x.r==='bot').length,body:added.filter(x=>x.r==='bot').map(x=>x.h).join(''),rendered:document.querySelectorAll('#chatB .msg.bot').length,stored:JSON.parse(localStorage.getItem('mahalino_v33')).liveHistory.filter(x=>x.r==='bot').length}},text));
       }
       const beforeEntry=await s.page.evaluate(()=>HIST.length);
       await s.page.locator('#chatB [data-cf="buy"]').first().click();

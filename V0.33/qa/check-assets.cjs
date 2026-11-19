@@ -3,7 +3,7 @@
 const fs=require('node:fs');
 const path=require('node:path');
 const root=path.resolve(__dirname,'..');
-const html=fs.readFileSync(path.join(root,'Mahalino+V0.32.html'),'utf8');
+const html=fs.readFileSync(path.join(root,'Mahalino+V0.33.html'),'utf8');
 const required=new Set([
   'assets/leaflet/leaflet.js','assets/leaflet/leaflet.css',
   'assets/leaflet/images/marker-icon.png','assets/leaflet/images/marker-icon-2x.png',

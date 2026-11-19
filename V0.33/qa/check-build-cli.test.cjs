@@ -11,15 +11,15 @@ function fixture(t) {
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   fs.mkdirSync(path.join(root, 'templates'));
   fs.cpSync(path.join(__dirname, '../build'), path.join(root, 'build'), { recursive: true });
-  fs.copyFileSync(path.join(__dirname, '../build_v032.js'), path.join(root, 'build_v032.js'));
+  fs.copyFileSync(path.join(__dirname, '../build_v033.js'), path.join(root, 'build_v033.js'));
   fs.writeFileSync(path.join(root, 'build-manifest.json'), JSON.stringify({
-    version: '0.32', output: 'Mahalino+V0.32.html', entry: 'templates/app.html', slots: {}
+    version: '0.33', output: 'Mahalino+V0.33.html', entry: 'templates/app.html', slots: {}
   }));
   const template = path.join(root, 'templates/app.html');
-  const output = path.join(root, 'Mahalino+V0.32.html');
+  const output = path.join(root, 'Mahalino+V0.33.html');
   const html = '<script>const version = 32;</script>';
   fs.writeFileSync(template, html);
-  const run = (...args) => spawnSync(process.execPath, [path.join(root, 'build_v032.js'), ...args], { encoding: 'utf8' });
+  const run = (...args) => spawnSync(process.execPath, [path.join(root, 'build_v033.js'), ...args], { encoding: 'utf8' });
   return { root, template, output, html, run };
 }
 

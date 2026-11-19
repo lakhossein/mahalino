@@ -1174,17 +1174,17 @@ ACT.pname=function(){
   save();if(CURRENT==='profile')renderCurrent();else renderTok();toast('ذخیره شد');
 };
 ACT.logout=function(){S.auth=null;save();APH=0;toggleF(false);go('landing');toast('خروج')};
-/* V0.32 — بازنشانی مستقل نسخهٔ جاری */
+/* V0.33 — بازنشانی مستقل نسخهٔ جاری */
 ACT.reset=function(){
-  openModal('<h3>بازنشانی داده‌های نسخهٔ ۰.۳۲</h3>'+
-  '<p class="note">گفت‌وگوها، درخواست‌ها، قراردادها، ذخیره‌ها، یادآورها، موجودی نمایشی و تنظیمات نسخهٔ ۰.۳۲ پاک می‌شود. داده‌های نسخه‌های قبلی و سایت‌های دیگر حفظ می‌شود. این کار بازگردانی ندارد.</p>'+
-  '<div class="fs-actions" style="margin-top:12px"><button class="btn btn-danger" data-act="resetOk">حذف داده‌های نسخهٔ ۰.۳۲</button><button class="btn" data-act="closeModal">انصراف</button></div>');
+  openModal('<h3>بازنشانی داده‌های نسخهٔ ۰.۳۳</h3>'+
+  '<p class="note">گفت‌وگوها، درخواست‌ها، قراردادها، ذخیره‌ها، یادآورها، موجودی نمایشی و تنظیمات نسخهٔ ۰.۳۳ پاک می‌شود. داده‌های نسخه‌های قبلی و سایت‌های دیگر حفظ می‌شود. این کار بازگردانی ندارد.</p>'+
+  '<div class="fs-actions" style="margin-top:12px"><button class="btn btn-danger" data-act="resetOk">حذف داده‌های نسخهٔ ۰.۳۳</button><button class="btn" data-act="closeModal">انصراف</button></div>');
 };
 ACT.resetOk=function(){
   if(typeof stateWriterReady==='boolean'&&!stateWriterReady){toast('بازنشانی انجام نشد؛ پنجرهٔ دیگر محلینو را ببندید و این صفحه را بازنشانی کنید.');return}
   var errs=[];
   function tryIt(fn,label){try{fn()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:1186',e,'caught');errs.push(label)}}
-  // An explicit empty state prevents migration from importing V0.31 again.
+  // An explicit empty state prevents migration from importing V0.32 again.
   try{localStorage.setItem(LSKEY,'{}')}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/actions.js:1188',e,'caught');toast('بازنشانی انجام نشد؛ ذخیره‌سازی محلی در دسترس نیست.');return}
   window.__mahalinoResetPending=true;
   tryIt(function(){localStorage.removeItem(LSKEY+'_recovery')},'localStorage');
@@ -1193,7 +1193,7 @@ ACT.resetOk=function(){
   // release. Do not delete them as part of this version-only action.
   closeModal();
   if(errs.length){toast('بازنشانی ناقص شد؛ صفحه را بازنشانی کنید و دوباره تلاش کنید.');return}
-  toast('داده‌های نسخهٔ ۰.۳۲ پاک شد — شروع از نو…');
+  toast('داده‌های نسخهٔ ۰.۳۳ پاک شد — شروع از نو…');
   location.reload();
 };
 /* CJM handlers removed in V0.9 */

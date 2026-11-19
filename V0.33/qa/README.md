@@ -1,4 +1,4 @@
-# V0.32 release acceptance gate
+# V0.33 release acceptance gate
 
 The HTML preview is an interactive demonstration. The quality gate covers its
 actual JavaScript and browser behavior, not a hypothetical production backend.
@@ -10,14 +10,14 @@ payment processor cannot be certified by browser tests against this static HTML.
 From the repository root:
 
 ```bash
-npm ci --prefix V0.32/qa
-V0.32/qa/node_modules/.bin/playwright install chromium
-bash V0.32/qa/run-quality-gate.sh
+npm ci --prefix V0.33/qa
+V0.33/qa/node_modules/.bin/playwright install chromium
+bash V0.33/qa/run-quality-gate.sh
 ```
 
 The script checks JS syntax, reproducible build output, starts an HTTP server,
 executes every browser suite, and returns nonzero if **any** suite fails. Logs,
-screenshots, and structured JSON are saved to `V0.32/qa/results/`.
+screenshots, and structured JSON are saved to `V0.33/qa/results/`.
 
 ## Suites and intended scope
 
@@ -81,7 +81,7 @@ The extended release gate intentionally fails until assertion-bearing UI
 evidence is mapped. Do not mark rows automated merely because older suites pass.
 
 Run the validator's isolated fixtures with:
-`node --test V0.32/qa/check-priority-audit.test.cjs`.
+`node --test V0.33/qa/check-priority-audit.test.cjs`.
 These fixtures are never browser coverage and never go into the evidence report.
 
 Browser harnesses must write `$QA_RESULTS_DIR/priority-audit-evidence.json`:

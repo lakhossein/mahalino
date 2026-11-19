@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const { assemble } = require('./build/assemble.cjs');
 const root = __dirname;
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'build-manifest.json'), 'utf8'));
-if (manifest.version !== '0.32' || manifest.output !== 'Mahalino+V0.32.html') {
+if (manifest.version !== '0.33' || manifest.output !== 'Mahalino+V0.33.html') {
   throw new Error('Unexpected release identity or output path');
 }
 const html = assemble(manifest, relative => fs.readFileSync(path.join(root, relative), 'utf8'));
@@ -16,11 +16,11 @@ for (const [index, match] of [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\
 }
 const output = path.join(root, manifest.output);
 if (process.argv.includes('--check')) {
-  if (fs.readFileSync(output, 'utf8') !== html) throw new Error('Generated HTML is stale; run node build_v032.js');
-  console.log('PASS V0.32 reproducible build');
+  if (fs.readFileSync(output, 'utf8') !== html) throw new Error('Generated HTML is stale; run node build_v033.js');
+  console.log('PASS V0.33 reproducible build');
 } else {
   // Stage beside the artifact so rename is atomic on the same filesystem.
-  const staging = fs.mkdtempSync(path.join(root, '.v032-build-'));
+  const staging = fs.mkdtempSync(path.join(root, '.v033-build-'));
   try {
     const stagedOutput = path.join(staging, manifest.output);
     fs.writeFileSync(stagedOutput, html, 'utf8');
@@ -28,5 +28,5 @@ if (process.argv.includes('--check')) {
   } finally {
     fs.rmSync(staging, { recursive: true, force: true });
   }
-  console.log('Built V0.32: ' + Object.keys(manifest.slots).length + ' explicit modules -> ' + output);
+  console.log('Built V0.33: ' + Object.keys(manifest.slots).length + ' explicit modules -> ' + output);
 }

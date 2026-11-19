@@ -4,7 +4,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const {chromium}=require('playwright');
 
-const url=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.32.html';
+const url=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.33.html';
 const out=process.env.QA_RESULTS_DIR||path.join(__dirname,'results');
 const tests=[],errors=[],consoleErrors=[],badRequests=[];
 const assert=(name,pass,data)=>{tests.push({name,pass:Boolean(pass),data});console.log(`${pass?'PASS':'FAIL'} ${name}: ${JSON.stringify(data||'').slice(0,400)}`)};
@@ -25,9 +25,9 @@ async function run(name,cb){
     await page.goto(url,{waitUntil:'domcontentloaded'});
     await page.waitForTimeout(800);
 
-    await run('R01 | Full app booted as E30 V0.32',async()=>{
+    await run('R01 | Full app booted as E30 V0.33',async()=>{
       const v=await page.evaluate(()=>({boot:window.__BOOTED,version:window.E30&&E30.VER}));
-      return {ok:v.boot===true&&v.version==='0.32',data:v};
+      return {ok:v.boot===true&&v.version==='0.33',data:v};
     });
     await run('R02 | Toman range normalized to rials',async()=>{
       const v=await page.evaluate(()=>parseMoneyRangeFA('۴۰۰ تا ۵۵۰ میلیون تومان'));

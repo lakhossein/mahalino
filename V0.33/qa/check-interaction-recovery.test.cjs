@@ -3,26 +3,26 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const assert=require('node:assert/strict'),{test}=require('node:test');
 const root=path.resolve(__dirname,'..');
 function extract(file,start,end){if(process.env.QA_INTERACTION_BASELINE==='1')return JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures/approved-interaction-baselines.json'),'utf8')).find(x=>x.file===file).original;const s=fs.readFileSync(path.join(root,'src',file),'utf8');return s.slice(s.indexOf(start),s.indexOf(end,s.indexOf(start)))}
-const reset=extract('legacy/actions.js','/* V0.32 — بازنشانی مستقل','/* CJM handlers removed');
+const reset=extract('legacy/actions.js','/* V0.33 — بازنشانی مستقل','/* CJM handlers removed');
 const copy=extract('legacy/sharing.js','  ACT.e29shCopy=async function','  ACT.e29shExport=function');
 const pdf=extract('v32-ux.js','    ACT.e30pdfSend=async function','    ACT.e30shWhole=function');
 function resetHarness(code=reset,fail=''){
- const data={mahalino_v31:'{"tokens":999}',mahalino_v32:'{"tokens":10}',mahalino_v32_recovery:'backup',mahalino_theme:'light',unrelated:'safe'};
- const ctx={ACT:{},LSKEY:'mahalino_v32',window:{},console,Date,Math,localStorage:{getItem:k=>data[k]??null,setItem(k,v){if(fail==='write')throw Error();data[k]=v},removeItem(k){if(fail==='remove')throw Error();delete data[k]}},sessionStorage:{removeItem(){}},location:{reload:()=>ctx.reloaded=true},toast:t=>ctx.message=t,closeModal(){},openModal:h=>ctx.modal=h};
+ const data={mahalino_v32:'{"tokens":999}',mahalino_v33:'{"tokens":10}',mahalino_v33_recovery:'backup',mahalino_theme:'light',unrelated:'safe'};
+ const ctx={ACT:{},LSKEY:'mahalino_v33',window:{},console,Date,Math,localStorage:{getItem:k=>data[k]??null,setItem(k,v){if(fail==='write')throw Error();data[k]=v},removeItem(k){if(fail==='remove')throw Error();delete data[k]}},sessionStorage:{removeItem(){}},location:{reload:()=>ctx.reloaded=true},toast:t=>ctx.message=t,closeModal(){},openModal:h=>ctx.modal=h};
  vm.runInNewContext(code,ctx);return {ctx,data};
 }
 test('reset deletes only current version; loader never imports predecessor after reload',()=>{
- const {ctx,data}=resetHarness();ctx.ACT.reset();assert.ok(ctx.modal.includes('۰.۳۲'));ctx.ACT.resetOk();
- assert.equal(data.mahalino_v31,'{"tokens":999}');assert.equal(data.unrelated,'safe');assert.equal(data.mahalino_theme,'light');
- assert.equal(data.mahalino_v32_recovery,undefined);assert.equal(data.mahalino_v32,'{}');assert.equal(ctx.reloaded,true);
+ const {ctx,data}=resetHarness();ctx.ACT.reset();assert.ok(ctx.modal.includes('۰.۳۳'));ctx.ACT.resetOk();
+ assert.equal(data.mahalino_v32,'{"tokens":999}');assert.equal(data.unrelated,'safe');assert.equal(data.mahalino_theme,'light');
+ assert.equal(data.mahalino_v33_recovery,undefined);assert.equal(data.mahalino_v33,'{}');assert.equal(ctx.reloaded,true);
  const u=fs.readFileSync(path.join(root,'src/legacy/utilities.js'),'utf8').replace('/* @mahalino:v32-state-codec-js */',()=>fs.readFileSync(path.join(root,'src/v32-state-codec.js'),'utf8'));ctx.window={};vm.runInNewContext(u.slice(u.indexOf('/* 2) state */')),ctx);assert.equal(ctx.S.tokens,0);
 });
 test('reset storage denial preserves original and does not reload',()=>{
- const {ctx,data}=resetHarness(reset,'write');ctx.ACT.resetOk();assert.equal(data.mahalino_v32,'{"tokens":10}');assert.equal(ctx.reloaded,undefined);assert.ok(ctx.message.includes('انجام نشد'));
+ const {ctx,data}=resetHarness(reset,'write');ctx.ACT.resetOk();assert.equal(data.mahalino_v33,'{"tokens":10}');assert.equal(ctx.reloaded,undefined);assert.ok(ctx.message.includes('انجام نشد'));
 });
 test('reset cleanup failure reports partial completion and blocks stale saves',()=>{
  const {ctx,data}=resetHarness(reset,'remove');ctx.ACT.resetOk();assert.ok(ctx.message.includes('ناقص'));assert.equal(ctx.reloaded,undefined);assert.equal(ctx.window.__mahalinoResetPending,true);
- const u=fs.readFileSync(path.join(root,'src/legacy/utilities.js'),'utf8').replace('/* @mahalino:v32-state-codec-js */',()=>fs.readFileSync(path.join(root,'src/v32-state-codec.js'),'utf8'));vm.runInNewContext(u.slice(u.indexOf('/* 2) state */')),ctx);ctx.S.tokens=300;ctx.save();assert.equal(data.mahalino_v32,'{}');
+ const u=fs.readFileSync(path.join(root,'src/legacy/utilities.js'),'utf8').replace('/* @mahalino:v32-state-codec-js */',()=>fs.readFileSync(path.join(root,'src/v32-state-codec.js'),'utf8'));vm.runInNewContext(u.slice(u.indexOf('/* 2) state */')),ctx);ctx.S.tokens=300;ctx.save();assert.equal(data.mahalino_v33,'{}');
 });
 for(const kind of ['success','reject-fallback','denied','missing','throw'])test('clipboard '+kind,async()=>{
  const messages=[];let selected=0;let resolveWrite;

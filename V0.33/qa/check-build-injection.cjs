@@ -4,9 +4,9 @@ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),asse
 const root=path.join(__dirname,'..'),tmp=fs.mkdtempSync(path.join(os.tmpdir(),'mahalino-build-literal-'));
 try{
  for(const name of ['templates','src','build'])fs.cpSync(path.join(root,name),path.join(tmp,name),{recursive:true});
- for(const name of ['build_v032.js','build-manifest.json'])fs.copyFileSync(path.join(root,name),path.join(tmp,name));
- const build=()=>{execFileSync(process.execPath,[path.join(tmp,'build_v032.js')]);return fs.readFileSync(path.join(tmp,'Mahalino+V0.32.html'),'utf8')};
- const clean=build();assert.equal(clean,fs.readFileSync(path.join(root,'Mahalino+V0.32.html'),'utf8'),'clean build changed the runtime artifact');
+ for(const name of ['build_v033.js','build-manifest.json'])fs.copyFileSync(path.join(root,name),path.join(tmp,name));
+ const build=()=>{execFileSync(process.execPath,[path.join(tmp,'build_v033.js')]);return fs.readFileSync(path.join(tmp,'Mahalino+V0.33.html'),'utf8')};
+ const clean=build();assert.equal(clean,fs.readFileSync(path.join(root,'Mahalino+V0.33.html'),'utf8'),'clean build changed the runtime artifact');
  const sentinel="/* BUILD_LITERAL_SENTINEL: $' $& $` $$ */";
  fs.appendFileSync(path.join(tmp,'src','v32-guidance.js'),'\n'+sentinel+'\n');
  const html=build();assert.equal(html.split(sentinel).length,2,'replacement tokens corrupted injected JavaScript');

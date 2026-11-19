@@ -1,6 +1,6 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
-const root=path.resolve(__dirname,'..'),html=fs.readFileSync(path.join(root,'Mahalino+V0.32.html'),'utf8');
+const root=path.resolve(__dirname,'..'),html=fs.readFileSync(path.join(root,'Mahalino+V0.33.html'),'utf8');
 const utilities=html.slice(html.indexOf('function fa(n,d)'),html.indexOf('function hoodFromText('));
 function runtime(flow){
   let seq=0;const shown=[],messages=[];

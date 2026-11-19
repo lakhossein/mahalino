@@ -46,7 +46,7 @@ def entry_file(folder: Path) -> Path:
 def exclude(directory: str, names: list[str]) -> set[str]:
     ignored = set()
     version_root = Path(directory).name
-    retained_builder = {"V0.30": "build_v030.js", "V0.31": "build_v031.js", "V0.32": "build_v032.js"}.get(version_root)
+    retained_builder = {"V0.30": "build_v030.js", "V0.31": "build_v031.js", "V0.32": "build_v032.js", "V0.33": "build_v033.js"}.get(version_root)
     for name in names:
         path = Path(directory) / name
         lower = name.lower()
@@ -98,7 +98,7 @@ def populate(output: Path) -> list[int]:
         target = output / slug
         shutil.copytree(folder, target, ignore=exclude)
         shutil.copy2(entry_file(folder), target / "index.html")
-        manifest = {"kind": "rebuildable-source" if number in (30, 31, 32) else "runtime-archive",
+        manifest = {"kind": "rebuildable-source" if number in (30, 31, 32, 33) else "runtime-archive",
                     "files": {p.relative_to(target).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
                               for p in sorted(target.rglob("*")) if p.is_file()}}
         (target / "package-manifest.json").write_text(json.dumps(manifest, sort_keys=True), encoding="utf-8")
@@ -127,7 +127,7 @@ def verify(numbers: list[int], output: Path | None = None) -> None:
             assert set(bundle.namelist()) == set(manifest["files"]) | {"package-manifest.json"}
             for name, digest in manifest["files"].items():
                 assert hashlib.sha256(bundle.read(name)).hexdigest() == digest
-            if number in (30, 31, 32):
+            if number in (30, 31, 32, 33):
                 assert f"build_v0{number}.js" in manifest["files"] and "README.md" in manifest["files"]
         class ResourceParser(HTMLParser):
             def handle_starttag(self, tag, attrs):

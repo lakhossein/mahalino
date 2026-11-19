@@ -8,7 +8,7 @@
    session is auto-refunded (§11.6). Duplicate clicks are impossible: only state 'presented'
    accepts go(); the button disables itself on first click.
    ═══════════════ */
-window.E30={VER:'0.32'};
+window.E30={VER:'0.33'};
 E30.uid=function(p){return (p||'E30')+'-'+Date.now().toString(36)+'-'+Math.floor(Math.random()*1e5).toString(36)};
 E30.chatRef=function(){
   var legacy=(window.E29&&E29.chatRef)?E29.chatRef():{chatId:null,chatTitle:'گفت‌وگوی جاری'};

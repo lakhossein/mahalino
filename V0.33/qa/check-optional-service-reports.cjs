@@ -30,7 +30,7 @@ assert(summary.q({ltype:'stay',stayRules:[]}).includes('ندارد'));
 console.log('PASS optional service reports: no repeated skipped details, no invented asset yield, unknown vs explicit empty rules');
 
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const html=fs.readFileSync(path.join(__dirname,'../Mahalino+V0.32.html'),'utf8');
+const html=fs.readFileSync(path.join(__dirname,'../Mahalino+V0.33.html'),'utf8');
 vm.runInContext(html.match(/var SLIST=\[[\s\S]*?\];/)[0],c);
 for(const city of ['تهران','شیراز','رامسر']){
  const expected=c.SLIST.filter(x=>x.city===city).map(x=>x.id);

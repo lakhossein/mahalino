@@ -2,7 +2,7 @@
 const { chromium } = require('playwright');
 const fs=require('node:fs');
 const path=require('node:path');
-const URL=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.32.html';
+const URL=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.33.html';
 let pass=0,fail=0;const fails=[];
 function ok(name,cond,extra){if(cond){pass++;console.log('  ✓ '+name)}else{fail++;fails.push(name);console.log('  ✗ '+name+(extra?' — '+JSON.stringify(extra).slice(0,200):''))}}
 async function send(page,t){await page.fill('#chatIn',t);await page.click('#chatSend');await page.waitForTimeout(700)}

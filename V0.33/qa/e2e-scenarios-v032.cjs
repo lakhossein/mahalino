@@ -5,7 +5,7 @@
 const {chromium}=require('playwright');
 const fs=require('node:fs');
 const path=require('node:path');
-const url=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.32.html';
+const url=process.env.QA_BASE_URL||'http://127.0.0.1:8731/Mahalino%2BV0.33.html';
 const out=process.env.QA_RESULTS_DIR||path.join(__dirname,'results');
 const cases=[];
 function ok(id,name,passed,info){

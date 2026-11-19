@@ -1,7 +1,7 @@
 {
-  "version": "0.32",
+  "version": "0.33",
   "entry": "templates/app.html",
-  "output": "Mahalino+V0.32.html",
+  "output": "Mahalino+V0.33.html",
   "slots": {
     "v32-age-range-js": "src/v32-age-range.js",
     "v32-core-js": "src/v32-core.js",
