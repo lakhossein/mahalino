@@ -109,6 +109,7 @@ E30.uiTidyInit=function(){
     if(f!=='rent'&&f!=='buy')return;
     if(!E30.discAPI||typeof E30.discAPI.start!=='function')return;
     ev.preventDefault();ev.stopImmediatePropagation();
+    if(CURRENT!=='landing')go('landing');
     usrC((trigger.textContent||'').replace(/\s+/g,' ').trim()||'شروع '+(f==='rent'?'اجاره':'خرید'));
     E30.discAPI.start(f,false);
   },true);
