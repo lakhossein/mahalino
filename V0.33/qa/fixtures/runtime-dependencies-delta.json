@@ -1,0 +1,104 @@
+{
+  "modules": [
+    {
+      "slot": "v32-guidance-js",
+      "imports": {"add": [
+        {"name":"addReq","owners":["legacy-wallet-charts"]},
+        {"name":"ceJump","owners":["legacy-conversation"]},
+        {"name":"closeModal","owners":["legacy-utilities"]},
+        {"name":"conCapture","owners":["legacy-actions"]},
+        {"name":"findH","owners":["legacy-sample-data"]},
+        {"name":"go","owners":["legacy-navigation"]},
+        {"name":"hoodFromText","owners":["legacy-utilities"]},
+        {"name":"parseCountFA","owners":["legacy-utilities"]},
+        {"name":"parseSearchMoneyFA","owners":["v32-money-js"]},
+        {"name":"pd","owners":["legacy-utilities"]},
+        {"name":"wf","owners":["legacy-workflows"]},
+        {"name":"wfModOfCat","owners":["legacy-workflows"]},
+        {"name":"wfName","owners":["legacy-workflows"]},
+        {"name":"wfOf","owners":["legacy-workflows"]}
+      ]},
+      "writes": {"add": [
+        "ACT.flowNewOk", "ACT.newRequest", "ACT.resume", "ACT.svcs", "ACT.wfOpen",
+        "CBACT.e33ApplyCriterion", "CBACT.e33BuildProject", "CBACT.e33EditCriteria",
+        "CBACT.e33SaveDraft", "CBACT.e33Service", "HIST.*.h", "S.liveHistory", "go"
+      ]}
+    },
+    {
+      "slot": "v32-guided-ui-js",
+      "imports": {"add": [
+        {"name":"CURRENT","owners":["legacy-navigation"]},
+        {"name":"go","owners":["legacy-navigation"]}
+      ]}
+    },
+    {
+      "slot": "v32-intel-js",
+      "imports": {"add": [{"name":"parseSearchMoneyFA","owners":["v32-money-js"]}]}
+    },
+    {
+      "slot": "v32-money-js",
+      "exports": {"add": ["parseSearchMoneyFA"]}
+    },
+    {
+      "slot": "v32-ux-js",
+      "writes": {"add": ["ACT.e29shManage"]}
+    },
+    {
+      "slot": "legacy-workflow-engine",
+      "exports": {"add": ["openTourChat", "rotateTourCard", "storeTourCard", "tourCardHTML", "tourIllustration", "tourListing", "tourSource", "tourSpaces"]},
+      "imports": {"add": [
+        {"name":"BLIST","owners":["legacy-sample-data"]},
+        {"name":"CURRENT","owners":["legacy-navigation"]},
+        {"name":"E30","owners":["v32-core-js"]},
+        {"name":"HIST","owners":["legacy-conversation"]},
+        {"name":"RLIST","owners":["legacy-sample-data"]},
+        {"name":"SEEDIMG","owners":["legacy-utilities"]},
+        {"name":"botC","owners":["legacy-conversation"]},
+        {"name":"qesc","owners":["legacy-utilities"]}
+      ]},
+      "writes": {"add": ["S.liveHistory"]}
+    },
+    {
+      "slot": "legacy-conversation",
+      "imports": {"add": [{"name":"parseSearchMoneyFA","owners":["v32-money-js"]}]}
+    },
+    {
+      "slot": "legacy-contracts",
+      "imports": {"add": [
+        {"name":"wfOf","owners":["legacy-workflows"]},
+        {"name":"wfTouch","owners":["legacy-workflows"]}
+      ]}
+    },
+    {
+      "slot": "legacy-actions",
+      "imports": {"add": [
+        {"name":"TOURROOMS","owners":["legacy-sample-data"]},
+        {"name":"storeTourCard","owners":["legacy-workflow-engine"]},
+        {"name":"tourListing","owners":["legacy-workflow-engine"]},
+        {"name":"tourSpaces","owners":["legacy-workflow-engine"]}
+      ]},
+      "writes": {"add": ["ACT.e33TourRoom"]}
+    },
+    {
+      "slot": "legacy-rich-conversation",
+      "imports": {"add": [{"name":"parseSearchMoneyFA","owners":["v32-money-js"]}]}
+    },
+    {
+      "slot": "legacy-market-ux",
+      "imports": {"add": [{"name":"parseSearchMoneyFA","owners":["v32-money-js"]}]}
+    },
+    {
+      "slot": "legacy-library",
+      "imports": {"add": [
+        {"name":"printContract","owners":["legacy-contracts"]},
+        {"name":"wfNew","owners":["legacy-workflows"]}
+      ], "remove": [
+        {"name":"CURRENT","owners":["legacy-navigation"]},
+        {"name":"botC","owners":["legacy-conversation"]},
+        {"name":"go","owners":["legacy-navigation"]},
+        {"name":"renderCurrent","owners":["legacy-navigation"]}
+      ]},
+      "writes": {"add": ["ACT.e29libPrint"]}
+    }
+  ]
+}

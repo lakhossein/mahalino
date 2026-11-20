@@ -19,6 +19,18 @@ The script checks JS syntax, reproducible build output, starts an HTTP server,
 executes every browser suite, and returns nonzero if **any** suite fails. Logs,
 screenshots, and structured JSON are saved to `V0.33/qa/results/`.
 
+## Runtime contract review
+
+V0.32 retains `docs/validation/runtime-dependencies.json` as its reviewed
+snapshot. V0.33 reconstructs its own reviewed inventory from that unchanged
+snapshot plus `V0.33/qa/fixtures/runtime-dependencies-delta.json`, then compares
+the complete inventory (including module slots/files, imports with owners,
+exports, writes, includes and load order) for exact equality.
+
+Run `node V0.33/qa/runtime-contracts.cjs --review-delta` to inspect any drift
+relative to the reviewed V0.33 inventory. Empty `modules` means no dependency
+drift. The command only reports; updating the fixture requires manual review.
+
 ## Suites and intended scope
 
 | Suite | Coverage |

@@ -26,8 +26,28 @@ function inventory(root){
  expand(manifest.entry);
  return {contract:'Explicit compatibility globals; imports resolve to declared owner slots. No claim of ES-module isolation.',loadOrder,modules:[...parsed.values()].map(x=>x.entry)};
 }
-// Compact, deterministic evidence for an audited per-release delta; this never
-// accepts or writes a new baseline on behalf of the test.
+// V0.33 reviews only its own changes against the unchanged V0.32 snapshot.
+// Reconstruct the complete reviewed contract, then compare all fields exactly.
+function applyReviewedDelta(baseline,delta){
+ const assert=require('node:assert/strict'),expected=structuredClone(baseline);
+ const seen=new Set();
+ for(const patch of delta.modules){
+  const module=expected.modules.find(x=>x.slot===patch.slot);
+  assert(module&&!seen.has(patch.slot),'unknown or duplicate delta slot: '+patch.slot);seen.add(patch.slot);
+  for(const [key,change] of Object.entries(patch)){
+   if(key==='slot')continue;
+   if(key==='includes'){module[key]=change;continue}
+   assert(['exports','imports','writes'].includes(key),'unknown delta field: '+key);
+   const names=x=>key==='imports'?x.name:x,items=new Map(module[key].map(x=>[names(x),x]));
+   for(const x of change.remove||[]){assert.deepEqual(items.get(names(x)),x,'unmatched removal: '+names(x));items.delete(names(x))}
+   for(const x of change.add||[]){assert(!items.has(names(x)),'duplicate addition: '+names(x));items.set(names(x),x)}
+   module[key]=[...items.keys()].sort().map(x=>items.get(x));
+  }
+ }
+ if(Object.hasOwn(delta,'loadOrder'))expected.loadOrder=delta.loadOrder;
+ return expected;
+}
+// Deterministic evidence for review; this never accepts or writes a baseline.
 function reviewedDelta(actual,baseline){
  const assert=require('node:assert/strict');
  assert.equal(actual.contract,baseline.contract);
@@ -35,21 +55,29 @@ function reviewedDelta(actual,baseline){
  const modules=[];
  for(let i=0;i<actual.modules.length;i++){
   const a=actual.modules[i],b=baseline.modules[i],patch={slot:a.slot};
-  for(const key of ['exports','imports','writes','includes']){
-   if(JSON.stringify(a[key])!==JSON.stringify(b[key]))patch[key]=a[key];
+  for(const key of ['exports','imports','writes']){
+   const add=a[key].filter(x=>!b[key].some(y=>JSON.stringify(x)===JSON.stringify(y)));
+   const remove=b[key].filter(x=>!a[key].some(y=>JSON.stringify(x)===JSON.stringify(y)));
+   if(add.length||remove.length)patch[key]={...(add.length?{add}:{}),...(remove.length?{remove}:{})};
   }
+  if(JSON.stringify(a.includes)!==JSON.stringify(b.includes))patch.includes=a.includes;
   if(Object.keys(patch).length>1)modules.push(patch);
  }
  const delta={modules};
  if(JSON.stringify(actual.loadOrder)!==JSON.stringify(baseline.loadOrder))delta.loadOrder=actual.loadOrder;
+ assert.deepEqual(applyReviewedDelta(baseline,delta),actual,'unrepresentable runtime contract difference');
  return delta;
 }
-module.exports={inventory,reviewedDelta};
+function reviewedInventory(root){
+ const baseline=JSON.parse(fs.readFileSync(path.join(root,'../docs/validation/runtime-dependencies.json')));
+ const delta=JSON.parse(fs.readFileSync(path.join(root,'qa/fixtures/runtime-dependencies-delta.json')));
+ return applyReviewedDelta(baseline,delta);
+}
+module.exports={inventory,reviewedDelta,reviewedInventory,applyReviewedDelta};
 if(require.main===module){
  const root=path.resolve(__dirname,'..'),actual=inventory(root);
  if(process.argv.includes('--review-delta')){
-  const baseline=JSON.parse(fs.readFileSync(path.join(root,'../docs/validation/runtime-dependencies.json')));
-  console.log('V033_CONTRACT_DELTA '+JSON.stringify(reviewedDelta(actual,baseline)));
+  console.log('V033_CONTRACT_DELTA '+JSON.stringify(reviewedDelta(actual,reviewedInventory(root))));
   const sites=JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures/diagnostic-sites.json')));
   console.log('V033_MISSING_DIAGNOSTICS '+JSON.stringify(sites.filter(site=>!fs.readFileSync(path.join(root,'src',site.file),'utf8').includes(site.statement)).map(site=>site.code)));
  }else console.log(JSON.stringify(actual,null,2));
