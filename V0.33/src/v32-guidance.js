@@ -19,9 +19,13 @@ E30.guide=(function(){
     {id:'valuation',group:'services',title:'تخمین نمونهٔ ارزش ملک',prompt:'می‌خوام ارزش ملک رو با داده‌های نمونه تخمین بزنم.',aliases:['تخمین ارزش ملک','ارزش‌گذاری ملک'],action:'valuation',slots:['hood','prop_area','prop_age'],result:'فرم داخلی و تأیید هزینه پیش از اجرا',next:['sell','neighborhood','contracts'],test:'guide-valuation'},
     {id:'contracts',group:'contract',title:'مدیریت قرارداد',prompt:'قراردادهای ذخیره‌شده رو داخل چت نشون بده.',aliases:['قراردادهای من رو نشون بده'],action:'contracts',slots:['contract_id'],result:'فهرست قراردادهای واقعاً ذخیره‌شده',next:['contract-start','termination','library'],test:'guide-contracts'},
     {id:'contract-start',group:'contract',title:'شروع قرارداد اجاره',prompt:'می‌خوام مسیر تنظیم قرارداد اجاره رو داخل چت شروع کنم.',aliases:['میخوام قرارداد اجاره تنظیم کنم'],action:'contract-start',slots:['budget_dep','budget_rent','contract_details'],result:'ورود مستقیم به فرم قرارداد؛ بدون ثبت خودکار',next:['contracts','rent-budget','rent'],test:'guide-contract-start'},
+    {id:'contract-buy',group:'contract',title:'شروع قرارداد خرید',prompt:'می‌خوام قرارداد خرید ملک تنظیم کنم.',aliases:['ثبت مبایعه نامه'],action:'contract-buy',slots:['contract_details'],result:'تنظیم مستقیم قرارداد خرید',next:['contracts','buy'],test:'guide-contract-buy'},
     {id:'termination',group:'contract',title:'پیگیری فسخ',prompt:'می‌خوام وضعیت فسخ قرارداد و چک‌لیست تسویه رو ببینم.',aliases:['چک‌لیست فسخ قرارداد را بده'],action:'termination',slots:['contract_id'],result:'چک‌لیست رایگان، بدون امضا یا فسخ خودکار',next:['contracts','library'],test:'guide-termination'},
     {id:'services',group:'services',title:'پیش‌درخواست خدمات ملک',prompt:'می‌خوام برای خدمات و تعمیرات ملک درخواست ثبت کنم.',aliases:['درخواست تعمیرات ملک دارم'],action:'services',slots:['service_type','details'],result:'پیش‌درخواست درون‌چتی، نه سفارش نهایی',next:['contracts','library'],test:'guide-services'},
     {id:'guaranteed',group:'services',title:'پیش‌درخواست اجارهٔ تضمینی',prompt:'می‌خوام پیش‌درخواست اجارهٔ تضمینی رو ثبت کنم.',aliases:['اجاره تضمینی چطور است'],action:'guaranteed',slots:['address','prop_area'],result:'فرم پیش‌درخواست بدون ادعای تضمین',next:['contracts','library'],test:'guide-guaranteed'},
+    {id:'visit',group:'services',title:'هماهنگی بازدید ملک',prompt:'می‌خوام درخواست بازدید ملک ثبت کنم.',aliases:['ثبت درخواست بازدید'],action:'draft:visit',slots:['details'],result:'پیش‌درخواست محلی',next:['rent'],test:'guide-visit-draft'},
+    {id:'legal',group:'services',title:'بررسی حقوقی و مدارک',prompt:'می‌خوام بررسی حقوقی ملک درخواست کنم.',aliases:['درخواست بررسی حقوقی'],action:'draft:legal',slots:['details'],result:'پیش‌درخواست محلی',next:['buy'],test:'guide-legal-draft'},
+    {id:'escrow',group:'services',title:'پرداخت و تسویهٔ امانی',prompt:'می‌خوام درباره پرداخت امانی درخواست ثبت کنم.',aliases:['درخواست پرداخت امانی'],action:'draft:escrow',slots:['details'],result:'پیش‌درخواست بدون انتقال وجه',next:['contracts'],test:'guide-escrow-draft'},
     {id:'saved',group:'library',title:'ملک‌های ذخیره‌شده',prompt:'ملک‌های ذخیره‌شده‌ام رو همین‌جا نشون بده.',aliases:['آگهی‌های ذخیره‌شده را ببینم'],action:'saved',slots:[],result:'خلاصهٔ واقعی ذخیره‌های مرورگر در چت',next:['library','rent','buy'],test:'guide-saved'},
     {id:'library',group:'library',title:'گزارش‌های کتابخانه',prompt:'گزارش‌ها و فایل‌های ذخیره‌شده‌ام رو در چت مرور کن.',aliases:['گزارش‌های کتابخانه را نشان بده'],action:'library',slots:[],result:'خلاصهٔ واقعی آثار ذخیره‌شده در چت',next:['contracts','saved','valuation'],test:'guide-library'},
     {id:'projects',group:'productivity',title:'پروژه‌های فعلی',prompt:'پروژه‌های فعلی من رو داخل چت خلاصه کن.',aliases:['پروژه‌های من رو نشون بده'],action:'projects',slots:[],result:'فهرست پروژه‌های موجود بدون ساخت یا حذف',next:['library','saved','rent'],test:'guide-projects'},
@@ -143,7 +147,7 @@ E30.guide=(function(){
     if(r.action==='contracts')return typeof CBACT.e30ContractList==='function';
     if(r.action==='services')return typeof CBACT.e30RequestService==='function';
     if(r.action==='guaranteed')return typeof CBACT.e30RequestGRT==='function';
-    if(r.action==='contract-start')return typeof E28!=='undefined'&&typeof E28.ctrStart==='function';
+    if(r.action==='contract-start'||r.action==='contract-buy')return typeof E28!=='undefined'&&typeof E28.ctrStart==='function';
     if(r.action==='map')return typeof E30.chatMap==='function';
     if(r.action==='native'&&r.id==='reminder')return typeof E28!=='undefined';
     return true;
@@ -200,6 +204,10 @@ E30.guide=(function(){
         esc(r.prompt)+' <span aria-hidden="true">↵</span></button>'}).join('')+
       '<p class="e31-guide-note">متن را انتخاب کنید، سپس در کادر گفت‌وگو ارسال یا ویرایش کنید. این پیش‌نمایش بدون AI است.</p></section>';
   }
+  function serviceDirectory(){
+    var ids=['rent','buy','sell','landlord','invest','neighborhood','valuation','contract-start','contract-buy','contracts','termination','visit','legal','escrow','services','guaranteed','stay','development','build','map','reminder'];
+    return '<section class="e31-guide e33-service-directory" aria-label="خدمات مستقل"><div class="e31-guide-title">خدمات مستقل محلینو</div><p class="note">هر خدمت را می‌توانید جداگانه شروع کنید؛ نیازی به جست‌وجو یا بازدید قبلی نیست.</p><div class="qr">'+ids.filter(function(id){return can(BY_ID[id],true)}).map(function(id){return '<button type="button" data-cba="e33Service" data-service="'+id+'">'+esc(BY_ID[id].title)+'</button>'}).join('')+'</div></section>';
+  }
   function setNode(n){
     var s=state();s.node=n;s.seq=(s.seq||0)+1;
     try{save()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-guidance.js:205',e,'caught');}
@@ -237,6 +245,11 @@ E30.guide=(function(){
       return '<div class="ccard"><div class="cb"><b>'+esc(p.t)+'</b><p>'+esc(p.loc)+' · '+esc(p.area)+' · '+esc(p.dur)+'</p><p>'+esc(p.scope)+'</p></div><div class="btns">'+
         '<button data-cba="e31ProjectBid" data-i="'+i+'">ثبت پیشنهاد به‌عنوان پیمانکار</button><button data-cba="e31ProjectEmployer" data-i="'+i+'">بررسی پیمانکارها به‌عنوان کارفرما</button><button data-cba="detPr" data-i="'+i+'">جزئیات همین پروژه</button></div></div>';
     }).join('')+'</div>',null);
+  }
+  function buildEntry(){
+    var eligible=(S.wfs||[]).filter(function(w){var d=w.data||{},i=d.chosen?d.chosen.prj:d.bid&&d.bid.prj;return w.m==='mkt'&&!w.cancelled&&(d.chosen||d.confirmed)&&typeof PRJ!=='undefined'&&Number.isInteger(i)&&PRJ[i]});
+    botC('<b>شروع ساخت و تأمین</b><p class="note">ابتدا پروژه و پیمانکار تأییدشده را مشخص کنید. هیچ سفارش یا تأیید فرضی ثبت نمی‌شود.</p><div class="qr">'+eligible.map(function(w){return '<button data-cba="e33BuildProject" data-wf="'+qesc(w.id)+'">ادامهٔ '+esc(wfName(w))+'</button>'}).join('')+'<button data-cba="e33Service" data-service="development">انتخاب پروژه و بررسی پیمانکار</button></div>',null);
+    if(!eligible.length)developmentCatalog();
   }
   function criteriaAction(flow,source){
     return '<p>آگهی منطبق پیدا نشد. هیچ محدودیتی خودکار تغییر نکرده است.</p><button type="button" class="primary" data-cba="e33EditCriteria" data-flow="'+flow+'" data-source="'+source+'">ویرایش معیارهای جست‌وجو</button>';
@@ -371,16 +384,20 @@ E30.guide=(function(){
     if(CE.f)ceStep();else botC('به کار قبلی برگشتید؛ اطلاعات گفت‌وگو حفظ شده است.',null);
     return true;
   }
-  function contractStart(){
-    suspend();
-    var parent=state().suspended;
-    if(parent&&parent.flow==='rent'){
-      if(!parent.activeId)parent.activeId=wfNew('rent').id;
-      wfNew('rent');save();
-    }
-    var work=wd('rent');
-    if(work.data.ctr&&work.data.ctr.finalized)wfNew('rent');
-    E28.ctrStart('rent');
+  function contractStart(kind){
+    kind=kind||'rent';archiveContract();suspend();
+    var work=wfNew(kind);work.data.standaloneContract=true;save();E28.ctrStart(kind);
+  }
+  function archiveContract(){
+    if(typeof E28==='undefined'||!E28.ctrKind)return;
+    var kind=E28.ctrKind,w=kind&&wf(kind);
+    if(!w||!w.data.ctr)return;
+    var i=HIST.length-1;
+    while(i>=0&&!(HIST[i].r==='bot'&&/data-e28ctr/.test(HIST[i].h||'')))i--;
+    if(i<0)return;
+    if(!w.data.ctr.finalized)conCapture(w.data,kind);
+    HIST[i].h='<b>'+esc(kind==='buy'?'مبایعه‌نامه':'اجاره‌نامه')+'</b><p class="note">'+(w.data.ctr.finalized?'ثبت داخلی انجام شده است.':'پیش‌نویس ذخیره شده است.')+'</p><div class="qr"><button data-act="resume" data-m="'+kind+'" data-wf="'+qesc(w.id)+'">مشاهده و ادامهٔ همین قرارداد</button></div>';
+    S.liveHistory=HIST.slice();save();E28.ctrKind=null;
   }
   function terminationChoices(){
     var cs=(S.contracts||[]).filter(function(c){return c&&c.code});
@@ -434,21 +451,25 @@ E30.guide=(function(){
     if(a==='map'){E30.chatMap({hood:E30.discAPI.getF('hood')||undefined});return true}
     if(a==='valuation'){CBACT.e30ValOpen();return true}
     if(a==='contracts'){CBACT.e30ContractList();return true}
-    if(a==='contract-start'){
-      contractStart();return true;
+    if(a==='contract-start'||a==='contract-buy'){
+      contractStart(a==='contract-buy'?'buy':'rent');return true;
     }
     if(a==='termination'){
       terminationChoices();return true;
     }
     if(a==='services'){CBACT.e30RequestService();return true}
     if(a==='guaranteed'){CBACT.e30RequestGRT();return true}
+    if(a.indexOf('draft:')===0){
+      suspend();var key=a.split(':')[1],id='e33-draft-'+key;
+      botC('<b>'+esc(r.title)+'</b><p class="note">این درخواست در محلینو به صورت پیش‌درخواست ذخیره می‌شود؛ هیچ پرداخت، بازدید یا بررسی بیرونی انجام نمی‌گیرد.</p><div class="sect"><label>مشخصات ملک یا قرارداد<textarea class="inp" id="'+id+'" rows="3" placeholder="نشانی یا شناسه، زمان و توضیحات درخواست"></textarea></label><button data-cba="e33SaveDraft" data-service="'+r.id+'">ذخیره پیش‌درخواست</button></div>',null);return true;
+    }
     if(a==='saved'){showList(S.savedListings,'ملک‌های ذخیره‌شده','هنوز ملکی ذخیره نشده است.',function(x){return '<div class="kv"><span>'+esc(x.title||x.listingId||'ملک')+'</span><b>'+esc(x.kind||'ذخیره')+'</b></div>'});return true}
     if(a==='library'){showList(S.library,'آثار ذخیره‌شده','هنوز گزارشی در کتابخانه ذخیره نشده است.',function(x){return '<div class="kv"><span>'+esc(x.title||'گزارش')+'</span><b>'+esc(x.type||'سند')+'</b></div>'});return true}
     if(a==='projects'){showList(S.projects,'پروژه‌های فعلی','هنوز پروژه‌ای در این مرورگر ثبت نشده است.',function(x){return '<div class="kv"><span>'+esc(x.name||x.title||'پروژه')+'</span><b>ذخیره‌شده</b></div>'});return true}
     if(a.indexOf('flow:')===0){
       var f=a.split(':')[1];
       if(f==='mkt'){developmentCatalog();return true}
-      if(f==='build'&&!activeBuildProject()){botC('برای ساخت و تأمین، ابتدا پروژه و پیمانکار تأییدشده را در مسیر پروژه‌ها مشخص کنید. پروژهٔ پیش‌فرضی ساخته یا انتخاب نشده است.',null);return true}
+      if(f==='build'&&!activeBuildProject()){buildEntry();return true}
       if(SCRIPTS[f]){botC('این مسیر نمایشی با دادهٔ نمونه در همین گفت‌وگو اجرا می‌شود. وضعیت و اطلاعات نهایی فقط در مراحل صریح ثبت خواهد شد.',null);ceStart(f);return true}
     }
     return false;
@@ -463,12 +484,51 @@ E30.guide=(function(){
       return true;
     }
     if(!r||!can(r,true))return false;
-    setNode(r.id);
-    return exec(r,String(t));
+    return beginService(r,String(t));
+  }
+  function beginService(r,text){
+    var a=r.action,starts=/^(discover:|flow:|draft:|contract-start$|contract-buy$|valuation$|termination$|services$|guaranteed$)/.test(a);
+    if(starts){
+      var payment=E30.pay&&E30.pay.session();
+      if(payment&&/^(processing|paid|executing)$/.test(payment.state)){botC('عملیات فعلی در حال انجام است؛ پس از پایان خدمت دیگری آغاز کنید.',null);return true}
+      if(payment&&/^(presented|awaiting_confirm|selected|priced|insufficient)$/.test(payment.state))E30.pay.cancel(payment.payId,true);
+      archiveContract();
+      if(a.indexOf('discover:')===0){var flow=a.split(':')[1],mode={invest:'invp',landlord:'lndl'}[flow]||flow;suspend();wfNew(mode)}
+    }
+    setNode(r.id);return exec(r,text);
   }
   var installed=false;
   function install(){
     if(installed)return;installed=true;
+    function assistant(){if(CURRENT!=='landing')go('landing')}
+    function selectService(id){
+      var r=BY_ID[id];if(!r||!can(r,true))return false;
+      closeModal();assistant();return beginService(r,r.prompt);
+    }
+    CBACT.e33Service=function(el){return selectService(el.getAttribute('data-service'))};
+    CBACT.e33BuildProject=function(el){var w=wfOf(el.getAttribute('data-wf'));if(!w||w.m!=='mkt'||w.cancelled){toast('پروژه در دسترس نیست');return false}wfSet('mkt',w.id);if(!activeBuildProject()){buildEntry();return false}return selectService('build')};
+    CBACT.e33SaveDraft=function(el){
+      var r=BY_ID[el.getAttribute('data-service')],box=el.closest('.sect'),input=box&&box.querySelector('textarea');
+      if(!r||r.action.indexOf('draft:')!==0||!input||!input.value.trim()){toast('مشخصات درخواست را وارد کنید');return false}
+      var rid=addReq('svc','پیش‌درخواست',r.title,'در انتظار بررسی',input.value.trim().slice(0,500));
+      botC('پیش‌درخواست با شناسهٔ '+esc(rid)+' ذخیره شد؛ اقدامی بیرونی انجام نشده است.',null);return true;
+    };
+    ACT.newRequest=function(){closeModal();assistant();archiveContract();botC(serviceDirectory(),null)};
+    ACT.svcs=function(){return selectService('services')};
+    var routeFor={rent:'rent',buy:'buy',sell:'sell',invp:'invest',lndl:'landlord',invr:'invest',invb:'invest',invest:'invest',mkt:'development',grt:'guaranteed',stay:'stay',build:'build',svc:'services'};
+    ACT.flowNewOk=function(el){return selectService(routeFor[el.getAttribute('data-m')])};
+    var previousGo=go;
+    go=function(v){if(S.auth&&Object.prototype.hasOwnProperty.call(routeFor,v))return selectService(routeFor[v]);return previousGo.apply(this,arguments)};
+    function resumeWork(el){
+      var m=wfModOfCat(el.getAttribute('data-m')),id=el.getAttribute('data-wf'),w=id?wfOf(id):wf(m);
+      if(!w||w.m!==m||w.cancelled){toast('این فلو در دسترس نیست');return false}
+      closeModal();assistant();archiveContract();suspend();wfSet(m,w.id);
+      if(w.data.standaloneContract){E28.ctrStart(m);return true}
+      if(w.done){botC('این خدمت کامل شده است.',null);return true}
+      if(!SCRIPTS[m])return selectService(routeFor[m]);
+      CE.f=m;CE.i=Math.max(0,Math.min(SCRIPTS[m].length-1,w.step-1));CE.li=0;CE.hist=[];ceStep();return true;
+    }
+    ACT.wfOpen=ACT.resume=resumeWork;
     CBACT.e33EditCriteria=function(el){
       var flow=el.getAttribute('data-flow'),source=el.getAttribute('data-source');
       if(['rent','buy'].indexOf(flow)<0||['legacy','sample'].indexOf(source)<0)return;
@@ -512,7 +572,9 @@ E30.guide=(function(){
       var w=(S.wfs||[]).filter(function(w){return w.id===el.getAttribute('data-wf')&&!w.cancelled&&w.m==='mkt'})[0];
       var rawP=el.getAttribute('data-p'),rawB=el.getAttribute('data-b'),p=Number(rawP),b=Number(rawB);
       if(rawP==null||rawB==null||!Number.isInteger(p)||!Number.isInteger(b)||CE.f!=='mkt'||!w||w.done||w.data.chosen||w.data.role!=='emp'||S.active.mkt!==w.id||w.data.prjI!==p||!PRJ[p]||typeof BIDS==='undefined'||!BIDS[b]){toast('این انتخاب دیگر به پروژهٔ فعال مربوط نیست؛ دوباره پروژه را انتخاب کنید.');return false}
-      return ACT.mChoose(el);
+      var result=ACT.mChoose(el);
+      if(activeBuildProject())botC('<div class="qr"><button data-cba="e33Service" data-service="build">شروع ساخت و تأمین برای این پروژه</button></div>',null);
+      return result;
     };
     CBACT.e31TermGuide=function(el){var code=el.getAttribute('data-code');if(code)return E29.termAI(code)};
     CBACT.e31TermStart=function(el){
@@ -522,20 +584,24 @@ E30.guide=(function(){
       CE.f='rent';CE.i=SCRIPTS.rent.findIndex(function(s){return s.id==='termq'});CE.li=0;CE.hist=[];
       usrC('شروع بررسی فسخ قرارداد '+code);ceStep();return true;
     };
-    CBACT.e30StartRent=function(){usrC('شروع قرارداد اجاره');contractStart();return true};
+    CBACT.e30StartRent=function(){return selectService('contract-start')};
     ['e30ValOpen','e30RequestService','e30RequestGRT'].forEach(function(key){
       var original=CBACT[key];if(typeof original!=='function')return;
       CBACT[key]=function(){suspend();return original.apply(this,arguments)};
     });
     var entryVal=ceVal,entryStart=ceStart,entryStep=ceStep;
-    function buildUnavailable(){botC('برای ادامهٔ ساخت و تأمین، ابتدا یک پروژه با پیمانکار تأییدشده انتخاب کنید. هیچ سفارش یا پیشرفت فرضی ثبت نشد.',null)}
+    function buildUnavailable(){buildEntry()}
     ceVal=function(v){
+      var step=/^F:step:(\w+)$/.exec(String(v));
+      if(step&&routeFor[step[1]])return resumeWork({getAttribute:function(k){return k==='data-m'?step[1]:null}});
       var m=/^F:(rent|buy|sell|invp|lndl)$/.exec(String(v));
-      if(m){suspend();usrC('شروع '+({rent:'اجاره',buy:'خرید',sell:'فروش',invp:'سرمایه‌گذاری',lndl:'اجاره‌دادن ملک'})[m[1]]);E30.discAPI.start(({invp:'invest',lndl:'landlord'})[m[1]]||m[1],false);return}
+      if(m)return selectService(routeFor[m[1]]);
       if(String(v)==='F:build'&&!activeBuildProject()||String(v)!=='F:build'&&CE.f==='build'&&!buildReady()){buildUnavailable();return}
       return entryVal.apply(this,arguments);
     };
     ceStart=function(flow){
+      if(S.auth)assistant();
+      if(!SCRIPTS[flow]&&routeFor[flow])return selectService(routeFor[flow]);
       if(flow==='build'&&!activeBuildProject()){buildUnavailable();return}
       if(['mkt','build','stay','grt'].indexOf(flow)>=0&&E30.discAPI.active())suspend();
       if(flow==='build'){
@@ -562,6 +628,7 @@ E30.guide=(function(){
     botC=function(h,chips){
       var html=String(h||''),skip=/(تعارضی در شرایط|e30-paycard|e31-guide|data-e28ctr|e30-val-hood)/.test(html);
       var startup=CE.f==='gate'&&state().node==='home'&&CE.i===0;
+      if(startup&&S.auth&&CURRENT==='landing')html+=serviceDirectory();
       if(!skip&&S.auth&&CURRENT==='landing'&&(startup||!(CE.f&&!E30.discAPI.active())||state().suspended||can(BY_ID['pause-service'],false))){
         html+=card();
       }
@@ -577,7 +644,7 @@ E30.guide=(function(){
         var box=document.getElementById('chatB');
         if(box&&!box.querySelector('.e31-guide')){
           box.innerHTML='<div class="msg bot"><span class="who">دستیار</span><div class="bub">برای مشاهدهٔ مسیرهای نمایشی محلینو یکی از این درخواست‌ها را وارد کنید.'+
-            card()+'</div></div>';
+            serviceDirectory()+card()+'</div></div>';
         }
       }
       return value;

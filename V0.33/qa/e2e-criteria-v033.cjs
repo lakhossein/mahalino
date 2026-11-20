@@ -5,7 +5,7 @@ const {pathToFileURL}=require('node:url');
 const path=require('node:path');
 const base=process.env.QA_BASE_URL||pathToFileURL(path.join(__dirname,'..','Mahalino+V0.33.html')).href;
 (async()=>{
-  const browser=await chromium.launch({headless:true});
+  const browser=await chromium.launch({headless:true,executablePath:process.env.QA_CHROMIUM_EXECUTABLE||undefined,args:process.env.QA_NO_SANDBOX==='1'?['--no-sandbox']:[]});
   try{
     for(const flow of ['rent','buy']){
       for(const mode of ['continue','sample']){

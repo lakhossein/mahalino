@@ -177,7 +177,7 @@ function conPartyHTML(D,kind){
 function conPropHTML(D,kind){
   var c=conInit(D,kind),isRent=kind!=='buy';
   var h='<div class="card"><div class="ct">ملک و شرایط مالی</div>';
-  h+='<div class="grid g2"><div><div class="kv"><span>ملک</span><b>'+esc(c.prop.title||'—')+'</b></div>'+
+  h+='<div class="grid g2"><div><div class="srow"><div class="slab"><span>عنوان ملک</span></div><input class="inp" id="cp-title" value="'+qesc(c.prop.title||'')+'" placeholder="مثلاً آپارتمان مسکونی"></div>'+
   '<div class="srow"><div class="slab"><span>کد پستی</span></div><div style="display:flex;gap:6px"><input class="inp" id="cp-postal" value="'+qesc(c.prop.postal||'')+'" inputmode="numeric" maxlength="10" style="direction:ltr;text-align:left;flex:1"><button class="btn btn-sm" data-act="lookupPostal">استعلام</button></div><div class="lk-status" id="lk-postal"></div></div>'+
   '<div class="srow"><div class="slab"><span>نشانی</span></div><input class="inp" id="cp-addr" value="'+qesc(c.prop.addr||'')+'" placeholder="با استعلام کد پستی یا دستی"></div>'+
   '<div class="srow"><div class="slab"><span>متراژ (متر)</span></div><input class="inp" id="cp-area" type="number" value="'+qesc(String(c.prop.area||''))+'"></div></div>';
@@ -285,6 +285,7 @@ function conFinalize(D,kind){
   var title=(kind==='buy'?'مبایعه‌نامه ':'اجاره‌نامهٔ ')+(c.prop.title||'ملک');
   var rid=addReq(kind,'قرارداد',title+' — '+c.code,'کامل شد','قرارداد داخلی امضاشده؛ ثبت رسمی انجام نشده');
   var wfId=S.active[kind]||null;
+  if(D.standaloneContract){var standalone=wfOf(wfId);if(standalone&&standalone.data===D){standalone.step=4;standalone.done=true;wfTouch(standalone)}}
   if(kind==='rent')closeReqs('rent','بازدید',wfId);
   S.contracts.push({code:c.code,draftCode:c.draftCode,kind:kind,title:title,t:Date.now(),req:rid,detail:true,status:'signed_internal',wfId:wfId,doc:snap});
 if(window.E29){try{

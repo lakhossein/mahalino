@@ -313,8 +313,14 @@ ACT.smap=function(el){
   openMapModal(s.ll,s.t,s.acc,s.ll);
 };
 ACT.vtour=function(el){openTourModal(el.getAttribute('data-id'))};
+ACT.e33TourRoom=function(el){
+  var card=el.closest('.e33-tour-card'),room=el.getAttribute('data-room'),x=card&&tourListing(card.getAttribute('data-listing'));
+  if(!x||!tourSpaces(x).some(function(r){return r.key===room}))return false;
+  var html=storeTourCard(card,room,0);if(html)card.outerHTML=html;return true;
+};
 ACT.troom=function(el){
   var i=+el.getAttribute('data-i');
+  if(!Number.isInteger(i)||i<0||i>=TOURROOMS.length)return;
   var pic=document.getElementById('tourpic');
   if(pic&&TOURX){pic.src='https://picsum.photos/seed/'+TOURX.seed+'-r'+i+'/1600/420'}
   TOURROT=0;drawTour();
@@ -610,6 +616,7 @@ function conCapture(D,kind){
   }
   if(document.getElementById('cp-postal')){
     var po=(v('cp-postal')||'').replace(/\D/g,''),ar=+v('cp-area');
+    if(v('cp-title')!==null)c.prop.title=v('cp-title');
     if(po)c.prop.postal=po;if(ar)c.prop.area=ar;if(v('cp-addr')!==null)c.prop.addr=v('cp-addr');
     if(kind==='rent'){
       if(v('cp-start'))c.terms.start=v('cp-start');if(v('cp-dur'))c.terms.duration=v('cp-dur');
@@ -656,6 +663,7 @@ ACT.cpropSave=function(){
   if(!validPostalCode(postal)){toast('کد پستی باید ۱۰ رقم و معتبر باشد');return}
   if(!addr){toast('نشانی را وارد کنید');return}
   if(!area||area<10){toast('متراژ را درست وارد کنید');return}
+  c.prop.title=v('cp-title')||c.prop.title||addr;
   c.prop.postal=postal;c.prop.addr=addr;c.prop.area=area;
   if(ctx.kind==='rent'){
     var depText=v('cp-dep'),rentText=v('cp-rent'),dep=10*Number(depText),rent=10*Number(rentText);
