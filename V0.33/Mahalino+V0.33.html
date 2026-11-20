@@ -19735,11 +19735,15 @@ E30.guide=(function(){
     }
     E30.discAPI.stop();CE.f=null;save();
   }
-  function resumeService(){
+  function resumeService(text){
     var st=state(),saved=st.suspended;if(!saved){botC('کار معلقی برای بازگشت ثبت نشده است.',null);return true}
     var pay=E30.pay&&E30.pay.session();
     if(pay&&/processing|paid|executing/.test(pay.state)){botC('عملیات خدمت در حال انجام است؛ پس از پایان می‌توانید بازگردید.',null);return true}
+    /* Capture the current draft while its workflow and form still match.
+       usrC redraws chat history, and restoring activeId changes that workflow. */
+    archiveContract();
     if(pay&&/^(presented|awaiting_confirm|selected|priced|insufficient)$/.test(pay.state))E30.pay.cancel(pay.payId,true);
+    usrC(text);
     if(saved.flow){if(!S.active)S.active={};S.active[saved.flow]=saved.activeId}
     Object.assign(CE,saved.ce);
     if(!S.ctx30Collectors)S.ctx30Collectors={};
@@ -19779,7 +19783,7 @@ E30.guide=(function(){
   }
   function exec(r,t){
     var a=r.action;
-    if(a==='resume'){usrC(t);return resumeService()}
+    if(a==='resume')return resumeService(t);
     if(a==='pause'){
       var payment=E30.pay&&E30.pay.session();
       if(payment&&/^(processing|paid|executing)$/.test(payment.state)){botC('عملیات در حال انجام است؛ پس از پایان می‌توانید خدمت را متوقف کنید.',null);return true}

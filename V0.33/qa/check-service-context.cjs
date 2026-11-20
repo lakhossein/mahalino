@@ -42,3 +42,21 @@ assert.equal(JSON.stringify(legacy.c.S.contracts),unchanged);
 legacy.c.S.contracts.push({code:'B',status:'terminated'});
 assert.equal(legacy.c.E29.termAI('B'),false,'ambiguous target selected its first match');
 console.log('PASS legacy termination entry: missing, nonexistent and ambiguous target IDs are rejected without selection');
+
+// Resume must capture a same-kind contract's unsaved input before usrC redraws
+// history and before the suspended search changes the active workflow ID.
+const isolation=runtime('rent'),ic=isolation.c,ig=ic.E30.guide;
+ic.S.active={rent:'search'};ic.S.wfs=[{id:'search',m:'rent',data:{marker:'search only'}}];ic.HIST=[];
+ic.wf=kind=>ic.S.wfs.find(w=>w.id===ic.S.active[kind]);
+ic.wfNew=kind=>{const w={id:'contract',m:kind,data:{}};ic.S.wfs.push(w);ic.S.active[kind]=w.id;return w};
+ic.E28={ctrKind:null,ctrStart(kind){this.ctrKind=kind;ic.wf(kind).data.ctr={};ic.HIST.push({r:'bot',h:'<div data-e28ctr="1"><input id="cl-name"></div>'})}};
+let pending='';ic.conCapture=(data,kind)=>{assert.equal(kind,'rent');assert.equal(ic.S.active.rent,'contract');data.ctr.name=pending};
+ic.usrC=()=>{pending=''}; // DOM redraw discards values not yet captured.
+assert.equal(ig.route(ig.actions['contract-start'].prompt),true);
+pending='Unsaved tenant';
+assert.equal(ig.route(ig.actions['resume-service'].prompt),true);
+assert.equal(ic.S.active.rent,'search');assert.equal(ic.E28.ctrKind,null);
+assert.equal(ic.S.wfs.find(w=>w.id==='contract').data.ctr.name,'Unsaved tenant');
+assert.equal(JSON.stringify(ic.wf('rent').data),'{"marker":"search only"}');
+assert(!/data-e28ctr/.test(ic.HIST[0].h));assert(/data-wf="contract"/.test(ic.HIST[0].h));
+console.log('PASS resume service: same-kind contract draft captured and archived before history redraw or workflow rebind');

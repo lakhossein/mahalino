@@ -43,6 +43,25 @@ const base=process.env.QA_BASE_URL||pathToFileURL(artifact).href;
       if(kind==='reminder')assert.match(info.html,/یادآور/,id);
       console.log('PASS '+id+': '+kind);await page.close();
     }
+    for(const useSuggestion of [false,true]){
+      const p=await open();await service(p,'rent').click();
+      const searchId=await p.evaluate(()=>wd('rent').id);
+      await service(p,'contract-start').click();
+      const contractId=await p.evaluate(()=>wd('rent').id);assert.notEqual(searchId,contractId);
+      await p.locator('#cl-name').fill('Unsaved tenant');
+      if(useSuggestion){
+        await p.locator('#chatB [data-e31-id="resume-service"]').last().click();
+        await p.locator('#chatIn').press('Enter');
+      }else await send(p,'resume-service');
+      assert.equal(await p.evaluate(()=>wd('rent').id),searchId);
+      assert.equal(await p.evaluate(()=>E28.ctrKind),null);
+      assert.equal(await p.locator('#chatB [data-e28ctr] #cl-name').count(),0);
+      assert.equal(await p.evaluate(id=>wfOf(id).data.ctr.parties.lessee.name,contractId),'Unsaved tenant');
+      await p.locator('#chatB [data-act="resume"][data-wf="'+contractId+'"]').last().click();
+      assert.equal(await p.locator('#cl-name').inputValue(),'Unsaved tenant');
+      assert.equal(await p.evaluate(()=>wd('rent').id),contractId);await p.close();
+    }
+    console.log('PASS same-kind contract draft survives typed and suggested return to search');
     const page=await open();
     await page.evaluate(()=>go('profile'));
     await page.locator('#v-profile [data-act="newRequest"]').first().click();
