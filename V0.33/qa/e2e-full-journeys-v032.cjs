@@ -169,16 +169,19 @@ async function drainDisc(page,final){
         return {libId:item.id,workflowId:w.id,savedStep,before:w.step,button:!!document.querySelector('[data-act="e29libResume"]')};
       });
       const button=page.locator('#e29-lbody [data-act="e29libResume"]');
+      const countBefore=await page.locator('#chatB .msg.bot').count();
       if(await button.count())await button.click();
       await sleep(page,380);
       const after=await page.evaluate(()=>({id:wd('rent').id,step:wd('rent').step,marker:wd('rent').data.qaMarker,
         budget:wd('rent').data.B,view:CURRENT,prompt:SCRIPTS[CE.f]?.[CE.i]?.id}));
-      const visible=await page.locator('#chatB .msg.bot').filter({hasText:'حداقل چند خواب'}).last().isVisible();
+      const bots=page.locator('#chatB .msg.bot'),current=bots.last();
+      const promptText=await current.innerText();
+      const visible=await bots.count()>countBefore&&await current.isVisible()&&promptText.includes('حداقل چند خواب')&&await current.locator('[data-cv="1"]').isVisible();
       await page.reload({waitUntil:'domcontentloaded'});await sleep(page,350);
       const reload=await page.evaluate(()=>({id:wd('rent').id,step:wd('rent').step,marker:wd('rent').data.qaMarker,budget:wd('rent').data.B}));
       return {ok:setup.button&&setup.before===1&&after.id===setup.workflowId&&after.step===setup.savedStep&&after.marker==='resume-persisted'&&
         after.view==='landing'&&after.prompt==='beds'&&visible&&after.budget?.depB===10000000000&&after.budget?.rentB===500000000&&
-        reload.id===setup.workflowId&&reload.step===setup.savedStep&&reload.marker==='resume-persisted'&&reload.budget?.depB===after.budget.depB&&reload.budget?.rentB===after.budget.rentB,info:{setup,after,visible,reload}};
+        reload.id===setup.workflowId&&reload.step===setup.savedStep&&reload.marker==='resume-persisted'&&reload.budget?.depB===after.budget.depB&&reload.budget?.rentB===after.budget.rentB,info:{setup,after,visible,promptText:promptText.slice(0,200),reload}};
     });
 
     await run('H05','A visible money slider commits the actual selected value and locks old input',async page=>{
@@ -486,7 +489,7 @@ async function drainDisc(page,final){
         const setup=await page.evaluate(kind=>{
           const w=wd(kind),steps={buy:'m2',sell:'s_rooms',invp:'i_hor',lndl:'l_rent',mkt:'adj',build:'ph',stay:'list'};
           const data={buy:{budg:100000000000,_budgSet:1},invr:{cap:10000000000,amt:1000000000,cnt:5},
-            sell:{sellerRole:'owner',ownership:'single',docs:'سند تک‌برگ',prop_area:80},invp:{objective:'rent_income',cap:10000000000},
+            sell:{sellerRole:'owner',ownership:'single',docs:'سند تک‌برگ',prop_area:80},invp:{objective:'rent_income',cap:10000000000,liquidity:'some'},
             lndl:{ltype:'res',hood:'h6',ask_dep:10000000000},mkt:{role:'con',prjI:0,bidAmt:80000000000},stay:{city:'تهران',date:'آخر هفته',ppl:2},grt:{}};
           if(kind==='buy'){defP(data.buy);defPR(data.buy);data.buy.PR.age=[0,10]}
           if(kind==='build'){
@@ -504,21 +507,30 @@ async function drainDisc(page,final){
           return {libId:item.id,id:w.id,savedStep,expectedData,expectedPrompt:steps[kind]||null,count:S.wfs.length,requests:S.reqs.length,rendered:!!document.querySelector('#e29-lbody [data-act="e29libResume"]')};
         },kind);
         const btn=page.locator('#e29-lbody [data-act="e29libResume"]');
+        const countBefore=await page.locator('#chatB .msg.bot').count();
         if(setup.rendered&&await btn.count())await btn.click();
         await sleep(page,120);
         const after=await page.evaluate(kind=>({id:S.active[kind],step:wd(kind).step,data:wd(kind).data,view:CURRENT,prompt:SCRIPTS[CE.f]?.[CE.i]?.id||null,count:S.wfs.length,requests:S.reqs.length,project:S.active.mkt}),kind);
-        let visible=false,detailsOpened=true;
+        const bots=page.locator('#chatB .msg.bot'),current=bots.last(),fresh=await bots.count()>countBefore;
+        let visible=false,detailsOpened=true,promptText=await current.innerText();
         if(setup.expectedPrompt){
-          const prompts={buy:'متراژ',sell:'چند خواب است',invp:'افق سرمایه‌گذاری',lndl:'اجارهٔ ماهانهٔ درخواستی',mkt:'شرط تعدیل',build:'پیشرفت پروژه',stay:'اقامتگاه‌های'};
-          visible=await page.locator('#chatB .msg.bot').filter({hasText:prompts[kind]}).last().isVisible();
+          // Match the installed stage's actual controls, not an older bubble
+          // (build uses simulation chips; stay must expose a Tehran listing).
+          const prompts={buy:['بازهٔ متراژ','[data-cv="45|60"]'],sell:['چند خواب است','[data-cv="1"]'],
+            invp:['افق سرمایه‌گذاری','[data-cv="میان‌مدت"]'],lndl:['اجارهٔ ماهانهٔ درخواستی',null],
+            mkt:['شرط تعدیل','[data-cv="none"]'],build:['پیشرفت داخلی پروژه','[data-cv="!p"]'],stay:['اقامتگاه‌های','[data-cba="selS"][data-l="s1"]']};
+          const [word,control]=prompts[kind];
+          visible=fresh&&await current.isVisible()&&promptText.includes(word)&&(control?await current.locator(control).isVisible():await page.locator('#chatIn').isEnabled());
         }else{
-          const card=page.locator('#chatB .e33-legacy-resume[data-wf="'+setup.id+'"]').last();visible=await card.isVisible();
+          const card=current.locator('.e33-legacy-resume[data-wf="'+setup.id+'"]');
+          const savedValue=kind==='invr'?await page.evaluate(cap=>rial(cap),setup.expectedData.cap):'ملک نمونهٔ ذخیره‌شده';
+          visible=fresh&&await card.isVisible()&&promptText.includes(savedValue)&&(kind!=='grt'||promptText.includes('۸۵'));
           if(visible)await card.locator('[data-cba="e33ResumeDetails"]').click();
           const details=page.locator('#e29-lbody [data-act="e29libResume"][data-lib="'+setup.libId+'"]');detailsOpened=await details.isVisible();
           await page.evaluate(()=>E29.shell.closePanel());
         }
         const sameFacts=Object.keys(setup.expectedData).every(k=>JSON.stringify(after.data[k])===JSON.stringify(setup.expectedData[k]));
-        checks.push({kind,setup,after,visible,detailsOpened,pass:setup.rendered&&setup.savedStep>0&&after.id===setup.id&&after.step===setup.savedStep&&sameFacts&&after.view==='landing'&&after.prompt===setup.expectedPrompt&&visible&&detailsOpened&&after.count===setup.count&&after.requests===setup.requests&&(kind!=='build'||after.project===setup.expectedData.projectWfId)});
+        checks.push({kind,setup,after,visible,detailsOpened,promptText:promptText.slice(0,220),pass:setup.rendered&&setup.savedStep>0&&after.id===setup.id&&after.step===setup.savedStep&&sameFacts&&after.view==='landing'&&after.prompt===setup.expectedPrompt&&visible&&detailsOpened&&after.count===setup.count&&after.requests===setup.requests&&(kind!=='build'||after.project===setup.expectedData.projectWfId)});
       }
       // Old build snapshots have no reliable project identity. They must stay
       // recoverable, but never borrow the currently active unrelated project.
@@ -526,9 +538,10 @@ async function drainDisc(page,final){
         const w=wfNew('build');w.step=2;w.data={ph:[10,0,0,0,0]};const i=E29.libAPI.saveWorkflowProgress(w);
         E29.shell.openPanel('library',{item:i.id});return {id:w.id,lib:i.id,project:S.active.mkt,count:S.wfs.length,requests:S.reqs.length};
       });
+      const oldCount=await page.locator('#chatB .msg.bot').count();
       await page.locator('#e29-lbody [data-act="e29libResume"][data-lib="'+old.lib+'"]').click();
-      const oldCard=page.locator('#chatB .e33-legacy-resume[data-wf="'+old.id+'"]').last();
-      const oldVisible=await oldCard.isVisible()&&/هیچ پروژهٔ جایگزینی انتخاب نشد/.test(await oldCard.innerText());
+      const oldBots=page.locator('#chatB .msg.bot'),oldCard=oldBots.last().locator('.e33-legacy-resume[data-wf="'+old.id+'"]');
+      const oldVisible=await oldBots.count()>oldCount&&await oldCard.isVisible()&&/هیچ پروژهٔ جایگزینی انتخاب نشد/.test(await oldCard.innerText());
       const oldSafe=await page.evaluate(old=>S.active.build===old.id&&S.active.mkt===old.project&&S.wfs.length===old.count&&S.reqs.length===old.requests&&CE.f===null&&wfOf(old.id).step===2&&!wfOf(old.id).data.projectWfId,old);
       await page.reload({waitUntil:'domcontentloaded'});await sleep(page,330);
       const persisted=await page.evaluate(ids=>ids.map(id=>({id,step:wfOf(id)?.step,data:wfOf(id)?.data})),checks.map(x=>x.setup.id));
