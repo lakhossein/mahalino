@@ -21,7 +21,7 @@
       "writes": {"add": [
         "ACT.flowNewOk", "ACT.newRequest", "ACT.resume", "ACT.svcs", "ACT.wfOpen",
         "CBACT.e33ApplyCriterion", "CBACT.e33BuildProject", "CBACT.e33EditCriteria",
-        "CBACT.e33SaveDraft", "CBACT.e33Service", "HIST.*.h", "S.liveHistory", "go"
+        "CBACT.e33ResumeDetails", "CBACT.e33SaveDraft", "CBACT.e33Service", "HIST.*.h", "S.liveHistory", "go"
       ]}
     },
     {

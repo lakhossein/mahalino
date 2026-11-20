@@ -103,7 +103,10 @@ E30.guide=(function(){
     return c.guide31;
   }
   function activeBuildProject(){
-    var id=S.active&&S.active.mkt,w=(S.wfs||[]).filter(function(w){return w.id===id&&!w.cancelled&&w.m==='mkt'})[0],d=w&&w.data;
+    var id=S.active&&S.active.mkt;return approvedBuildProject(id);
+  }
+  function approvedBuildProject(id){
+    var w=(S.wfs||[]).filter(function(w){return w.id===id&&!w.cancelled&&w.m==='mkt'})[0],d=w&&w.data;
     if(!d||!(d.confirmed||d.chosen))return null;
     var index=d.chosen?d.chosen.prj:d.bid&&d.bid.prj;
     return typeof PRJ!=='undefined'&&Number.isInteger(index)&&PRJ[index]?w:null;
@@ -523,13 +526,41 @@ E30.guide=(function(){
     ACT.flowNewOk=function(el){return selectService(routeFor[el.getAttribute('data-m')])};
     var previousGo=go;
     go=function(v){if(S.auth&&Object.prototype.hasOwnProperty.call(routeFor,v))return selectService(routeFor[v]);return previousGo.apply(this,arguments)};
+    function legacyResume(w,reason){
+      var d=w.data,details=[];
+      if(w.m==='invr'||w.m==='invb'){
+        if(d.cap!=null)details.push('سرمایه: '+rial(d.cap));
+        if(d.amt!=null)details.push('مبلغ ثبت‌شده: '+rial(d.amt));
+        if(d.cnt!=null)details.push('تعداد کلید: '+fa(d.cnt,0));
+      }
+      if(w.m==='grt'){
+        var entity=(S.grt||[]).filter(function(e){return e.id===d.grtId&&e.wf===w.id})[0],prop=entity&&entity.prop;
+        if(prop){if(prop.title||prop.addr)details.push('ملک: '+(prop.title||prop.addr));if(prop.area)details.push('متراژ: '+fa(prop.area,0)+' متر');}
+      }
+      if(w.m==='build'&&Array.isArray(d.ph))details.push('درصدهای پیشرفت ثبت‌شده: '+d.ph.map(function(n){return fa(n,0)+'٪'}).join('، '));
+      var item=(S.library||[]).filter(function(it){return it.type==='wf_progress'&&it.workflowId===w.id})[0];
+      botC('<section class="e33-legacy-resume" data-wf="'+qesc(w.id)+'"><b>ادامهٔ '+esc(wfName(w))+' — مرحلهٔ '+fa(w.step,0)+'</b>'+
+        (details.length?'<p>'+details.map(esc).join(' · ')+'</p>':'')+
+        '<p class="note">اطلاعات این فلو محفوظ است. '+esc(reason||'اجرای مرحلهٔ قدیمی در دستیار فعلی پشتیبانی نمی‌شود.')+' در اینجا فقط می‌توانید اطلاعات ذخیره‌شده را مرور کنید. هیچ درخواست جدید یا عملیات مالی ثبت نمی‌شود.</p>'+
+        (item?'<button data-cba="e33ResumeDetails" data-wf="'+qesc(w.id)+'" data-lib="'+qesc(item.id)+'">مشاهدهٔ جزئیات همین فلو در کتابخانه</button>':'')+'</section>',null);
+    }
+    CBACT.e33ResumeDetails=function(el){
+      var item=E29.libAPI.byId(el.getAttribute('data-lib'));
+      if(!item||item.type!=='wf_progress'||item.workflowId!==el.getAttribute('data-wf')){toast('این گردش کار در کتابخانه یافت نشد');return false}
+      E29.shell.openPanel('library',{item:item.id});return true;
+    };
     function resumeWork(el){
       var m=wfModOfCat(el.getAttribute('data-m')),id=el.getAttribute('data-wf'),w=id?wfOf(id):wf(m);
       if(!w||w.m!==m||w.cancelled){toast('این فلو در دسترس نیست');return false}
       closeModal();assistant();archiveContract();suspend();wfSet(m,w.id);
       if(w.data.standaloneContract){E28.ctrStart(m);return true}
       if(w.done){botC('این خدمت کامل شده است.',null);return true}
-      if(!SCRIPTS[m])return selectService(routeFor[m]);
+      if(!SCRIPTS[m]){legacyResume(w);return true}
+      if(m==='build'){
+        var project=approvedBuildProject(w.data.projectWfId);
+        if(!project){legacyResume(w,'پیوند پروژهٔ تأییدشدهٔ همین فلو یافت نشد؛ هیچ پروژهٔ جایگزینی انتخاب نشد.');return true}
+        wfSet('mkt',project.id);
+      }
       CE.f=m;CE.i=Math.max(0,Math.min(SCRIPTS[m].length-1,w.step-1));CE.li=0;CE.hist=[];ceStep();return true;
     }
     ACT.wfOpen=ACT.resume=resumeWork;
