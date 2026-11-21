@@ -106,12 +106,10 @@ E30.uiTidyInit=function(){
     var trigger=ev.target&&ev.target.closest&&ev.target.closest('[data-cf]');
     if(!trigger||!S.auth)return;
     var f=trigger.getAttribute('data-cf');
-    if(f!=='rent'&&f!=='buy')return;
-    if(!E30.discAPI||typeof E30.discAPI.start!=='function')return;
+    var service={rent:'rent',buy:'buy',sell:'sell',invp:'invest',invr:'invest',invb:'invest',invest:'invest',lndl:'landlord',stay:'stay',mkt:'development',build:'build',grt:'guaranteed',svc:'services'}[f];
+    if(!service||typeof CBACT.e33Service!=='function')return;
     ev.preventDefault();ev.stopImmediatePropagation();
-    if(CURRENT!=='landing')go('landing');
-    usrC((trigger.textContent||'').replace(/\s+/g,' ').trim()||'شروع '+(f==='rent'?'اجاره':'خرید'));
-    E30.discAPI.start(f,false);
+    CBACT.e33Service({getAttribute:function(key){return key==='data-service'?service:null}});
   },true);
   if(CBACT.e30StartRent){
     CBACT.e30StartRent=function(){

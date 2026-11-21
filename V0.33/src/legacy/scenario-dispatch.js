@@ -172,7 +172,8 @@ E23.edu=function(nn,raw){
   ])+
   rcNote('محلینو ثبت رسمی انجام نمی‌دهد؛ برای ثبت رسمی به سامانهٔ رسمی (خودنویس / srem.mrud.ir) مراجعه کنید.')+
   rcActs([
-    {l:'شروع پیش‌نویس قرارداد (پس از انتخاب ملک در فلوی اجاره)',a:'data-cf="rent"',p:1},
+    {l:'شروع پیش‌نویس مستقل قرارداد اجاره',a:'data-cba="e33Service" data-service="contract-start"',p:1},
+    {l:'شروع پیش‌نویس مستقل قرارداد خرید',a:'data-cba="e33Service" data-service="contract-buy"'},
     {l:'مشاهدهٔ قراردادها',a:'data-act="dt" data-t="con"'}
   ]),null);
   return true;

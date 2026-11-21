@@ -185,10 +185,8 @@ RINT.scGuide=function(m){
   var steps=WSTEPS[m]||[],d=wd(m),cur=d?Math.min(d.step-1,steps.length-1):0;
   var guard=d?guardOK(m):null;
   var v=MODBY[m]?MODBY[m].v:null;
-  var scripted=!!SCRIPTS[m];
   var acts=[];
-  if(v&&scripted)acts.push({l:'ادامه در همین گفت‌وگو',a:'data-cf="'+m+'"',p:1});
-  if(v&&!scripted)acts.push({l:'رفتن به صفحهٔ اختصاصی',a:'data-view="'+v+'"',p:1});
+  if(v&&d&&d.id)acts.push({l:'ادامه در همین گفت‌وگو',a:'data-act="resume" data-m="'+m+'" data-wf="'+qesc(d.id)+'"',p:1});
   acts.push({l:'درخواست‌های این مسیر',a:'data-act="dt" data-t="req" data-cat="'+(m==='invest'?'invr':m)+'"'});
   if(m==='grt')acts.push({l:'توضیح اجارهٔ تضمینی',a:'data-cq="اجاره تضمینی چیست؟"'});
   botC('مسیر «'+esc(MODBY[m]?MODBY[m].t:m)+'» '+fa(steps.length,0)+' مرحله دارد. وضعیت فعلی شما:'+
@@ -392,8 +390,8 @@ RINT.scOOS=function(q){
   }
   botC('ثبت سند رسمی و دفترخانه از قابلیت‌های این نسخه نیست؛ قراردادهای سامانه «داخلی»اند و برای ثبت رسمی، احراز هویت و امضای الکترونیک لازم است.'+
   rcActs([
-    {l:'تنظیم قرارداد داخلی اجاره',a:'data-cf="rent"',p:1},
-    {l:'گزارش حقوقی خرید',a:'data-cf="buy"'}
+    {l:'تنظیم قرارداد داخلی اجاره',a:'data-cba="e33Service" data-service="contract-start"',p:1},
+    {l:'پیش‌درخواست بررسی حقوقی خرید',a:'data-cba="e33Service" data-service="legal"'}
   ]),null);
 };
 /* مرتب‌سازی جدول‌های گفت‌وگو */

@@ -146,8 +146,8 @@ E27.reqModal=function(cat,f){
   }else{
     h+='<div class="tblwrap"><table class="tbl"><thead><tr><th>عنوان</th><th>وضعیت</th><th>تاریخ</th><th><span class="sr">اقدام</span></th></tr></thead><tbody>';
     list.slice(0,20).forEach(function(r2){
-      var fv=MODBY[r2.cat]?MODBY[r2.cat].v:null;
-      h+='<tr><td>'+esc(r2.title)+'</td><td>'+stB(r2.status)+'</td><td>'+dt(r2.t)+'</td><td><div class="fs-actions"><button class="btn btn-xs" data-act="reqDetail" data-id="'+r2.id+'">جزئیات</button>'+(fv?'<button class="btn btn-xs" data-cf="'+r2.cat+'">ادامه در گفت‌وگو</button>':'')+'</div></td></tr>';
+      var rw=r2.wf&&wfOf(r2.wf);
+      h+='<tr><td>'+esc(r2.title)+'</td><td>'+stB(r2.status)+'</td><td>'+dt(r2.t)+'</td><td><div class="fs-actions"><button class="btn btn-xs" data-act="reqDetail" data-id="'+r2.id+'">جزئیات</button>'+(rw&&!rw.cancelled?'<button class="btn btn-xs" data-act="resume" data-m="'+qesc(rw.m)+'" data-wf="'+qesc(rw.id)+'">ادامه در گفت‌وگو</button>':'')+'</div></td></tr>';
     });
     h+='</tbody></table></div>';
   }

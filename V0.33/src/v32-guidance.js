@@ -493,6 +493,19 @@ E30.guide=(function(){
   function route(t){
     if(!S.auth||CURRENT!=='landing')return false;
     var nt=norm(t),r=BY_PROMPT[nt];
+    /* Explicit natural-language contract creation must not fall into the
+       legacy purchase/rental discovery parser; education remains separate. */
+    if(!r&&/(?:^| )قرارداد(?: |$)|اجاره ?نامه|مبایعه ?نامه/.test(nt)&&/ثبت|تنظیم|شروع|تهیه|نوشتن|ایجاد|پیش ?نویس|جدید/.test(nt)&&!/فسخ|لغو|تخلیه|مدارک|راهنما|آموزش|کد رهگیری|رسمی|چطور|چگونه|چرا|چه |(?:^| )چی(?: |$)|لازمه|لازم است|نمایش|مشاهده|نشان بده|فهرست|وضعیت|پیگیری|(?:ثبت|تنظیم|ایجاد) شده/.test(nt)){
+      var kind=/خرید|مبایعه ?نامه/.test(nt)?'buy':/اجاره|رهن/.test(nt)?'rent':null;
+      if(/(?:این|همین) (?:ملک|آگهی)|(?:ملک|آگهی) انتخاب شده/.test(nt)){
+        kind=kind||CE.f;
+        var w=S.active&&wfOf(S.active[kind]);
+        if((kind==='rent'||kind==='buy')&&CE.f===kind&&w&&!w.cancelled&&!w.done&&!w.data.signed&&((kind==='rent'&&w.data.listing)||(kind==='buy'&&w.data.blist))){archiveContract();usrC(t);E28.ctrStart(kind);return true}
+        usrC(t);botC('ملک انتخاب‌شدهٔ فعالی برای این قرارداد یافت نشد. می‌توانید ملک را در مسیر جست‌وجو انتخاب کنید یا قرارداد مستقلی شروع کنید.'+serviceDirectory(),null);return true;
+      }
+      if(kind)r=BY_ID[kind==='buy'?'contract-buy':'contract-start'];
+      else{usrC(t);botC('نوع قراردادی را که می‌خواهید مستقل تنظیم کنید انتخاب کنید.<div class="qr"><button data-cba="e33Service" data-service="contract-start">قرارداد اجاره</button><button data-cba="e33Service" data-service="contract-buy">قرارداد خرید</button></div>',null);return true}
+    }
     if(!r&&/مقایسه/.test(nt)&&/محله/.test(nt))r=BY_ID.compare;
     if(!r&&/^(یه|یک) (خونه|خانه) (برام|برای من )? ?پیدا کن$/.test(nt)){
       setNode('home');usrC(String(t));
@@ -622,12 +635,20 @@ E30.guide=(function(){
       return result;
     };
     CBACT.e31TermGuide=function(el){var code=el.getAttribute('data-code');if(code)return E29.termAI(code)};
-    CBACT.e31TermStart=function(el){
-      var code=el.getAttribute('data-code'),work=rentalTarget(code);
+    function startTermination(work,code){
       if(!work){botC('قرارداد انتخابی دیگر شرایط شروع فسخ را ندارد؛ فهرست را دوباره بررسی کنید.',null);return false}
-      suspend();wfSet('rent',work.id);
-      CE.f='rent';CE.i=SCRIPTS.rent.findIndex(function(s){return s.id==='termq'});CE.li=0;CE.hist=[];
+      closeModal();assistant();archiveContract();suspend();wfSet('rent',work.id);
+      var term=work.data.term,step=!term?'termq':term.ai?'tpay':term.ok?'tai':term.rid?'totp':!term.reason?'treason':!term.date?'tdate':'tmin';
+      CE.f='rent';CE.i=SCRIPTS.rent.findIndex(function(s){return s.id===step});CE.li=0;CE.hist=[];
       usrC('شروع بررسی فسخ قرارداد '+code);ceStep();return true;
+    }
+    CBACT.e31TermStart=function(el){
+      var code=el.getAttribute('data-code');return startTermination(rentalTarget(code),code);
+    };
+    ACT.startTerm=function(el){
+      var id=el&&el.getAttribute('data-wf'),w=id&&wfOf(id),code=w&&w.data&&w.data.code;
+      if(!w||rentalTarget(code)!==w){toast('قرارداد انتخابی دیگر در دسترس نیست.');return false}
+      return startTermination(w,code);
     };
     CBACT.e30StartRent=function(){return selectService('contract-start')};
     ['e30ValOpen','e30RequestService','e30RequestGRT'].forEach(function(key){

@@ -557,35 +557,10 @@ function openGateway(amt,title,cb){
   '<button class="btn" style="width:100%;margin-top:8px" data-act="closeModal">انصراف و بازگشت</button></div>');
 }
 function openTourModal(lid){
-  if(CURRENT==='landing')return openTourChat(lid);
-  var selected=tourListing(lid);if(!selected){toast('ملک مشخصی برای تور انتخاب نشده است');return false}
-  TOURX=selected;TOURROT=0;
-  openModal('<h3> تور مجازی ۳۶۰° — '+TOURX.t+'</h3>'+
-  '<p class="note">تصویر را بکشید تا بچرخد؛ با انتخاب اتاق بین فضاها جابه‌جا شوید.</p>'+
-  '<div class="tourwrap" id="tourwrap"><div class="tourimg" id="tourimg"><img id="tourpic" src="https://picsum.photos/seed/'+TOURX.seed+'-r0/1600/420" alt=""></div>'+
-  '<span class="tourtag">۳۶۰°</span><span class="tourhud" id="tourdeg">۰°</span></div>'+
-  '<div class="chips" style="margin-top:10px">'+TOURROOMS.map(function(nm,i){return '<span class="chip'+(i===0?' on':'')+'" data-act="troom" data-i="'+i+'">'+nm+'</span>'}).join('')+'</div>'+
-  '<div class="alert al-warn">تور مجازی جایگزین چند بازدید اولیه است — بازدید نهایی را برگزار کنید.</div>'+
-  '<button class="btn" data-act="closeModal" style="margin-top:10px">بستن</button>',function(){
-    var wrap=document.getElementById('tourwrap');
-    if(!wrap){return}
-    wrap.addEventListener('pointerdown',function(e){
-      e.preventDefault();
-      var sx=e.clientX,sr=TOURROT;
-      function mv(ev){
-        var w2=wrap.clientWidth||1;
-        TOURROT=Math.max(0,Math.min(100,sr+(ev.clientX-sx)/w2*100));
-        drawTour();
-      }
-      function up(){
-        document.removeEventListener('pointermove',mv);
-        document.removeEventListener('pointerup',up);
-      }
-      document.addEventListener('pointermove',mv);
-      document.addEventListener('pointerup',up);
-    });
-    drawTour();
-  });
+  if(!tourListing(lid)){toast('ملک مشخصی برای تور انتخاب نشده است');return false}
+  closeModal();
+  if(CURRENT!=='landing')go('landing');
+  return openTourChat(lid);
 }
 /* Inline tour cards keep per-listing, per-card state in the transcript. */
 function tourListing(lid){return RLIST.concat(BLIST).find(function(x){return x.id===lid})}

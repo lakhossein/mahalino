@@ -4785,35 +4785,10 @@ function openGateway(amt,title,cb){
   '<button class="btn" style="width:100%;margin-top:8px" data-act="closeModal">انصراف و بازگشت</button></div>');
 }
 function openTourModal(lid){
-  if(CURRENT==='landing')return openTourChat(lid);
-  var selected=tourListing(lid);if(!selected){toast('ملک مشخصی برای تور انتخاب نشده است');return false}
-  TOURX=selected;TOURROT=0;
-  openModal('<h3> تور مجازی ۳۶۰° — '+TOURX.t+'</h3>'+
-  '<p class="note">تصویر را بکشید تا بچرخد؛ با انتخاب اتاق بین فضاها جابه‌جا شوید.</p>'+
-  '<div class="tourwrap" id="tourwrap"><div class="tourimg" id="tourimg"><img id="tourpic" src="https://picsum.photos/seed/'+TOURX.seed+'-r0/1600/420" alt=""></div>'+
-  '<span class="tourtag">۳۶۰°</span><span class="tourhud" id="tourdeg">۰°</span></div>'+
-  '<div class="chips" style="margin-top:10px">'+TOURROOMS.map(function(nm,i){return '<span class="chip'+(i===0?' on':'')+'" data-act="troom" data-i="'+i+'">'+nm+'</span>'}).join('')+'</div>'+
-  '<div class="alert al-warn">تور مجازی جایگزین چند بازدید اولیه است — بازدید نهایی را برگزار کنید.</div>'+
-  '<button class="btn" data-act="closeModal" style="margin-top:10px">بستن</button>',function(){
-    var wrap=document.getElementById('tourwrap');
-    if(!wrap){return}
-    wrap.addEventListener('pointerdown',function(e){
-      e.preventDefault();
-      var sx=e.clientX,sr=TOURROT;
-      function mv(ev){
-        var w2=wrap.clientWidth||1;
-        TOURROT=Math.max(0,Math.min(100,sr+(ev.clientX-sx)/w2*100));
-        drawTour();
-      }
-      function up(){
-        document.removeEventListener('pointermove',mv);
-        document.removeEventListener('pointerup',up);
-      }
-      document.addEventListener('pointermove',mv);
-      document.addEventListener('pointerup',up);
-    });
-    drawTour();
-  });
+  if(!tourListing(lid)){toast('ملک مشخصی برای تور انتخاب نشده است');return false}
+  closeModal();
+  if(CURRENT!=='landing')go('landing');
+  return openTourChat(lid);
 }
 /* Inline tour cards keep per-listing, per-card state in the transcript. */
 function tourListing(lid){return RLIST.concat(BLIST).find(function(x){return x.id===lid})}
@@ -6259,10 +6234,8 @@ RINT.scGuide=function(m){
   var steps=WSTEPS[m]||[],d=wd(m),cur=d?Math.min(d.step-1,steps.length-1):0;
   var guard=d?guardOK(m):null;
   var v=MODBY[m]?MODBY[m].v:null;
-  var scripted=!!SCRIPTS[m];
   var acts=[];
-  if(v&&scripted)acts.push({l:'ادامه در همین گفت‌وگو',a:'data-cf="'+m+'"',p:1});
-  if(v&&!scripted)acts.push({l:'رفتن به صفحهٔ اختصاصی',a:'data-view="'+v+'"',p:1});
+  if(v&&d&&d.id)acts.push({l:'ادامه در همین گفت‌وگو',a:'data-act="resume" data-m="'+m+'" data-wf="'+qesc(d.id)+'"',p:1});
   acts.push({l:'درخواست‌های این مسیر',a:'data-act="dt" data-t="req" data-cat="'+(m==='invest'?'invr':m)+'"'});
   if(m==='grt')acts.push({l:'توضیح اجارهٔ تضمینی',a:'data-cq="اجاره تضمینی چیست؟"'});
   botC('مسیر «'+esc(MODBY[m]?MODBY[m].t:m)+'» '+fa(steps.length,0)+' مرحله دارد. وضعیت فعلی شما:'+
@@ -6466,8 +6439,8 @@ RINT.scOOS=function(q){
   }
   botC('ثبت سند رسمی و دفترخانه از قابلیت‌های این نسخه نیست؛ قراردادهای سامانه «داخلی»اند و برای ثبت رسمی، احراز هویت و امضای الکترونیک لازم است.'+
   rcActs([
-    {l:'تنظیم قرارداد داخلی اجاره',a:'data-cf="rent"',p:1},
-    {l:'گزارش حقوقی خرید',a:'data-cf="buy"'}
+    {l:'تنظیم قرارداد داخلی اجاره',a:'data-cba="e33Service" data-service="contract-start"',p:1},
+    {l:'پیش‌درخواست بررسی حقوقی خرید',a:'data-cba="e33Service" data-service="legal"'}
   ]),null);
 };
 /* مرتب‌سازی جدول‌های گفت‌وگو */
@@ -8181,8 +8154,8 @@ E27.reqModal=function(cat,f){
   }else{
     h+='<div class="tblwrap"><table class="tbl"><thead><tr><th>عنوان</th><th>وضعیت</th><th>تاریخ</th><th><span class="sr">اقدام</span></th></tr></thead><tbody>';
     list.slice(0,20).forEach(function(r2){
-      var fv=MODBY[r2.cat]?MODBY[r2.cat].v:null;
-      h+='<tr><td>'+esc(r2.title)+'</td><td>'+stB(r2.status)+'</td><td>'+dt(r2.t)+'</td><td><div class="fs-actions"><button class="btn btn-xs" data-act="reqDetail" data-id="'+r2.id+'">جزئیات</button>'+(fv?'<button class="btn btn-xs" data-cf="'+r2.cat+'">ادامه در گفت‌وگو</button>':'')+'</div></td></tr>';
+      var rw=r2.wf&&wfOf(r2.wf);
+      h+='<tr><td>'+esc(r2.title)+'</td><td>'+stB(r2.status)+'</td><td>'+dt(r2.t)+'</td><td><div class="fs-actions"><button class="btn btn-xs" data-act="reqDetail" data-id="'+r2.id+'">جزئیات</button>'+(rw&&!rw.cancelled?'<button class="btn btn-xs" data-act="resume" data-m="'+qesc(rw.m)+'" data-wf="'+qesc(rw.id)+'">ادامه در گفت‌وگو</button>':'')+'</div></td></tr>';
     });
     h+='</tbody></table></div>';
   }
@@ -12744,7 +12717,8 @@ E23.edu=function(nn,raw){
   ])+
   rcNote('محلینو ثبت رسمی انجام نمی‌دهد؛ برای ثبت رسمی به سامانهٔ رسمی (خودنویس / srem.mrud.ir) مراجعه کنید.')+
   rcActs([
-    {l:'شروع پیش‌نویس قرارداد (پس از انتخاب ملک در فلوی اجاره)',a:'data-cf="rent"',p:1},
+    {l:'شروع پیش‌نویس مستقل قرارداد اجاره',a:'data-cba="e33Service" data-service="contract-start"',p:1},
+    {l:'شروع پیش‌نویس مستقل قرارداد خرید',a:'data-cba="e33Service" data-service="contract-buy"'},
     {l:'مشاهدهٔ قراردادها',a:'data-act="dt" data-t="con"'}
   ]),null);
   return true;
@@ -19264,12 +19238,10 @@ E30.uiTidyInit=function(){
     var trigger=ev.target&&ev.target.closest&&ev.target.closest('[data-cf]');
     if(!trigger||!S.auth)return;
     var f=trigger.getAttribute('data-cf');
-    if(f!=='rent'&&f!=='buy')return;
-    if(!E30.discAPI||typeof E30.discAPI.start!=='function')return;
+    var service={rent:'rent',buy:'buy',sell:'sell',invp:'invest',invr:'invest',invb:'invest',invest:'invest',lndl:'landlord',stay:'stay',mkt:'development',build:'build',grt:'guaranteed',svc:'services'}[f];
+    if(!service||typeof CBACT.e33Service!=='function')return;
     ev.preventDefault();ev.stopImmediatePropagation();
-    if(CURRENT!=='landing')go('landing');
-    usrC((trigger.textContent||'').replace(/\s+/g,' ').trim()||'شروع '+(f==='rent'?'اجاره':'خرید'));
-    E30.discAPI.start(f,false);
+    CBACT.e33Service({getAttribute:function(key){return key==='data-service'?service:null}});
   },true);
   if(CBACT.e30StartRent){
     CBACT.e30StartRent=function(){
@@ -19871,6 +19843,19 @@ E30.guide=(function(){
   function route(t){
     if(!S.auth||CURRENT!=='landing')return false;
     var nt=norm(t),r=BY_PROMPT[nt];
+    /* Explicit natural-language contract creation must not fall into the
+       legacy purchase/rental discovery parser; education remains separate. */
+    if(!r&&/(?:^| )قرارداد(?: |$)|اجاره ?نامه|مبایعه ?نامه/.test(nt)&&/ثبت|تنظیم|شروع|تهیه|نوشتن|ایجاد|پیش ?نویس|جدید/.test(nt)&&!/فسخ|لغو|تخلیه|مدارک|راهنما|آموزش|کد رهگیری|رسمی|چطور|چگونه|چرا|چه |(?:^| )چی(?: |$)|لازمه|لازم است|نمایش|مشاهده|نشان بده|فهرست|وضعیت|پیگیری|(?:ثبت|تنظیم|ایجاد) شده/.test(nt)){
+      var kind=/خرید|مبایعه ?نامه/.test(nt)?'buy':/اجاره|رهن/.test(nt)?'rent':null;
+      if(/(?:این|همین) (?:ملک|آگهی)|(?:ملک|آگهی) انتخاب شده/.test(nt)){
+        kind=kind||CE.f;
+        var w=S.active&&wfOf(S.active[kind]);
+        if((kind==='rent'||kind==='buy')&&CE.f===kind&&w&&!w.cancelled&&!w.done&&!w.data.signed&&((kind==='rent'&&w.data.listing)||(kind==='buy'&&w.data.blist))){archiveContract();usrC(t);E28.ctrStart(kind);return true}
+        usrC(t);botC('ملک انتخاب‌شدهٔ فعالی برای این قرارداد یافت نشد. می‌توانید ملک را در مسیر جست‌وجو انتخاب کنید یا قرارداد مستقلی شروع کنید.'+serviceDirectory(),null);return true;
+      }
+      if(kind)r=BY_ID[kind==='buy'?'contract-buy':'contract-start'];
+      else{usrC(t);botC('نوع قراردادی را که می‌خواهید مستقل تنظیم کنید انتخاب کنید.<div class="qr"><button data-cba="e33Service" data-service="contract-start">قرارداد اجاره</button><button data-cba="e33Service" data-service="contract-buy">قرارداد خرید</button></div>',null);return true}
+    }
     if(!r&&/مقایسه/.test(nt)&&/محله/.test(nt))r=BY_ID.compare;
     if(!r&&/^(یه|یک) (خونه|خانه) (برام|برای من )? ?پیدا کن$/.test(nt)){
       setNode('home');usrC(String(t));
@@ -20000,12 +19985,20 @@ E30.guide=(function(){
       return result;
     };
     CBACT.e31TermGuide=function(el){var code=el.getAttribute('data-code');if(code)return E29.termAI(code)};
-    CBACT.e31TermStart=function(el){
-      var code=el.getAttribute('data-code'),work=rentalTarget(code);
+    function startTermination(work,code){
       if(!work){botC('قرارداد انتخابی دیگر شرایط شروع فسخ را ندارد؛ فهرست را دوباره بررسی کنید.',null);return false}
-      suspend();wfSet('rent',work.id);
-      CE.f='rent';CE.i=SCRIPTS.rent.findIndex(function(s){return s.id==='termq'});CE.li=0;CE.hist=[];
+      closeModal();assistant();archiveContract();suspend();wfSet('rent',work.id);
+      var term=work.data.term,step=!term?'termq':term.ai?'tpay':term.ok?'tai':term.rid?'totp':!term.reason?'treason':!term.date?'tdate':'tmin';
+      CE.f='rent';CE.i=SCRIPTS.rent.findIndex(function(s){return s.id===step});CE.li=0;CE.hist=[];
       usrC('شروع بررسی فسخ قرارداد '+code);ceStep();return true;
+    }
+    CBACT.e31TermStart=function(el){
+      var code=el.getAttribute('data-code');return startTermination(rentalTarget(code),code);
+    };
+    ACT.startTerm=function(el){
+      var id=el&&el.getAttribute('data-wf'),w=id&&wfOf(id),code=w&&w.data&&w.data.code;
+      if(!w||rentalTarget(code)!==w){toast('قرارداد انتخابی دیگر در دسترس نیست.');return false}
+      return startTermination(w,code);
     };
     CBACT.e30StartRent=function(){return selectService('contract-start')};
     ['e30ValOpen','e30RequestService','e30RequestGRT'].forEach(function(key){
