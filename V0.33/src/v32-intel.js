@@ -617,11 +617,17 @@ E30.disc=(function(){
     try{
       var saved=S.ctx30Collectors&&S.ctx30Collectors[contextKey()];
       if(saved&&saved.active&&saved.wf){COL=Object.assign({},saved);COL.optional=true}
-      else COL={active:false,wf:null,fix:null,confirming:null,turns:0};
+      else COL={active:false,wf:null,fix:null,confirming:null,turns:0,searchId:saved&&saved.searchId||null};
     }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('v32-intel.js:621',e,'caught');COL={active:false,wf:null,fix:null,confirming:null,turns:0}}
     return COL.active;
   }
   function active(){return COL.active}
+  /* A search identity survives saving/reopening its chat, but never a new
+     collector or stop. Historical result controls must not bind lazily. */
+  function searchIdentity(create){
+    if(create&&!COL.searchId){COL.searchId=E30.uid('SEARCH');saveCollector()}
+    return COL.searchId||null;
+  }
 
   function start(wf,silent,budgetFirst){
     COL={active:true,optional:true,wf:wf,fix:null,expecting:null,confirming:null,turns:0,finConfirmed:false};
@@ -1513,7 +1519,7 @@ E30.disc=(function(){
 
   E30.discAPI={route:route,active:active,start:start,stop:stop,reset:reset,bindChat:bindChat,useChat:useChat,forgetChat:forgetChat,resume:resume,
     getF:getF,setF:setF,ctx:ctx,personaOf:personaOf,
-    preference:preference,canPreference:canPreference,collector:function(){return COL},
+    preference:preference,canPreference:canPreference,collector:function(){return COL},searchIdentity:searchIdentity,
     resumePrompt:resumePrompt,
     profileCard:profileCard,missing:missing,show:show,markUnknown:markUnknown,SLOT_LABEL:SLOT_LABEL,
     extract:extract,answer:answer};

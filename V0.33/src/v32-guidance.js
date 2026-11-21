@@ -254,10 +254,19 @@ E30.guide=(function(){
     botC('<b>شروع ساخت و تأمین</b><p class="note">ابتدا پروژه و پیمانکار تأییدشده را مشخص کنید. هیچ سفارش یا تأیید فرضی ثبت نمی‌شود.</p><div class="qr">'+eligible.map(function(w){return '<button data-cba="e33BuildProject" data-wf="'+qesc(w.id)+'">ادامهٔ '+esc(wfName(w))+'</button>'}).join('')+'<button data-cba="e33Service" data-service="development">انتخاب پروژه و بررسی پیمانکار</button></div>',null);
     if(!eligible.length)developmentCatalog();
   }
-  function criteriaAction(flow,source){
-    return '<p>آگهی منطبق پیدا نشد. هیچ محدودیتی خودکار تغییر نکرده است.</p><button type="button" class="primary" data-cba="e33EditCriteria" data-flow="'+flow+'" data-source="'+source+'">ویرایش معیارهای جست‌وجو</button>';
+  function criteriaOwner(flow,source,create){
+    if(['rent','buy'].indexOf(flow)<0||['legacy','sample'].indexOf(source)<0)return null;
+    var col=E30.discAPI.collector(),work=CE.f&&S.active&&wfOf(S.active[CE.f]);
+    if(source==='legacy'&&(col.active||CE.f!==flow||!work||work.m!==flow||work.done||work.cancelled))return null;
+    if(source==='sample'&&(col.active?col.wf!==flow:(CE.f==='buy'?'buy':'rent')!==flow))return null;
+    var search=E30.discAPI.searchIdentity(create);
+    return search?[search,CE.f||'',work&&work.id||'',S.active&&S.active[flow]||''].join(':'):null;
   }
-  function criteriaEditor(flow,source){
+  function criteriaAction(flow,source){
+    var owner=criteriaOwner(flow,source,true);
+    return '<p>آگهی منطبق پیدا نشد. هیچ محدودیتی خودکار تغییر نکرده است.</p>'+(owner?'<button type="button" class="primary" data-cba="e33EditCriteria" data-flow="'+flow+'" data-source="'+source+'" data-owner="'+qesc(owner)+'">ویرایش معیارهای جست‌وجو</button>':'');
+  }
+  function criteriaEditor(flow,source,owner){
     var f=E30.discAPI.getF,D=source==='legacy'?wd(flow).data:null;
     var ids=flow==='rent'?['budget_dep','budget_rent','hood','m2','rooms','prop_age']:['buy_budget','hood','m2','rooms','prop_age','price_per_m2'];
     ids=ids.concat(['floor_preference','amenity_parking','amenity_elevator','amenity_balcony','amenity_storage']);
@@ -277,7 +286,7 @@ E30.guide=(function(){
       if(id==='floor_preference'){var floor=flow==='rent'?p.requiredFloor||((p.requirements||{}).floor):r.requiredFloor;if(floor)return fa(floor.min,0)+' تا '+fa(floor.max,0);if(flow==='buy'&&r.floorR)return fa(r.floorR[0],0)+' تا '+fa(r.floorR[1],0);if(p.floorNum!=null&&p.floorNum!=='')return fa(p.floorNum,0);if(p.floor==='low')return '۱ تا ۳';if(p.floor==='high')return '۴ به بالا';return 'تعیین نشده'}
       return v==null?'تعیین نشده':fa(v,0);
     }
-    botC('<div class="e33-criteria-editor" data-flow="'+flow+'" data-source="'+source+'"'+(D?' data-work="'+qesc(wd(flow).id)+'"':'')+'><b>ویرایش یک معیار و جست‌وجوی دوباره</b><p class="note">فقط همان معیار تغییر می‌کند. برای برداشتن محدودیت، «مهم نیست» را بنویسید؛ برای مبلغ، واحد تومان را مشخص کنید.</p>'+ids.map(function(id){
+    botC('<div class="e33-criteria-editor" data-flow="'+flow+'" data-source="'+source+'" data-owner="'+qesc(owner)+'"'+(D?' data-work="'+qesc(wd(flow).id)+'"':'')+'><b>ویرایش یک معیار و جست‌وجوی دوباره</b><p class="note">فقط همان معیار تغییر می‌کند. برای برداشتن محدودیت، «مهم نیست» را بنویسید؛ برای مبلغ، واحد تومان را مشخص کنید.</p>'+ids.map(function(id){
       var label=amenities[id.slice(8)]||E30.discAPI.SLOT_LABEL[id]||id;
       var control=id.indexOf('amenity_')===0?'<select aria-label="'+qesc(label)+'"><option value="">انتخاب مقدار جدید</option><option value="required">الزامی</option><option value="preferred">ترجیحی</option><option value="irrelevant">مهم نیست</option><option value="forbidden">نباید داشته باشد</option></select>':'<input type="text" aria-label="'+qesc(label)+'" placeholder="'+(id==='floor_preference'?'مثلاً ۲ تا ۴':'مقدار جدید')+'">';
       return '<div class="fld" data-criterion="'+id+'"><label>'+esc(label)+' — '+esc(current(id))+control+'</label> <button type="button" data-cba="e33ApplyCriterion" data-slot="'+id+'">تغییر و جست‌وجو</button></div>';
@@ -332,7 +341,7 @@ E30.guide=(function(){
   }
   function sample(explicitFlow){
     var col=S.ctx30Collectors&&S.ctx30Collectors[S.ctx30ActiveKey];
-    var flow=explicitFlow||((col&&col.wf==='buy')||CE.f==='buy'?'buy':'rent'),f=E30.discAPI.getF;
+    var flow=explicitFlow||((col&&col.active?col.wf==='buy':CE.f==='buy')?'buy':'rent'),f=E30.discAPI.getF;
     var dep=f('budget_dep'),rent=f('budget_rent'),budget=f('buy_budget'),age=f('prop_age');
     var rules=f('prefRules')||{},floor=f('floor_preference');
     var fields=E30.discAPI.ctx().fields;
@@ -565,14 +574,15 @@ E30.guide=(function(){
     }
     ACT.wfOpen=ACT.resume=resumeWork;
     CBACT.e33EditCriteria=function(el){
-      var flow=el.getAttribute('data-flow'),source=el.getAttribute('data-source');
-      if(['rent','buy'].indexOf(flow)<0||['legacy','sample'].indexOf(source)<0)return;
-      if(source==='legacy'&&CE.f!==flow){toast('این جست‌وجو دیگر فعال نیست.');return}
-      criteriaEditor(flow,source);
+      var flow=el.getAttribute('data-flow'),source=el.getAttribute('data-source'),owner=el.getAttribute('data-owner');
+      if(!owner||criteriaOwner(flow,source,false)!==owner){toast('این جست‌وجو دیگر فعال نیست.');return}
+      criteriaEditor(flow,source,owner);
     };
     CBACT.e33ApplyCriterion=function(el){
       var editor=el.closest('.e33-criteria-editor'),row=el.closest('[data-criterion]');if(!editor||!row)return;
       var flow=editor.getAttribute('data-flow'),source=editor.getAttribute('data-source'),id=el.getAttribute('data-slot'),value=row.querySelector('input,select').value.trim(),label=row.querySelector('input,select').getAttribute('aria-label');
+      var owner=editor.getAttribute('data-owner');
+      if(!owner||criteriaOwner(flow,source,false)!==owner){toast('این جست‌وجو دیگر فعال نیست.');return}
       if(!value){toast('مقدار جدید را وارد کنید.');return}
       if(source==='legacy'){
         if(CE.f!==flow||wd(flow).id!==editor.getAttribute('data-work')){toast('این جست‌وجو دیگر فعال نیست.');return}
