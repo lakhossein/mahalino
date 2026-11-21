@@ -456,7 +456,7 @@ VIEWS.rent=function(){
         }
         h+='<button class="btn" style="margin-top:10px;color:var(--danger);border-color:#f2c8c7" data-act="tdel"> حذف</button></div>';
       }else if(T.ph===4){
-        h+='<div class="card"><div class="ct">۴) تخلیهٔ هوشمند</div>'+baHTML();
+        h+='<div class="card"><div class="ct">۴) تخلیهٔ هوشمند</div>'+baHTML(T.ba||{});
         if(T.wait){
           h+='<div class="alert al-warn"> تحلیل تصاویر... <span class="dots"><i></i><i></i><i></i></span></div>';
         }else if(!T.ai){

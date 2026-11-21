@@ -492,9 +492,10 @@ function termSteps(T){
   }).join('')+'</div>';
 }
 /* V0.27 — مقایسهٔ قبل/بعد تخلیه با تصویر واقعی دمو، لغزنده، بزرگ‌نمایی و بارگذاری عکس کاربر */
-function baHTML(){
-  var st=(CE.f==='rent')?((wd('rent').data.term||{}).ba||{}):{};
+function baHTML(st){
+  st=st||((CE.f==='rent'||CURRENT==='rent')?((wd('rent').data.term||{}).ba||{}):{});
   var stage=st.stage||1;
+  var initial=stage===2?100:50;
   try{ /* preload هر دو تصویر برای کشش بی‌وقفه */
     ['assets/img/emptying-before.jpg','assets/img/emptying-after.jpg'].forEach(function(u){var i2=new Image();i2.src=u});
   }catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/workflow-engine.js:500',e,'caught');}
@@ -504,12 +505,12 @@ function baHTML(){
   '<div class="ba27-step '+(stage===2?'on':'')+'">۲) روز تخلیه</div>'+
   '<div class="ba27-step">۳) تحلیل و تسویه</div>'+
   '</div>'+
-  '<div class="ba27-wrap" tabindex="0" role="slider" aria-label="مقایسهٔ روز ورود و روز تخلیه" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">'+
+  '<div class="ba27-wrap" tabindex="0" role="slider" aria-label="مقایسهٔ روز ورود و روز تخلیه" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+initial+'">'+
   '<img id="ba27-img-before" src="'+E27.baImg('before')+'" width="1200" height="800" decoding="async" fetchpriority="high" alt="روز ورود — پیش از تخلیه، با اثاثیه">'+
-  '<div class="ba27-after"><img src="'+E27.baImg('after')+'" width="1200" height="800" decoding="async" alt="روز تخلیه — پس از خارج‌شدن اثاثیه"></div>'+
-  '<div class="ba27-handle" style="left:50%"></div>'+
+  '<div class="ba27-after" style="clip-path:inset(0 '+(100-initial)+'% 0 0)"><img src="'+E27.baImg('after')+'" width="1200" height="800" decoding="async" alt="روز تخلیه — پس از خارج‌شدن اثاثیه"></div>'+
+  '<div class="ba27-handle" style="left:'+initial+'%"></div>'+
   '</div>'+
-  '<input type="range" class="ba27-range" min="0" max="100" value="50" aria-label="لغزندهٔ مقایسهٔ قبل و بعد">'+
+  '<input type="range" class="ba27-range" min="0" max="100" value="'+initial+'" aria-label="لغزندهٔ مقایسهٔ قبل و بعد">'+
   '<div class="ba27-labs"><span>روز ورود — مبلمان موجود</span><span>روز تخلیه — خالی</span></div>'+
   '<div class="ba27-acts">'+
   '<button class="btn btn-xs" data-cba="baZoom" data-src="'+E27.baImg('before')+'">بزرگ‌نمایی روز ورود</button>'+
