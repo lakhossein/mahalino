@@ -223,6 +223,28 @@ const assert=(x,s)=>{if(!x)throw Error(s)};
       await send(page,await page.evaluate(()=>E30.guide.actions.sample.prompt));
       assert(await page.locator('#chatB .e31-results .pcard').count()>0,'resumed legacy entry failed to complete a search');
     });
+    for(const both of [true,false])for(const mode of ['typed','suggestion'])await test('Known '+(both?'combined':'partial')+' rental budget goes directly to results after '+mode+' continuation',async page=>{
+      await send(page,await page.evaluate(()=>E30.guide.actions.rent.prompt));
+      await send(page,'ودیعه تا ۳ میلیارد تومان'+(both?' و اجاره ماهانه تا ۷۰ میلیون تومان':''));
+      const known=await page.evaluate(()=>({dep:E30.discAPI.getF('budget_dep'),rent:E30.discAPI.getF('budget_rent')}));
+      assert(known.dep?.v?.[1]===30e9&&(both?known.rent?.v?.[1]===7e8:known.rent===null),'real composer failed to extract known budget: '+JSON.stringify(known));
+      if(mode==='suggestion'){
+        const button=page.locator('#chatB [data-e31-id="start-service"]').last();assert(await button.isVisible(),'continue suggestion unavailable');
+        await button.click();assert((await page.locator('#chatIn').inputValue()).includes('با اطلاعات فعلی ادامه بده'),'continue suggestion did not prefill');
+        await page.locator('#chatSend').click();
+      }else await send(page,'با اطلاعات فعلی ادامه بده');
+      assert(await page.evaluate(()=>E30.discAPI.collector().confirming?.type==='final'),'explicit continuation did not reach confirmation');
+      const since=await page.evaluate(()=>HIST.length);
+      await send(page,'درسته');
+      const result=await page.evaluate(since=>({step:SCRIPTS[CE.f]?.[CE.i]?.id,active:E30.discAPI.active(),data:wd('rent').data.B,
+        confirmation:E30.discAPI.ctx().fields.budget_dep.requiresConfirmation,html:HIST.slice(since).map(x=>x.h||'').join('')}),since);
+      assert(result.step==='list'&&!result.active&&result.data.depB===30e9&&result.data.rentB===(both?7e8:null)&&result.confirmation===false,
+        'continuation re-asked or replaced a known amount: '+JSON.stringify({...result,html:result.html.slice(0,300)}));
+      assert(!/data-slot="rent\.dep"|مبلغ ودیعهٔ شما/.test(result.html),'a new deposit slider or prompt was emitted after final confirmation');
+      const current=page.locator('#chatB .msg.bot').last();
+      assert(await current.isVisible()&&/آگهی‌های منطبق/.test(await current.innerText())&&await current.locator('[data-slot="rent.dep"]').count()===0,
+        'current Assistant message is not the real rental result surface');
+    });
     await test('Skipping investment preferences produces an honest limited report that can be saved and resumed',async page=>{
       await send(page,await page.evaluate(()=>E30.guide.actions.invest.prompt));
       const before=await page.evaluate(()=>S.tokens);

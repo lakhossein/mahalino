@@ -1467,9 +1467,11 @@ E30.disc=(function(){
     var nt=nz(text);
     if(/درسته|درست است|درست فع|اوکی|باشه|تأیید|تایید|همینه|همین/.test(nt)){
       usrC(text);
-      if(financialPending()){
-        if(!COL.skipOptionalToHoods){promptFinancial();return true}
-        COL.finConfirmed=true;['budget_dep','budget_rent'].forEach(function(id){var f=fMeta(id);if(f)f.requiresConfirmation=false});persist();saveCollector();
+      if(financialPending()&&!COL.skipOptionalToHoods){promptFinancial();return true}
+      /* Explicit continuation confirms the displayed facts even when only one
+         rental amount was supplied. An omitted amount remains unknown. */
+      if(COL.wf==='rent'&&COL.skipOptionalToHoods){
+        COL.finConfirmed=true;['budget_dep','budget_rent'].forEach(function(id){var f=fMeta(id);if(f&&getF(id)!=null)f.requiresConfirmation=false});persist();saveCollector();
       }
       if(hardContradiction()){promptContradiction();return true}
       handoff();return true;

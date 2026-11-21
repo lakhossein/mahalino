@@ -36,6 +36,31 @@ assert(commute.c.E30.discAPI.missing('rent').some(x=>x.id==='work_loc'),'explici
 const keep=runtime('rent');keep.set('budget_dep',{v:[5e9,5e9]});keep.set('budget_rent',{v:[2e8,2e8]});
 keep.c.E30.discAPI.preference('budget_pair');keep.c.E30.discAPI.route('رد');
 assert.equal(keep.c.E30.discAPI.getF('budget_dep').v[1],5e9);assert.equal(keep.c.E30.discAPI.getF('budget_rent').v[1],2e8);
+// Exercise actual discovery extraction, explicit opt-out, final confirmation
+// and the legacy ceStart/ceJump/ceStep rendering path (no browser DOM needed).
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const conversation=fs.readFileSync(path.join(__dirname,'../src/legacy/conversation.js'),'utf8');
+const engine=fs.readFileSync(path.join(__dirname,'../src/legacy/workflow-engine.js'),'utf8');
+for(const mode of ['typed','chip'])for(const both of [true,false]){
+  const r=runtime('rent'),c=r.c,api=c.E30.discAPI,g=c.E30.guide;
+  const w={id:'rent-known',m:'rent',data:{},step:1};
+  Object.assign(c,{SCRIPTS:{},MODBY:{rent:{}},wd:()=>w,wf:()=>w,cePush(){},wLabel:()=>'',lscore:()=>0,getPlaces:()=>[]});
+  c.S.active={rent:w.id};c.S.wfs=[w];
+  vm.runInContext(engine.match(/^function defP\(D\).*$/m)[0],c);
+  vm.runInContext(conversation.slice(conversation.indexOf('SCRIPTS.rent=['),conversation.indexOf('SCRIPTS.buy=[')),c);
+  vm.runInContext(conversation.slice(conversation.indexOf('function ceStart('),conversation.indexOf('function CHIP5(')),c);
+  assert.equal(api.route('ودیعه تا ۳ میلیارد تومان'+(both?' و اجاره ماهانه تا ۷۰ میلیون تومان':'')),true);
+  assert.equal(api.getF('budget_dep').v[1],30e9);
+  if(mode==='typed')assert.equal(g.route(g.actions['start-service'].prompt),true);else c.CBACT.e30UseKnown();
+  assert.equal(api.collector().confirming.type,'final');
+  const before=r.messages.length;
+  assert.equal(api.route('درسته'),true);assert(!api.active());
+  assert.equal(c.SCRIPTS.rent[c.CE.i].id,'list');
+  assert.equal(w.data.B.depB,30e9);assert.equal(w.data.B.rentB,both?7e8:null);
+  assert.equal(api.ctx().fields.budget_dep.requiresConfirmation,false);
+  assert(r.messages.slice(before).some(h=>h.includes('آگهی‌های منطبق')));
+  assert(!r.messages.slice(before).some(h=>/مبلغ ودیعهٔ شما|لغزندهٔ انتخاب مبلغ/.test(h)));
+}
 for(const flow of ['sell','invest','landlord']){
   const r=runtime(flow);r.c.E30.discAPI.start(flow,false);
   assert.equal(r.c.E30.discAPI.collector().expecting,null,flow+' forced its discovery questionnaire');
