@@ -1,0 +1,37 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),runtime=require('./guide-runtime.cjs');
+const r=runtime('rent'),c=r.c,html=fs.readFileSync(path.join(__dirname,'..','Mahalino+V0.33.html'),'utf8');
+for(const name of ['PRJ','BIDS'])vm.runInContext(html.match(new RegExp('var '+name+'=\\[[\\s\\S]*?\\];'))[0],c);
+c.SCRIPTS={buy:[{id:'buy_ctr'}]};
+const start=html.indexOf('SCRIPTS.mkt=['),end=html.indexOf('SCRIPTS.build=[',start);
+assert(start>0&&end>start);vm.runInContext(html.slice(start,end),c);
+c.MODBY={};c.FRC={};c.WSTEPS={};c.window=c;c.E30.flowsAPI.install();
+c.S.wfs=[{id:'first',m:'mkt',data:{role:'con',prjI:0,bidAmt:8e10,adj:'none'}},{id:'second',m:'mkt',data:{role:'emp',prjI:1,marker:'untouched'}}];c.S.active={mkt:'first'};
+c.wd=flow=>c.S.wfs.find(w=>w.id===c.S.active[flow]);
+vm.runInContext(html.match(/^function wfOf\(id\).*$/m)[0],c);
+const timers=[];c.setTimeout=fn=>timers.push(fn);c.spend=()=>true;c.addReq=()=> 'request-first';c.setReq=function(){};c.ceJump=function(){};
+c.SCRIPTS.mkt.find(s=>s.id==='send').acts.b(c.S.wfs[0].data);
+assert.equal(timers.length,1);const other=JSON.stringify(c.S.wfs[1]);c.S.active.mkt='second';timers[0]();
+assert.equal(c.S.wfs[0].data.confirmed,true,'delayed approval failed to reach the submitting workflow');
+assert.equal(JSON.stringify(c.S.wfs[1]),other,'delayed approval changed another active project');
+const snapshot=JSON.stringify(c.S);const tracking=c.SCRIPTS.mkt.find(s=>s.id==='trk').q(c.S.wfs[1].data);
+assert(tracking.includes('پیشرفت ثبت‌شده')&&tracking.includes('ثبت نشده'));
+assert.equal(JSON.stringify(c.S),snapshot,'viewing project progress created a build workflow or invented phase values');
+const count=c.S.wfs.length;c.E30.guide.route(c.E30.guide.actions.development.prompt);
+assert(r.messages.at(-1).includes('e31-project-catalog'));
+assert.equal(c.S.wfs.length,count,'browsing projects created an operational workflow');
+console.log('PASS project scope: role-free catalog, delayed approval identity, unrelated state and read-only progress');
+
+const bidStep=c.SCRIPTS.mkt.find(s=>s.id==='bid'),amount={};
+assert.equal(bidStep.set(amount,'۸ میلیارد تومان'),null);assert.equal(amount.bidAmt,8e10);
+c.moneyCanonical(()=>{assert.equal(bidStep.set(amount,'80000000000'),null)});assert.equal(amount.bidAmt,8e10);
+assert.equal(bidStep.set(amount,'نامعتبر'),'ERR');assert.equal(amount.bidAmt,8e10);
+const counts=runtime('rent').c;
+for(const v of ['۲.۵','۲٫۵','نیم','2.5'])assert.equal(counts.parseCountFA(v).ok,false,'fractional count rounded: '+v);
+assert.equal(counts.parseCountFA('دو شب').value,2);
+console.log('PASS contractor money parsing and fractional-count rejection without rounding');
+
+const guardedBid=c.SCRIPTS.mkt.find(s=>s.id==='send').acts.b;
+assert.equal(typeof guardedBid.e30PaidDelegate,'function');
+assert(/\bspend\s*\(/.test(Function.prototype.toString.call(guardedBid.e30PaidDelegate)),'guarded bid must retain its payment discovery source');
+console.log('PASS delegated contractor action retains explicit payment discovery');
