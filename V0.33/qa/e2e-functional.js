@@ -83,6 +83,7 @@ async function drainDisc(page,final){
     budget:JSON.parse(JSON.stringify(wd('rent').data.B||{})),beds:wd('rent').data.P?.beds}));
   ok('T1.1a initial handoff retains the user’s 3B/70M Toman budget',
     st.budget.depB===30000000000&&st.budget.rentB===700000000&&st.beds===2,st);
+  const listSince=await page.evaluate(()=>SCRIPTS[CE.f]?.[CE.i]?.id==='list'?HIST.length-1:HIST.length);
   await walkTo(page,'list');
   st=await page.evaluate(()=>({id:(SCRIPTS[CE.f][CE.i]||{}).id}));
   ok('T1.2 reached listing step',st.id==='list',st);
@@ -92,14 +93,22 @@ async function drainDisc(page,final){
   });
   ok('T1.3 hard constraints active (park/beds/exact stated budget)',st.D.park===true&&st.D.beds===2&&
     st.D.rentB===700000000&&st.D.depB===30000000000,st.D);
-  st=await page.evaluate(()=>{
+  st=await page.evaluate(listSince=>{
     const D=wd('rent').data;
-    const bub=[...document.querySelectorAll('#chatB .msg.bot .bub')].pop();
-    const ids=[];bub.querySelectorAll('[data-l]').forEach(x=>{const l=x.getAttribute('data-l');if(l&&!ids.includes(l))ids.push(l)});
+    const msgs=[...document.querySelectorAll('#chatB .msg')];
+    const visible=el=>el&&el.getClientRects().length>0&&getComputedStyle(el).visibility==='visible';
+    const bub=msgs.map((msg,i)=>({msg,i})).filter(({msg,i})=>HIST.length-msgs.length+i>=listSince&&msg.classList.contains('bot'))
+      .map(({msg})=>msg.querySelector('.bub')).filter(b=>visible(b)&&[...b.querySelectorAll('[data-cba="selL"][data-l]')].some(visible)).pop();
+    const ids=[];bub?.querySelectorAll('[data-cba="selL"][data-l]').forEach(x=>{const l=x.getAttribute('data-l');if(visible(x)&&l&&!ids.includes(l))ids.push(l)});
     const viol=ids.filter(id=>{const x=RLIST.find(r=>r.id===id);return x?!E30.flowsAPI.rentPass(x,D):false});
-    const expected=RLIST.filter(x=>x.hood===D.hood&&E30.flowsAPI.rentPass(x,D)).length;
+    const candidates=RLIST.filter(x=>!D.hood||x.hood===D.hood);
+    const expected=candidates.filter(x=>E30.flowsAPI.rentPass(x,D)).length;
+    const counts=[...(bub?.innerText||'').matchAll(/آگهی‌های منطبق\s*\(([۰-۹٬]+)\s+از\s+([۰-۹٬]+)\)\s*:/g)];
+    const countText=counts.length===1?counts[0]:null;
+    const displayed=countText?Number(pd(countText[1]).replace(/٬/g,'')):null;
+    const displayedTotal=countText?Number(pd(countText[2]).replace(/٬/g,'')):null;
     const candidate=RLIST.find(x=>x.id==='r5');
-    return {checked:ids.length,expected,viol:viol,head:bub.textContent.slice(0,80),
+    return {checked:ids.length,expected,viol:viol,displayed,displayedTotal,expectedTotal:candidates.length,countText:countText?.[0]||null,
       diagnostic:{hood:D.hood,preferences:{beds:D.P?.beds,bedsNum:D.P?.bedsNum,
         maxAge:D.P?.maxAge,ageHard:D.P?._ageHard,minM2:D.P?.minM2,
         floor:D.P?.floor,floorNum:D.P?.floorNum,requiredFloor:D.P?.requiredFloor,
@@ -109,10 +118,11 @@ async function drainDisc(page,final){
           hood:candidate.hood,beds:candidate.beds,age:candidate.age,area:candidate.m2,
           floor:candidate.floor,elev:candidate.elev,park:candidate.park,
           dep:candidate.dep,rent:candidate.rent}}};
-  });
+  },listSince);
   ok('T1.4 at least one real matched card (max 3), never a violating candidate',st.expected>=1&&st.checked>0&&st.checked===Math.min(3,st.expected)&&st.viol.length===0,st);
   if(st.expected===0)console.log('  T1.4 FILTER DIAGNOSTIC: '+JSON.stringify(st.diagnostic));
-  ok('T1.5 match count honestly shown',/منطبق/.test(st.head),st.head);
+  ok('T1.5 exact match count and inventory total honestly shown',st.displayed===st.expected&&st.displayedTotal===st.expectedTotal,
+    {displayed:st.displayed,expected:st.expected,displayedTotal:st.displayedTotal,expectedTotal:st.expectedTotal,countText:st.countText});
   st=await page.evaluate(()=>{
     const d=JSON.parse(JSON.stringify(wd('rent').data));
     d.B={...(d.B||{}),depB:100000000,rentB:300000000};
