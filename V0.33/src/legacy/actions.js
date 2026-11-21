@@ -764,12 +764,11 @@ ACT.tai=function(){
 };
 ACT.tpay=function(){
   var d=wd('rent'),D=d.data,T=D.term;
-  if(!T||T.paid)return;
+  if(!T||T.paid||!D.signed||rentalSettlementDeposit(D)==null||!E28.applyTermination(D.code))return false;
   T.paid=true;d.done=true;
   if(T.rid)setReq(T.rid,'کامل شد');
   addReq('rent','تسویه','۱۰۰٪ ودیعه '+D.code,'کامل شد','کسر: صفر (AI)');
-  E28.applyTermination(D.code); /* V0.28: امضاشده (داخلی) → فسخ‌شده */
-  save();renderCurrent();toast('ودیعه واریز ✓');
+  save();renderCurrent();toast('تسویهٔ داخلی ثبت شد ✓');return true;
 };
 ACT.blsel=function(el){wd('buy').data.lsel=el.getAttribute('data-k');save();renderCurrent()};
 ACT.blegal=function(){

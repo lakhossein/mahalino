@@ -414,7 +414,7 @@ VIEWS.rent=function(){
       '<div class="kv"><span>موجر / مستأجر</span><b>'+esc(C.parties.lessor.name||'—')+' / '+esc(S.auth.name)+'</b></div>'+
       '<div class="kv"><span>وضعیت درخواست</span><b>'+(crq?stB(crq.status):stB('کامل شد'))+'</b></div>'+
       '<div class="alert al-warn">این قرارداد در سامانهٔ رسمی ثبت نشده است. برای ثبت رسمی، احراز هویت و امضای الکترونیک لازم است.</div>'+
-      '<div class="fs-actions" style="justify-content:center;margin-top:12px"><button class="btn btn-sm" data-act="cdoc" data-i="cur">مشاهدهٔ سند</button><button class="btn btn-sm" data-act="cprint">دریافت PDF</button>'+(D.grtId?'<button class="btn btn-sm" data-act="grtBackToEnr">بازگشت به پروندهٔ اجارهٔ تضمینی</button>':'')+'<button class="btn btn-sm btn-primary" data-act="startTerm">شروع فسخ و تخلیه</button></div></div>';
+      '<div class="fs-actions" style="justify-content:center;margin-top:12px"><button class="btn btn-sm" data-act="cdoc" data-i="cur">مشاهدهٔ سند</button><button class="btn btn-sm" data-act="cprint">دریافت PDF</button>'+(D.grtId?'<button class="btn btn-sm" data-act="grtBackToEnr">بازگشت به پروندهٔ اجارهٔ تضمینی</button>':'')+'<button class="btn btn-sm btn-primary" data-act="startTerm" data-wf="'+qesc(d.id)+'" data-code="'+qesc(D.code)+'">شروع فسخ و تخلیه</button></div></div>';
       h+='<div class="card" style="margin-top:14px"><div class="ct">خدمات پس از سکونت</div>'+
       '<p class="note">خدمات را داخل محلینو سفارش دهید؛ زمان و جزئیات همان‌جا ثبت می‌شود.</p>'+
       '<button class="btn btn-primary" data-act="svcs">مشاهده و ثبت درخواست</button></div>';
@@ -427,7 +427,8 @@ VIEWS.rent=function(){
     if(!D.term){
       h+='<div class="card"><div class="ct"> وضعیت قرارداد</div>';
       h+='<div class="kv"><span>کد</span><b>'+(D.code||'—')+'</b></div>';
-      h+='<div class="kv"><span>ودیعه</span><b>'+rial(D.B.depB)+' — در امانی</b></div>';
+      var amount=rentalSettlementDeposit(D);
+      h+='<div class="kv"><span>ودیعهٔ قرارداد</span><b>'+(amount==null?'نامشخص':rial(amount))+'</b></div>';
       h+='<div class="alert al-warn">فسخ: درخواست ← صورت‌جلسه ← تأیید طرف مقابل ← تخلیهٔ هوشمند ← تسویهٔ ودیعه.</div>';
       h+='<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn btn-primary" data-act="tstart">شروع فسخ</button><button class="btn" data-act="svcs"> خدمات</button><button class="btn" data-act="rdone">فعال — پایان</button></div></div>';
     }else{
@@ -466,9 +467,10 @@ VIEWS.rent=function(){
       }else{
         h+='<div class="card"><div class="ct">۵) تسویهٔ ودیعه</div>';
         h+='<div class="alert al-ok"> ۱ مورد خارج از استهلاک (بار موجر) + ۱ استهلاک عادی. <b>کسر: صفر.</b></div>';
-        h+='<div class="kv"><span>ودیعه</span><b>'+rial(D.B.depB)+'</b></div>';
+        var amount=rentalSettlementDeposit(D);
+        h+='<div class="kv"><span>ودیعهٔ قرارداد</span><b>'+(amount==null?'نامشخص':rial(amount))+'</b></div>';
         if(!T.paid){
-          h+='<button class="btn btn-primary" style="margin-top:10px" data-act="tpay">واریز ۱۰۰٪ از امانی</button>';
+          h+=amount==null?'<p class="note">تا مشخص‌شدن مبلغ ثبت‌شده، تسویه ثبت نمی‌شود.</p>':'<button class="btn btn-primary" style="margin-top:10px" data-act="tpay">ثبت تسویهٔ نمایشی</button>';
         }else{
           h+='<div class="done-card"><div class="bigicon">✓</div><div class="ct">فسخ کامل شد</div><p class="note">ودیعه تسویه و قرارداد بسته شد. سابقه در «درخواست‌ها» باقی می‌ماند.</p>'+
           '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="btn" data-act="dt" data-t="con">قراردادها</button><button class="btn btn-primary" data-act="flowNew" data-m="rent">درخواست اجارهٔ جدید</button></div></div>';

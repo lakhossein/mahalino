@@ -498,15 +498,15 @@ E21.escConfirmHTML=function(){
   return rcConfirm(rows,[{l:'تأیید و آزادسازی همین مرحله',a:'data-cba="attEscGo"',p:1}]);
 };
 E21.tpayConfirmHTML=function(){
-  var D=wd('rent').data;
+  var w=wd('rent'),D=w.data,amount=rentalSettlementDeposit(D);
   var rows=[
     {l:'قرارداد',v:esc(D.code||'—')},
-    {l:'ودیعهٔ قابل واریز',v:rial(D.B?D.B.depB:0)},
+    {l:'ودیعهٔ ثبت‌شدهٔ قرارداد',v:amount==null?'نامشخص':rial(amount)},
     {l:'کسورات',v:'صفر — شبیه‌سازی؛ نتیجهٔ واقعی از عکس شما استخراج نمی‌شود'},
-    {l:'نحوهٔ واریز',v:'۱۰۰٪ از حساب امانی'},
+    {l:'نحوهٔ تسویه',v:'ثبت داخلی نمایشی، بدون انتقال واقعی وجه'},
     {l:'هزینهٔ کلید',v:'۰ کلید'}
   ];
-  return rcConfirm(rows,[{l:'تأیید واریز ودیعه',a:'data-cba="attTpayGo"',p:1}]);
+  return rcConfirm(rows,amount==null?[]:[{l:'تأیید ثبت تسویه',a:'data-cba="attTpayGo" data-wf="'+qesc(w.id)+'" data-code="'+qesc(D.code)+'"',p:1}]);
 };
 /* دکمه‌های تأیید پنل‌ها با گاردِ گام — هرگز موتور صفحه را دور نمی‌زنند */
 CBACT.attVisitGo=function(){
@@ -519,9 +519,10 @@ CBACT.attEscGo=function(){
   if(!st||st.id!=='escC'){toast('این دکمه به گام «پرداخت امانی» تعلق دارد.');return}
   ceVal('!ok');
 };
-CBACT.attTpayGo=function(){
+CBACT.attTpayGo=function(el){
   var st=(CE.f==='rent'&&SCRIPTS.rent)?SCRIPTS.rent[CE.i]:null;
-  if(!st||st.id!=='tpay'){toast('این دکمه به گام «تسویه» تعلق دارد.');return}
+  var w=S.active&&wfOf(S.active.rent);
+  if(!st||st.id!=='tpay'||!w||!el||el.getAttribute('data-wf')!==w.id||el.getAttribute('data-code')!==w.data.code||rentalSettlementDeposit(w.data)==null){toast('این دکمه به تسویهٔ قرارداد فعال تعلق ندارد.');return}
   ceVal('!pay');
 };
 /* جمع‌بندیِ گفت‌وگومحور فلو (S-CMP-03) — نگاشت فیلد→گام برای data-cj */

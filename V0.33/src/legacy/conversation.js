@@ -566,9 +566,9 @@ SCRIPTS.rent=[
      botC(' نتیجهٔ تحلیل: ۱ مورد خارج از استهلاک (نم دیوار — بار موجر) + ۱ مورد استهلاک عادی. <b>کسر: صفر.</b>',[['تسویه ودیعه','!pay']]);
    },1400);
  }}},
-{id:'tpay',q:function(D){return ' تسویه: ودیعه '+rial(D.B.depB)+' — کسورات صفر. واریز ۱۰۰٪ از حساب امانی؟'},
- chips:function(){return [['واریز کن','!pay']]},
- acts:{pay:function(){ACT.tpay();ceEnd()}}}
+{id:'tpay',q:function(D){var amount=rentalSettlementDeposit(D);return amount==null?'مبلغ ودیعه در قرارداد ثبت‌شده مشخص نیست؛ تسویه ثبت نمی‌شود.':' تسویهٔ نمایشی: ودیعهٔ ثبت‌شدهٔ قرارداد '+rial(amount)+' — کسورات صفر. تأیید ثبت داخلی تسویه؟'},
+ chips:function(D){return rentalSettlementDeposit(D)==null?[]:[['ثبت تسویه','!pay']]},
+ acts:{pay:function(D){if(rentalSettlementDeposit(D)==null){toast('مبلغ ودیعهٔ قرارداد مشخص نیست.');return}if(ACT.tpay())ceEnd()}}}
 ];
 SCRIPTS.buy=[
 {id:'budg',money:true,q:' بودجهٔ کل خرید شما چقدر است؟ (تومان — تایپ کنید)',kind:'num',

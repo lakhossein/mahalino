@@ -4709,8 +4709,20 @@ function rentCalc(D){
   var depNeed=D.B.rentB<rent?Math.round(D.B.rentB/0.03):null;
   return {rent:rent,depNeed:depNeed,mon:rent+D.B.chg};
 }
+function signedRentalDoc(D){
+  var matches=(S.contracts||[]).filter(function(c){return D&&D.code&&c&&c.code===D.code}),c=matches[0];
+  if(matches.length!==1||c.kind!=='rent'||!D.signed||(c.wfId&&c.wfId!==S.active.rent))return null;
+  if(c.doc&&c.doc.terms)return c.doc;
+  var draft=D.ctr;
+  return draft&&draft.finalized&&draft.kind==='rent'&&draft.code===D.code?{terms:draft.terms,lessor:draft.parties&&draft.parties.lessor,lessee:draft.parties&&draft.parties.lessee}:null;
+}
+function rentalSettlementDeposit(D){
+  var doc=signedRentalDoc(D),amount=doc&&doc.terms&&doc.terms.deposit;
+  return amount!==null&&amount!==undefined&&amount!==''&&Number.isFinite(Number(amount))&&Number(amount)>=0?Number(amount):null;
+}
 function termTpl(T,D){
-  return 'صورت‌جلسهٔ فسخ قرارداد '+D.code+'\nطرفین: موجر '+D.owner+' و مستأجر '+S.auth.name+'\nدرخواست‌کنندهٔ فسخ: '+T.who+'\nدلیل: '+T.reason+'\nزمان تخلیه: '+T.date+'\nشرایط تحویل:\n۱- تحویل مطابق صورت‌جلسهٔ آغاز\n۲- تسویهٔ روزشمار شارژ و قبوض\n۳- بررسی وضعیت با هوش مصنوعی\n۴- بازگشت ودیعه از حساب امانی';
+  var doc=signedRentalDoc(D),owner=doc&&doc.lessor&&doc.lessor.name,tenant=doc&&doc.lessee&&doc.lessee.name;
+  return 'صورت‌جلسهٔ فسخ قرارداد '+D.code+'\nطرفین: موجر '+(owner||'نامشخص')+' و مستأجر '+(tenant||'نامشخص')+'\nدرخواست‌کنندهٔ فسخ: '+T.who+'\nدلیل: '+T.reason+'\nزمان تخلیه: '+T.date+'\nشرایط تحویل:\n۱- تحویل مطابق صورت‌جلسهٔ آغاز\n۲- تسویهٔ روزشمار شارژ و قبوض\n۳- بررسی وضعیت با هوش مصنوعی\n۴- بازگشت ودیعه از حساب امانی';
 }
 function termSteps(T){
   var TS=['درخواست فسخ','صورت‌جلسه','تأیید طرف مقابل','تخلیهٔ هوشمند','تسویه ودیعه'];
@@ -5628,9 +5640,9 @@ SCRIPTS.rent=[
      botC(' نتیجهٔ تحلیل: ۱ مورد خارج از استهلاک (نم دیوار — بار موجر) + ۱ مورد استهلاک عادی. <b>کسر: صفر.</b>',[['تسویه ودیعه','!pay']]);
    },1400);
  }}},
-{id:'tpay',q:function(D){return ' تسویه: ودیعه '+rial(D.B.depB)+' — کسورات صفر. واریز ۱۰۰٪ از حساب امانی؟'},
- chips:function(){return [['واریز کن','!pay']]},
- acts:{pay:function(){ACT.tpay();ceEnd()}}}
+{id:'tpay',q:function(D){var amount=rentalSettlementDeposit(D);return amount==null?'مبلغ ودیعه در قرارداد ثبت‌شده مشخص نیست؛ تسویه ثبت نمی‌شود.':' تسویهٔ نمایشی: ودیعهٔ ثبت‌شدهٔ قرارداد '+rial(amount)+' — کسورات صفر. تأیید ثبت داخلی تسویه؟'},
+ chips:function(D){return rentalSettlementDeposit(D)==null?[]:[['ثبت تسویه','!pay']]},
+ acts:{pay:function(D){if(rentalSettlementDeposit(D)==null){toast('مبلغ ودیعهٔ قرارداد مشخص نیست.');return}if(ACT.tpay())ceEnd()}}}
 ];
 SCRIPTS.buy=[
 {id:'budg',money:true,q:' بودجهٔ کل خرید شما چقدر است؟ (تومان — تایپ کنید)',kind:'num',
@@ -6961,7 +6973,7 @@ VIEWS.rent=function(){
       '<div class="kv"><span>موجر / مستأجر</span><b>'+esc(C.parties.lessor.name||'—')+' / '+esc(S.auth.name)+'</b></div>'+
       '<div class="kv"><span>وضعیت درخواست</span><b>'+(crq?stB(crq.status):stB('کامل شد'))+'</b></div>'+
       '<div class="alert al-warn">این قرارداد در سامانهٔ رسمی ثبت نشده است. برای ثبت رسمی، احراز هویت و امضای الکترونیک لازم است.</div>'+
-      '<div class="fs-actions" style="justify-content:center;margin-top:12px"><button class="btn btn-sm" data-act="cdoc" data-i="cur">مشاهدهٔ سند</button><button class="btn btn-sm" data-act="cprint">دریافت PDF</button>'+(D.grtId?'<button class="btn btn-sm" data-act="grtBackToEnr">بازگشت به پروندهٔ اجارهٔ تضمینی</button>':'')+'<button class="btn btn-sm btn-primary" data-act="startTerm">شروع فسخ و تخلیه</button></div></div>';
+      '<div class="fs-actions" style="justify-content:center;margin-top:12px"><button class="btn btn-sm" data-act="cdoc" data-i="cur">مشاهدهٔ سند</button><button class="btn btn-sm" data-act="cprint">دریافت PDF</button>'+(D.grtId?'<button class="btn btn-sm" data-act="grtBackToEnr">بازگشت به پروندهٔ اجارهٔ تضمینی</button>':'')+'<button class="btn btn-sm btn-primary" data-act="startTerm" data-wf="'+qesc(d.id)+'" data-code="'+qesc(D.code)+'">شروع فسخ و تخلیه</button></div></div>';
       h+='<div class="card" style="margin-top:14px"><div class="ct">خدمات پس از سکونت</div>'+
       '<p class="note">خدمات را داخل محلینو سفارش دهید؛ زمان و جزئیات همان‌جا ثبت می‌شود.</p>'+
       '<button class="btn btn-primary" data-act="svcs">مشاهده و ثبت درخواست</button></div>';
@@ -6974,7 +6986,8 @@ VIEWS.rent=function(){
     if(!D.term){
       h+='<div class="card"><div class="ct"> وضعیت قرارداد</div>';
       h+='<div class="kv"><span>کد</span><b>'+(D.code||'—')+'</b></div>';
-      h+='<div class="kv"><span>ودیعه</span><b>'+rial(D.B.depB)+' — در امانی</b></div>';
+      var amount=rentalSettlementDeposit(D);
+      h+='<div class="kv"><span>ودیعهٔ قرارداد</span><b>'+(amount==null?'نامشخص':rial(amount))+'</b></div>';
       h+='<div class="alert al-warn">فسخ: درخواست ← صورت‌جلسه ← تأیید طرف مقابل ← تخلیهٔ هوشمند ← تسویهٔ ودیعه.</div>';
       h+='<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn btn-primary" data-act="tstart">شروع فسخ</button><button class="btn" data-act="svcs"> خدمات</button><button class="btn" data-act="rdone">فعال — پایان</button></div></div>';
     }else{
@@ -7013,9 +7026,10 @@ VIEWS.rent=function(){
       }else{
         h+='<div class="card"><div class="ct">۵) تسویهٔ ودیعه</div>';
         h+='<div class="alert al-ok"> ۱ مورد خارج از استهلاک (بار موجر) + ۱ استهلاک عادی. <b>کسر: صفر.</b></div>';
-        h+='<div class="kv"><span>ودیعه</span><b>'+rial(D.B.depB)+'</b></div>';
+        var amount=rentalSettlementDeposit(D);
+        h+='<div class="kv"><span>ودیعهٔ قرارداد</span><b>'+(amount==null?'نامشخص':rial(amount))+'</b></div>';
         if(!T.paid){
-          h+='<button class="btn btn-primary" style="margin-top:10px" data-act="tpay">واریز ۱۰۰٪ از امانی</button>';
+          h+=amount==null?'<p class="note">تا مشخص‌شدن مبلغ ثبت‌شده، تسویه ثبت نمی‌شود.</p>':'<button class="btn btn-primary" style="margin-top:10px" data-act="tpay">ثبت تسویهٔ نمایشی</button>';
         }else{
           h+='<div class="done-card"><div class="bigicon">✓</div><div class="ct">فسخ کامل شد</div><p class="note">ودیعه تسویه و قرارداد بسته شد. سابقه در «درخواست‌ها» باقی می‌ماند.</p>'+
           '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="btn" data-act="dt" data-t="con">قراردادها</button><button class="btn btn-primary" data-act="flowNew" data-m="rent">درخواست اجارهٔ جدید</button></div></div>';
@@ -7860,12 +7874,11 @@ function contractWf(c){
 }
 function contractActions(c){
   var w=contractWf(c),f=w?w.data:null,T=f?f.term:null,a='';
-  var wfAttr=w?(' data-wf="'+w.id+'"'):'';
+  var wfAttr=w?(' data-wf="'+qesc(w.id)+'" data-code="'+qesc(c.code)+'"'):'';
   if(w&&MODBY[w.m]){a+='<button class="btn btn-xs" data-act="wfOpen" data-m="'+w.m+'"'+wfAttr+'>فلوی این قرارداد</button>'}
-  if(c.kind==='rent'&&f&&f.signed){
-    if(!T){a='<button class="btn btn-xs btn-primary" data-act="startTerm"'+wfAttr+'>شروع فسخ</button>'}
-    else if(!T.paid){a='<button class="btn btn-xs btn-primary" data-act="startTerm"'+wfAttr+'>ادامهٔ فسخ — '+fa(T.ph,0)+'</button>'}
-    else{a='<span class="badge b-ok">تسویه کامل</span>'}
+  if(c.kind==='rent'&&f&&f.signed&&f.code===c.code){
+    if(T&&T.paid){a='<span class="badge b-ok">تسویه کامل</span>'}
+    else if(c.status==='signed_internal')a='<button class="btn btn-xs btn-primary" data-act="startTerm"'+wfAttr+'>'+(T?'ادامهٔ فسخ — '+fa(T.ph,0):'شروع فسخ')+'</button>';
   }
   return a;
 }
@@ -8772,12 +8785,11 @@ ACT.tai=function(){
 };
 ACT.tpay=function(){
   var d=wd('rent'),D=d.data,T=D.term;
-  if(!T||T.paid)return;
+  if(!T||T.paid||!D.signed||rentalSettlementDeposit(D)==null||!E28.applyTermination(D.code))return false;
   T.paid=true;d.done=true;
   if(T.rid)setReq(T.rid,'کامل شد');
   addReq('rent','تسویه','۱۰۰٪ ودیعه '+D.code,'کامل شد','کسر: صفر (AI)');
-  E28.applyTermination(D.code); /* V0.28: امضاشده (داخلی) → فسخ‌شده */
-  save();renderCurrent();toast('ودیعه واریز ✓');
+  save();renderCurrent();toast('تسویهٔ داخلی ثبت شد ✓');return true;
 };
 ACT.blsel=function(el){wd('buy').data.lsel=el.getAttribute('data-k');save();renderCurrent()};
 ACT.blegal=function(){
@@ -11400,15 +11412,15 @@ E21.escConfirmHTML=function(){
   return rcConfirm(rows,[{l:'تأیید و آزادسازی همین مرحله',a:'data-cba="attEscGo"',p:1}]);
 };
 E21.tpayConfirmHTML=function(){
-  var D=wd('rent').data;
+  var w=wd('rent'),D=w.data,amount=rentalSettlementDeposit(D);
   var rows=[
     {l:'قرارداد',v:esc(D.code||'—')},
-    {l:'ودیعهٔ قابل واریز',v:rial(D.B?D.B.depB:0)},
+    {l:'ودیعهٔ ثبت‌شدهٔ قرارداد',v:amount==null?'نامشخص':rial(amount)},
     {l:'کسورات',v:'صفر — شبیه‌سازی؛ نتیجهٔ واقعی از عکس شما استخراج نمی‌شود'},
-    {l:'نحوهٔ واریز',v:'۱۰۰٪ از حساب امانی'},
+    {l:'نحوهٔ تسویه',v:'ثبت داخلی نمایشی، بدون انتقال واقعی وجه'},
     {l:'هزینهٔ کلید',v:'۰ کلید'}
   ];
-  return rcConfirm(rows,[{l:'تأیید واریز ودیعه',a:'data-cba="attTpayGo"',p:1}]);
+  return rcConfirm(rows,amount==null?[]:[{l:'تأیید ثبت تسویه',a:'data-cba="attTpayGo" data-wf="'+qesc(w.id)+'" data-code="'+qesc(D.code)+'"',p:1}]);
 };
 /* دکمه‌های تأیید پنل‌ها با گاردِ گام — هرگز موتور صفحه را دور نمی‌زنند */
 CBACT.attVisitGo=function(){
@@ -11421,9 +11433,10 @@ CBACT.attEscGo=function(){
   if(!st||st.id!=='escC'){toast('این دکمه به گام «پرداخت امانی» تعلق دارد.');return}
   ceVal('!ok');
 };
-CBACT.attTpayGo=function(){
+CBACT.attTpayGo=function(el){
   var st=(CE.f==='rent'&&SCRIPTS.rent)?SCRIPTS.rent[CE.i]:null;
-  if(!st||st.id!=='tpay'){toast('این دکمه به گام «تسویه» تعلق دارد.');return}
+  var w=S.active&&wfOf(S.active.rent);
+  if(!st||st.id!=='tpay'||!w||!el||el.getAttribute('data-wf')!==w.id||el.getAttribute('data-code')!==w.data.code||rentalSettlementDeposit(w.data)==null){toast('این دکمه به تسویهٔ قرارداد فعال تعلق ندارد.');return}
   ceVal('!pay');
 };
 /* جمع‌بندیِ گفت‌وگومحور فلو (S-CMP-03) — نگاشت فیلد→گام برای data-cj */
@@ -13677,8 +13690,8 @@ E28.contractOf=function(code){
   return null;
 };
 E28.applyTermination=function(code){
-  var c=E28.contractOf(code);
-  if(!c||c.status==='terminated')return false;
+  var matches=(S.contracts||[]).filter(function(c){return code&&c&&c.code===code}),c=matches[0];
+  if(matches.length!==1||c.kind!=='rent'||c.status!=='signed_internal'||(c.wfId&&c.wfId!==S.active.rent))return false;
   c.statusTrail=(c.statusTrail||[]).concat([{st:c.status||'signed_internal',t:c.t||Date.now()}]);
   c.status='terminated';
   if(c.doc)c.doc.status='terminated';
@@ -13689,6 +13702,11 @@ E28.applyTermination=function(code){
 E28.ctrBubble=function(){
   var kind=E28.ctrKind||'rent',D=wd(kind).data,c=conInit(D,kind);
   return '<div data-e28ctr="1">'+conFlowHTML(D,kind)+'</div>';
+};
+E28.terminationButton=function(kind,D){
+  var w=kind==='rent'&&wfOf(S.active.rent),matches=(S.contracts||[]).filter(function(c){return c&&c.code===D.code});
+  if(!w||w.data!==D||!D.signed||!D.code||matches.length!==1||matches[0].kind!=='rent'||matches[0].status!=='signed_internal'||(matches[0].wfId&&matches[0].wfId!==w.id))return '';
+  return '<button class="qbtn primary" data-cba="ctrCont" data-v="trm" data-wf="'+qesc(w.id)+'" data-code="'+qesc(D.code)+'">شروع فسخ و تخلیه</button>';
 };
 E28.ctrRefresh=function(){
   if(CURRENT!=='landing')return;
@@ -13702,8 +13720,8 @@ E28.ctrRefresh=function(){
   var kind=E28.ctrKind||'rent',D=wd(kind).data,c=conInit(D,kind);
   if(c.finalized&&E28.ctrDone!==c.code){
     E28.ctrDone=c.code;
-    botC(' قرارداد داخلی <b dir="ltr">'+esc(c.code)+'</b> ثبت شد. فسخ بعدی هم در همین گفت‌وگو انجام می‌شود.'+
-    '<div class="racts"><button class="qbtn primary" data-cba="ctrCont" data-v="trm">شروع فسخ و تخلیه</button><button class="qbtn" data-cv="F:reqs">درخواست‌های من</button></div>',null);
+    botC(' قرارداد داخلی <b dir="ltr">'+esc(c.code)+'</b> ثبت شد.'+
+    '<div class="racts">'+E28.terminationButton(kind,D)+'<button class="qbtn" data-cv="F:reqs">درخواست‌های من</button></div>',null);
   }
 };
 E28.ctrStart=function(kind){
@@ -13714,8 +13732,8 @@ E28.ctrStart=function(kind){
   if(D.ctr.finalized&&D.code)E28.ctrDone=D.code;
   botC('<b>'+(kind==='buy'?'مبایعه‌نامه':'اجاره‌نامه')+'</b> — فرم درون‌گفت‌وگو:'+E28.ctrBubble(),null);
   if(D.ctr.finalized){
-    botC(' قرارداد <b dir="ltr">'+esc(D.code||D.ctr.code||'')+'</b> ثبت شده است. فسخ هم در همین گفت‌وگو انجام می‌شود.'+
-    '<div class="racts"><button class="qbtn primary" data-cba="ctrCont" data-v="trm">شروع فسخ و تخلیه</button></div>',null);
+    var term=E28.terminationButton(kind,D);
+    botC(' قرارداد <b dir="ltr">'+esc(D.code||D.ctr.code||'')+'</b> ثبت شده است.'+(term?'<div class="racts">'+term+'</div>':''),null);
   }
 };
 var _oConKind=conKind;
@@ -13725,15 +13743,8 @@ conKind=function(){return (CURRENT==='landing'&&E28.ctrKind)?E28.ctrKind:_oConKi
   if(typeof o!=='function')return;
   ACT[k]=function(el){o(el);setTimeout(function(){try{E28.ctrRefresh()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:137',e,'caught');}},30)};
 });
-CBACT.ctrCont=function(el){
-  var v=el.getAttribute('data-v');
-  if(v==='trm'){
-    var kind=E28.ctrKind||'rent',D=wd(kind).data;
-    if(CE.f!=='rent'){CE.f='rent';CE.i=0;CE.li=0;CE.hist=[]}
-    if(!D.term)D.term={ph:1,who:'مستأجر (شما)'};
-    save();ceJump('termq');
-  }
-};
+/* The Assistant's identity-validated termination dispatcher installs later. */
+CBACT.ctrCont=function(){toast('قرارداد هدف در دسترس نیست.');return false};
 
 /* ── یادآور جامع (V0.28) — مدل کامل، تشخیص خودکار، مدیریت ── */
 E28.remNorm=function(){
@@ -19996,10 +20007,11 @@ E30.guide=(function(){
       var code=el.getAttribute('data-code');return startTermination(rentalTarget(code),code);
     };
     ACT.startTerm=function(el){
-      var id=el&&el.getAttribute('data-wf'),w=id&&wfOf(id),code=w&&w.data&&w.data.code;
-      if(!w||rentalTarget(code)!==w){toast('قرارداد انتخابی دیگر در دسترس نیست.');return false}
+      var id=el&&el.getAttribute('data-wf'),w=id&&wfOf(id),code=el&&el.getAttribute('data-code');
+      if(!w||!code||rentalTarget(code)!==w){toast('قرارداد انتخابی دیگر در دسترس نیست.');return false}
       return startTermination(w,code);
     };
+    CBACT.ctrCont=ACT.startTerm;
     CBACT.e30StartRent=function(){return selectService('contract-start')};
     ['e30ValOpen','e30RequestService','e30RequestGRT'].forEach(function(key){
       var original=CBACT[key];if(typeof original!=='function')return;
@@ -20273,8 +20285,8 @@ E30.init=function(){
       }
       if(E28.ctrDone!==D.code){
         E28.ctrDone=D.code;
-        botC('قرارداد داخلی <b dir="ltr">'+esc(D.code)+'</b> ثبت شد. این ثبت رسمی نیست و در صورت نیاز می‌توانید فسخ را در همین گفت‌وگو آغاز کنید.'+
-          '<div class="racts"><button class="qbtn primary" data-cba="ctrCont" data-v="trm">شروع فسخ و تخلیه</button></div>',null);
+        var term=E28.terminationButton(kind,D);
+        botC('قرارداد داخلی <b dir="ltr">'+esc(D.code)+'</b> ثبت شد. این ثبت رسمی نیست.'+(term?'<div class="racts">'+term+'</div>':''),null);
       }
       return done;
     };

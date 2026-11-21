@@ -169,7 +169,7 @@ async function test(id,name,fn){
       const v=await s.page.evaluate(()=>{
         const D=wd('rent').data;
         D.code='MH-QA-TERMINATION';D.signed=true;
-        S.contracts.push({code:D.code,kind:'rent',status:'signed_internal',detail:true,title:'اجاره‌نامهٔ نمونه'});
+        S.contracts.push({code:D.code,kind:'rent',status:'signed_internal',detail:true,title:'اجاره‌نامهٔ نمونه',wfId:wd('rent').id,doc:{terms:{deposit:10000000000}}});
         D.term={ph:4,reason:'توافق طرفین',date:'۱۴۰۵/۰۸/۲۰',min:'تسویه شد',paid:false,ok:true};
         const was=S.contracts.at(-1).status;
         ACT.tpay();

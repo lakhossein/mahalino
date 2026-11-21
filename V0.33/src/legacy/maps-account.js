@@ -188,12 +188,11 @@ function contractWf(c){
 }
 function contractActions(c){
   var w=contractWf(c),f=w?w.data:null,T=f?f.term:null,a='';
-  var wfAttr=w?(' data-wf="'+w.id+'"'):'';
+  var wfAttr=w?(' data-wf="'+qesc(w.id)+'" data-code="'+qesc(c.code)+'"'):'';
   if(w&&MODBY[w.m]){a+='<button class="btn btn-xs" data-act="wfOpen" data-m="'+w.m+'"'+wfAttr+'>فلوی این قرارداد</button>'}
-  if(c.kind==='rent'&&f&&f.signed){
-    if(!T){a='<button class="btn btn-xs btn-primary" data-act="startTerm"'+wfAttr+'>شروع فسخ</button>'}
-    else if(!T.paid){a='<button class="btn btn-xs btn-primary" data-act="startTerm"'+wfAttr+'>ادامهٔ فسخ — '+fa(T.ph,0)+'</button>'}
-    else{a='<span class="badge b-ok">تسویه کامل</span>'}
+  if(c.kind==='rent'&&f&&f.signed&&f.code===c.code){
+    if(T&&T.paid){a='<span class="badge b-ok">تسویه کامل</span>'}
+    else if(c.status==='signed_internal')a='<button class="btn btn-xs btn-primary" data-act="startTerm"'+wfAttr+'>'+(T?'ادامهٔ فسخ — '+fa(T.ph,0):'شروع فسخ')+'</button>';
   }
   return a;
 }

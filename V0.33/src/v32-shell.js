@@ -157,8 +157,8 @@ E30.init=function(){
       }
       if(E28.ctrDone!==D.code){
         E28.ctrDone=D.code;
-        botC('قرارداد داخلی <b dir="ltr">'+esc(D.code)+'</b> ثبت شد. این ثبت رسمی نیست و در صورت نیاز می‌توانید فسخ را در همین گفت‌وگو آغاز کنید.'+
-          '<div class="racts"><button class="qbtn primary" data-cba="ctrCont" data-v="trm">شروع فسخ و تخلیه</button></div>',null);
+        var term=E28.terminationButton(kind,D);
+        botC('قرارداد داخلی <b dir="ltr">'+esc(D.code)+'</b> ثبت شد. این ثبت رسمی نیست.'+(term?'<div class="racts">'+term+'</div>':''),null);
       }
       return done;
     };

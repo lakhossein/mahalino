@@ -90,8 +90,8 @@ E28.contractOf=function(code){
   return null;
 };
 E28.applyTermination=function(code){
-  var c=E28.contractOf(code);
-  if(!c||c.status==='terminated')return false;
+  var matches=(S.contracts||[]).filter(function(c){return code&&c&&c.code===code}),c=matches[0];
+  if(matches.length!==1||c.kind!=='rent'||c.status!=='signed_internal'||(c.wfId&&c.wfId!==S.active.rent))return false;
   c.statusTrail=(c.statusTrail||[]).concat([{st:c.status||'signed_internal',t:c.t||Date.now()}]);
   c.status='terminated';
   if(c.doc)c.doc.status='terminated';
@@ -102,6 +102,11 @@ E28.applyTermination=function(code){
 E28.ctrBubble=function(){
   var kind=E28.ctrKind||'rent',D=wd(kind).data,c=conInit(D,kind);
   return '<div data-e28ctr="1">'+conFlowHTML(D,kind)+'</div>';
+};
+E28.terminationButton=function(kind,D){
+  var w=kind==='rent'&&wfOf(S.active.rent),matches=(S.contracts||[]).filter(function(c){return c&&c.code===D.code});
+  if(!w||w.data!==D||!D.signed||!D.code||matches.length!==1||matches[0].kind!=='rent'||matches[0].status!=='signed_internal'||(matches[0].wfId&&matches[0].wfId!==w.id))return '';
+  return '<button class="qbtn primary" data-cba="ctrCont" data-v="trm" data-wf="'+qesc(w.id)+'" data-code="'+qesc(D.code)+'">شروع فسخ و تخلیه</button>';
 };
 E28.ctrRefresh=function(){
   if(CURRENT!=='landing')return;
@@ -115,8 +120,8 @@ E28.ctrRefresh=function(){
   var kind=E28.ctrKind||'rent',D=wd(kind).data,c=conInit(D,kind);
   if(c.finalized&&E28.ctrDone!==c.code){
     E28.ctrDone=c.code;
-    botC(' قرارداد داخلی <b dir="ltr">'+esc(c.code)+'</b> ثبت شد. فسخ بعدی هم در همین گفت‌وگو انجام می‌شود.'+
-    '<div class="racts"><button class="qbtn primary" data-cba="ctrCont" data-v="trm">شروع فسخ و تخلیه</button><button class="qbtn" data-cv="F:reqs">درخواست‌های من</button></div>',null);
+    botC(' قرارداد داخلی <b dir="ltr">'+esc(c.code)+'</b> ثبت شد.'+
+    '<div class="racts">'+E28.terminationButton(kind,D)+'<button class="qbtn" data-cv="F:reqs">درخواست‌های من</button></div>',null);
   }
 };
 E28.ctrStart=function(kind){
@@ -127,8 +132,8 @@ E28.ctrStart=function(kind){
   if(D.ctr.finalized&&D.code)E28.ctrDone=D.code;
   botC('<b>'+(kind==='buy'?'مبایعه‌نامه':'اجاره‌نامه')+'</b> — فرم درون‌گفت‌وگو:'+E28.ctrBubble(),null);
   if(D.ctr.finalized){
-    botC(' قرارداد <b dir="ltr">'+esc(D.code||D.ctr.code||'')+'</b> ثبت شده است. فسخ هم در همین گفت‌وگو انجام می‌شود.'+
-    '<div class="racts"><button class="qbtn primary" data-cba="ctrCont" data-v="trm">شروع فسخ و تخلیه</button></div>',null);
+    var term=E28.terminationButton(kind,D);
+    botC(' قرارداد <b dir="ltr">'+esc(D.code||D.ctr.code||'')+'</b> ثبت شده است.'+(term?'<div class="racts">'+term+'</div>':''),null);
   }
 };
 var _oConKind=conKind;
@@ -138,15 +143,8 @@ conKind=function(){return (CURRENT==='landing'&&E28.ctrKind)?E28.ctrKind:_oConKi
   if(typeof o!=='function')return;
   ACT[k]=function(el){o(el);setTimeout(function(){try{E28.ctrRefresh()}catch(e){if(typeof MahalinoDiagnostics!=='undefined')MahalinoDiagnostics.record('legacy/chat-ux.js:137',e,'caught');}},30)};
 });
-CBACT.ctrCont=function(el){
-  var v=el.getAttribute('data-v');
-  if(v==='trm'){
-    var kind=E28.ctrKind||'rent',D=wd(kind).data;
-    if(CE.f!=='rent'){CE.f='rent';CE.i=0;CE.li=0;CE.hist=[]}
-    if(!D.term)D.term={ph:1,who:'مستأجر (شما)'};
-    save();ceJump('termq');
-  }
-};
+/* The Assistant's identity-validated termination dispatcher installs later. */
+CBACT.ctrCont=function(){toast('قرارداد هدف در دسترس نیست.');return false};
 
 /* ── یادآور جامع (V0.28) — مدل کامل، تشخیص خودکار، مدیریت ── */
 E28.remNorm=function(){

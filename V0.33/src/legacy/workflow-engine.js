@@ -481,8 +481,20 @@ function rentCalc(D){
   var depNeed=D.B.rentB<rent?Math.round(D.B.rentB/0.03):null;
   return {rent:rent,depNeed:depNeed,mon:rent+D.B.chg};
 }
+function signedRentalDoc(D){
+  var matches=(S.contracts||[]).filter(function(c){return D&&D.code&&c&&c.code===D.code}),c=matches[0];
+  if(matches.length!==1||c.kind!=='rent'||!D.signed||(c.wfId&&c.wfId!==S.active.rent))return null;
+  if(c.doc&&c.doc.terms)return c.doc;
+  var draft=D.ctr;
+  return draft&&draft.finalized&&draft.kind==='rent'&&draft.code===D.code?{terms:draft.terms,lessor:draft.parties&&draft.parties.lessor,lessee:draft.parties&&draft.parties.lessee}:null;
+}
+function rentalSettlementDeposit(D){
+  var doc=signedRentalDoc(D),amount=doc&&doc.terms&&doc.terms.deposit;
+  return amount!==null&&amount!==undefined&&amount!==''&&Number.isFinite(Number(amount))&&Number(amount)>=0?Number(amount):null;
+}
 function termTpl(T,D){
-  return 'صورت‌جلسهٔ فسخ قرارداد '+D.code+'\nطرفین: موجر '+D.owner+' و مستأجر '+S.auth.name+'\nدرخواست‌کنندهٔ فسخ: '+T.who+'\nدلیل: '+T.reason+'\nزمان تخلیه: '+T.date+'\nشرایط تحویل:\n۱- تحویل مطابق صورت‌جلسهٔ آغاز\n۲- تسویهٔ روزشمار شارژ و قبوض\n۳- بررسی وضعیت با هوش مصنوعی\n۴- بازگشت ودیعه از حساب امانی';
+  var doc=signedRentalDoc(D),owner=doc&&doc.lessor&&doc.lessor.name,tenant=doc&&doc.lessee&&doc.lessee.name;
+  return 'صورت‌جلسهٔ فسخ قرارداد '+D.code+'\nطرفین: موجر '+(owner||'نامشخص')+' و مستأجر '+(tenant||'نامشخص')+'\nدرخواست‌کنندهٔ فسخ: '+T.who+'\nدلیل: '+T.reason+'\nزمان تخلیه: '+T.date+'\nشرایط تحویل:\n۱- تحویل مطابق صورت‌جلسهٔ آغاز\n۲- تسویهٔ روزشمار شارژ و قبوض\n۳- بررسی وضعیت با هوش مصنوعی\n۴- بازگشت ودیعه از حساب امانی';
 }
 function termSteps(T){
   var TS=['درخواست فسخ','صورت‌جلسه','تأیید طرف مقابل','تخلیهٔ هوشمند','تسویه ودیعه'];

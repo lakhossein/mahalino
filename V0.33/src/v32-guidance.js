@@ -646,10 +646,11 @@ E30.guide=(function(){
       var code=el.getAttribute('data-code');return startTermination(rentalTarget(code),code);
     };
     ACT.startTerm=function(el){
-      var id=el&&el.getAttribute('data-wf'),w=id&&wfOf(id),code=w&&w.data&&w.data.code;
-      if(!w||rentalTarget(code)!==w){toast('قرارداد انتخابی دیگر در دسترس نیست.');return false}
+      var id=el&&el.getAttribute('data-wf'),w=id&&wfOf(id),code=el&&el.getAttribute('data-code');
+      if(!w||!code||rentalTarget(code)!==w){toast('قرارداد انتخابی دیگر در دسترس نیست.');return false}
       return startTermination(w,code);
     };
+    CBACT.ctrCont=ACT.startTerm;
     CBACT.e30StartRent=function(){return selectService('contract-start')};
     ['e30ValOpen','e30RequestService','e30RequestGRT'].forEach(function(key){
       var original=CBACT[key];if(typeof original!=='function')return;
